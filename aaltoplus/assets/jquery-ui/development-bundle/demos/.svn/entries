@@ -1,0 +1,168 @@
+10
+
+dir
+117
+svn+ssh://vkaravir@hutcs.cs.hut.fi/home/tarkoski/aaltoplus_svn/Aaltoplus/aaltoplus/assets/jquery-ui/development-bundle/demos
+svn+ssh://vkaravir@hutcs.cs.hut.fi/home/tarkoski/aaltoplus_svn
+
+
+
+2011-12-01T10:57:45.159587Z
+2
+tarkoski
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+e9d832e7-45de-6a8b-f475-936ee54e8b6c
+
+resizable
+dir
+
+show
+dir
+
+toggle
+dir
+
+slider
+dir
+
+removeClass
+dir
+
+switchClass
+dir
+
+progressbar
+dir
+
+tabs
+dir
+
+effect
+dir
+
+demos.css
+file
+
+
+
+
+2011-12-01T13:15:46.000000Z
+2e2ec04700af4ac5681a956cfe405c47
+2011-12-01T10:57:45.159587Z
+2
+tarkoski
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+14338
+
+dialog
+dir
+
+autocomplete
+dir
+
+accordion
+dir
+
+selectable
+dir
+
+position
+dir
+
+images
+dir
+
+toggleClass
+dir
+
+droppable
+dir
+
+draggable
+dir
+
+hide
+dir
+
+index.html
+file
+
+
+
+
+2011-12-01T13:15:46.000000Z
+68cc2555b21e07d67924f61c19015367
+2011-12-01T10:57:45.159587Z
+2
+tarkoski
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+14152
+
+datepicker
+dir
+
+button
+dir
+
+sortable
+dir
+
+animate
+dir
+
+addClass
+dir
+
