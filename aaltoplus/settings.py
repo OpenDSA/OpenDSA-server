@@ -19,10 +19,10 @@ XS_SHARING_ALLOWED_HEADERS = ["Content-Type"]
 APPEND_SLASH=False
 
 # This URL is used when building absolute URLs to this service
-BASE_URL = "http://128.173.55.223:8080"
+BASE_URL = ""
 
 ADMINS = (
-     ('efouh', 'efouh@cs.vt.edu'),
+     ('', ''),
 )
 
 MANAGERS = ADMINS
@@ -30,9 +30,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'opendsa',         #g3et_path('test.db'),            # Or path to database file if using sqlite3.
-        'USER': 'root',                  # Not used with sqlite3.
-        'PASSWORD': 'mad31eric',                  # Not used with sqlite3.
+        'NAME': '',         #g3et_path('test.db'),            # Or path to database file if using sqlite3.
+        'USER': '',                  # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
