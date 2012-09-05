@@ -8,13 +8,15 @@ from tastypie.serializers import Serializer
 from tastypie.http import HttpUnauthorized, HttpForbidden  
 
 # ODSA 
-from opendsa.models import Exercise, UserExercise, ProblemLog 
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData  
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout 
 from django.contrib.auth.models import User
 from django.utils import simplejson 
 from django.contrib.sessions.models import Session
+from django.http import HttpResponse
+
 
 from exercises import attempt_problem, make_wrong_attempt
 
@@ -117,8 +119,6 @@ class UserexerciseResource(ModelResource):
         resource_name   = 'user/exercise'
         excludes        = []
         
-        # TODO: In this version, only GET requests are accepted and no 
-        # permissions are checked.
         allowed_methods = ['get','post']
         authentication  = Authentication()
         authorization   = ReadOnlyAuthorization()
@@ -126,37 +126,32 @@ class UserexerciseResource(ModelResource):
         return [
             url(r"^(?P<resource_name>%s)/attempt%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logexercise'), name="api_logexe"),
         ]
+    def listlogs():
+        return UserExercise.objects.all() 
+ 
     def logexercise(self, request, **kwargs):
 
         if request.POST['user']:    #request.user:
             kexercise = Exercise.objects.get(name= request.POST['sha1'])  
             kusername = User.objects.get(username=request.POST['user']) 
-            print '---'
-            print request
-            print kusername.id   
-            print '---'
-            user_exercise = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise)  
+            user_exercise = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise) 
+            user_data, created = UserData.objects.get_or_create(user=kusername) 
             if user_exercise:
-                 review_mode = request.POST['review_mode'] 
-                 problem_number = 1  
-                 user_exercise = attempt_problem(
-                    kusername,
+                 user_exercise,correct = attempt_problem(
+                    user_data,  #kusername,
                     user_exercise,
-                    problem_number,
                     request.POST['attempt_number'],
-                    request.POST['attempt_content'],
-                    request.POST['sha1'],
-                    request.POST['seed'],
                     request.POST['complete'],
                     request.POST['count_hints'],
                     int(request.POST['time_taken']),
-                    review_mode,
-                    0, #request.POST['non_summative'],
-                    request.POST['problem_type'],
                     request.META['REMOTE_ADDR'],
                     )
-                 return user_exercise
-        return 'unauthorize response' 
+                 if correct:
+                    return  self.create_response(request, user_exercise) 
+                 else:
+                    return  self.create_response(request, {'error': 'attempt not logged'})   
+        return self.create_response(request, {'error': 'unauthorized action'})
+ 
  
     def obj_create(self, bundle, request=None, **kwargs):
         try:
@@ -173,7 +168,7 @@ class ProblemlogResource(ModelResource):
     def determine_format(self, request):
         return "application/json"
     class Meta:
-        queryset        = ProblemLog.objects.all()
+        queryset        = UserExerciseLog.objects.all()
         resource_name   = 'problemlog'
         excludes        = []
 
@@ -181,4 +176,19 @@ class ProblemlogResource(ModelResource):
         # permissions are checked.
         allowed_methods = ['get']
         authentication  = Authentication()
-        authorization   = ReadOnlyAuthorization()
+        authorization   = ReadOnlyAuthorization()  
+
+class UserExerciseSummaryResource(ModelResource):
+    #instances           = fields.ToManyField('course.api.CourseInstanceResource', 'instances')
+    def determine_format(self, request):
+        return "application/json"
+    class Meta:
+        queryset        = UserExercise.objects.all()
+        resource_name   = 'userlog'
+        excludes        = []
+
+        # TODO: In this version, only GET requests are accepted and no
+        # permissions are checked.
+        allowed_methods = ['get']
+        authentication  = Authentication()
+        authorization   = ReadOnlyAuthorization() 
