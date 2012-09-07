@@ -31,17 +31,30 @@ class Exercise(models.Model):
     streak = models.IntegerField()
 
 
-class UserExercise(models.Model):
 
-    user = models.ForeignKey(User)    
-    exercise =  models.ForeignKey(Exercise) #models.CharField(max_length=60)
-    streak = models.IntegerField(default = 0)
-    longest_streak = models.IntegerField(default = 0)
+class Module(models.Model):
+
+     short_display_name = models.CharField(max_length=50)  #name
+     name = models.TextField()  #decription 
+     covers = models.TextField() 
+     author = models.CharField(max_length=50)  
+     creation_date = models.DateTimeField(default="2012-01-01 00:00:00") 
+     h_position = models.IntegerField(default = 0)
+     v_position = models.IntegerField(default = 0) 
+     last_modified = models.DateTimeField(default="2012-01-01 00:00:00") 
+     prerequisites = models.TextField() 
+     raw_html = models.TextField()   
+     exercise_list = models.TextField() 
+
+
+class UserModule(models.Model):
+
+    user = models.ForeignKey(User)
+    module =  models.ForeignKey(Module) #models.CharField(max_length=60)
     first_done = models.DateTimeField(auto_now_add=True)
     last_done = models.DateTimeField(auto_now_add=True)
-    total_done = models.IntegerField(default = 0)
-    total_correct = models.IntegerField(default = 0)
-    proficient_date = models.DateTimeField(default="2012-01-01 00:00:00")
+    proficient_date = models.DateTimeField(default="2012-01-01 00:00:00") 
+
 
 
 
@@ -179,7 +192,12 @@ class UserData(models.Model):
     def is_proficient_at(self, exid, exgraph=None):
         if self.all_proficient_exercises is None:
             return False
-        return (exid in self.all_proficient_exercises.split(','))
+        prof_ex =[]
+        for ex in self.all_proficient_exercises.split(','):
+            if ex.isdigit():
+              number = int(ex)
+              prof_ex.append(int(ex))
+        return (exid.id in prof_ex)
 
     def is_explicitly_proficient_at(self, exid):
         return (exid in self.proficient_exercises)
@@ -373,3 +391,30 @@ class UserExerciseLog(models.Model):
 
         logging.info(problem_log.time_ended())
         problem_log.put()
+
+
+
+class UserExercise(models.Model):
+
+    user = models.ForeignKey(User)
+    exercise =  models.ForeignKey(Exercise) #models.CharField(max_length=60)
+    streak = models.IntegerField(default = 0)
+    longest_streak = models.IntegerField(default = 0)
+    first_done = models.DateTimeField(auto_now_add=True)
+    last_done = models.DateTimeField(auto_now_add=True)
+    total_done = models.IntegerField(default = 0)
+    total_correct = models.IntegerField(default = 0)
+    proficient_date = models.DateTimeField(default="2012-01-01 00:00:00")
+
+    def update_proficiency_ka(self, correct):
+        exercise = Exercise.objects.get(pk=self.exercise_id)
+        user_data = UserData.objects.get(user=self.user)
+        dt_now = datetime.datetime.now() 
+        if correct and (self.longest_streak >= exercise.streak):
+           self.proficient_date = dt_now
+           
+           user_data.proficient_exercises += "%s," %self.exercise_id
+           user_data.all_proficient_exercises += "%s," %self.exercise_id 
+           user_data.save() 
+           return True
+        return False  
