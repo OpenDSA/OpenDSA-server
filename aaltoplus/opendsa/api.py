@@ -125,6 +125,7 @@ class UserexerciseResource(ModelResource):
     def override_urls(self):
         return [
             url(r"^(?P<resource_name>%s)/attempt%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logexercise'), name="api_logexe"),
+            url(r"^(?P<resource_name>%s)/hint%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logexercisehint'), name="api_logexeh"),
         ]
     def listlogs():
         return UserExercise.objects.all() 
@@ -134,7 +135,7 @@ class UserexerciseResource(ModelResource):
         if request.POST['user']:    #request.user:
             kexercise = Exercise.objects.get(name= request.POST['sha1'])  
             kusername = User.objects.get(username=request.POST['user']) 
-            user_exercise = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise) 
+            user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise) 
             user_data, created = UserData.objects.get_or_create(user=kusername) 
             if user_exercise:
                  user_exercise,correct = attempt_problem(
@@ -152,7 +153,30 @@ class UserexerciseResource(ModelResource):
                     return  self.create_response(request, {'error': 'attempt not logged'})   
         return self.create_response(request, {'error': 'unauthorized action'})
  
- 
+    def logexercisehint(self, request, **kwargs):
+
+        if request.POST['user']:    #request.user:
+            kexercise = Exercise.objects.get(name= request.POST['sha1'])
+            kusername = User.objects.get(username=request.POST['user'])
+            user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise)
+            user_data, created = UserData.objects.get_or_create(user=kusername)
+            if user_exercise:
+                 user_exercise,correct = attempt_problem(
+                    user_data,  #kusername,
+                    user_exercise,
+                    request.POST['attempt_number'],
+                    request.POST['complete'],
+                    request.POST['count_hints'],
+                    int(request.POST['time_taken']),
+                    request.META['REMOTE_ADDR'],
+                    )
+                 if correct:
+                    return  self.create_response(request, user_exercise)
+                 else:
+                    return  self.create_response(request, {'error': 'attempt not logged'})
+        return self.create_response(request, {'error': 'unauthorized action'})
+
+
     def obj_create(self, bundle, request=None, **kwargs):
         try:
             bundle = super(CreateUserResource, self).obj_create(bundle, request, **kwargs)
@@ -177,6 +201,46 @@ class ProblemlogResource(ModelResource):
         allowed_methods = ['get']
         authentication  = Authentication()
         authorization   = ReadOnlyAuthorization()  
+
+
+
+
+class UserDataResource(ModelResource):
+    #instances           = fields.ToManyField('course.api.CourseInstanceResource', 'instances')
+    def determine_format(self, request):
+        return "application/json"
+    class Meta:
+        queryset        = UserData.objects.all()
+        resource_name   = 'userdata'
+        excludes        = []
+
+        # TODO: In this version, only GET requests are accepted and no
+        # permissions are checked.
+        allowed_methods = ['get','post']
+        authentication  = Authentication()
+        authorization   = ReadOnlyAuthorization()
+    def override_urls(self):
+        return [
+            url(r"^(?P<resource_name>%s)/isproficient%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('isproficient'), name="api_exeproficient"),
+        ]
+     
+    def isproficient(self, request, **kwargs):
+
+        if request.POST['user']:    #request.user:
+            kexercise = Exercise.objects.get(name= request.POST['exercise'])
+            kusername = User.objects.get(username=request.POST['user'])
+            user_data = UserData.objects.get(user=kusername)
+            return self.create_response(request, {'proficient': user_data.is_proficient_at(kexercise)}) 
+        return self.create_response(request, {'proficient': 'false'})
+
+
+
+
+
+
+
+
+
 
 class UserExerciseSummaryResource(ModelResource):
     #instances           = fields.ToManyField('course.api.CourseInstanceResource', 'instances')

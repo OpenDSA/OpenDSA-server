@@ -35,20 +35,19 @@ def attempt_problem(user_data, user_exercise, attempt_number,
     completed, count_hints, time_taken,
     ip_address):
 
-    if user_exercise[0]:   # and user_exercise.belongs_to(user_data):
-      
+    if user_exercise:   # and user_exercise.belongs_to(user_data):
+        print user_exercise  
         dt_now = datetime.datetime.now()
-        print user_exercise
-        exercise = user_exercise[0].exercise
-        user_exercise[0].last_done = dt_now
+        exercise = user_exercise.exercise 
+        user_exercise.last_done = dt_now
         # Build up problem log for deferred put
         problem_log = models.UserExerciseLog(
                 user=user_data, 
-                exercise=user_exercise[0].exercise,
+                exercise=user_exercise.exercise,
                 time_taken=time_taken,
                 time_done=dt_now,
                 count_hints=count_hints,
-                hint_used=count_hints > 0,
+                hint_used=int(count_hints) > 0,
                 correct=completed and not str2bool(count_hints) and (int(attempt_number) == 1),
                 count_attempts=attempt_number,
                 ip_address=ip_address,
@@ -57,7 +56,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
 
         first_response = (attempt_number == 1 and count_hints == 0) or (count_hints == 1 and attempt_number == 0)
 
-        if user_exercise[0].total_done > 0 and user_exercise[0].streak == 0 and first_response:
+        if user_exercise.total_done > 0 and user_exercise.streak == 0 and first_response:
             bingo('hints_keep_going_after_wrong')
 
         just_earned_proficiency = False
@@ -68,11 +67,12 @@ def attempt_problem(user_data, user_exercise, attempt_number,
         #         user_data, current_user=True) or StrugglingExperiment.DEFAULT
         if completed:
 
-            user_exercise[0].total_done += 1
+            user_exercise.total_done += 1
 
             if problem_log.correct:
 
-                proficient = user_data.is_proficient_at(user_exercise[0].exercise)
+                proficient = user_data.is_proficient_at(user_exercise.exercise)
+
                 #explicitly_proficient = user_data.is_explicitly_proficient_at(user_exercise[0].exercise)
                 #suggested = user_data.is_suggested(user_exercise[0].exercise)
                 #problem_log.suggested = suggested
@@ -81,12 +81,15 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 #user_data.add_points(problem_log.points_earned)
 
                 # Streak only increments if problem was solved correctly (on first attempt)
-                user_exercise[0].total_correct += 1
-                user_exercise[0].streak += 1
-                user_exercise[0].longest_streak = max(user_exercise[0].longest_streak, user_exercise[0].streak)
+                user_exercise.total_correct += 1
+                user_exercise.streak += 1
+                user_exercise.longest_streak = max(user_exercise.longest_streak, user_exercise.streak)
 
-                #user_exercise[0].update_proficiency_model(correct=True)
-
+                if not proficient: 
+                    if exercise.ex_type == 'ka':
+                        problem_log.earned_proficiency = user_exercise.update_proficiency_ka(correct=True)
+                    
+   
 #                bingo('struggling_problems_correct')
 
 #                if user_exercise[0].progress >= 1.0 and not explicitly_proficient:
@@ -123,7 +126,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
         else:
             # Only count wrong answer at most once per problem
             if first_response:
-                user_exercise[0].update_proficiency_model(correct=False)
+                user_exercise.update_proficiency_model(correct=False)
                 bingo(['hints_wrong_problems', 'struggling_problems_wrong'])
 
 #            if user_exercisei[0].is_struggling(struggling_model):
@@ -155,5 +158,5 @@ def attempt_problem(user_data, user_exercise, attempt_number,
 #                       _queue="log-summary-queue",
 #                       _url="/_ah/queue/deferred_log_summary")
         problem_log.save()
-        return user_exercise[0].save(),True      #, user_exercise_graph, goals_updated
+        return user_exercise.save(),True      #, user_exercise_graph, goals_updated
         
