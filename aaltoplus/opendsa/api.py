@@ -8,7 +8,7 @@ from tastypie.serializers import Serializer
 from tastypie.http import HttpUnauthorized, HttpForbidden  
 
 # ODSA 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData  
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module   
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout 
@@ -18,7 +18,7 @@ from django.contrib.sessions.models import Session
 from django.http import HttpResponse
 
 
-from exercises import attempt_problem, make_wrong_attempt
+from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action 
 
 
 
@@ -126,12 +126,49 @@ class UserexerciseResource(ModelResource):
         return [
             url(r"^(?P<resource_name>%s)/attempt%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logexercise'), name="api_logexe"),
             url(r"^(?P<resource_name>%s)/hint%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logexercisehint'), name="api_logexeh"),
+            url(r"^(?P<resource_name>%s)/attemptpe%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logpeexercise'), name="api_logpeexe"),
+            url(r"^(?P<resource_name>%s)/avbutton%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logavbutton'), name="api_logavbutt"),
         ]
+
     def listlogs():
         return UserExercise.objects.all() 
+
+    def logavbutton(self, request, **kwargs):
+        print request 
+        if request.POST['username']:   
+            action =   request.POST['actions']
+            actions = simplejson.loads(action)
+            pe_name = get_pe_name_from_referer(request.META['HTTP_REFERER'])
+            number_logs = 0
+            for act in actions:
+               kexercise, result = Exercise.objects.get_or_create(name = act['av'], author='',ex_type='pe', streak=1)              #(name= pe_name)                            #act['av'])  # request.POST['sha1'])
+               kusername = User.objects.get(username=request.POST['username'])
+               #user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise)
+               user_data, created = UserData.objects.get_or_create(user=kusername)
+               module = Module.objects.get(name='Shellsort') 
+               if kexercise:
+                 user_button,correct = log_button_action(
+                    kusername,  #kusername,
+                    kexercise,
+                    module,
+                    act['type'],
+                    'description', 
+                    act['tstamp'],
+                    request.META['REMOTE_ADDR'],
+                    )
+                 if correct:
+                    number_logs += 1 #return  self.create_response(request, user_button)
+            
+            if number_logs == len(actions):
+                return  self.create_response(request,  {'message': 'all button action logged'})
+            else:
+                    return  self.create_response(request, {'error': 'not all button action logged'})
+        return self.create_response(request, {'error': 'unauthorized action'})
+
+
  
     def logexercise(self, request, **kwargs):
-
+        print request 
         if request.POST['user']:    #request.user:
             kexercise = Exercise.objects.get(name= request.POST['sha1'])  
             kusername = User.objects.get(username=request.POST['user']) 

@@ -9,8 +9,9 @@ import logging
 import datetime
 import models
 import simplejson as json
+import time
 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -23,6 +24,15 @@ from django.contrib.sessions.models import Session
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
 
+
+def get_pe_name_from_referer(referer):
+    tab = referer.split('/')
+    print tab[len(tab)-1].split('.')[0] 
+    return tab[len(tab)-1].split('.')[0]
+
+def date_from_timestamp(tstamp):
+    date = datetime.datetime.fromtimestamp(tstamp/1000)
+    return date.strftime('%Y-%m-%d %H:%M:%S')
 
 def make_wrong_attempt(user_data, user_exercise):
     if user_exercise and user_exercise.belongs_to(user_data):
@@ -90,38 +100,6 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                         problem_log.earned_proficiency = user_exercise.update_proficiency_ka(correct=True)
                     
    
-#                bingo('struggling_problems_correct')
-
-#                if user_exercise[0].progress >= 1.0 and not explicitly_proficient:
-#                    bingo(['hints_gained_proficiency_all',
-#                           'struggling_gained_proficiency_all',
-#                           'homepage_restructure_gained_proficiency_all'])
-#                    if not user_exercise[0].has_been_proficient():
-#                        bingo('hints_gained_new_proficiency')
-
-#                    if user_exercise.history_indicates_struggling(struggling_model):
-#                        bingo('struggling_gained_proficiency_post_struggling')
-
-#                    user_exercise[0].set_proficient(user_data)
-#                    user_data.reassess_if_necessary()
-
-#                    just_earned_proficiency = True
-#                    problem_log.earned_proficiency = True
-
-#            util_badges.update_with_user_exercise(
-#                user_data,
-#                user_exercise,
-#                include_other_badges=True,
-#                action_cache=last_action_cache.LastActionCache.get_cache_and_push_problem_log(user_data, problem_log))
-
-            # Update phantom user notifications
-#            util_notify.update(user_data, user_exercise)
-
-#            bingo([
-#                'hints_problems_done',
-#                'struggling_problems_done',
-#                'homepage_restructure_problems_done',
-#            ])
 
         else:
             # Only count wrong answer at most once per problem
@@ -129,34 +107,23 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 user_exercise.update_proficiency_model(correct=False)
                 bingo(['hints_wrong_problems', 'struggling_problems_wrong'])
 
-#            if user_exercisei[0].is_struggling(struggling_model):
-#                bingo('struggling_struggled_binary')
-
-        # If this is the first attempt, update review schedule appropriately
-#        if attempt_number == 1:
-#            user_exercise[0].schedule_review(completed)
-
-#        user_exercise_graph = models.UserExerciseGraph.get_and_update(user_data, user_exercise)
-
-#        goals_updated = GoalList.update_goals(user_data,
-#            lambda goal: goal.just_did_exercise(user_data, user_exercise,
-#                just_earned_proficiency))
-
-        # Bulk put
-#        db.put([user_data, user_exercise, user_exercise_graph.cache])
-
-        # Defer the put of ProblemLog for now, as we think it might be causing hot tablets
-        # and want to shift it off to an automatically-retrying task queue.
-        # http://ikaisays.com/2011/01/25/app-engine-datastore-tip-monotonically-increasing-values-are-bad/
-#        deferred.defer(models.commit_problem_log, problem_log,
-#                       _queue="problem-log-queue",
-#                       _url="/_ah/queue/deferred_problemlog")
-
-#        if user_data is not None and user_data.coaches:
-#            # Making a separate queue for the log summaries so we can clearly see how much they are getting used
-#            deferred.defer(models.commit_log_summary_coaches, problem_log, user_data.coaches,
-#                       _queue="log-summary-queue",
-#                       _url="/_ah/queue/deferred_log_summary")
         problem_log.save()
         return user_exercise.save(),True      #, user_exercise_graph, goals_updated
+
+
+def log_button_action( user, exercise, module, name, description, action_time, ip_address):
+    button_log = models.UserButton(
+                        user = user,
+                        exercise = exercise,
+                        module = module,
+                        name = name,
+                        description = description,
+                        action_time =  date_from_timestamp(action_time),
+                        ip_address = ip_address) 
+
+
+
+
+    return button_log.save(),True  
+
         

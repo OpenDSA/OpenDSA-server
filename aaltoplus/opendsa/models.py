@@ -47,6 +47,17 @@ class Module(models.Model):
      exercise_list = models.TextField() 
 
 
+class UserButton(models.Model):
+     user = models.ForeignKey(User) 
+     exercise = models.ForeignKey(Exercise)
+     module =  models.ForeignKey(Module)
+     name = models.CharField(max_length=50)
+     description = models.TextField() 
+     action_time = models.DateTimeField(default="2000-01-01 00:00:00")
+     ip_address = models.CharField(max_length=20)
+
+
+
 class UserModule(models.Model):
 
     user = models.ForeignKey(User)
@@ -83,113 +94,8 @@ class UserData(models.Model):
     #has_current_goals = models.BooleanField(default=False)
 
 
-    @property
-    def seconds_since_joined(self):
-        return util.seconds_since(self.joined)
 
-    @staticmethod
-    #@request_cache.cache_with_key_fxn(lambda user_id: "UserData_user_id:%s" % user_id)
-    def get_from_user_id(user_id):
-        if not user_id:
-            return None
-
-        query = UserData.all()
-        query.filter('user_id =', user_id)
-        query.order('-points') # Temporary workaround for issue 289
-        return query.get()
-
-    @staticmethod
-    def get_from_user_input_email(email):
-        if not email:
-            return None
-
-        query = UserData.all()
-        query.filter('user_email =', email)
-        query.order('-points') # Temporary workaround for issue 289
-
-        return query.get()
-
-    @staticmethod
-    def get_from_username(username):
-        if not username:
-            return None
-        canonical_username = UniqueUsername.get_canonical(username)
-        if not canonical_username:
-            return None
-        query = UserData.all()
-        query.filter('username =', canonical_username.username)
-        return query.get()
-
-    @staticmethod
-    def get_from_models_key_email(email):
-        if not email:
-            return None
-
-        query = UserData.all()
-        query.filter('user =', users.User(email))
-        query.order('-points') # Temporary workaround for issue 289
-
-        return query.get()
-
-    @staticmethod
-    def get_from_username_or_email(username_or_email):
-        if not username_or_email:
-            return None
-
-        user_data = None
-
-        if UniqueUsername.is_valid_username(username_or_email):
-            user_data = UserData.get_from_username(username_or_email)
-        else:
-            user_data = UserData.get_possibly_current_user(username_or_email)
-
-        return user_data
-
-
-    def get_or_insert_exercise(self, exercise, allow_insert = True):
-        if not exercise:
-            return None
-
-        exid = exercise.name
-        userExercise = UserExercise.get_by_key_name(exid, parent=self)
-
-        if not userExercise:
-            # There are some old entities lying around that don't have keys.
-            # We have to check for them here, but once we have reparented and rekeyed legacy entities,
-            # this entire function can just be a call to .get_or_insert()
-            query = UserExercise.all(keys_only = True)
-            query.filter('user =', self.user)
-            query.filter('exercise =', exid)
-            query.order('-total_done') # Temporary workaround for issue 289
-
-            # In order to guarantee consistency in the HR datastore, we need to query
-            # via models.get for these old, parent-less entities.
-            key_user_exercise = query.get()
-            if key_user_exercise:
-                userExercise = UserExercise.get(str(key_user_exercise))
-
-        if allow_insert and not userExercise:
-            userExercise = UserExercise.get_or_insert(
-                key_name=exid,
-                parent=self,
-                user=self.user,
-                exercise=exid,
-                exercise_model=exercise,
-                streak=0,
-                _progress=0.0,
-                longest_streak=0,
-                first_done=datetime.datetime.now(),
-                last_done=None,
-                total_done=0,
-                summative=exercise.summative,
-                _accuracy_model=AccuracyModel(),
-                )
-
-        return userExercise
-
-
-
-    def is_proficient_at(self, exid, exgraph=None):
+    def is_proficient_at(self, exid):
         if self.all_proficient_exercises is None:
             return False
         prof_ex =[]
@@ -199,60 +105,7 @@ class UserData(models.Model):
               prof_ex.append(int(ex))
         return (exid.id in prof_ex)
 
-    def is_explicitly_proficient_at(self, exid):
-        return (exid in self.proficient_exercises)
 
-    def is_suggested(self, exid):
-        self.reassess_if_necessary()
-        return (exid in self.suggested_exercises)
-
-    def get_students_data(self):
-        coach_email = self.key_email
-        query = UserData.all().filter('coaches =', coach_email)
-        students_data = [s for s in query.fetch(1000)]
-
-        if coach_email.lower() != coach_email:
-            students_set = set([s.key().id_or_name() for s in students_data])
-            query = UserData.all().filter('coaches =', coach_email.lower())
-            for student_data in query:
-                if student_data.key().id_or_name() not in students_set:
-                    students_data.append(student_data)
-        return students_data
-
-    def record_activity(self, dt_activity):
-
-        # Make sure last_activity and start_consecutive_activity_date have values
-        self.last_activity = self.last_activity or dt_activity
-        self.start_consecutive_activity_date = self.start_consecutive_activity_date or dt_activity
-
-        if dt_activity > self.last_activity:
-
-            # If it has been over 40 hours since we last saw this user, restart
-            # the consecutive activity streak.
-            #
-            # We allow for a lenient 40 hours in order to offer kinder timezone
-            # interpretation.
-            #
-            # 36 hours wasn't quite enough. A user with activity at 8am on
-            # Monday and 8:15pm on Tuesday would not have consecutive days of
-            # activity.
-            #
-            # See http://meta.stackoverflow.com/questions/55483/proposed-consecutive-days-badge-tracking-change
-            if util.hours_between(self.last_activity, dt_activity) >= 40:
-                self.start_consecutive_activity_date = dt_activity
-
-            self.last_activity = dt_activity
-
-    def current_consecutive_activity_days(self):
-        if not self.last_activity or not self.start_consecutive_activity_date:
-            return 0
-        dt_now = datetime.datetime.now()
-
-        # If it has been over 40 hours since last activity, bail.
-        if util.hours_between(self.last_activity, dt_now) >= 40:
-            return 0
-
-        return (self.last_activity - self.start_consecutive_activity_date).days
 
     def add_points(self, points):
         if self.points is None:
@@ -291,16 +144,6 @@ class UserExerciseLog(models.Model):
 #            self.random_float = random.random()
         models.Model.put(self)
 
-    @staticmethod
-    def get_for_user_data_between_dts(user_data, dt_a, dt_b):
-        query = UserExerciseLog.all()
-        query.filter('user =', user_data.user)
-        query.filter('time_done >=', dt_a)
-        query.filter('time_done <', dt_b)
-
-        query.order('time_done')
-
-        return query
     def time_taken_capped_for_reporting(self):
         # For reporting's sake, we cap the amount of time that you can be considered to be
         # working on a single problem at 60 minutes. If you've left your browser open
