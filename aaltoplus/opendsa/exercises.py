@@ -111,6 +111,62 @@ def attempt_problem(user_data, user_exercise, attempt_number,
         return user_exercise.save(),True      #, user_exercise_graph, goals_updated
 
 
+
+def attempt_problem_pe(user_data, user_exercise, attempt_number,
+    completed, time_taken, fix, undo, correct, student, total, ip_address):
+
+    if user_exercise:   # and user_exercise.belongs_to(user_data):
+        print user_exercise
+        dt_now = datetime.datetime.now()
+        exercise = user_exercise.exercise
+        user_exercise.last_done = dt_now
+        count_hints=0
+        # Build up problem log for deferred put
+        problem_log = models.UserExerciseLog(
+                user=user_data,
+                exercise=user_exercise.exercise,
+                time_taken=time_taken,
+                time_done=dt_now,
+                count_hints=count_hints,
+                hint_used=int(count_hints) > 0,
+                correct=total> user_exercise.streak,
+                count_attempts=attempt_number,
+                ip_address=ip_address,
+        )
+
+
+
+        just_earned_proficiency = False
+
+
+        user_exercise.total_done += 1
+
+        if problem_log.correct:
+
+                proficient = user_data.is_proficient_at(user_exercise.exercise)
+
+                problem_log.points_earned = total   
+                user_exercise.total_correct += 1
+                user_exercise.longest_streak = max(user_exercise.longest_streak, total)
+
+                if not proficient:
+                        problem_log.earned_proficiency =total> user_exercise.streak 
+
+
+        problem_log.save()  
+        pe_log = models.UserProfExerciseLog( 
+                                             problem_log=problem_log,  #user_exercise,
+                                             student = student,
+                                             correct = correct,
+                                             fix =fix,
+                                             undo = undo, 
+                                             total = total)
+
+        pe_log.save()  
+        return user_exercise.save(),True  
+
+
+
 def log_button_action( user, exercise, module, name, description, action_time, ip_address):
     button_log = models.UserButton(
                         user = user,

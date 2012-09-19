@@ -1,14 +1,14 @@
 # Tastypie
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 from tastypie.authentication import Authentication, OAuthAuthentication
-from tastypie.authorization import DjangoAuthorization, ReadOnlyAuthorization
+from tastypie.authorization import DjangoAuthorization, ReadOnlyAuthorization, Authorization 
 from tastypie import fields
 from tastypie.utils import trailing_slash
 from tastypie.serializers import Serializer
 from tastypie.http import HttpUnauthorized, HttpForbidden  
 
 # ODSA 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module   
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module, Feedback    
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout 
@@ -18,7 +18,7 @@ from django.contrib.sessions.models import Session
 from django.http import HttpResponse
 
 
-from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action 
+from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, attempt_problem_pe 
 
 
 
@@ -104,6 +104,37 @@ class ExerciseResource(ModelResource):
             'name': ('exact',), 
         }
  
+class FeedbackResource(ModelResource): 
+      
+    def determine_format(self, request):
+        return "application/json"
+
+    class Meta:
+        queryset        = Feedback.objects.all()
+        resource_name   = 'feedback'
+        excludes        = []
+
+        allowed_methods = ['get','post']
+        authentication  = Authentication()
+        authorization   = Authorization()   #ReadOnlyAuthorization()  
+
+    def override_urls(self):
+        return [
+            url(r"^(?P<resource_name>%s)/feedback%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logfeedback'), name="api_logfb"),
+    ]
+#    def logfeedback(self, request, **kwargs):
+#            print 'toto'    #request.META['REMOTE_ADDR']   
+#            feedback, created = Feedback.objects.create(name=kusername)
+#                    request.META['REMOTE_ADDR'],
+#                 if correct:
+#                    return  self.create_response(request, user_exercise)
+#                 else:
+#                    return  self.create_response(request, {'error': 'attempt not logged'})
+#        return self.create_response(request, {'error': 'unauthorized action'})
+
+
+
+
 class UserexerciseResource(ModelResource):
     #course_modules      = fields.ToManyField('exercise.api.CourseModuleResource', 'course_modules')
     
@@ -126,7 +157,7 @@ class UserexerciseResource(ModelResource):
         return [
             url(r"^(?P<resource_name>%s)/attempt%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logexercise'), name="api_logexe"),
             url(r"^(?P<resource_name>%s)/hint%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logexercisehint'), name="api_logexeh"),
-            url(r"^(?P<resource_name>%s)/attemptpe%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logpeexercise'), name="api_logpeexe"),
+            url(r"^(?P<resource_name>%s)/attemptpe%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logpeexercise'), name="api_logpeexe"), #return success and isproficient??
             url(r"^(?P<resource_name>%s)/avbutton%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logavbutton'), name="api_logavbutt"),
         ]
 
@@ -134,7 +165,6 @@ class UserexerciseResource(ModelResource):
         return UserExercise.objects.all() 
 
     def logavbutton(self, request, **kwargs):
-        print request 
         if request.POST['username']:   
             action =   request.POST['actions']
             actions = simplejson.loads(action)
@@ -160,15 +190,44 @@ class UserexerciseResource(ModelResource):
                     number_logs += 1 #return  self.create_response(request, user_button)
             
             if number_logs == len(actions):
-                return  self.create_response(request,  {'message': 'all button action logged'})
+                return  self.create_response(request,  {'success':True, 'message': 'all button action logged'})
             else:
-                    return  self.create_response(request, {'error': 'not all button action logged'})
+                    return  self.create_response(request, {'success':False, 'error': 'not all button action logged'})
+        return self.create_response(request, {'success':False, 'error': 'unauthorized action'})
+
+
+    def logpeexercise(self, request, **kwargs):
+        print request 
+        if request.POST['username']:    #request.user:
+            av = request.POST['av'] #request.POST['avs']
+            kexercise, inserted = Exercise.objects.get_or_create(name= av,covers="sorting",description="",streak=0) #streak = min number of correct steps
+            kusername = User.objects.get(username=request.POST['username'])
+            user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0) 
+            user_data, created = UserData.objects.get_or_create(user=kusername)
+            if user_exercise:
+                    user_exercise,correct = attempt_problem_pe(
+                       user_data,  
+                       user_exercise,
+                       request.POST['attempt'],
+                       1, #request.POST['complete'],
+                       int(request.POST['total_time']),
+                       request.POST['score[fix]'],
+                       int(request.POST['score[undo]']),
+                       int(request.POST['score[correct]']),
+                       int(request.POST['score[student]']),
+                       int(request.POST['score[total]']),
+                       request.META['REMOTE_ADDR'],
+                       ) 
+                    if correct:
+                       return  self.create_response(request, {'success': True})   #user_exercise)
+                    else:
+                       return  self.create_response(request, {'error': 'attempt not logged'})
         return self.create_response(request, {'error': 'unauthorized action'})
+
 
 
  
     def logexercise(self, request, **kwargs):
-        print request 
         if request.POST['user']:    #request.user:
             kexercise = Exercise.objects.get(name= request.POST['sha1'])  
             kusername = User.objects.get(username=request.POST['user']) 

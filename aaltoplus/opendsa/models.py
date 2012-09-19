@@ -66,8 +66,12 @@ class UserModule(models.Model):
     last_done = models.DateTimeField(auto_now_add=True)
     proficient_date = models.DateTimeField(default="2012-01-01 00:00:00") 
 
-
-
+class Feedback(models.Model):  
+     
+    name = models.CharField(max_length=100) 
+    email = models.CharField(max_length=50) 
+    subject = models.CharField(max_length=75)
+    message = models.TextField()  
 
 class UserData(models.Model):
     # Canonical reference to the user entity. Avoid referencing this directly
@@ -235,6 +239,15 @@ class UserExerciseLog(models.Model):
         logging.info(problem_log.time_ended())
         problem_log.put()
 
+
+class UserProfExerciseLog(models.Model):
+
+    problem_log =  models.ForeignKey(UserExerciseLog)
+    student =  models.IntegerField(default = 0)
+    correct =  models.IntegerField(default = 0)
+    fix =  models.IntegerField(default = 0) 
+    undo =  models.IntegerField(default = 0) 
+    total =  models.IntegerField(default = 0) 
 
 
 class UserExercise(models.Model):
