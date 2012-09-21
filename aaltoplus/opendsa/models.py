@@ -273,4 +273,18 @@ class UserExercise(models.Model):
            user_data.all_proficient_exercises += "%s," %self.exercise_id 
            user_data.save() 
            return True
-        return False  
+        return False 
+
+    def update_proficiency_pe(self, correct):
+        exercise = Exercise.objects.get(pk=self.exercise_id)
+        user_data = UserData.objects.get(user=self.user)
+        dt_now = datetime.datetime.now()
+        if correct:
+           self.proficient_date = dt_now
+
+           user_data.proficient_exercises += "%s," %self.exercise_id
+           user_data.all_proficient_exercises += "%s," %self.exercise_id
+           user_data.save()
+           return True
+        return False
+ 

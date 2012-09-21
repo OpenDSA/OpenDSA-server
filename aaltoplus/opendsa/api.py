@@ -200,7 +200,7 @@ class UserexerciseResource(ModelResource):
         print request 
         if request.POST['username']:    #request.user:
             av = request.POST['av'] #request.POST['avs']
-            kexercise, inserted = Exercise.objects.get_or_create(name= av,covers="sorting",description="",streak=0) #streak = min number of correct steps
+            kexercise, inserted = Exercise.objects.get_or_create(name= av,covers="dsa",description="",ex_type= request.POST['type'],streak= request.POST['score[total]']) #streak = max number of correct steps
             kusername = User.objects.get(username=request.POST['username'])
             user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0) 
             user_data, created = UserData.objects.get_or_create(user=kusername)
