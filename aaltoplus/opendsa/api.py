@@ -174,10 +174,21 @@ class UserexerciseResource(ModelResource):
                #kexercise = Exercise.objects.get(name = act['av'])  
                #if kexercise:
                #else:
-               kexercise, result = Exercise.objects.get_or_create(name = act['av']) #, author='',ex_type='', streak=1)     
+               if 'score[total]' in request.POST:
+                  streak = request.POST['score[total]'] 
+               else:
+                  streak = 0 
+
+               if  len(Exercise.objects.filter(name= act['av']))==1:
+                   kexercise =  Exercise.objects.get(name= act['av'])
+                   kexercise.streak= streak
+                   kexercise.save()
+               else:
+                   kexercise = Exercise(name = act['av'], streak=streak)
+                   kexercise.save()  #, result = Exercise.objects.get_or_create(name = act['av'], streak=streak) #, author='',ex_type='', streak=1)     
                kusername = User.objects.get(username=request.POST['username'])
                user_data, created = UserData.objects.get_or_create(user=kusername)
-               module = Module.objects.get(name=act['module_name']) #   'Shellsort') 
+               module = Module.objects.get(short_display_name=act['module_name']) #   'Shellsort') 
                if kexercise:
                  user_button,correct = log_button_action(
                     kusername,  #kusername,
