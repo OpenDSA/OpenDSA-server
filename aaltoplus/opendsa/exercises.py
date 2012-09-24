@@ -48,7 +48,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         print user_exercise  
         dt_now = datetime.datetime.now()
-        exercise = user_exercise.exercise 
+        #exercise = user_exercise.exercise 
         user_exercise.last_done = dt_now
         # Build up problem log for deferred put
         problem_log = models.UserExerciseLog(

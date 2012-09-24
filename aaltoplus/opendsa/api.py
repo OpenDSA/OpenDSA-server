@@ -171,11 +171,13 @@ class UserexerciseResource(ModelResource):
             pe_name = get_pe_name_from_referer(request.META['HTTP_REFERER'])
             number_logs = 0
             for act in actions:
-               kexercise, result = Exercise.objects.get_or_create(name = act['av'], author='',ex_type='pe', streak=1)              #(name= pe_name)                            #act['av'])  # request.POST['sha1'])
+               #kexercise = Exercise.objects.get(name = act['av'])  
+               #if kexercise:
+               #else:
+               kexercise, result = Exercise.objects.get_or_create(name = act['av']) #, author='',ex_type='', streak=1)     
                kusername = User.objects.get(username=request.POST['username'])
-               #user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise)
                user_data, created = UserData.objects.get_or_create(user=kusername)
-               module = Module.objects.get(name='Shellsort') 
+               module = Module.objects.get(name=act['module_name']) #   'Shellsort') 
                if kexercise:
                  user_button,correct = log_button_action(
                     kusername,  #kusername,
@@ -198,11 +200,20 @@ class UserexerciseResource(ModelResource):
 
     def logpeexercise(self, request, **kwargs):
         print request 
-        if request.POST['username']:    #request.user:
-            av = request.POST['av'] #request.POST['avs']
-            kexercise, inserted = Exercise.objects.get_or_create(name= av,covers="dsa",description="",ex_type= request.POST['type'],streak= request.POST['score[total]']) #streak = max number of correct steps
+        if request.POST['username']:    
+            av = request.POST['av']
+            kexercise =  Exercise.objects.get(name= av) 
+            if kexercise:
+                kexercise.ex_type= request.POST['type'] 
+                kexercise.streak= request.POST['score[total]']
+                kexercise.covers="dsa"
+                kexercise.save()                 
+            else: 
+                kexercise, inserted = Exercise.objects.get_or_create(name= av,covers="dsa",description="",ex_type= request.POST['type'],streak= request.POST['score[total]']) #streak = max number of correct steps
+   
             kusername = User.objects.get(username=request.POST['username'])
-            user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0) 
+            if kusername and kexercise:
+                user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0) 
             user_data, created = UserData.objects.get_or_create(user=kusername)
             if user_exercise:
                     user_exercise,correct = attempt_problem_pe(
@@ -322,11 +333,13 @@ class UserDataResource(ModelResource):
      
     def isproficient(self, request, **kwargs):
 
-        if request.POST['user']:    #request.user:
+        if request.POST['username']:    #request.user:
             kexercise = Exercise.objects.get(name= request.POST['exercise'])
-            kusername = User.objects.get(username=request.POST['user'])
+            kusername = User.objects.get(username=request.POST['username'])
             user_data = UserData.objects.get(user=kusername)
-            return self.create_response(request, {'proficient': user_data.is_proficient_at(kexercise)}) 
+            if kexercise:
+                return self.create_response(request, {'proficient': user_data.is_proficient_at(kexercise)}) 
+            self.create_response(request, {'proficient': 'false'}) 
         return self.create_response(request, {'proficient': 'false'})
 
 
