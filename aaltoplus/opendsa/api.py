@@ -239,10 +239,9 @@ class UserexerciseResource(ModelResource):
                        int(request.POST['score[student]']),
                        int(request.POST['score[total]']),
                        request.META['REMOTE_ADDR'],
-                       ) 
-                    if correct:
-                       return  self.create_response(request, {'success': True})   #user_exercise)
-                    else:
+                       )
+                    return  self.create_response(request, {'success': True, 'proficient': correct})   
+            else:
                        return  self.create_response(request, {'error': 'attempt not logged'})
         return self.create_response(request, {'error': 'unauthorized action'})
 

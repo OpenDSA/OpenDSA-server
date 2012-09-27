@@ -136,7 +136,7 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
                 time_done=dt_now,
                 count_hints=count_hints,
                 hint_used=int(count_hints) > 0,
-                correct=total>= user_exercise.streak,
+                correct=correct>= total,
                 count_attempts=attempt_number,
                 ip_address=ip_address,
         )
@@ -147,7 +147,7 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
 
 
         user_exercise.total_done += 1
-
+        value = False
         if problem_log.correct:
 
                 proficient = user_data.is_proficient_at(user_exercise.exercise)
@@ -155,11 +155,10 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
                 problem_log.points_earned = total   
                 user_exercise.total_correct += 1
                 user_exercise.longest_streak = max(user_exercise.longest_streak, total)
-
+                value = True  
                 if not proficient:
-                   if(total>=user_exercise.streak):
+                   #if(total>=user_exercise.streak):
                         problem_log.earned_proficiency =  user_exercise.update_proficiency_pe(correct=True) 
-
 
         problem_log.save()  
         pe_log = models.UserProfExerciseLog( 
@@ -171,7 +170,7 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
                                              total = total)
 
         pe_log.save()  
-        return user_exercise.save(),True  
+        return user_exercise.save(),value  
 
 
 
