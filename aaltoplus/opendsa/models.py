@@ -261,7 +261,7 @@ class UserExercise(models.Model):
     total_done = models.IntegerField(default = 0)
     total_correct = models.IntegerField(default = 0)
     proficient_date = models.DateTimeField(default="2012-01-01 00:00:00")
-
+    progress = models.DecimalField(default = 0, max_digits=3, decimal_places=2) 
     def update_proficiency_ka(self, correct):
         exercise = Exercise.objects.get(pk=self.exercise_id)
         user_data = UserData.objects.get(user=self.user)

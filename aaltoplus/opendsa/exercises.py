@@ -10,6 +10,8 @@ import datetime
 import models
 import simplejson as json
 import time
+from decimal import Decimal
+import jsonpickle 
 
 from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton
 from django.conf.urls.defaults import patterns, url
@@ -46,7 +48,6 @@ def attempt_problem(user_data, user_exercise, attempt_number,
     ip_address):
 
     if user_exercise:   # and user_exercise.belongs_to(user_data):
-        print user_exercise  
         dt_now = datetime.datetime.now()
         #exercise = user_exercise.exercise 
         user_exercise.last_done = dt_now
@@ -58,7 +59,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 time_done=dt_now,
                 count_hints=count_hints,
                 hint_used=int(count_hints) > 0,
-                correct=completed and not str2bool(count_hints) and (int(attempt_number) == 1),
+                correct=str2bool(completed) and not str2bool(count_hints) and (int(attempt_number) == 1),
                 count_attempts=attempt_number,
                 ip_address=ip_address,
         )
@@ -75,7 +76,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
         # bucket always corresponds to the one for this current user
         #struggling_model = StrugglingExperiment.get_alternative_for_user(
         #         user_data, current_user=True) or StrugglingExperiment.DEFAULT
-        if completed:
+        if str2bool(completed):
 
             user_exercise.total_done += 1
 
@@ -94,21 +95,27 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 user_exercise.total_correct += 1
                 user_exercise.streak += 1
                 user_exercise.longest_streak = max(user_exercise.longest_streak, user_exercise.streak)
-
+                user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)  
                 if not proficient: 
-                    if exercise.ex_type == 'ka':
+                    #if exercise.ex_type == 'ka':
                         problem_log.earned_proficiency = user_exercise.update_proficiency_ka(correct=True)
-                    
-   
-
+            else:          
+                user_exercise.total_done += 1
+                user_exercise.streak += 1 
+                user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak) 
         else:
             # Only count wrong answer at most once per problem
+            user_exercise.total_done += 1
+            user_exercise.streak = 0
+            user_exercise.progress = Decimal('0')
+
             if first_response:
                 user_exercise.update_proficiency_model(correct=False)
                 bingo(['hints_wrong_problems', 'struggling_problems_wrong'])
 
         problem_log.save()
-        return user_exercise.save(),True      #, user_exercise_graph, goals_updated
+        user_exercise.save() 
+        return user_exercise,True      #, user_exercise_graph, goals_updated
 
 
 

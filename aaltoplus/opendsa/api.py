@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 from django.utils import simplejson 
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse
-
+import jsonpickle  
 
 from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, attempt_problem_pe 
 
@@ -266,7 +266,8 @@ class UserexerciseResource(ModelResource):
                     request.META['REMOTE_ADDR'],
                     )
                  if correct:
-                    return  self.create_response(request, user_exercise) 
+                    print jsonpickle.encode(user_exercise)
+                    return  self.create_response(request, jsonpickle.encode(user_exercise) )           #    user_exercise) 
                  else:
                     return  self.create_response(request, {'error': 'attempt not logged'})   
         return self.create_response(request, {'error': 'unauthorized action'})
