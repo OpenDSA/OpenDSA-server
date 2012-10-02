@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <style>
+      /*error {
+        /*border: 2px solid red;
+        color:#999;
+        font-size:11px;
+        line-height:18px;*/
+      }*/ 
+      fieldset {
+        border:none;
+      }  
+
+      form.wide .textbox label {
+        display:block;
+        padding-bottom:7px;
+      }
+
+      form.wide .textbox span {
+        display:block;
+      }
+
+      form.wide p, form.signup span {
+        color:#999;
+        font-size:11px;
+        line-height:18px;
+      }
+      form.wide .textbox input {
+        background:#666666;
+        border-bottom:1px solid #333;
+        border-left:1px solid #000;
+        border-right:1px solid #333;
+        border-top:1px solid #000;
+        color:#fff;
+        border-radius: 3px 3px 3px 3px;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        font:13px Arial, Helvetica, sans-serif;
+        padding:6px 6px 4px;
+        width:200px;
+      }
+
+      form.wide input:-moz-placeholder { color:#bbb; text-shadow:0 0 2px #000; }
+      form.wide input::-webkit-input-placeholder { color:#bbb; text-shadow:0 0 2px #000;  }
+    </style>
+    <title>{% block title %}Tagging Exploration{% endblock %}</title>
+</head>
+
+<body>
+    <div id="sidebar">
+        {% block sidebar %}{% endblock %}
+    </div>
+
+    <div id="content">
+        {% block content %}{% endblock %}
+        {% block main_content %}{% endblock %}
+    </div>
+</body>
+</html>
