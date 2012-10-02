@@ -33,6 +33,9 @@ urlpatterns = patterns('',
     # Shibboleth
     (r'^shibboleth/', include('django_shibboleth.urls')),
     
+    #registration
+    (r'^accounts/', include('registration.backends.simple.urls')),
+
     # Django:
     (r'^admin/', include(admin.site.urls)),
     (r'^accounts/login/$', login),

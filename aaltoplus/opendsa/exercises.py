@@ -99,19 +99,22 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 if not proficient: 
                     #if exercise.ex_type == 'ka':
                         problem_log.earned_proficiency = user_exercise.update_proficiency_ka(correct=True)
-            else:          
+            else:  
                 user_exercise.total_done += 1
-                user_exercise.streak += 1 
+                #user_exercise.streak += 1 
                 user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak) 
         else:
+            if (count_hints ==0):
             # Only count wrong answer at most once per problem
-            user_exercise.total_done += 1
-            user_exercise.streak = 0
-            user_exercise.progress = Decimal('0')
-
-            if first_response:
-                user_exercise.update_proficiency_model(correct=False)
-                bingo(['hints_wrong_problems', 'struggling_problems_wrong'])
+               user_exercise.streak = user_exercise.streak - 1 
+               if (user_exercise.streak <= 0):  
+                   user_exercise.streak = 0 
+                   user_exercise.progress = Decimal('0')
+               else: 
+                   user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)  
+               if first_response:
+                   user_exercise.update_proficiency_model(correct=False)
+                   bingo(['hints_wrong_problems', 'struggling_problems_wrong'])
 
         problem_log.save()
         user_exercise.save() 

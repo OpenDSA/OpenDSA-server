@@ -16,8 +16,9 @@ XS_SHARING_ALLOWED_ORIGINS = 'http://algoviz-beta.cc.vt.edu'
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
 XS_SHARING_ALLOWED_HEADERS = ["Content-Type"] 
 
-APPEND_SLASH=False
+APPEND_SLASH=True
 
+ACCOUNT_ACTIVATION_DAYS = 365 
 # This URL is used when building absolute URLs to this service
 BASE_URL = ""
 
@@ -30,9 +31,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',         #g3et_path('test.db'),            # Or path to database file if using sqlite3.
-        'USER': '',                  # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
+        'NAME': 'opendsa',         #g3et_path('test.db'),            # Or path to database file if using sqlite3.
+        'USER': 'root',                  # Not used with sqlite3.
+        'PASSWORD': 'mad31eric',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -155,6 +156,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.admin',
+    'django.contrib.humanize', 
     'exercise',
     'course',
     #'south', # South disabled due to refactoring of the database 
@@ -163,6 +165,7 @@ INSTALLED_APPS = (
     'userprofile',
     'apps',
     'opendsa',
+    'registration', 
 )
 
 # OAuth settings

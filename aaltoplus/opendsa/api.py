@@ -289,8 +289,9 @@ class UserexerciseResource(ModelResource):
                     request.META['REMOTE_ADDR'],
                     )
                  if correct:
-                    return  self.create_response(request, user_exercise)
-                 else:
+                    print jsonpickle.encode(user_exercise)
+                    return  self.create_response(request, jsonpickle.encode(user_exercise) )  
+		 else:
                     return  self.create_response(request, {'error': 'attempt not logged'})
         return self.create_response(request, {'error': 'unauthorized action'})
 
