@@ -104,7 +104,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 #user_exercise.streak += 1 
                 user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak) 
         else:
-            if (count_hints ==0):
+            if (int(count_hints) ==0):
             # Only count wrong answer at most once per problem
                user_exercise.streak = user_exercise.streak - 1 
                if (user_exercise.streak <= 0):  
