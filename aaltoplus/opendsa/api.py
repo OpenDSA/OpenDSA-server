@@ -262,6 +262,7 @@ class UserexerciseResource(ModelResource):
                     request.POST['complete'],
                     request.POST['count_hints'],
                     int(request.POST['time_taken']),
+                    request.POST['attempt_content'],
                     request.META['REMOTE_ADDR'],
                     )
                  if correct:
@@ -286,6 +287,7 @@ class UserexerciseResource(ModelResource):
                     request.POST['complete'],
                     request.POST['count_hints'],
                     int(request.POST['time_taken']),
+                    request.POST['attempt_content'],
                     request.META['REMOTE_ADDR'],
                     )
                  if correct:
