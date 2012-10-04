@@ -13,7 +13,7 @@ import time
 from decimal import Decimal
 import jsonpickle 
 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -43,8 +43,34 @@ def make_wrong_attempt(user_data, user_exercise):
 
         return user_exercise
 
+
+def update_module_proficiency(user_data, module):
+
+    db_module = Module.objects.get(name=module)
+    module_ex_list = db_module.get_proficiency_model 
+    user_prof = user_data.all_proficient_exercises 
+    user_module =  UserModule.objects.get_or_create(user=user_data.user, module=db_module)
+    dt_now = datetime.datetime.now()
+    if user_module: 
+        if user_module.first_done == None:
+            user_module.first_done = dt_now
+        user_module.last_done = dt_now
+        if user_module.proficient_date ==None:
+            if set(module_ex_list).issubset(set(user_prof)):
+                user_module.proficient_date = dt_now 
+                user_module.save()
+                return True
+            else:
+                user_module.save()
+                return False
+        user_module.save()   
+        return True 
+    return False
+
+    
+
 def attempt_problem(user_data, user_exercise, attempt_number,
-    completed, count_hints, time_taken, attempt_content, 
+    completed, count_hints, time_taken, attempt_content, module, 
     ip_address):
 
     if user_exercise:   # and user_exercise.belongs_to(user_data):
@@ -93,6 +119,8 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)  
                 if not proficient: 
                         problem_log.earned_proficiency = user_exercise.update_proficiency_ka(correct=True)
+                if problem_log.earned_proficiency:
+                    update_module_proficiency(user_data, module)
             else:  
                 user_exercise.total_done += 1
                 user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak) 

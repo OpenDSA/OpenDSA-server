@@ -263,9 +263,11 @@ class UserexerciseResource(ModelResource):
                     request.POST['count_hints'],
                     int(request.POST['time_taken']),
                     request.POST['attempt_content'],
+                    request.POST['module_name'],
                     request.META['REMOTE_ADDR'],
                     )
                  if correct:
+                    
                     print jsonpickle.encode(user_exercise)
                     return  self.create_response(request, jsonpickle.encode(user_exercise) )           #    user_exercise) 
                  else:

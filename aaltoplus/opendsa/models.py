@@ -46,6 +46,19 @@ class Module(models.Model):
      raw_html = models.TextField()   
      exercise_list = models.TextField() 
 
+     #function that returns list of id of exercises
+     #will be compared to student list of proficiency exercises 
+     def get_proficiency_modeli(self):
+         if self.exercise_list != None: 
+            ex_list = self.exercise_list.split(',') 
+            ex_id_list = []
+            for ex in ex_list:
+                ex_id = Exercise.objects.get(name=ex)
+                ex_id_list.append(ex_id)
+            return ex_id_list
+         return 
+
+
 
 class UserButton(models.Model):
      user = models.ForeignKey(User) 
