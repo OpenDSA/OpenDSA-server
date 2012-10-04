@@ -44,7 +44,7 @@ def make_wrong_attempt(user_data, user_exercise):
         return user_exercise
 
 def attempt_problem(user_data, user_exercise, attempt_number,
-    completed, count_hints, time_taken,
+    completed, count_hints, time_taken, attempt_content, 
     ip_address):
 
     if user_exercise:   # and user_exercise.belongs_to(user_data):
@@ -84,35 +84,24 @@ def attempt_problem(user_data, user_exercise, attempt_number,
 
                 proficient = user_data.is_proficient_at(user_exercise.exercise)
 
-                #explicitly_proficient = user_data.is_explicitly_proficient_at(user_exercise[0].exercise)
-                #suggested = user_data.is_suggested(user_exercise[0].exercise)
-                #problem_log.suggested = suggested
 
-                problem_log.points_earned = 4  #points.ExercisePointCalculator(user_exercise[0], suggested, proficient)
-                #user_data.add_points(problem_log.points_earned)
-
+                problem_log.points_earned +=1   #points.ExercisePointCalculator(user_exercise[0], suggested, proficient)
                 # Streak only increments if problem was solved correctly (on first attempt)
                 user_exercise.total_correct += 1
                 user_exercise.streak += 1
                 user_exercise.longest_streak = max(user_exercise.longest_streak, user_exercise.streak)
                 user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)  
                 if not proficient: 
-                    #if exercise.ex_type == 'ka':
                         problem_log.earned_proficiency = user_exercise.update_proficiency_ka(correct=True)
             else:  
                 user_exercise.total_done += 1
-                #user_exercise.streak += 1 
                 user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak) 
         else:
-            if (int(count_hints) ==0):
+            if ((int(count_hints) ==0) or (attempt_content!='hint')):
             # Only count wrong answer at most once per problem
-               user_exercise.streak = user_exercise.streak - 1 
-               if (user_exercise.streak <= 0):  
-                   user_exercise.streak = 0 
-                   user_exercise.progress = Decimal('0')
-               else: 
-                   user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)  
-               if first_response:
+               user_exercise.streak = 0 #user_exercise.streak - 1 
+            user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)
+            if first_response:
                    user_exercise.update_proficiency_model(correct=False)
                    bingo(['hints_wrong_problems', 'struggling_problems_wrong'])
 
