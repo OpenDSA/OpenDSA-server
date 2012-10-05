@@ -55,7 +55,7 @@ def update_module_proficiency(user_data, module):
         if user_module.first_done == None:
             user_module.first_done = dt_now
         user_module.last_done = dt_now
-        if user_module.proficient_date ==None:
+        if user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'):
             if set(module_ex_list).issubset(set(user_prof)):
                 user_module.proficient_date = dt_now 
                 user_module.save()
