@@ -22,6 +22,9 @@ from django.utils import simplejson
 from django.contrib.sessions.models import Session
 
 
+def diff(a, b):
+    b = set(b)
+    return [aa for aa in a if aa not in b]
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
@@ -56,10 +59,9 @@ def update_module_proficiency(user_data, module, exercise):
             user_module.first_done = dt_now
         user_module.last_done = dt_now
         if user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'):
-            if (set(module_ex_list).issubset(set(user_prof))) or (len(diff(set(module_ex_list),set(user_prof))==1)):
-                if diff(set(module_ex_list),set(user_prof))==[exercise.id]:
-                    user_module.proficient_date = dt_now 
-                    user_module.save()
+            if (set(module_ex_list).issubset(set(user_prof))) or diff(set(module_ex_list),set(user_prof))==[exercise.id]:
+                user_module.proficient_date = dt_now 
+                user_module.save()
                 return True
             else:
                 user_module.save()
@@ -136,7 +138,8 @@ def attempt_problem(user_data, user_exercise, attempt_number,
         
         problem_log.save()
         user_exercise.save() 
-        update_module_proficiency(user_data, module, user_exercise.exercise)
+        if proficient or problem_log.earned_proficiency:
+            update_module_proficiency(user_data, module, user_exercise.exercise)
         return user_exercise,True      #, user_exercise_graph, goals_updated
 
 
@@ -193,7 +196,8 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
 
         pe_log.save() 
         user_exercise.save() 
-        update_module_proficiency(user_data, module, user_exercise.exercise)
+        if proficient or problem_log.earned_proficiency:
+            update_module_proficiency(user_data, module, user_exercise.exercise)
         return user_exercise,value  
 
 
