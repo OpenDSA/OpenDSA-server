@@ -44,7 +44,7 @@ def make_wrong_attempt(user_data, user_exercise):
         return user_exercise
 
 
-def update_module_proficiency(user_data, module):
+def update_module_proficiency(user_data, module, exercise):
 
     db_module = Module.objects.get(name=module)
     module_ex_list = db_module.get_proficiency_model() 
@@ -56,9 +56,10 @@ def update_module_proficiency(user_data, module):
             user_module.first_done = dt_now
         user_module.last_done = dt_now
         if user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'):
-            if set(module_ex_list).issubset(set(user_prof)):
-                user_module.proficient_date = dt_now 
-                user_module.save()
+            if (set(module_ex_list).issubset(set(user_prof))) or (len(diff(set(module_ex_list),set(user_prof))==1)):
+                if diff(set(module_ex_list),set(user_prof))==[exercise.id]:
+                    user_module.proficient_date = dt_now 
+                    user_module.save()
                 return True
             else:
                 user_module.save()
@@ -135,7 +136,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
         
         problem_log.save()
         user_exercise.save() 
-        update_module_proficiency(user_data, module)
+        update_module_proficiency(user_data, module, user_exercise.exercise)
         return user_exercise,True      #, user_exercise_graph, goals_updated
 
 
@@ -192,7 +193,7 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
 
         pe_log.save() 
         user_exercise.save() 
-        update_module_proficiency(user_data, module)
+        update_module_proficiency(user_data, module, user_exercise.exercise)
         return user_exercise,value  
 
 
