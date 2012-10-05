@@ -48,13 +48,16 @@ class Module(models.Model):
 
      #function that returns list of id of exercises
      #will be compared to student list of proficiency exercises 
-     def get_proficiency_modeli(self):
+     def get_proficiency_model(self):
          if self.exercise_list != None: 
             ex_list = self.exercise_list.split(',') 
             ex_id_list = []
             for ex in ex_list:
-                ex_id = Exercise.objects.get(name=ex)
-                ex_id_list.append(ex_id)
+                if len(Exercise.objects.filter(name= ex))==1:
+                    ex_id = Exercise.objects.get(name=ex)
+                    ex_id_list.append(int(ex_id.id))
+                else:
+                    ex_id_list.append(0)
             return ex_id_list
          return 
 

@@ -203,7 +203,8 @@ class UserexerciseResource(ModelResource):
                     number_logs += 1 #return  self.create_response(request, user_button)
             
             if number_logs == len(actions):
-                return  self.create_response(request,  {'success':True, 'message': 'all button action logged'})
+                #user_data.is_proficient_at(kexercise) 
+                return  self.create_response(request,  {'success':True, 'message': '+all button action logged'})
             else:
                     return  self.create_response(request, {'success':False, 'error': 'not all button action logged'})
         return self.create_response(request, {'success':False, 'error': 'unauthorized action'})
@@ -238,6 +239,7 @@ class UserexerciseResource(ModelResource):
                        int(request.POST['score[correct]']),
                        int(request.POST['score[student]']),
                        int(request.POST['score[total]']),
+                       request.POST['module_name'], 
                        request.META['REMOTE_ADDR'],
                        )
                     return  self.create_response(request, {'success': True, 'proficient': correct})   

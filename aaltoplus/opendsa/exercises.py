@@ -47,9 +47,9 @@ def make_wrong_attempt(user_data, user_exercise):
 def update_module_proficiency(user_data, module):
 
     db_module = Module.objects.get(name=module)
-    module_ex_list = db_module.get_proficiency_model 
+    module_ex_list = db_module.get_proficiency_model() 
     user_prof = user_data.all_proficient_exercises 
-    user_module =  UserModule.objects.get_or_create(user=user_data.user, module=db_module)
+    user_module, exist =  UserModule.objects.get_or_create(user=user_data.user, module=db_module)
     dt_now = datetime.datetime.now()
     if user_module: 
         if user_module.first_done == None:
@@ -119,8 +119,8 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)  
                 if not proficient: 
                         problem_log.earned_proficiency = user_exercise.update_proficiency_ka(correct=True)
-                if problem_log.earned_proficiency:
-                    update_module_proficiency(user_data, module)
+                #if problem_log.earned_proficiency:
+                #    update_module_proficiency(user_data, module)
             else:  
                 user_exercise.total_done += 1
                 user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak) 
@@ -132,7 +132,8 @@ def attempt_problem(user_data, user_exercise, attempt_number,
             if first_response:
                    user_exercise.update_proficiency_model(correct=False)
                    bingo(['hints_wrong_problems', 'struggling_problems_wrong'])
-
+        
+        update_module_proficiency(user_data, module)
         problem_log.save()
         user_exercise.save() 
         return user_exercise,True      #, user_exercise_graph, goals_updated
@@ -140,7 +141,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
 
 
 def attempt_problem_pe(user_data, user_exercise, attempt_number,
-    completed, time_taken, fix, undo, correct, student, total, ip_address):
+    completed, time_taken, fix, undo, correct, student, total, module, ip_address):
 
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         print user_exercise
@@ -190,6 +191,7 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
                                              total = total)
 
         pe_log.save()  
+        update_module_proficiency(user_data, module)
         return user_exercise.save(),value  
 
 
