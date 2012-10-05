@@ -133,9 +133,9 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                    user_exercise.update_proficiency_model(correct=False)
                    bingo(['hints_wrong_problems', 'struggling_problems_wrong'])
         
-        update_module_proficiency(user_data, module)
         problem_log.save()
         user_exercise.save() 
+        update_module_proficiency(user_data, module)
         return user_exercise,True      #, user_exercise_graph, goals_updated
 
 
@@ -190,9 +190,10 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
                                              undo = undo, 
                                              total = total)
 
-        pe_log.save()  
+        pe_log.save() 
+        user_exercise.save() 
         update_module_proficiency(user_data, module)
-        return user_exercise.save(),value  
+        return user_exercise,value  
 
 
 
