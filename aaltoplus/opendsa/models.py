@@ -126,7 +126,13 @@ class UserData(models.Model):
         return (exid.id in prof_ex)
 
 
-
+    def get_prof_list(self):
+        prof_ex =[] 
+        for ex in self.all_proficient_exercises.split(','):
+            if ex.isdigit():
+              number = int(ex)
+              prof_ex.append(int(ex))
+        return prof_ex 
     def add_points(self, points):
         if self.points is None:
             self.points = 0

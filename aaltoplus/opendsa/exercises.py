@@ -48,7 +48,7 @@ def update_module_proficiency(user_data, module):
 
     db_module = Module.objects.get(name=module)
     module_ex_list = db_module.get_proficiency_model() 
-    user_prof = user_data.all_proficient_exercises 
+    user_prof = user_data.get_prof_list() 
     user_module, exist =  UserModule.objects.get_or_create(user=user_data.user, module=db_module)
     dt_now = datetime.datetime.now()
     if user_module: 
