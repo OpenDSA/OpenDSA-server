@@ -61,7 +61,8 @@ class Module(models.Model):
             return ex_id_list
          return 
 
-
+     def is_proficient_at(self):
+         return  self.proficient_date != datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S')
 
 class UserButton(models.Model):
      user = models.ForeignKey(User) 
@@ -128,7 +129,7 @@ class UserData(models.Model):
 
     def get_prof_list(self):
         prof_ex =[] 
-        for ex in self.all_proficient_exercises.split(','):
+        for ex in self.all_proficient_exercises[:-1].split(','):
             if ex.isdigit():
               number = int(ex)
               prof_ex.append(int(ex))
