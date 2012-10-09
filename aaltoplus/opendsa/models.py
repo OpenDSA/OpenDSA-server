@@ -61,8 +61,7 @@ class Module(models.Model):
             return ex_id_list
          return 
 
-     def is_proficient_at(self):
-         return  self.proficient_date != datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S')
+
 
 class UserButton(models.Model):
      user = models.ForeignKey(User) 

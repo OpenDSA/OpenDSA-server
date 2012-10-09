@@ -12,6 +12,7 @@ import simplejson as json
 import time
 from decimal import Decimal
 import jsonpickle 
+import math
 
 from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module
 from django.conf.urls.defaults import patterns, url
@@ -20,7 +21,6 @@ from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.utils import simplejson
 from django.contrib.sessions.models import Session
-
 
 def diff(a, b):
     b = set(b)
@@ -48,7 +48,7 @@ def make_wrong_attempt(user_data, user_exercise):
 
 
 def update_module_proficiency(user_data, module, exercise):
-
+      
     db_module = Module.objects.get(name=module)
     module_ex_list = db_module.get_proficiency_model() 
     user_prof = user_data.get_prof_list() 
@@ -58,6 +58,7 @@ def update_module_proficiency(user_data, module, exercise):
         if user_module.first_done == None:
             user_module.first_done = dt_now
         user_module.last_done = dt_now
+        print 'diff == %s - Exercise == %s\n' %(diff(set(module_ex_list),set(user_prof)),[int(exercise.id)])
         if user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'):
             if (set(module_ex_list).issubset(set(user_prof))) or diff(set(module_ex_list),set(user_prof))==[exercise.id]:
                 user_module.proficient_date = dt_now 
@@ -105,13 +106,14 @@ def attempt_problem(user_data, user_exercise, attempt_number,
         # bucket always corresponds to the one for this current user
         #struggling_model = StrugglingExperiment.get_alternative_for_user(
         #         user_data, current_user=True) or StrugglingExperiment.DEFAULT
+        proficient = user_data.is_proficient_at(user_exercise.exercise)  
         if str2bool(completed):
 
             user_exercise.total_done += 1
-
+            #proficient = user_data.is_proficient_at(user_exercise.exercise)
             if problem_log.correct:
 
-                proficient = user_data.is_proficient_at(user_exercise.exercise)
+                #proficient = user_data.is_proficient_at(user_exercise.exercise)
 
 
                 problem_log.points_earned +=1   #points.ExercisePointCalculator(user_exercise[0], suggested, proficient)
@@ -153,6 +155,12 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
         exercise = user_exercise.exercise
         user_exercise.last_done = dt_now
         count_hints=0
+        print ' exercise.name %s' %exercise.name
+        print ' exercise.streak %s' %exercise.streak
+        print ' total %s-\n' %total
+        print ' correct %s' %correct
+        print 'threshold  %s-\n' %((Decimal(exercise.streak)/100) * int(total))
+        threshold = (Decimal(exercise.streak)/100) * int(total)
         # Build up problem log for deferred put
         problem_log = models.UserExerciseLog(
                 user=user_data,
@@ -161,7 +169,7 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
                 time_done=dt_now,
                 count_hints=count_hints,
                 hint_used=int(count_hints) > 0,
-                correct=correct>= total,
+                correct=correct>= threshold,  
                 count_attempts=attempt_number,
                 ip_address=ip_address,
         )
@@ -173,9 +181,10 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
 
         user_exercise.total_done += 1
         value = False
+        proficient = user_data.is_proficient_at(user_exercise.exercise)
         if problem_log.correct:
 
-                proficient = user_data.is_proficient_at(user_exercise.exercise)
+                #proficient = user_data.is_proficient_at(user_exercise.exercise)
 
                 problem_log.points_earned = total   
                 user_exercise.total_correct += 1

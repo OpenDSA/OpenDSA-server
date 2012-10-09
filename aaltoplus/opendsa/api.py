@@ -8,7 +8,7 @@ from tastypie.serializers import Serializer
 from tastypie.http import HttpUnauthorized, HttpForbidden  
 
 # ODSA 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module, Feedback, UserModule    
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module, Feedback    
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout 
@@ -159,26 +159,10 @@ class UserexerciseResource(ModelResource):
             url(r"^(?P<resource_name>%s)/hint%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logexercisehint'), name="api_logexeh"),
             url(r"^(?P<resource_name>%s)/attemptpe%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logpeexercise'), name="api_logpeexe"), #return success and isproficient??
             url(r"^(?P<resource_name>%s)/avbutton%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logavbutton'), name="api_logavbutt"),
-            url(r"^(?P<resource_name>%s)/getprogress%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('getuserprogress'), name="api_getuserprogress"),
         ]
 
     def listlogs():
         return UserExercise.objects.all() 
-
-    def getuserprogress(self, request, **kwargs):
-        if request.POST['username'] and request.POST['exercise']:
-            if len(Exercise.objects.filter(name=request.POST['exercise']))==1:
-                kexercise =  Exercise.objects.get(name= request.POST['exercise'])
-            if len(User.objects.filter(name=request.POST['username']))==1:  
-                kusername = User.objects.get(username=request.POST['username']) 
-            if kexercise and kusername:
-                if len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==1:
-                    user_exercise = UserExercise.objects.get(user=kusername, exercise=kexercise)
-                    return  self.create_response(request,  {'progress':user_exercise.progress})
-            return
-        return 
-               
-
 
     def logavbutton(self, request, **kwargs):
         if request.POST['username']:   
@@ -197,8 +181,8 @@ class UserexerciseResource(ModelResource):
 
                if  len(Exercise.objects.filter(name= act['av']))==1:
                    kexercise =  Exercise.objects.get(name= act['av'])
-                   kexercise.streak= streak
-                   kexercise.save()
+                   #kexercise.streak= streak
+                   #kexercise.save()
                else:
                    kexercise = Exercise(name = act['av'], streak=streak)
                    kexercise.save()  #, result = Exercise.objects.get_or_create(name = act['av'], streak=streak) #, author='',ex_type='', streak=1)     
@@ -230,14 +214,16 @@ class UserexerciseResource(ModelResource):
         print request 
         if request.POST['username']:    
             av = request.POST['av']
-            kexercise =  Exercise.objects.get(name= av) 
-            if kexercise:
-                kexercise.ex_type= request.POST['type'] 
-                kexercise.streak= request.POST['score[total]']
-                kexercise.covers="dsa"
-                kexercise.save()                 
+            if  len(Exercise.objects.filter(name= av))==1:
+                kexercise =  Exercise.objects.get(name= av) 
+           
+            #if kexercise:
+            #    kexercise.ex_type= request.POST['type'] 
+            #    kexercise.streak= request.POST['score[total]']
+            #    kexercise.covers="dsa"
+            #    kexercise.save()                 
             else: 
-                kexercise, inserted = Exercise.objects.get_or_create(name= av,covers="dsa",description="",ex_type= request.POST['type'],streak= request.POST['score[total]']) #streak = max number of correct steps
+                kexercise = Exercise.objects.get_or_create(name= av,covers="dsa",description="",ex_type= request.POST['type'],streak= request.POST['score[total]']) #streak = max number of correct steps
    
             kusername = User.objects.get(username=request.POST['username'])
             if kusername and kexercise:
@@ -378,35 +364,6 @@ class UserDataResource(ModelResource):
 
 
 
-class UserModuleResource(ModelResource):
-    #instances           = fields.ToManyField('course.api.CourseInstanceResource', 'instances')
-    def determine_format(self, request):
-        return "application/json"
-    class Meta:
-        queryset        = UserModule.objects.all()
-        resource_name   = 'userdata'
-        excludes        = []
-
-        # TODO: In this version, only GET requests are accepted and no
-        # permissions are checked.
-        allowed_methods = ['get','post']
-        authentication  = Authentication()
-        authorization   = ReadOnlyAuthorization()
-    def override_urls(self):
-        return [
-            url(r"^(?P<resource_name>%s)/isproficient%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('isproficient'), name="api_modproficient"),
-        ]
-
-    def isproficient(self, request, **kwargs):
-
-        if request.POST['username']:    #request.user:
-            kmodule = Module.objects.get(name= request.POST['module'])
-            kusername = User.objects.get(username=request.POST['username'])
-            user_module = UserModule.objects.get(user=kusername, module=kmodule)
-            if user_module:
-                return self.create_response(request, {'proficient': user_module.is_proficient_at()})
-            self.create_response(request, {'proficient': 'false'})
-        return self.create_response(request, {'proficient': 'false'})
 
 
 
