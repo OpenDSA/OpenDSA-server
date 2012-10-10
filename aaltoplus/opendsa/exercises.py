@@ -132,7 +132,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
         else:
             if ((int(count_hints) ==0) or (attempt_content!='hint')):
             # Only count wrong answer at most once per problem
-               user_exercise.streak = 0 #user_exercise.streak - 1 
+               user_exercise.streak = user_exercise.streak - 1 
             user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)
             if first_response:
                    user_exercise.update_proficiency_model(correct=False)
