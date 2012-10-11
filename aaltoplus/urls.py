@@ -1,7 +1,7 @@
 # A+
 from views import login, home, verify_credentials
 from oauth_provider.views import protected_resource_example
-
+from opendsa.views import exercise_summary
 # Django
 from django.conf.urls.defaults import *
 from django.contrib import admin
@@ -16,10 +16,13 @@ urlpatterns = patterns('',
     
     # A view for returning credentials through OAuth authentication
     url(r'^account/verify_credentials.json$', verify_credentials),
-    
+
+    # OpenDSA
+    url(r'^teacher_view/', exercise_summary),
+
     # A+
     (r'^$', home),
-    
+                       
     (r'^exercise/', include('exercise.urls')),
     (r'^course/', include('course.urls')),
     (r'^api/', include('api_urls')),
