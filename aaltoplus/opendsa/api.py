@@ -8,7 +8,7 @@ from tastypie.serializers import Serializer
 from tastypie.http import HttpUnauthorized, HttpForbidden  
 
 # ODSA 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module, Feedback    
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module, Feedback, UserModule     
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout 
@@ -366,8 +366,35 @@ class UserDataResource(ModelResource):
 
 
 
+class UserModuleResource(ModelResource): 
 
+    def determine_format(self, request):
+        return "application/json"
+    class Meta:
+        queryset        = UserData.objects.all()
+        resource_name   = 'usermodule'
+        excludes        = []
 
+        # TODO: In this version, only GET requests are accepted and no
+        # permissions are checked.
+        allowed_methods = ['get','post']
+        authentication  = Authentication()
+        authorization   = ReadOnlyAuthorization()
+    def override_urls(self):
+        return [
+            url(r"^(?P<resource_name>%s)/ismoduleproficient%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('ismoduleproficient'), name="api_modproficient"),
+        ]
+
+    def ismoduleproficient(self, request, **kwargs):
+
+        if request.POST['username']:    #request.user:
+            kmodule = Module.objects.get(name= request.POST['module_name'])
+            kusername = User.objects.get(username=request.POST['username'])
+            user_module = UserModule.objects.get(user=kusername, module=kmodule)
+            if user_module:
+                return self.create_response(request, {'proficient': user_module.is_proficient_at()})
+            self.create_response(request, {'proficient': 'false'})
+        return self.create_response(request, {'proficient': 'false'})
 
 
 
