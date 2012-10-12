@@ -1,40 +1,37 @@
-{% load i18n %}
+{% load i18n %} 
+ 
+<h2>{% trans "Progress Summary" %}</h2> 
+ 
+<table style="border: 1px solid black; width:100%; border-collapse : collapse"> 
+    <tbody> 
+    <th style="border: 1px solid black; min-width : 50px"> 
+    {% for exercise in exercises %} 
+        <td style="border: 1px solid black; padding: 8px">{{ exercise.name }}</td>           
+    {% endfor %} 
+    </th> 
+         
+        {% for userVal in user_exerciseLst %} 
+            <tr style="border: 1px solid black; width: 100px"> 
+            <td style="border: 1px solid black; padding: 8px">{{ userVal.name }}</td> 
+ 	      
 
-<!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8" />
-        
-        <title>{% block title %}OpenDSA{% endblock %}</title>
-    </head>
-  
-<body style="font-family: arial, sans-serif;">
-<h2>{% trans "Progress Summary" %}</h2>
-
-<table style="border: 1px solid black; width:100%; border-collapse : collapse">
-    <tbody>
-    <th style="border: 1px solid black; min-width : 50px">
-    {% for exercise in exercises %}
-        <td style="border: 1px solid black; padding: 8px">{{ exercise.name }}</td>          
-    {% endfor %}
-    </th>
-    {% for user_exercise in user_exercises %}
-            <tr style="border: 1px solid black; width: 100px">
-            <td style="border: 1px solid black; padding: 8px">{{ user_exercise.user }}</td> 
-            {% for exercise in exercises %}
-                {%if exercise = user_exercise.exercise %} 
-                    {% if exercise.streak > user_exercise.longest_streak %} <td style="border: 1px solid black; background-color:red"> {% endif %} 
-                    {% if exercise.streak <= user_exercise.longest_streak %} <td style="border: 1px solid black; background-color:green"> {% endif %}
-                {% endif %}
-                {%if exercise != user_exercise.exercise %}
-                    <td style="border: 1px solid black">
-                {% endif %}
-                </td>
-             {% endfor %}
-              </tr>
-         {% endfor %}
-    
-    </tbody>
+ 	           {% for userExecVal in userVal.userExecs %}
+		              	{% if userExecVal.prof == -1 %}
+ 					<td style="border: 1px solid black; background-color:red"></td> {% endif %}
+   
+ 		                   {% if userExecVal.prof == 1 %} 
+ 						
+					<td style="border: 1px solid black; background-color:green"> 
+                	        	</td>
+              				  {% endif %}
+				{% if userExecVal.prof == 0 %}
+					<td style="border: 1px solid black; background-color:grey"></td>
+				{% endif %}
+   
+				
+            {% endfor %} 
+            </tr> 
+        {% endfor %} 
+     
+    </tbody> 
 </table>
-</body>
-</html>
