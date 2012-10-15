@@ -158,11 +158,27 @@ class UserexerciseResource(ModelResource):
             url(r"^(?P<resource_name>%s)/attempt%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logexercise'), name="api_logexe"),
             url(r"^(?P<resource_name>%s)/hint%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logexercisehint'), name="api_logexeh"),
             url(r"^(?P<resource_name>%s)/attemptpe%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logpeexercise'), name="api_logpeexe"), #return success and isproficient??
-            url(r"^(?P<resource_name>%s)/avbutton%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logavbutton'), name="api_logavbutt"),
+            url(r"^(?P<resource_name>%s)/avbutton%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logavbutton'), name="api_logavbutt"),  
+             url(r"^(?P<resource_name>%s)/getprogress%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('getprogress'), name="api_getprogress"), 
         ]
 
     def listlogs():
         return UserExercise.objects.all() 
+
+    def getprogress(self, request, **kwargs):
+
+        if request.POST['username']:    #request.user:
+            kexercise =  Exercise.objects.get(name= request.POST['exercise']) 
+            kusername = User.objects.get(username=request.POST['username'])
+            if  len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==1:
+                user_exercise =  UserExercise.objects.get(user=kusername, exercise=kexercise)
+            else:
+                user_exercise = None
+            if user_exercise is not None:
+                return self.create_response(request, {'progress': user_exercise.progress})
+            self.create_response(request, {'progress': 0})
+        return self.create_response(request, {'progress': 0})
+
 
     def logavbutton(self, request, **kwargs):
         if request.POST['username']:   
@@ -188,7 +204,7 @@ class UserexerciseResource(ModelResource):
                    kexercise.save()  #, result = Exercise.objects.get_or_create(name = act['av'], streak=streak) #, author='',ex_type='', streak=1)     
                kusername = User.objects.get(username=request.POST['username'])
                user_data, created = UserData.objects.get_or_create(user=kusername)
-               module = Module.objects.get(short_display_name=act['module_name']) #   'Shellsort') 
+               module = Module.objects.get(name=act['module_name']) #   'Shellsort') 
                if kexercise:
                  user_button,correct = log_button_action(
                     kusername,  #kusername,
@@ -359,8 +375,8 @@ class UserDataResource(ModelResource):
             user_data = UserData.objects.get(user=kusername)
             if kexercise:
                 return self.create_response(request, {'proficient': user_data.is_proficient_at(kexercise)}) 
-            self.create_response(request, {'proficient': 'false'}) 
-        return self.create_response(request, {'proficient': 'false'})
+            self.create_response(request, {'proficient': False}) 
+        return self.create_response(request, {'proficient': False})
 
 
 
@@ -388,13 +404,16 @@ class UserModuleResource(ModelResource):
     def ismoduleproficient(self, request, **kwargs):
 
         if request.POST['username']:    #request.user:
-            kmodule = Module.objects.get(name= request.POST['module_name'])
+            kmodule = Module.objects.get(name= request.POST['module'])
             kusername = User.objects.get(username=request.POST['username'])
-            user_module = UserModule.objects.get(user=kusername, module=kmodule)
-            if user_module:
+            if  len(UserModule.objects.filter(user=kusername, module=kmodule))==1:  
+                user_module = UserModule.objects.get(user=kusername, module=kmodule)
+            else:
+                user_module = None 
+            if user_module is not None:
                 return self.create_response(request, {'proficient': user_module.is_proficient_at()})
-            self.create_response(request, {'proficient': 'false'})
-        return self.create_response(request, {'proficient': 'false'})
+            self.create_response(request, {'proficient': False})
+        return self.create_response(request, {'proficient': False})
 
 
 

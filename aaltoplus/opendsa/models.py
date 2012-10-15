@@ -83,7 +83,7 @@ class UserModule(models.Model):
     proficient_date = models.DateTimeField(default="2012-01-01 00:00:00") 
 
     def is_proficient_at(self):
-        return (self.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))  
+        return (self.proficient_date != datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))  
 
 
 class Feedback(models.Model):  
