@@ -1,0 +1,90 @@
+<head>
+ {% block javascript %}  
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>  
+<script>
+$(document).ready(function(){
+	$(".desc").hide();
+	$(".Exercls").hide();
+	$(".descEx").hide();
+        $(".titleExhdr").click(function()
+	{
+		$(".descEx",$(this).parent()).toggle();
+	});
+	$(".titlehdr").click(function()
+	{
+		$(".desc",$(this).parent()).toggle();
+	});
+
+	$(".arrow").click(function()
+	{
+		$(".Exercls",$(this).parent()).toggle();
+		
+	});
+
+
+});
+</script> 
+{% endblock %}
+<style>
+.checktree li { list-style-type: none;} 
+.titlehdr { cursor: pointer; }
+.titleExhdr { cursor: pointer; }
+.arrow {
+cursor: pointer;
+width: 10px;
+height: 10px;
+background-color: black;
+position: absolute;
+margin-left: -20px;
+margin-top: 5px;
+}
+</style>
+</head>
+{% load i18n %} 
+ 
+<h2>Module Summary</h2>
+{{ request }}
+<ul class="checktree">
+	{% for module in modules%}
+		<li> 
+<div class="arrow"></div>
+	{% if module.prof == 0 %}
+<label class="titlehdr" style="color:grey;"><h3>{{ module.name }}</h3></label>
+{% endif %}
+{% if module.prof == -1 %}
+<label class="titlehdr" style="color:red;"><h3>{{ module.name }}</h3></label>
+{% endif %}
+{% if module.prof == 1 %}
+<label class="titlehdr" style="color:green;"><h3>{{ module.name }}</h3></label>
+{% endif %}
+<div style="padding-left: 50px;background-color:lightgoldenrodyellow" class="desc">
+<h4>Covers : {{ module.covers }}</h4>
+<h4>Author : {{ module.author }}</h4>
+<h4>Pre-requisites : {{ module.prerequisites }}</h4>
+</div>
+
+		<ul class="Exercls">
+		{% for exercise in module.userExecs %}
+			<li> 
+	{% if exercise.prof == 0 %}
+		<label class="titleExhdr" style="color:grey;"><h3>{{ exercise.exercise.name }}</h3></label>
+	{% endif %}
+	{% if exercise.prof == -1 %}
+		<label class="titleExhdr" style="color:red;"><h3>{{ exercise.exercise.name }}</h3></label>
+	{% endif %}
+	{% if exercise.prof == 1 %}
+		<label class="titleExhdr" style="color:green;"><h3>{{ exercise.exercise.name }}</h3></label>
+	{% endif %}
+<div style="padding-left: 50px;background-color:lightgoldenrodyellow" class="descEx">
+<h4>Covers : {{ exercise.exercise.covers }}</h4>
+<h4>Author : {{ exercise.exercise.author }}</h4>
+<h4>Description : {{ exercise.exercise.description }}</h4>
+<h4>Streak : {{ exercise.exercise.streak }}</h4>
+</div>
+</li>
+		{% endfor %}
+		</ul>
+</li>	{% endfor %}
+</ul> 
+ 
+
