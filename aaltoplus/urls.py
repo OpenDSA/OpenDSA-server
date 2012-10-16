@@ -1,7 +1,7 @@
 # A+
 from views import login, home, verify_credentials
 from oauth_provider.views import protected_resource_example
-from opendsa.views import exercise_summary
+from opendsa.views import exercise_summary, module_list
 # Django
 from django.conf.urls.defaults import *
 from django.contrib import admin
@@ -19,7 +19,7 @@ urlpatterns = patterns('',
 
     # OpenDSA
     url(r'^teacher_view/', exercise_summary),
-
+    url(r'^student_view/', module_list),
     # A+
     (r'^$', home),
                        
