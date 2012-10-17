@@ -18,8 +18,7 @@ from django.contrib.sessions.models import Session
 from django.http import HttpResponse
 import jsonpickle  
 
-from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, attempt_problem_pe 
-
+from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, attempt_problem_pe, update_module_proficiency
 
 
 #user authentication and registration through the api
@@ -416,6 +415,8 @@ class UserModuleResource(ModelResource):
             else:
                 user_module = None 
             if user_module is not None:
+                user_data, created = UserData.objects.get_or_create(user=kusername) 
+                update_module_proficiency(user_data, request.POST['module'], None)
                 return self.create_response(request, {'proficient': user_module.is_proficient_at()})
             self.create_response(request, {'proficient': False})
         return self.create_response(request, {'proficient': False})
