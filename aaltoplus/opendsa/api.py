@@ -205,6 +205,7 @@ class UserexerciseResource(ModelResource):
                kusername = User.objects.get(username=request.POST['username'])
                user_data, created = UserData.objects.get_or_create(user=kusername)
                module = Module.objects.get(name=act['module_name']) #   'Shellsort') 
+               user_module, exist =  UserModule.objects.get_or_create(user=kusername, module=module)
                if kexercise:
                  user_button,correct = log_button_action(
                     kusername,  #kusername,
@@ -245,6 +246,8 @@ class UserexerciseResource(ModelResource):
             if kusername and kexercise:
                 user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0) 
             user_data, created = UserData.objects.get_or_create(user=kusername)
+            module = Module.objects.get(name=request.POST['module_name'])  
+            user_module, exist =  UserModule.objects.get_or_create(user=kusername, module=module)
             if user_exercise:
                     user_exercise,correct = attempt_problem_pe(
                        user_data,  
@@ -273,7 +276,9 @@ class UserexerciseResource(ModelResource):
             kexercise = Exercise.objects.get(name= request.POST['sha1'])  
             kusername = User.objects.get(username=request.POST['user']) 
             user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise) 
-            user_data, created = UserData.objects.get_or_create(user=kusername) 
+            user_data, created = UserData.objects.get_or_create(user=kusername)
+            module = Module.objects.get(name=request.POST['module_name'])
+            user_module, exist =  UserModule.objects.get_or_create(user=kusername, module=module) 
             if user_exercise:
                  user_exercise,correct = attempt_problem(
                     user_data,  #kusername,
