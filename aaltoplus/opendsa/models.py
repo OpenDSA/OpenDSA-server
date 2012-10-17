@@ -313,4 +313,7 @@ class UserExercise(models.Model):
            user_data.save()
            return True
         return False
- 
+   
+    def is_proficient(self):
+        return (self.proficient_date != datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))
+  
