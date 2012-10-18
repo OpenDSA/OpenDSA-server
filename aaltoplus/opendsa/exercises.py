@@ -62,8 +62,11 @@ def update_module_proficiency(user_data, module, exercise):
 #        print  '%s' %(diff(set(module_ex_list),set(user_prof))==[exercise.id])
         print 'value %s' %(user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))
         if user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'):
-            print 'value1'
-            if (set(module_ex_list).issubset(set(user_prof))) or diff(set(module_ex_list),set(user_prof))==[exercise.id]:
+            if exercise is not None: 
+               is_last_exercise = diff(set(module_ex_list),set(user_prof))==[exercise.id]
+            else:
+               is_last_exercise = False 
+            if (set(module_ex_list).issubset(set(user_prof))) or is_last_exercise:
                 print 'value1'
                 user_module.proficient_date = dt_now 
                 user_module.save()
