@@ -15,20 +15,11 @@ from course.context import CourseContext
 
 
 class userExec:
-	def __init__(self, exercise,long_streak,argtype):
+	def __init__(self, exercise,prof):
 		
-		self.longest_streak = long_streak
-                self.exercise = exercise
+		self.exercise = exercise
 		exerexist = False
-		if argtype == 0 :
-			self.prof= 0
-                else:	
-			for exerc in Exercise.objects.all():
-				if exerc == exercise: 
-					if long_streak >= exerc.streak:
-						self.prof = 1
-					else:
-						self.prof = -1
+		self.prof = prof
 			
 
 class userOutput:
@@ -37,11 +28,11 @@ class userOutput:
  	   self.name = name
 	   self.userExecs = []
     
-    def append(self, exercise,long_streak):
-           self.userExecs.append(userExec(exercise,long_streak,1)); 
+    def append(self, exercise):
+           self.userExecs.append(userExec(exercise, 0)); 
     
-    def append(self, exercise,long_streak,argType):
-           self.userExecs.append(userExec(exercise,long_streak,argType));  
+    def append(self, exercise, prof):
+           self.userExecs.append(userExec(exercise,prof));  
 
 def exercise_summary(request): 
     exercises = Exercise.objects.all() 
@@ -53,16 +44,16 @@ def exercise_summary(request):
             for uservals in userOutputVals:
                 if uservals.name == user_exercise.user:
                        userexist=True;
-                       exerexist =False;
-                       for exerc in uservals.userExecs:
-                                if user_exercise.exercise == exerc:
-                                    exerexist = True;
-                    
-                       if not exerexist:
-                  		uservals.append(user_exercise.exercise , user_exercise.longest_streak,1);  
+		       if user_exercise.is_proficient():
+                       		uservals.append(user_exercise.exercise, 1);
+		       else:  
+				uservals.append(user_exercise.exercise, -1); 
             if not userexist:
                 userOutputVal = userOutput(user_exercise.user);
-                userOutputVal.append(user_exercise.exercise, user_exercise.longest_streak,1)
+                if user_exercise.is_proficient():
+                       		userOutputVal.append(user_exercise.exercise, 1);
+		else:  
+				userOutputVal.append(user_exercise.exercise, -1); 
                 userOutputVals.append(userOutputVal)
 
     userOutputFinalVals = []
@@ -75,9 +66,9 @@ def exercise_summary(request):
 		for userExe in useroutput.userExecs:
 			if exercise == userExe.exercise:
 				execExist = True;
-				userOutputFinVal.append(userExe.exercise, userExe.longest_streak,1)
+				userOutputFinVal.append(userExe.exercise, userExe.prof)
 		if not execExist:
-			userOutputFinVal.append(exercise,0,0)
+			userOutputFinVal.append(exercise,0)
 			execExist = True;
 	userOutputFinalVals.append(userOutputFinVal);
 				
@@ -89,7 +80,7 @@ class useruiExec:
 	def __init__(self, exercise,userExercs):
 		
 		self.exercise = exercise
-		if (exercise.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S')):
+		if exercise.is_proficient():
 			self.prof= -1
                 else:	
 			self.prof = 1
