@@ -20,7 +20,6 @@ import jsonpickle
 
 from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, \
                        attempt_problem_pe, update_module_proficiency, student_grade 
-#user_activity_summary
 
 
 #user authentication and registration through the api
@@ -418,7 +417,6 @@ class UserModuleResource(ModelResource):
         ]
 
     def ismoduleproficient(self, request, **kwargs):
-        #user_activity_summary() 
         if request.POST['username']:    #request.user:
             kmodule = Module.objects.get(name= request.POST['module'])
             kusername = User.objects.get(username=request.POST['username'])

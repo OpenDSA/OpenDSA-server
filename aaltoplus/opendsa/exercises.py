@@ -47,29 +47,6 @@ def make_wrong_attempt(user_data, user_exercise):
         return user_exercise
 
 
-def user_activity_summary():
-       current_user = None
-       user_activity =[]
-       result_list = []
-       print 'records = %s' %len(all_record) 
-       for user_exercise in UserExercise.objects.all():
-          print 
-          if user_exercise.user != current_user or current_user is None:
-             if len(user_activity) > 0:
-                result_list.append(user_activity)
-                del user_activity[:]
-             current_user = user_exercise.user
-          else:
-             if len(user_activity) == 0:
-                user_activity.append(user_exercise.user)
-                user_activity.append({user_exercise.exercise.name:user_exercise.is_proficient()})
-             else:
-                user_activity.append({user_exercise.exercise.name:user_exercise.is_proficient()})  
-       result_list.append(user_activity)
-       print 'Size = %s' %len(result_list)
-       print result_list
-       return result_list
-
 
 def student_grade(user_data):
 
