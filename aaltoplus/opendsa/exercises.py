@@ -53,7 +53,8 @@ def student_grade(user_data):
     prof_list = user_data.get_prof_list()
     book = Books.objects.get(book_name="Fall2012")   #book name will be later send by the frontend
     modules =  Module.objects.all()
-    grade ={}
+    user_grade = {}
+    grade = []
     for ex_prof in prof_list:
         ex = Exercise.objects.get(id=ex_prof)
         for mod in modules:
@@ -67,9 +68,10 @@ def student_grade(user_data):
             points = Decimal(book.ka_points)
         else:
             points = Decimal(book.ss_points)
-        grade[ex.name] = {'description':ex.description,'type':ex.ex_type,'points':points,'module':module_name}  
-    
-    return grade
+        grade.append({'exercise':ex.name, 'description':ex.description,'type':ex.ex_type,'points':points,'module':module_name})  
+    user_grade['headers'] = {"ss":"Slideshow","ka":"MCQ","pe":"Proficiency Ex."}
+    user_grade['grades'] = grade 
+    return user_grade
 
 def update_module_proficiency(user_data, module, exercise):
       
