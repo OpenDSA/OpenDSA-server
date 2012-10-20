@@ -64,7 +64,7 @@ def student_grade(user_data):
             points = Decimal(book.ss_points)
         elif ex.ex_type == 'pe':
             points = Decimal(book.pe_points)
-        elif ex.ex_type == 'ks':
+        elif ex.ex_type == 'ka':
             points = Decimal(book.ka_points)
         else:
             points = Decimal(book.ss_points)
