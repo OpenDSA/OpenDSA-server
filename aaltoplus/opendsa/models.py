@@ -30,6 +30,15 @@ class Exercise(models.Model):
     description = models.TextField()
     streak = models.IntegerField()
 
+class Books(models.Model):
+
+    book_name = models.CharField(max_length=50)
+    course =  models.IntegerField(default = 0)  #will be later changed to  models.ForeignKey(course_instance) 
+    ss_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for mini slideshows av
+    pe_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for JSAV proficiency exercises
+    ka_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for KA exercises
+    pr_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for Programing exercises
+    ot_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for Other  exercises
 
 
 class Module(models.Model):

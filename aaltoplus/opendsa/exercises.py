@@ -14,7 +14,7 @@ from decimal import Decimal
 import jsonpickle 
 import math
 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, Books
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -46,6 +46,53 @@ def make_wrong_attempt(user_data, user_exercise):
 
         return user_exercise
 
+
+def user_activity_summary():
+       current_user = None
+       user_activity =[]
+       result_list = []
+       print 'records = %s' %len(all_record) 
+       for user_exercise in UserExercise.objects.all():
+          print 
+          if user_exercise.user != current_user or current_user is None:
+             if len(user_activity) > 0:
+                result_list.append(user_activity)
+                del user_activity[:]
+             current_user = user_exercise.user
+          else:
+             if len(user_activity) == 0:
+                user_activity.append(user_exercise.user)
+                user_activity.append({user_exercise.exercise.name:user_exercise.is_proficient()})
+             else:
+                user_activity.append({user_exercise.exercise.name:user_exercise.is_proficient()})  
+       result_list.append(user_activity)
+       print 'Size = %s' %len(result_list)
+       print result_list
+       return result_list
+
+
+def student_grade(user_data):
+
+    prof_list = user_data.get_prof_list()
+    book = Books.objects.get(book_name="Fall2012")   #book name will be later send by the frontend
+    modules =  Module.objects.all()
+    grade ={}
+    for ex_prof in prof_list:
+        ex = Exercise.objects.get(id=ex_prof)
+        for mod in modules:
+            if ex.id in mod.get_proficiency_model(): 
+               module_name = mod.name
+        if ex.ex_type == 'ss':
+            points = Decimal(book.ss_points)
+        elif ex.ex_type == 'pe':
+            points = Decimal(book.pe_points)
+        elif ex.ex_type == 'ks':
+            points = Decimal(book.ka_points)
+        else:
+            points = Decimal(book.ss_points)
+        grade[ex.name] = {'description':ex.description,'type':ex.ex_type,'points':points,'module':module_name}  
+    
+    return grade
 
 def update_module_proficiency(user_data, module, exercise):
       

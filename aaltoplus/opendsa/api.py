@@ -18,7 +18,9 @@ from django.contrib.sessions.models import Session
 from django.http import HttpResponse
 import jsonpickle  
 
-from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, attempt_problem_pe, update_module_proficiency
+from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, \
+                       attempt_problem_pe, update_module_proficiency, student_grade 
+#user_activity_summary
 
 
 #user authentication and registration through the api
@@ -369,6 +371,7 @@ class UserDataResource(ModelResource):
     def override_urls(self):
         return [
             url(r"^(?P<resource_name>%s)/isproficient%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('isproficient'), name="api_exeproficient"),
+            url(r"^(?P<resource_name>%s)/getgrade%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('getgrade'), name="api_getgrade"),
         ]
      
     def isproficient(self, request, **kwargs):
@@ -383,6 +386,15 @@ class UserDataResource(ModelResource):
         return self.create_response(request, {'proficient': False})
 
 
+    def getgrade(self, request, **kwargs):
+
+        if request.POST['username']:    #request.user:
+            kusername = User.objects.get(username=request.POST['username'])
+            user_data = UserData.objects.get(user=kusername)
+            if user_data:
+                return self.create_response(request, student_grade(user_data))
+            self.create_response(request, {'grade': False})
+        return self.create_response(request, {'grade': False})
 
 
 
@@ -406,7 +418,7 @@ class UserModuleResource(ModelResource):
         ]
 
     def ismoduleproficient(self, request, **kwargs):
-
+        #user_activity_summary() 
         if request.POST['username']:    #request.user:
             kmodule = Module.objects.get(name= request.POST['module'])
             kusername = User.objects.get(username=request.POST['username'])
