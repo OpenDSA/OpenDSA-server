@@ -7,7 +7,8 @@ from userprofile.models import UserProfile
 # OpenDSA 
 from opendsa.models import Exercise, UserExercise, Module , UserModule
  
-# Django 
+# Django
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response 
 from django.http import HttpResponse, HttpResponseForbidden 
 from course.context import CourseContext 
@@ -34,6 +35,7 @@ class userOutput:
     def append(self, exercise, prof):
            self.userExecs.append(userExec(exercise,prof));  
 
+@login_required
 def exercise_summary(request): 
     exercises = Exercise.objects.all() 
     user_exercises = UserExercise.objects.order_by('user', 'exercise').all() 
