@@ -82,7 +82,6 @@ def student_grade_all(user):
  
 def student_grade(user_data):
 
-    student_summary() 
     prof_list = user_data.get_prof_list()
     book = Books.objects.get(book_name="Fall2012")   #book name will be later send by the frontend
     modules =  Module.objects.all()
