@@ -14,13 +14,14 @@ from decimal import Decimal
 import jsonpickle 
 import math
 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, Books
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, Books, UserSummary
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.utils import simplejson
 from django.contrib.sessions.models import Session
+from django.db import connection
 
 def diff(a, b):
     b = set(b)
@@ -47,9 +48,41 @@ def make_wrong_attempt(user_data, user_exercise):
         return user_exercise
 
 
+def student_grade_all(user):
 
+    #prof_list = user_data.get_prof_list()
+    student_data_id = UserSummary.objects.get(value = user.username)
+    student_data = UserSummary.objects.filter(grouping = student_data_id.grouping)  
+    book = Books.objects.get(book_name="Fall2012")   #book name will be later send by the frontend
+    modules =  Module.objects.all()
+    user_grade = {}
+    grade = []
+    for u_data in student_data:
+        if u_data.key != 'name' and  len(Exercise.objects.filter(name=u_data.key))==1:
+           ex = Exercise.objects.get(name=u_data.key)
+           for mod in modules:
+              if ex.id in mod.get_proficiency_model():
+                 module_name = mod.name    
+           if ex.ex_type == 'ss':
+              points = Decimal(book.ss_points)
+           elif ex.ex_type == 'pe':
+              points = Decimal(book.pe_points)
+           elif ex.ex_type == 'ka':
+              points = Decimal(book.ka_points)
+           else:
+              points = Decimal(book.ss_points)
+           if int(u_data.value) != 1:
+              points = 0
+           grade.append({'exercise':ex.name, 'description':ex.description,'type':ex.ex_type,'points':points,'module':module_name})
+    user_grade['headers'] = {"ss":"Slideshow","ka":"MCQ","pe":"Proficiency Ex."}
+    user_grade['grades'] = grade
+    return user_grade
+
+
+ 
 def student_grade(user_data):
 
+    student_summary() 
     prof_list = user_data.get_prof_list()
     book = Books.objects.get(book_name="Fall2012")   #book name will be later send by the frontend
     modules =  Module.objects.all()

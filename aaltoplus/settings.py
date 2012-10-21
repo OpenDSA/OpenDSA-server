@@ -1,9 +1,10 @@
 # Django settings for aaltoplus project.
 import os
 
-# Lines for Celery. Disabled until actually needed
-# import djcelery
-# djcelery.setup_loader()
+
+# Lines for Celery.
+import djcelery
+djcelery.setup_loader()
 
 # Returns the path to given filename
 def get_path(filename):
@@ -12,13 +13,18 @@ def get_path(filename):
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 #gist middleware variables
-XS_SHARING_ALLOWED_ORIGINS = 'http://algoviz-beta.cc.vt.edu'
+XS_SHARING_ALLOWED_ORIGINS = 'http://algoviz.org'
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
 XS_SHARING_ALLOWED_HEADERS = ["Content-Type"] 
 
 APPEND_SLASH=True
 
 ACCOUNT_ACTIVATION_DAYS = 365 
+
+#celery broker
+#BROKER_URL = 'amqp://guest:guest@localhost:5672/'
+BROKER_URL = "django://" 
+ 
 # This URL is used when building absolute URLs to this service
 BASE_URL = ""
 
@@ -165,7 +171,9 @@ INSTALLED_APPS = (
     'userprofile',
     'apps',
     'opendsa',
-    'registration', 
+    'registration',
+    'kombu.transport.django',
+    'djcelery',
 )
 
 # OAuth settings

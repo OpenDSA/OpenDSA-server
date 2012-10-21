@@ -19,7 +19,7 @@ from django.http import HttpResponse
 import jsonpickle  
 
 from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, \
-                       attempt_problem_pe, update_module_proficiency, student_grade 
+                       attempt_problem_pe, update_module_proficiency, student_grade, student_grade_all 
 
 
 #user authentication and registration through the api
@@ -389,9 +389,9 @@ class UserDataResource(ModelResource):
 
         if request.POST['username']:    #request.user:
             kusername = User.objects.get(username=request.POST['username'])
-            user_data = UserData.objects.get(user=kusername)
-            if user_data:
-                return self.create_response(request, student_grade(user_data))
+            #user_data = UserData.objects.get(user=kusername)
+            if kusername:
+                return self.create_response(request, student_grade_all(kusername))
             self.create_response(request, {'grade': False})
         return self.create_response(request, {'grade': False})
 

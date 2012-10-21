@@ -40,6 +40,13 @@ class Books(models.Model):
     pr_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for Programing exercises
     ot_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for Other  exercises
 
+#A table to hold user status (proficient, started, not started) for each exercise.
+class UserSummary(models.Model):
+
+   grouping =  models.IntegerField()
+   key = models.CharField(max_length=50)
+   value = models.CharField(max_length=50)
+
 
 class Module(models.Model):
 
