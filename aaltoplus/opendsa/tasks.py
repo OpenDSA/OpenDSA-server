@@ -121,7 +121,7 @@ def student_summary():
 
 
 @task()
-@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
+@periodic_task(run_every=crontab(hour="*/3", minute="0", day_of_week="*"))
 def exercise_module():
    #we empty the table first
    cursor = connection.cursor()
@@ -131,16 +131,10 @@ def exercise_module():
 
    for exer in exercises: 
       for mod in modules: 
-         if exer.id in mod.get_proficiency_model() : 
+         if exer.id in mod.get_proficiency_model() and  exer.name!='' and  mod.name!='': 
              ex_mod = models.ExerciseModule(
                   exercise = exer.name,
                   module = mod.name,
-             )
-             ex_mod.save()
-         else: 
-             ex_mod = models.ExerciseModule(
-                  exercise = exer.name,
-                  module = "",
              )
              ex_mod.save()
 
