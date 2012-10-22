@@ -48,6 +48,14 @@ class UserSummary(models.Model):
    value = models.CharField(max_length=50)
 
 
+#A map table between exercise and modules
+class ExerciseModule(models.Model):
+   exercise = models.CharField(max_length=50)
+   module = models.CharField(max_length=50)
+
+
+
+
 class Module(models.Model):
 
      short_display_name = models.CharField(max_length=50)  #name

@@ -14,7 +14,7 @@ from decimal import Decimal
 import jsonpickle 
 import math
 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, Books, UserSummary
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, Books, UserSummary, ExerciseModule 
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -60,9 +60,9 @@ def student_grade_all(user):
     for u_data in student_data:
         if u_data.key != 'name' and  len(Exercise.objects.filter(name=u_data.key))==1:
            ex = Exercise.objects.get(name=u_data.key)
-           for mod in modules:
-              if ex.id in mod.get_proficiency_model():
-                 module_name = mod.name    
+           module_name = '' 
+           if len(ExerciseModule.objects.filter(exercise=ex.name))==1:
+              module_name = ExerciseModule.objects.get(exercise=ex.name).module    
            if ex.ex_type == 'ss':
               points = Decimal(book.ss_points)
            elif ex.ex_type == 'pe':

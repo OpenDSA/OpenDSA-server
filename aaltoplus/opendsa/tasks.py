@@ -14,7 +14,7 @@ from decimal import Decimal
 import jsonpickle
 import math
 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, Books, UserSummary
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, Books, UserSummary, ExerciseModule 
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -55,7 +55,7 @@ def make_wrong_attempt(user_data, user_exercise):
         return user_exercise
 
 @task()
-@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
+@periodic_task(run_every=crontab(hour="*", minute="*/30", day_of_week="*"))
 def student_summary():
 
    #we empty the table first
@@ -120,4 +120,27 @@ def student_summary():
        u_summary1.save()
 
 
+@task()
+@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
+def exercise_module():
+   #we empty the table first
+   cursor = connection.cursor()
+   cursor.execute("TRUNCATE TABLE `opendsa_exercisemodule`")
+   exercises = Exercise.objects.all() 
+   modules = Module.objects.all() 
+
+   for exer in exercises: 
+      for mod in modules: 
+         if exer.id in mod.get_proficiency_model() : 
+             ex_mod = models.ExerciseModule(
+                  exercise = exer.name,
+                  module = mod.name,
+             )
+             ex_mod.save()
+         else: 
+             ex_mod = models.ExerciseModule(
+                  exercise = exer.name,
+                  module = "",
+             )
+             ex_mod.save()
 
