@@ -40,6 +40,8 @@ class Books(models.Model):
     pr_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for Programing exercises
     ot_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for Other  exercises
 
+
+
 #A table to hold user status (proficient, started, not started) for each exercise.
 class UserSummary(models.Model):
 
@@ -97,6 +99,13 @@ class Module(models.Model):
             return ex_id_list
          return 
 
+
+
+#A table to hold Book, modules , exercises data
+class BookModuleExercise (models.Model):
+    book = models.ForeignKey(Books)
+    module = models.ForeignKey(Module)
+    exercise = models.ForeignKey(Exercise) 
 
 
 class UserButton(models.Model):

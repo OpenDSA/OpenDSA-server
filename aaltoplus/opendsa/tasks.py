@@ -15,7 +15,7 @@ import jsonpickle
 import math
 
 from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, \
-                           UserModule, Module, Books, UserSummary, ExerciseModule, UserModuleSummary 
+                           UserModule, Module, Books, UserSummary, ExerciseModule, UserModuleSummary, BookModuleExercise 
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -53,6 +53,27 @@ def make_wrong_attempt(user_data, user_exercise):
         user_exercise.put()
 
         return user_exercise
+
+
+
+
+
+@task()
+@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
+def book_module_exercise():
+
+   modules = Module.objects.all() 
+   book = Books.objects.get(book_name="Fall2012")  
+   for mod in modules:
+      exe_list = mod.get_proficiency_model()
+      for exer in exe_list:
+          bme = BookModuleExercise(  
+                   book= book,
+                   module= mod,
+                   exercise = Exercise.objects.get(id=exer) 
+          )    
+          bme.save()  
+
 
 @task()
 @periodic_task(run_every=crontab(hour="*", minute="*/30", day_of_week="*"))
