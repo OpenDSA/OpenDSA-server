@@ -54,6 +54,18 @@ class ExerciseModule(models.Model):
    module = models.CharField(max_length=50)
 
 
+#Table summarizing all students module activities
+class UserModuleSummary(models.Model): 
+
+    user =  models.CharField(max_length=50)
+    module = models.CharField(max_length=60)
+    module_status =  models.CharField(max_length=3)
+    first_done = models.DateTimeField(default="1800-01-01 00:00:00")
+    last_done = models.DateTimeField(default="1800-01-01 00:00:00")
+    proficient_date = models.DateTimeField(default="1800-01-01 00:00:00")
+    proficient_exe =  models.TextField()
+    started_exe =  models.TextField()
+    notstarted_exe =  models.TextField()
 
 
 class Module(models.Model):

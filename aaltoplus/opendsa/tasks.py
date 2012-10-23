@@ -14,7 +14,8 @@ from decimal import Decimal
 import jsonpickle
 import math
 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, Books, UserSummary, ExerciseModule 
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, \
+                           UserModule, Module, Books, UserSummary, ExerciseModule, UserModuleSummary 
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -40,7 +41,6 @@ def str2bool(v):
 
 def get_pe_name_from_referer(referer):
     tab = referer.split('/')
-    print tab[len(tab)-1].split('.')[0]
     return tab[len(tab)-1].split('.')[0]
 
 def date_from_timestamp(tstamp):
@@ -118,6 +118,78 @@ def student_summary():
             value = '-1',
        )
        u_summary1.save()
+
+
+#given a user exercise activity list returs 3 list conataining not started, started and proficient exercises respectively.
+def exercise_list_split(u_exe_list, mod):
+    prof =[]
+    started = []
+    notstart = []
+    exe_in_table = []
+    for ue in u_exe_list:
+       if ue.exercise.id in mod.get_proficiency_model():
+          exe_in_table.append(ue.exercise.name)  
+          if ue.is_proficient:
+             prof.append(ue.exercise.name)
+          else:
+             started.append(ue.exercise.name)
+    for mod_exe in mod.get_proficiency_model():
+          if mod_exe not in prof and mod_exe not in started: 
+              notstart.append(Exercise.objects.get(id=mod_exe).name)
+    return notstart, started, prof  
+
+@task()
+@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
+def student_module_summary():
+
+   #we empty the table first
+   cursor = connection.cursor()
+   cursor.execute("TRUNCATE TABLE `opendsa_usermodulesummary`")
+  
+   users = User.objects.all()
+   modules = Module.objects.all()
+   exercises = Exercise.objects.all() 
+   for user in users: 
+       for mod in modules:
+           if len(UserModule.objects.filter(user=user,module=mod))==0: #module not started
+               if mod.exercise_list=="":
+                  exe_list ='None' 
+               u_mod_s = models.UserModuleSummary( 
+                       user = user.username,
+                       module = mod.name,
+                       module_status = "-1",
+                       proficient_exe = "",
+                       started_exe = "",
+                       notstarted_exe = exe_list,
+               )
+               u_mod_s.save()
+           else:  
+               u_mod = UserModule.objects.get(user=user,module=mod)
+               if u_mod.is_proficient_at():
+                   stat = "1"
+               else:
+                   stat = "0"
+               u_exe = UserExercise.objects.filter(user=user)
+               notstart, start, prof = exercise_list_split(u_exe, mod) 
+               
+               u_mod_s = models.UserModuleSummary(
+                       user = user.username,
+                       module = mod.name,
+                       module_status = stat,
+                       first_done = u_mod.first_done,
+                       last_done = u_mod.last_done,
+                       proficient_date = u_mod.proficient_date,
+                       proficient_exe = ",".join(prof),
+                       started_exe = ",".join(start),
+                       notstarted_exe = ",".join(notstart),
+               )
+               u_mod_s.save()
+
+
+     
+
+
+
 
 
 @task()
