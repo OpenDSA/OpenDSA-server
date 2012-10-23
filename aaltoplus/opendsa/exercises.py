@@ -69,12 +69,14 @@ def student_grade_all(user):
               points = Decimal(book.pe_points)
            elif ex.ex_type == 'ka':
               points = Decimal(book.ka_points)
+           elif ex.ex_type == 'ot':
+              points = Decimal(book.ot_points)
            else:
               points = Decimal(book.ss_points)
            if int(u_data.value) != 1:
               points = 0
            grade.append({'exercise':ex.name, 'description':ex.description,'type':ex.ex_type,'points':points,'module':module_name})
-    user_grade['max_points'] = {"ss":book.ss_points,"ka":book.ka_points,"pe":book.pe_points}
+    user_grade['max_points'] = {"ss":book.ss_points,"ka":book.ka_points,"pe":book.pe_points, "ot":book.ot_points}
     user_grade['grades'] = grade
     return user_grade
 
