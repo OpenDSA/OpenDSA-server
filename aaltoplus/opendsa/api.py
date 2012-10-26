@@ -172,6 +172,8 @@ class UserexerciseResource(ModelResource):
             kusername = User.objects.get(username=request.POST['username'])
             if  len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==1:
                 user_exercise =  UserExercise.objects.get(user=kusername, exercise=kexercise)
+            elif len(UserExercise.objects.filter(user=kusername, exercise=kexercise))>1:
+                  user_exercise =UserExercise.objects.filter(user=kusername, exercise=kexercise)[0]  
             else:
                 user_exercise = None
             if user_exercise is not None:
@@ -378,7 +380,7 @@ class UserDataResource(ModelResource):
         if request.POST['username']:    #request.user:
             kexercise = Exercise.objects.get(name= request.POST['exercise'])
             kusername = User.objects.get(username=request.POST['username'])
-            user_data = UserData.objects.get(user=kusername)
+            user_data = UserData.objects.filter(user=kusername)[0]
             if kexercise:
                 return self.create_response(request, {'proficient': user_data.is_proficient_at(kexercise)}) 
             self.create_response(request, {'proficient': False}) 
@@ -422,6 +424,8 @@ class UserModuleResource(ModelResource):
             kusername = User.objects.get(username=request.POST['username'])
             if  len(UserModule.objects.filter(user=kusername, module=kmodule))==1:  
                 user_module = UserModule.objects.get(user=kusername, module=kmodule)
+            elif len(UserModule.objects.filter(user=kusername, module=kmodule))>1:
+                user_module = UserModule.objects.filter(user=kusername, module=kmodule)[0]
             else:
                 user_module = None 
             if user_module is not None:

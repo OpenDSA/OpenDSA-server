@@ -14,7 +14,8 @@ from decimal import Decimal
 import jsonpickle 
 import math
 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, Books, UserSummary, ExerciseModule 
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, \
+                           Books, UserSummary, ExerciseModule, BookModuleExercise 
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -60,23 +61,32 @@ def student_grade_all(user):
     for u_data in student_data:
         if u_data.key != 'name' and  len(Exercise.objects.filter(name=u_data.key))==1:
            ex = Exercise.objects.get(name=u_data.key)
-           module_name = '' 
-           if len(ExerciseModule.objects.filter(exercise=ex.name))==1:
-              module_name = ExerciseModule.objects.get(exercise=ex.name).module    
-           if ex.ex_type == 'ss':
-              points = Decimal(book.ss_points)
-           elif ex.ex_type == 'pe':
-              points = Decimal(book.pe_points)
-           elif ex.ex_type == 'ka':
-              points = Decimal(book.ka_points)
-           elif ex.ex_type == 'ot':
-              points = Decimal(book.ot_points)
-           else:
-              points = Decimal(book.ss_points)
-           if int(u_data.value) != 1:
-              points = 0
-           grade.append({'exercise':ex.name, 'description':ex.description,'type':ex.ex_type,'points':points,'module':module_name})
-    user_grade['max_points'] = {"ss":book.ss_points,"ka":book.ka_points,"pe":book.pe_points, "ot":book.ot_points}
+           print 'exe name %s' %ex.name
+           #if  len(BookModuleExercise.objects.filter(exercise=ex))==0:
+           #   break 
+           #module_name = ''
+           print 'line   %s' %len(BookModuleExercise.objects.filter(exercise=ex)) 
+           if len(BookModuleExercise.objects.filter(exercise=ex))==1:
+              module_name = BookModuleExercise.objects.get(exercise=ex).module.name  #ExerciseModule.objects.get(exercise=ex.name).module    
+              print 'module_name  %s'  %module_name
+           #else: 
+           #   break 
+              if ex.ex_type == 'ss':
+                 points = Decimal(book.ss_points)
+              elif ex.ex_type == 'pe':
+                 points = Decimal(book.pe_points)
+              elif ex.ex_type == 'ka':
+                 points = Decimal(book.ka_points)
+              elif ex.ex_type == 'ot':
+                 points = Decimal(book.ot_points)
+              elif ex.ex_type == 'pr':
+                 points = Decimal(book.pr_points)
+              else:
+                 points = Decimal(book.ss_points)
+              if int(u_data.value) != 1:
+                 points = 0
+              grade.append({'exercise':ex.name, 'description':ex.description,'type':ex.ex_type,'points':points,'module':module_name})
+    user_grade['max_points'] = {"ss":book.ss_points,"ka":book.ka_points,"pe":book.pe_points, "ot":book.ot_points, "pr":book.pr_points}
     user_grade['grades'] = grade
     return user_grade
 
