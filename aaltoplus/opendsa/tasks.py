@@ -67,16 +67,18 @@ def book_module_exercise():
    for mod in modules:
       exe_list = mod.get_proficiency_model()
       for exer in exe_list:
-          bme = BookModuleExercise(  
-                   book= book,
-                   module= mod,
-                   exercise = Exercise.objects.get(id=exer) 
-          )    
-          bme.save()  
+          if len( Exercise.objects.filter(id=exer))>0:
+             print 'exercise id = %s' %exer   
+             bme = BookModuleExercise(  
+                      book= book,
+                      module= mod,
+                      exercise = Exercise.objects.get(id=exer) 
+             )    
+             bme.save()  
 
 
 @task()
-@periodic_task(run_every=crontab(hour="*", minute="*/30", day_of_week="*"))
+@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
 def student_summary():
 
    #we empty the table first
@@ -101,12 +103,13 @@ def student_summary():
       elif cur_user != u_exe.user and grouping != 0:
          exe_not_started = diff(set(exe_list),set(u_exe_list))
          for ex in exe_not_started:
-            u_summary1 = models.UserSummary(
-                grouping = grouping,
-                key = ex.name,
-                value = '-1',
-            )
-            u_summary1.save()
+            if len(UserSummary.objects.filter(grouping=grouping, key=ex.name))==0:
+               u_summary1 = models.UserSummary(
+                   grouping = grouping,
+                   key = ex.name,
+                   value = '-1',
+               )
+               u_summary1.save()
          cur_user = u_exe.user
          grouping += 1
          del u_exe_list[:]
@@ -133,12 +136,13 @@ def student_summary():
    u_exe_list.append(u_exe.exercise.id)
    exe_not_started = diff(set(exe_list),set(u_exe_list))
    for ex in exe_not_started:
-       u_summary1 = models.UserSummary(
-            grouping = grouping,
-            key = ex.name,
-            value = '-1',
-       )
-       u_summary1.save()
+       if len(UserSummary.objects.filter(grouping=grouping, key=ex.name))==0:
+          u_summary1 = models.UserSummary(
+               grouping = grouping,
+               key = ex.name,
+               value = '-1',
+          )
+          u_summary1.save()
 
 
 #given a user exercise activity list returs 3 list conataining not started, started and proficient exercises respectively.
@@ -155,8 +159,8 @@ def exercise_list_split(u_exe_list, mod):
           else:
              started.append(ue.exercise.name)
     for mod_exe in mod.get_proficiency_model():
-          if mod_exe not in prof and mod_exe not in started: 
-              notstart.append(Exercise.objects.get(id=mod_exe).name)
+          if mod_exe not in prof and mod_exe not in started and len(Exercise.objects.filter(id=mod_exe))>0: 
+              notstart.append(Exercise.objects.filter(id=mod_exe)[0].name)
     return notstart, started, prof  
 
 @task()

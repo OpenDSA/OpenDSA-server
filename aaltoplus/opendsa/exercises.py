@@ -59,15 +59,15 @@ def student_grade_all(user):
     user_grade = {}
     grade = []
     for u_data in student_data:
-        if u_data.key != 'name' and  len(Exercise.objects.filter(name=u_data.key))==1:
-           ex = Exercise.objects.get(name=u_data.key)
+        if u_data.key != 'name' and  len(Exercise.objects.filter(name=u_data.key))>=1:
+           ex = Exercise.objects.filter(name=u_data.key)[0]
            print 'exe name %s' %ex.name
            #if  len(BookModuleExercise.objects.filter(exercise=ex))==0:
            #   break 
            #module_name = ''
            print 'line   %s' %len(BookModuleExercise.objects.filter(exercise=ex)) 
-           if len(BookModuleExercise.objects.filter(exercise=ex))==1:
-              module_name = BookModuleExercise.objects.get(exercise=ex).module.name  #ExerciseModule.objects.get(exercise=ex.name).module    
+           if len(BookModuleExercise.objects.filter(exercise=ex))>=1:
+              module_name = BookModuleExercise.objects.filter(exercise=ex)[0].module.name  #ExerciseModule.objects.get(exercise=ex.name).module    
               print 'module_name  %s'  %module_name
            #else: 
            #   break 
