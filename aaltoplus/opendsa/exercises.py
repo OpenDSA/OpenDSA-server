@@ -118,7 +118,8 @@ def student_grade(user_data):
     return user_grade
 
 def update_module_proficiency(user_data, module, exercise):
-      
+    
+    print '----------------update_module_proficiency---------------\n'  
     db_module = Module.objects.get(name=module)
     module_ex_list = db_module.get_proficiency_model() 
     user_prof = user_data.get_prof_list() 
@@ -130,17 +131,15 @@ def update_module_proficiency(user_data, module, exercise):
         user_module.last_done = dt_now
 #        print 'diff == %s - Exercise == %s\n' %(diff(set(module_ex_list),set(user_prof)),[int(exercise.id)])
 #        print  '%s' %(diff(set(module_ex_list),set(user_prof))==[exercise.id])
-        print 'value %s' %(user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))
+        print 'value .proficient_date  %s' %(user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))
         if user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'):
             if exercise is not None: 
                is_last_exercise = diff(set(module_ex_list),set(user_prof))==[exercise.id]
             else:
                is_last_exercise = False 
             if (set(module_ex_list).issubset(set(user_prof))) or is_last_exercise:
-                print 'value1'
                 user_module.proficient_date = dt_now 
                 user_module.save()
-                print 'updated'  
                 return True
             else:
                 user_module.save()

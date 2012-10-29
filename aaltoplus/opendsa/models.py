@@ -94,8 +94,8 @@ class Module(models.Model):
                 if len(Exercise.objects.filter(name= ex))==1:
                     ex_id = Exercise.objects.get(name=ex)
                     ex_id_list.append(int(ex_id.id))
-                else:
-                    ex_id_list.append(0)
+                #else:
+                #    ex_id_list.append(0)
             return ex_id_list
          return 
 
