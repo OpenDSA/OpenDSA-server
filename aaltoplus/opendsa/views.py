@@ -83,17 +83,18 @@ def exercise_summary(request):
                              {'user_exerciseLst' : userOutputFinalVals, 'exercises' : exercises, 'tempval' : 0 })
 
 class useruiExec:
-	def __init__(self, exercise,userExercs):
+	def __init__(self, exercise):
 		
-		self.exercise = exercise
-		if exercise.is_proficient():
-			self.prof= -1
-                else:	
-			self.prof = 1
+		self.exercise = exercise;
+		self.prof = 0;
 
-	def __init__(self, exercise,prof):
+	def __init__(self, exercise,isprof):
 		self.exercise = exercise
-		self.prof = 0
+		if isprof:
+			self.prof = 1;
+		else:
+			self.prof =-1;
+
 
 class userOutputModule:
 	     
@@ -108,10 +109,13 @@ class userOutputModule:
                 self.userExecs = []
 		for exercise in Exercise.objects.all():
 			if exercise.name in execvals:
-				if exercise in userExercs:
-					self.userExecs.append(useruiExec(exercise,userExercs))
-				else:
-					self.userExecs.append(useruiExec(exercise,0))
+				exerpresent = False;
+				for userexer in userExercs:
+					if exercise == userexer.exercise:
+						self.userExecs.append(useruiExec(userexer,userexer.is_proficient()))
+						exerpresent = True;
+				if not exerpresent:
+					self.userExecs.append(useruiExec(userexer))
     	
 	    def setprof(self, prof):
 		self.prof = prof	
@@ -141,6 +145,21 @@ def module_list(request):
 					else:
 						userOptMod.setprof(1)
 		userOutputModules.append(userOptMod);	
+	takenExercs = []	
+	profExecs = [];
+	nontakenExercs = []
+	for userexerc in userExercs:
+		if userexerc.is_proficient():
+			profExecs.append(userexerc);
+		takenExercs.append(userexerc.exercise);
+
+	nonProfExecs = [];
+	for userexerc in userExercs:
+		if userexerc not in profExecs:	
+			nonProfExecs.append(useruiExec(userexerc, False));	
+	for exercise in Exercise.objects.all():
+		if exercise not in takenExercs:
+			nontakenExercs.append(exercise);
 		
 	return render_to_response("student_view/module_list.html", 
-                              {'modules' : userOutputModules })
+                              {'modules' : userOutputModules , 'profExecs' : profExecs, 'nonProfExecs' : nonProfExecs, 'nontakenExercs' : nontakenExercs })
