@@ -206,10 +206,11 @@ class UserexerciseResource(ModelResource):
                    kexercise.save()  #, result = Exercise.objects.get_or_create(name = act['av'], streak=streak) #, author='',ex_type='', streak=1)     
                kusername = User.objects.get(username=request.POST['username'])
                user_data, created = UserData.objects.get_or_create(user=kusername)
+               module = None 
                if len(Module.objects.filter(name=act['module_name']))>0: 
                   module = Module.objects.get(name=act['module_name'])  
-               user_module, exist =  UserModule.objects.get_or_create(user=kusername, module=module)
                if kexercise and module:
+                 user_module, exist =  UserModule.objects.get_or_create(user=kusername, module=module)  
                  user_button,correct = log_button_action(
                     kusername,  #kusername,
                     kexercise,

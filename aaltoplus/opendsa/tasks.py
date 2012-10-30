@@ -68,7 +68,6 @@ def book_module_exercise():
       exe_list = mod.get_proficiency_model()
       for exer in exe_list:
           if len( Exercise.objects.filter(id=exer))>0:
-             print 'exercise id = %s' %exer   
              bme = BookModuleExercise(  
                       book= book,
                       module= mod,
@@ -103,7 +102,7 @@ def student_summary():
       elif cur_user != u_exe.user and grouping != 0:
          exe_not_started = diff(set(exe_list),set(u_exe_list))
          for ex in exe_not_started:
-            if len(UserSummary.objects.filter(grouping=grouping, key=ex.name))==0:
+            if len(UserSummary.objects.filter(grouping=grouping, key=ex.name))==0 and ex.name!="":
                u_summary1 = models.UserSummary(
                    grouping = grouping,
                    key = ex.name,
@@ -113,6 +112,10 @@ def student_summary():
          cur_user = u_exe.user
          grouping += 1
          del u_exe_list[:]
+      if u_exe.is_proficient():
+             value = '1'
+      else:
+             value = '0'
 
       if not UserSummary.objects.filter(value=u_exe.user.username):
          u_summary = models.UserSummary(
@@ -121,22 +124,31 @@ def student_summary():
               value = u_exe.user.username,
          )
          u_summary.save()
+         if u_exe.exercise.name !="":
+            u_summary2 = models.UserSummary(
+                   grouping = grouping,
+                   key = u_exe.exercise.name,
+                   value = value,
+            )
+            u_summary2.save()
       else:
-         if u_exe.is_proficient():
-             value = '1'
+         if len(UserSummary.objects.filter(grouping=grouping, key=u_exe.exercise.name))==0:
+            u_summary1 = models.UserSummary(
+                 grouping = grouping,
+                 key = u_exe.exercise.name,
+                 value = value,
+            )
+            u_summary1.save()
          else:
-             value = '0'
-         u_summary1 = models.UserSummary(
-              grouping = grouping,
-              key = u_exe.exercise.name,
-              value = value,
-         )
-         u_summary1.save()
+            u_summary1 = UserSummary.objects.filter(grouping=grouping, key=u_exe.exercise.name)[0]
+            if int(u_summary1.value)<int(value):  
+               u_summary1.value = value
+               u_summary1.save()  
       u_exe_list.append(u_exe.exercise.id)
    u_exe_list.append(u_exe.exercise.id)
    exe_not_started = diff(set(exe_list),set(u_exe_list))
    for ex in exe_not_started:
-       if len(UserSummary.objects.filter(grouping=grouping, key=ex.name))==0:
+       if len(UserSummary.objects.filter(grouping=grouping, key=ex.name))==0 and ex.name!="":
           u_summary1 = models.UserSummary(
                grouping = grouping,
                key = ex.name,
@@ -235,3 +247,32 @@ def exercise_module():
              )
              ex_mod.save()
 
+
+@task()
+@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
+def compute_points():
+
+   user_data = UserData.objects.all()
+   book = Books.objects.get(book_name="Fall2012")
+   for u_data in user_data:
+      grade = 0 
+      prof_list = u_data.get_prof_list()
+      for exercise_id in prof_list:
+          exercise = Exercise.objects.get(id=exercise_id)
+          if exercise.ex_type == 'ss':
+                 points = Decimal(book.ss_points)
+          elif exercise.ex_type == 'pe':
+                 points = Decimal(book.pe_points)
+          elif exercise.ex_type == 'ka':
+                 points = Decimal(book.ka_points)
+          elif exercise.ex_type == 'ot':
+                 points = Decimal(book.ot_points)
+          elif exercise.ex_type == 'pr':
+                 points = Decimal(book.pr_points)
+          else:
+                 points = 0 
+          grade += points
+      print 'Grade\n'
+      print Decimal(format(Decimal(grade), '.2f'))
+      u_data.points = Decimal(format(Decimal(grade), '.2f'))  #grade 
+      u_data.save()
