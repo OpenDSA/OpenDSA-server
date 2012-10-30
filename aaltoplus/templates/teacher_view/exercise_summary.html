@@ -7,9 +7,9 @@ border-collapse: collapse;
 font-size: 10pt;
 }
 th {border: 2px solid darkslateblue;}
-td.header {
+#header {
 border: 2px solid darkslateblue;
-max-width: 50px;
+max-width: 20px;
 height: 250px;
 transform:rotate(-90deg);
 -ms-transform:rotate(-90deg);
@@ -17,12 +17,22 @@ transform:rotate(-90deg);
 -moz-transform: rotate(-90deg);
 -o-transform:rotate(-90deg);
 }
-tr {border: 2px solid darkslateblue;}
-td.name { border: 2px solid darkslateblue; padding: 8px;}
-td.inproficient { border: 2px solid darkslateblue; background-color: tomato;}
-td.proficient { border: 2px solid darkslateblue; background-color: lightgreen;}
-td.none { border: 2px solid darkslateblue; background-color: lightgray;}
+#name { padding: 3px;}
+#inproficient { background-color: tomato;}
+#proficient {background-color: lightgreen;}
+#none { background-color: lightgray;}
+tr {border: 2px solid darkslateblue; cursor: pointer; }
+tr.highlighted td{  border: 2px solid yellow;}
+
 </style>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+  $("tr").click(function(){
+    $(this).toggleClass("highlighted");
+  });
+});
+</script>
 <title>OpenDSA Teacher View - Exercise Summary</title>
 </head>
 
@@ -33,22 +43,23 @@ td.none { border: 2px solid darkslateblue; background-color: lightgray;}
     <tbody> 
     <th> 
     {% for exercise in exercises %} 
-        <td class="header">{{ exercise.name }}</td>           
+        <td id="header">{{ exercise.name }}</td>           
     {% endfor %} 
     </th> 
          
-       {% for userVal in user_exerciseLst %} 
+      {% for userVal in user_exerciseLst %} 
             <tr> 
-            <td class="name">{{ userVal.name }}</td> 
- 	        {% for userExecVal in userVal.userExecs %}
+            <td id="name">{{ userVal.name }}</td>
+
+ 	       {% for userExecVal in userVal.userExecs %}
                 {% if userExecVal.prof == -1 %}
-                    <td class="inproficient"></td> 
+                    <td id="inproficient"></td> 
                 {% endif %}
                 {% if userExecVal.prof == 1 %} 
-                    <td class="proficient"></td>
+                    <td id="proficient"></td>
               	{% endif %}
 				{% if userExecVal.prof == 0 %}
-					<td class="none"></td>
+					<td id="none"></td>
 				{% endif %}				
             {% endfor %} 
             </tr> 
