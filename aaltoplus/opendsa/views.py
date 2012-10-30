@@ -114,9 +114,6 @@ class userOutputModule:
 					if exercise == userexer.exercise:
 						self.userExecs.append(useruiExec(userexer,userexer.is_proficient()))
 						exerpresent = True;
-				if not exerpresent:
-					self.userExecs.append(useruiExec(userexer))
-    	
 	    def setprof(self, prof):
 		self.prof = prof	
             
