@@ -77,7 +77,7 @@ def book_module_exercise():
 
 
 @task()
-@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
+@periodic_task(run_every=crontab(hour="*", minute="*/8", day_of_week="*"))
 def student_summary():
 
    #we empty the table first
@@ -272,7 +272,5 @@ def compute_points():
           else:
                  points = 0 
           grade += points
-      print 'Grade\n'
-      print Decimal(format(Decimal(grade), '.2f'))
       u_data.points = Decimal(format(Decimal(grade), '.2f'))  #grade 
       u_data.save()
