@@ -216,7 +216,7 @@ class UserexerciseResource(ModelResource):
                     kexercise,
                     module,
                     act['type'],
-                    'description', 
+                    act['desc'], 
                     act['tstamp'],
                     request.META['REMOTE_ADDR'],
                     )
