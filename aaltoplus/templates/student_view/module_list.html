@@ -1,8 +1,14 @@
 <head>
  {% block javascript %}  
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>  
+<script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+<script src="http://code.jquery.com/ui/1.9.0/jquery-ui.js"></script>
+<script type="text/javascript" src="{{ static_url }}module_list.js"></script>
 <script>
 $(document).ready(function(){
+
+	$("#tabs").tabs();
+	$("#tabs-1").click();
+
 	$(".desc").hide();
 	$(".Exercls").hide();
 	$(".descEx").hide();
@@ -14,10 +20,20 @@ $(document).ready(function(){
 	{
 		$(".desc",$(this).parent()).toggle();
 	});
+	$(".modulehdr").click(function()
+	{
+	$(".desc",$(this).parent()).toggle();
+	$(".Exercls",$(this).parent()).toggle();
+//	$(".arrow",$(this).parent()).toggleClass("collapsed");
+//	$(".arrow",$(this).parent()).toggleClass("expanded");
+
+	});
 
 	$(".arrow").click(function()
 	{
 		$(".Exercls",$(this).parent()).toggle();
+	//	$(this).toggleClass("collapsed");
+	//	$(this).toggleClass("expanded");
 		
 	});
 
@@ -27,64 +43,155 @@ $(document).ready(function(){
 {% endblock %}
 <style>
 .checktree li { list-style-type: none;} 
+.ProfExercls li { list-style-type: none;}
+.nonProfExercls li { list-style-type: none;} 
 .titlehdr { cursor: pointer; }
+.modulehdr { cursor: pointer; }
 .titleExhdr { cursor: pointer; }
 .arrow {
 cursor: pointer;
-width: 10px;
-height: 10px;
-background-color: black;
 position: absolute;
 margin-left: -20px;
-margin-top: 5px;
+margin-top: 4px;
+width: 0; 
+height: 0; 
+}
+.collapsed{
+border-top: 6px solid transparent;
+border-bottom: 6px solid transparent;
+border-left: 5px solid #030344;
+}
+
+.expanded{
+margin-top: 7px !important;
+margin-left: -25px !important;
+border-left: 6px solid transparent;
+border-right: 6px solid transparent;
+border-top: 5px solid #030344;
 }
 </style>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.0/themes/base/jquery-ui.css">
 </head>
 {% load i18n %} 
- 
-<h2>Module Summary</h2>
-{{ request }}
-<ul class="checktree">
-	{% for module in modules%}
-		<li> 
-<div class="arrow"></div>
-	{% if module.prof == 0 %}
-<label class="titlehdr" style="color:grey;"><h3>{{ module.name }}</h3></label>
-{% endif %}
-{% if module.prof == -1 %}
-<label class="titlehdr" style="color:red;"><h3>{{ module.name }}</h3></label>
-{% endif %}
-{% if module.prof == 1 %}
-<label class="titlehdr" style="color:green;"><h3>{{ module.name }}</h3></label>
-{% endif %}
-<div style="padding-left: 50px;background-color:lightgoldenrodyellow" class="desc">
-<h4>Covers : {{ module.covers }}</h4>
-<h4>Author : {{ module.author }}</h4>
-<h4>Pre-requisites : {{ module.prerequisites }}</h4>
-</div>
 
-		<ul class="Exercls">
-		{% for exercise in module.userExecs %}
-			<li> 
-	{% if exercise.prof == 0 %}
-		<label class="titleExhdr" style="color:grey;"><h3>{{ exercise.exercise.name }}</h3></label>
+
+
+
+<div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+	<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist">
+		<li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab" tabindex="0" aria-controls="tabs-1" aria-labelledby="ui-id-1" aria-selected="true"><a href="#tabs-1" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-1">Module Summary</a></li>
+		<li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-2" aria-labelledby="ui-id-2" aria-selected="false"><a href="#tabs-2" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-2">Proficient Exercises</a></li>
+		<li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-3" aria-labelledby="ui-id-3" aria-selected="false"><a href="#tabs-3" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-3">Exercises to be taken</a></li>
+	</ul>
+	<div id="tabs-1" aria-labelledby="ui-id-1" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="" aria-expanded="true" aria-hidden="false">
+		<h2>Module Summary</h2>
+	<ul class="checktree">
+	{% for module in modules%}
+	<li> 
+	<div class="arrow collapsed"></div>
+	{% if module.prof == 0 %}
+	<label class="modulehdr" style="color:grey;"><h4>{{ module.name }}</h4></label>
 	{% endif %}
-	{% if exercise.prof == -1 %}
-		<label class="titleExhdr" style="color:red;"><h3>{{ exercise.exercise.name }}</h3></label>
+	{% if module.prof == -1 %}
+	<label class="modulehdr" style="color:red;"><h4>{{ module.name }}</h4></label>
 	{% endif %}
-	{% if exercise.prof == 1 %}
-		<label class="titleExhdr" style="color:green;"><h3>{{ exercise.exercise.name }}</h3></label>
+	{% if module.prof == 1 %}
+	<label class="modulehdr" style="color:green;"><h4>{{ module.name }}</h4></label>
 	{% endif %}
-<div style="padding-left: 50px;background-color:lightgoldenrodyellow" class="descEx">
-<h4>Covers : {{ exercise.exercise.covers }}</h4>
-<h4>Author : {{ exercise.exercise.author }}</h4>
-<h4>Description : {{ exercise.exercise.description }}</h4>
-<h4>Streak : {{ exercise.exercise.streak }}</h4>
+	
+	<ul class="Exercls">
+	{% for exercise in module.userExecs %}
+		<li> 
+		<div class="arrow collapsed"></div>
+		{% if exercise.prof == 0 %}
+		<label class="titleExhdr" style="color:grey;"><h4>{{ exercise.exercise.exercise.name }}</h4></label>
+		{% endif %}
+		{% if exercise.prof == -1 %}
+		<label class="titleExhdr" style="color:red;"><h4>{{ exercise.exercise.exercise.name }}</h4></label>
+		{% endif %}
+		{% if exercise.prof == 1 %}
+		<label class="titleExhdr" style="color:green;"><h4>{{ exercise.exercise.exercise.name}}</h4></label>
+		{% endif %}
+		<div style="padding-left: 50px;background-color:lightgoldenrodyellow" class="descEx">
+		<h5>Covers : {{ exercise.exercise.exercise.covers }}</h5>
+		<h5>Author : {{ exercise.exercise.exercise.author }}</h5>
+		<h5>Description : {{ exercise.exercise.exercise.description }}</h5>
+		<h5>Streak : {{ exercise.exercise.exercise.streak }}</h5>
+		</div>
+		</li>
+	{% endfor %}
+	</ul>
+</li>	
+{% endfor %}
+</ul> 
+</div>
+	<div id="tabs-2" aria-labelledby="ui-id-2" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; " aria-expanded="false" aria-hidden="true">
+		 
+<ul class="ProfExercls">
+		{% for exercise in profExecs %}
+			<li> 	
+		
+<div class="arrow collapsed"></div>
+<label class="titleExhdr" style="color:green;"><h4>{{ exercise.exercise.name }}</h4>
+<div style="padding-left: 50px;background-color:lightgoldenrodyellow;color:black" class="descEx">
+<h4>Exercise Details</h4>
+<div>Covers : {{ exercise.exercise.covers }}</div>
+<div>Author : {{ exercise.exercise.author }}</div>
+<div>Description : {{ exercise.exercise.description }}</div>
+<div>Streak : {{ exercise.exercise.streak }}</div>
+<h4>User Performance</h4>
+<div>Longest Streak : {{ exercise.longest_streak }}</div>
+<div>Total Correct : {{ exercise.total_correct }}</div>
+<div>Total Done : {{ exercise.total_done  }}</div>
 </div>
 </li>
 		{% endfor %}
 		</ul>
-</li>	{% endfor %}
-</ul> 
+	</div>
+        <div id="tabs-3" aria-labelledby="ui-id-3" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; " aria-expanded="false" aria-hidden="true">
+        <ul class="nonProfExercls">
+		{% for nonProfExercise in nonProfExecs %}
+			<li> 	
+		<div class="arrow collapsed"></div>
+		<label class="titleExhdr" style="color:red;"><h4>{{ nonProfExercise.exercise.exercise.name }}</h4>
+	
+        <div style="padding-left: 50px;background-color:lightgoldenrodyellow;color:black" class="descEx">
+	<h4>Exercise Details</h4>
+	<div>Covers : {{ nonProfExercise.exercise.exercise.covers }}</div>
+	<div>Author : {{ nonProfExercise.exercise.exercise.author }}</div>
+	<div>Description : {{ nonProfExercise.exercise.exercise.description }}</div>
+	<div>Streak : {{ nonProfExercise.exercise.exercise.streak }}</div>
+	<h4>User Performance</h4>
+	<div>Longest Streak : {{ nonProfExercise.exercise.longest_streak }}</div>
+	<div>Total Correct : {{ nonProfExercise.exercise.total_correct }}</div>
+	<div>Total Done : {{ nonProfExercise.exercise.total_done  }}</div>
+	</div>
+</li>
+		{% endfor %}
+		</ul>
+<ul class="nonTakenExercls">
+		{% for nontakenExercise in nontakenExercs %}
+			<li> 	
+
+		<label class="titleExhdr" style="color:grey;"><h4>{{ nontakenExercise.name }}</h4>
+<div style="padding-left: 50px;background-color:lightgoldenrodyellow;color:black" class="descEx">
+<h4>Exercise Details</h4>
+<div>Covers : {{ nontakenExercise.covers }}</div>
+<div>Author : {{ nontakenExercise.author }}</div>
+<div>Description : {{ nontakenExercise.description }}</div>
+<div>Streak : {{ nontakenExercise.streak }}</div>
+</div>
+	</li>
+{% endfor %}
+</ul>
+	</div>
+</div>
+
+
+
+
+
+
  
+
 
