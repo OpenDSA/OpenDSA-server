@@ -72,7 +72,7 @@ def exercises_time(request):
     userExerciseLog = UserExerciseLog.objects.order_by('exercise').all();
         
     temp = ''   
-    time =  0 #float fro division
+    time =  0
     exercises = []
     count = 0
     
