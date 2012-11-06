@@ -5,7 +5,7 @@ from icalendar import Calendar, Event
 from userprofile.models import UserProfile 
  
 # OpenDSA 
-from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserSummary
+from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserSummary, UserData
  
 # Django
 from django.contrib.auth.decorators import login_required
@@ -42,6 +42,8 @@ def exercise_summary(request):
     BookModExercises = BookModuleExercise.objects.order_by('book', 'module').all()
     for bookmodex in BookModExercises:
             exercises.append(bookmodex.exercise)
+
+    userData = UserData.objects.order_by('user').all()
 
     user_exercises = UserExercise.objects.order_by('user', 'exercise').all()
 
@@ -80,7 +82,7 @@ def exercise_summary(request):
 	userOutputFinalVals.append(userOutputFinVal);
 				
     return render_to_response("teacher_view/exercise_summary.html", 
-                             {'user_exerciseLst' : userOutputFinalVals, 'exercises' : exercises, 'tempval' : 0 })
+                             {'user_exerciseLst' : userOutputFinalVals, 'exercises' : exercises, 'userData' : userData })
 
 class useruiExec:
 	def __init__(self, exercise):
