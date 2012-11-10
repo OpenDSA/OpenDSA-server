@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<head>
+	<title>Exercises Time Graph</title>
+</head>
+
+<body>
+Exercises Bar Graph
+	<div id="graphDiv1"></div>
+	<br />
+	<!--[if IE]><script src="excanvas.js"></script><![endif]-->
+	<script src="http://www.williammalone.com/articles/html5-canvas-javascript-bar-graph/downloads/html5-canvas-bar-graph.js"></script>
+	<script>(function () {
+	
+		function createCanvas(divName) {
+			
+			var div = document.getElementById(divName);
+			var canvas = document.createElement('canvas');
+			div.appendChild(canvas);
+			if (typeof G_vmlCanvasManager != 'undefined') {
+				canvas = G_vmlCanvasManager.initElement(canvas);
+			}	
+			var ctx = canvas.getContext("2d");
+			return ctx;
+		}
+		
+		var ctx = createCanvas("graphDiv1");
+		
+		var graph = new BarGraph(ctx);
+		graph.maxValue = 80;
+		graph.margin = 1;
+		graph.width = 20000;
+		graph.height = 350;
+		{% for exeStat in exercises %} 
+		graph.xAxisLabelArr.push("{{exeStat.exercise.name}}");
+	    {% endfor %} 
+	    var newArr = [];
+	    {% for exeStat in exercises %} 
+		newArr.push("{{exeStat.score}}");
+	    {% endfor %} 
+		setInterval(function () {
+			graph.update(newArr);
+		});
+
+	}());
+		
+</script>
+</body>
+</html>

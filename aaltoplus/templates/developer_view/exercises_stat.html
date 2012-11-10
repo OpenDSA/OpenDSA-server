@@ -1,0 +1,55 @@
+<html>
+<head>
+	<title>Exercises Statistics</title>
+
+<style>
+body {font-family:Arial; color: darkslateblue;}
+table {border: 2px solid darkslateblue;
+border-collapse: collapse;
+font-size: 10pt;
+}
+th {border: 2px solid darkslateblue;}
+#header {
+border: 2px solid darkslateblue;
+max-width: 20px;
+height: 250px;
+transform:rotate(-90deg);
+-ms-transform:rotate(-90deg);
+-webkit-transform: rotate(-90deg);
+-moz-transform: rotate(-90deg);
+-o-transform:rotate(-90deg);
+}
+#name { padding: 3px;}
+#insufficient { background-color: tomato;}
+#sufficient {background-color: lightgreen;}
+#none { background-color: lightgray;}
+tr {border: 2px solid darkslateblue; cursor: pointer; }
+tr.highlighted td{  border: 2px solid yellow;}
+
+</style>
+
+</head>
+
+<body>
+Exercises Statistics
+<table> 
+    <tbody> 
+    <th> 
+    {% for exeStat in exercises %} 
+    	{% if exeStat.score > 0.5 %}
+    	<tr>
+        <td id="sufficient"><a href="../exercises_bargraph/">{{ exeStat.exercise.name }}  {{ exeStat.score }}</a>></td>           
+        </tr>>
+		{% endif %}		
+		{% if exeStat.score <= 0.5 %}
+		<tr>
+        <td id="insufficient"><a href="../exercises_bargraph/">{{ exeStat.exercise.name }}  {{ exeStat.score }}</a>></td>           
+        </tr>
+		{% endif %}				
+    {% endfor %} 
+    </th> 
+    </tbody>
+</table>
+</body>
+
+</html>
