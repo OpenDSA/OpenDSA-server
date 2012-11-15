@@ -1,0 +1,86 @@
+<html>
+<head>
+	<title>Student Activity: Module Load</title>
+
+<style>
+body {font-family:Arial; color: darkslateblue;}
+table {border: 2px solid darkslateblue;
+border-collapse: collapse;
+font-size: 10pt;
+}
+th {border: 2px solid darkslateblue;}
+#header {
+border: 2px solid darkslateblue;
+max-width: 20px;
+height: 250px;
+transform:rotate(-90deg);
+-ms-transform:rotate(-90deg);
+-webkit-transform: rotate(-90deg);
+-moz-transform: rotate(-90deg);
+-o-transform:rotate(-90deg);
+}
+#name { padding: 3px;}
+#insufficient { background-color: tomato;}
+#sufficient {background-color: lightgreen;}
+#none { background-color: lightgray;}
+tr {border: 2px solid darkslateblue; cursor: pointer; }
+tr.highlighted td{  border: 2px solid yellow;}
+
+</style>
+
+</head>
+Frequency of loading modules
+<body>
+	<div id="graphDiv1"></div>
+	<br />
+	<!--[if IE]><script src="excanvas.js"></script><![endif]-->
+	<script src="http://www.williammalone.com/articles/html5-canvas-javascript-bar-graph/downloads/html5-canvas-bar-graph.js"></script>
+	<script>(function () {
+	
+		function createCanvas(divName) {
+			
+			var div = document.getElementById(divName);
+			var canvas = document.createElement('canvas');
+			div.appendChild(canvas);
+			if (typeof G_vmlCanvasManager != 'undefined') {
+				canvas = G_vmlCanvasManager.initElement(canvas);
+			}	
+			var ctx = canvas.getContext("2d");
+			return ctx;
+		}
+		
+		var ctx = createCanvas("graphDiv1");
+		
+		var graph = new BarGraph(ctx);
+		graph.maxValue = {{max}};
+		graph.margin = 10;
+		graph.width = {{number}} * 100;
+		graph.height = 200;
+		{% for activity in activities %} 
+		graph.xAxisLabelArr.push("{{activity.module.name}}");
+	    {% endfor %} 
+	    var newArr = [];
+		{% for activity in activities %} 
+		newArr.push("{{activity.activity_num}}");
+	    {% endfor %} 
+		setInterval(function (){
+			graph.update(newArr, 10000);
+		}
+		);
+
+	}());
+		
+</script>
+<table> 
+    <tbody> 
+    <th> 
+    {% for activity in activities %} 
+    	<tr>
+        <td><a href="/developer_view/exercise_list/{{student}}/{{activity.module.id}}/">{{ activity.module.name }}</a></td>           
+        </tr>			
+    {% endfor %} 
+    </th> 
+    </tbody>
+</table>
+</body>
+</html>

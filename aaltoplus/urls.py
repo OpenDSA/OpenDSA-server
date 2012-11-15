@@ -2,7 +2,7 @@
 from views import login, home, verify_credentials
 from oauth_provider.views import protected_resource_example
 from opendsa.views import exercise_summary, module_list
-from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time
+from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail
 # Django
 from django.conf.urls.defaults import *
 from django.contrib import admin
@@ -24,6 +24,12 @@ urlpatterns = patterns('',
     url(r'^developer_view/exercises_stat/$', exercises_stat),
     url(r'^developer_view/exercises_bargraph/$', exercises_bargraph),
     url(r'^developer_view/exercises_time/$', exercises_time),
+    url(r'^developer_view/student_list/$', student_list),  
+    url(r'^developer_view/student_exercise/(?P<student>[\w]+)/$', student_exercise),
+    url(r'^developer_view/exercise_list/(?P<student>[\w]+)/(?P<module>[\w]+)/$', exercise_list),      
+    url(r'^developer_view/exercise_detail/(?P<student>[\w]+)/(?P<module>[\w]+)/(?P<exercise>[\w]+)/$', exercise_detail),      
+
+
     # A+
     (r'^$', home),
                        
