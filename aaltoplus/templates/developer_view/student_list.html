@@ -1,0 +1,33 @@
+<html>
+<head>
+	<title>Student List</title>
+
+<style>
+body {font-family:Arial; color: darkslateblue;}
+table {border: 2px solid darkslateblue;
+border-collapse: collapse;
+font-size: 10pt;
+}
+th {border: 2px solid darkslateblue;}
+tr {border: 2px solid darkslateblue; cursor: pointer; }
+tr.highlighted td{  border: 2px solid yellow;}
+
+</style>
+
+</head>
+
+<body>
+Student List<br>
+<table> 
+    <tbody> 
+    <th> 
+    {% for student in students %} 
+    	<tr>
+        <td><a href="../student_exercise/{{student.id}}/">{{ student.username }} id:{{student.id}}</a></td>           
+        </tr>
+    {% endfor %} 
+    </th> 
+    </tbody>
+</table>
+</body>
+</html>

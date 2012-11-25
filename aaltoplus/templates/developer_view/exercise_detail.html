@@ -1,0 +1,94 @@
+<html>
+<head>
+	<title>Exercise Details</title>
+
+<style>
+body {font-family:Arial; color: darkslateblue;}
+table {border: 2px solid darkslateblue;
+border-collapse: collapse;
+font-size: 10pt;
+}
+th {border: 2px solid darkslateblue;}
+tr {border: 2px solid darkslateblue; cursor: pointer; }
+tr.highlighted td{  border: 2px solid yellow;}
+
+</style>
+
+</head>
+
+<body>
+Exercise Details by Steps
+	<div id="graphDiv1"></div>
+	<br />
+	<!--[if IE]><script src="excanvas.js"></script><![endif]-->
+	<script src="http://www.williammalone.com/articles/html5-canvas-javascript-bar-graph/downloads/html5-canvas-bar-graph.js"></script>
+	<script>(function () {
+	
+		function createCanvas(divName) {
+			
+			var div = document.getElementById(divName);
+			var canvas = document.createElement('canvas');
+			div.appendChild(canvas);
+			if (typeof G_vmlCanvasManager != 'undefined') {
+				canvas = G_vmlCanvasManager.initElement(canvas);
+			}	
+			var ctx = canvas.getContext("2d");
+			return ctx;
+		}
+		
+		var ctx = createCanvas("graphDiv1");
+		
+		var graph = new BarGraph(ctx);
+		graph.maxValue = {{max}};
+		graph.margin = 10;
+		graph.width = {{number}} * 100;
+		graph.height = 200;
+		graph.colors = [];
+		{% for exe_step in exe_steps %} 
+		graph.xAxisLabelArr.push("{{exe_step.step_num}}");
+		{% if exe_step.is_backward == 'true' %} 
+		graph.colors.push("red");
+		{% elif exe_step.is_backward == 'false' %} 
+		graph.colors.push("blue");
+	    {% endif %} 
+	    {% endfor %} 
+	    var newArr = [];
+		{% for exe_step in exe_steps %} 
+		newArr.push("{{exe_step.time}}");
+	    {% endfor %} 
+		setInterval(function (){
+			graph.update(newArr, 10000);
+		}
+		);
+
+	}());
+		
+</script>
+<table> 
+    <tbody> 
+    <th> 
+    {% for exe_step in exe_steps %} 
+    	<tr>
+        <td>{{ exe_step.step_num }} {{ exe_step.time }} {{ exe_step.is_backward }}</td>           
+        </tr>
+    {% endfor %} 
+    </th> 
+    </tbody>
+</table>
+
+<br>Review Statistics</br>
+<br>proficient date: {{proficient_date}} </br>
+<br>review dates:</br>
+<table> 
+    <tbody> 
+    <th> 
+    {% for review_date in review_dates %} 
+    	<tr>
+        <td>{{ review_date }}</td>           
+        </tr>		
+    {% endfor %} 
+    </th> 
+    </tbody>
+</table>
+</body>
+</html>
