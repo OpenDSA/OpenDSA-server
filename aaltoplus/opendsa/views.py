@@ -1,6 +1,6 @@
 # Python 
 from icalendar import Calendar, Event 
- 
+import json  
 # A+ 
 from userprofile.models import UserProfile 
  
@@ -12,7 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response 
 from django.http import HttpResponse, HttpResponseForbidden 
 from course.context import CourseContext 
-
+from django.utils import simplejson
+from django.core import serializers
 
 
 class userExec:
@@ -85,80 +86,160 @@ def exercise_summary(request):
                              {'user_exerciseLst' : userOutputFinalVals, 'exercises' : exercises, 'userData' : userData })
 
 class useruiExec:
-	def __init__(self, exercise):
-		
-		self.exercise = exercise;
-		self.prof = 0;
-
-	def __init__(self, exercise,isprof):
-		self.exercise = exercise
-		if isprof:
-			self.prof = 1;
+	def __init__(self, exercise, exectype,books):
+		if exectype == 0 :
+			self.exercise = exercise;
+			self.prof = 0;
 		else:
-			self.prof =-1;
+			self.userexercise = exercise
+			if self.userexercise.is_proficient():
+				self.prof = 1;
+				for book in books:
+					if self.userexercise.exercise.ex_type == 'ka':
+						self.points = book.ka_points;
+					if self.userexercise.exercise.ex_type == 'ss':
+						self.points =  book.ss_points;
+					if self.userexercise.exercise.ex_type == 'pe':
+						self.points =  book.pe_points;
+					if self.userexercise.exercise.ex_type == 'pr':
+						self.points =  book.pr_points;
+					if self.userexercise.exercise.ex_type == 'ot':
+						self.points = book.ot_points;
+					break;
+			else:
+				self.prof =-1;
 
+	
+class profUIExec:
+  	def __init__(self,userExerc,books):
+		self.userexercise= userExerc;
+		for book in books:
+			if userExerc.exercise.ex_type == 'ka':
+				self.points = book.ka_points;
+			if userExerc.exercise.ex_type == 'ss':
+				self.points =  book.ss_points;
+			if userExerc.exercise.ex_type == 'pe':
+				self.points =  book.pe_points;
+			if userExerc.exercise.ex_type == 'pr':
+				self.points =  book.pr_points;
+			if userExerc.exercise.ex_type == 'ot':
+				self.points = book.ot_points;
+			break;
+
+	
 
 class userOutputModule:
 	     
-            def __init__(self, mod,userExercs):
+            def __init__(self, mod,userExercs,books):
 
                 self.name = mod.short_display_name
 		self.covers = mod.covers
 		self.author = mod.author
+		self.prof = 0;
 		self.prerequisites = mod.prerequisites
-		self.prof = 0
 		execvals = mod.exercise_list.split(',');
-                self.userExecs = []
-		for exercise in Exercise.objects.all():
-			if exercise.name in execvals:
-				exerpresent = False;
-				for userexer in userExercs:
-					if exercise == userexer.exercise:
-						self.userExecs.append(useruiExec(userexer,userexer.is_proficient()))
-						exerpresent = True;
+                self.userExecs = [];
+		countExec = 0	
+		if execvals.count > 0:	
+			for exercise in Exercise.objects.all():
+				if exercise.name in execvals:
+					if exercise.name != '':
+						countExec = countExec + 1;
+						exerpresent = False;
+						for userexer in userExercs:
+							if exercise == userexer.exercise:
+								self.userExecs.append(useruiExec(userexer,1,books))
+								exerpresent = True;
+						if not exerpresent:
+							self.userExecs.append(useruiExec(exercise,0,books))
+		self.countExec = countExec;		
 	    def setprof(self, prof):
 		self.prof = prof	
             
-            def append(self, exercise,long_streak):
-                self.userExecs.append(userExec(exercise,long_streak,1)); 
+         
+def GetModuleDetails(request):
+        
+	userName= request.META.get('USER')
+	modules = Module.objects.all();
 
-	    def append(self, exercise,long_streak,argType):
-                self.userExecs.append(userExec(exercise,long_streak,argType));
+	userExercs = []
+	userScore = 0;
+	for userdata in UserData.objects.all():
+		if userdata.user.username == userName:
+			userScore = userdata.points;
+	for userexerc in UserExercise.objects.all():
+		if userexerc.user.username == userName:
+			userExercs.append(userexerc);
+	for module in modules:
+		outputMod = userOutputModule(module,userExercs,0);
+
+#	data = serializers.serialize('json',outputMod)	
+#	json = simplejson.dumps(data);
+#	return_str =  render_to_response({"UserModule" : outputMod })
+	return HttpResponse(yaml.dump(outputMod));
+
+def xhr_test(request):
+    if request.is_ajax():
+        message = "Hello AJAX"
+    else:
+        message = "Hello"
+    return HttpResponse(message);
+
 
 def module_list(request):
-	modules = Module.objects.all();
+     	book = Books.objects.all();
+        username= request.META.get('USER')
+	username = 'shaffer'
+        modules = Module.objects.all();
 	usermodules = UserModule.objects.all();
 	userExercs = []
-	for userexerc in UserExercise.objects.all():
-		if userexerc.user.username == request.META.get('USER'):
+	userScore = 0;
+	userDataObjects = UserData.objects.all()
+	UserExercises = UserExercise.objects.all()
+	for userdata in userDataObjects:
+		if userdata.user.username == username:
+			userScore = userdata.points;
+			break;
+	for userexerc in UserExercises :
+		if userexerc.user.username == username:
 			userExercs.append(userexerc);
+	UserModuleDict = dict()
+	for usermod in usermodules:
+		if usermod.user.username == username:
+			UserModuleDict[usermod.module] =  usermod;
+
 	userOutputModules = []
 	for module in modules:
-		userOptMod = userOutputModule(module,userExercs)
-		moduleexist = False;
-		for usermod in usermodules:
-			if usermod.user.username == request.META.get('USER') : 
-				if module == usermod.module:
-					if usermod.is_proficient_at():
-						userOptMod.setprof(-1)
-					else:
+		if module.exercise_list.split(',').count > 0:
+			userOptMod = userOutputModule(module,userExercs,book)
+			if userOptMod.countExec > 0:
+				moduleexist = False;
+				if module in UserModuleDict.keys():
+					if UserModuleDict[module].is_proficient_at():
 						userOptMod.setprof(1)
-		userOutputModules.append(userOptMod);	
+					else:
+						userOptMod.setprof(-1)
+				userOutputModules.append(userOptMod);	
 	takenExercs = []	
 	profExecs = [];
 	nontakenExercs = []
+        profUIExecs = []
+	nonProfExecs = [];
 	for userexerc in userExercs:
 		if userexerc.is_proficient():
 			profExecs.append(userexerc);
+			profUIExecs.append(profUIExec(userexerc,book));
 		takenExercs.append(userexerc.exercise);
 
-	nonProfExecs = [];
+	
 	for userexerc in userExercs:
 		if userexerc not in profExecs:	
-			nonProfExecs.append(useruiExec(userexerc, False));	
+			nonProfExecs.append(useruiExec(userexerc, False,book));	
 	for exercise in Exercise.objects.all():
 		if exercise not in takenExercs:
 			nontakenExercs.append(exercise);
-		
+	
 	return render_to_response("student_view/module_list.html", 
-                              {'modules' : userOutputModules , 'profExecs' : profExecs, 'nonProfExecs' : nonProfExecs, 'nontakenExercs' : nontakenExercs })
+                              {'modules' : userOutputModules , 'profExecs' : profUIExecs, 'nonProfExecs' : nonProfExecs, 'nontakenExercs':nontakenExercs,'total':userScore });
+       
+

@@ -2,9 +2,9 @@
  {% block javascript %}  
 <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
 <script src="http://code.jquery.com/ui/1.9.0/jquery-ui.js"></script>
-<script type="text/javascript" src="{{ static_url }}module_list.js"></script>
 <script>
 $(document).ready(function(){
+
 
 	$("#tabs").tabs();
 	$("#tabs-1").click();
@@ -85,105 +85,169 @@ border-top: 5px solid #030344;
 	</ul>
 	<div id="tabs-1" aria-labelledby="ui-id-1" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="" aria-expanded="true" aria-hidden="false">
 		<h2>Module Summary</h2>
+	<table>		 
+<tr>
+<td>Total</td>
+<td><span style="padding-left:100px;">{{total}}</span></td>
+</table>
 	<ul class="checktree">
 	{% for module in modules%}
-	<li> 
-	<div class="arrow collapsed"></div>
-	{% if module.prof == 0 %}
-	<label class="modulehdr" style="color:grey;"><h4>{{ module.name }}</h4></label>
-	{% endif %}
-	{% if module.prof == -1 %}
-	<label class="modulehdr" style="color:red;"><h4>{{ module.name }}</h4></label>
-	{% endif %}
-	{% if module.prof == 1 %}
-	<label class="modulehdr" style="color:green;"><h4>{{ module.name }}</h4></label>
-	{% endif %}
-	
-	<ul class="Exercls">
-	{% for exercise in module.userExecs %}
 		<li> 
-		<div class="arrow collapsed"></div>
-		{% if exercise.prof == 0 %}
-		<label class="titleExhdr" style="color:grey;"><h4>{{ exercise.exercise.exercise.name }}</h4></label>
+		{% if module.countExec > 0 %}
+			<div class="arrow collapsed"></div>
+		{% endif%}
+		{% if module.prof == 0 %}
+			<label class="modulehdr" style="color:grey;"><div>{{ module.name }}</div></label>
 		{% endif %}
-		{% if exercise.prof == -1 %}
-		<label class="titleExhdr" style="color:red;"><h4>{{ exercise.exercise.exercise.name }}</h4></label>
+		{% if module.prof == -1 %}
+			<label class="modulehdr" style="color:red;"><div>{{ module.name }}</div></label>
 		{% endif %}
-		{% if exercise.prof == 1 %}
-		<label class="titleExhdr" style="color:green;"><h4>{{ exercise.exercise.exercise.name}}</h4></label>
+		{% if module.prof == 1 %}
+			<label class="modulehdr" style="color:green;"><div>{{ module.name }}</div></label>
 		{% endif %}
-		<div style="padding-left: 50px;background-color:lightgoldenrodyellow" class="descEx">
-		<h5>Covers : {{ exercise.exercise.exercise.covers }}</h5>
-		<h5>Author : {{ exercise.exercise.exercise.author }}</h5>
-		<h5>Description : {{ exercise.exercise.exercise.description }}</h5>
-		<h5>Streak : {{ exercise.exercise.exercise.streak }}</h5>
-		</div>
+	
+		<ul class="Exercls">
+		{% if module.countExec > 0 %}
+			{% for exercise in module.userExecs %}
+			<li> 
+			<div class="arrow collapsed"></div>
+			{% if exercise.prof == 0 %}
+				<label class="titleExhdr" style="color:grey;"><div>{{ exercise.exercise.name }}</div></label>
+				<div style="padding-left: 50px;background-color:lightgoldenrodyellow" class="descEx">
+					<div>Covers : {{ exercise.exercise.covers }}</div>
+					<div>Author : {{ exercise.exercise.author }}</div>
+					<div>Description : {{ exercise.exercise.description }}</div>
+					<div>Streak : {{ exercise.exercise.streak }}</div>
+				</div>
+			{% endif %}
+			{% if exercise.prof == -1 %}
+				<label class="titleExhdr" style="color:red;"><div>{{ exercise.userexercise.exercise.name }}</div></label>
+			{% endif %}
+			{% if exercise.prof == 1 %}
+				<label class="titleExhdr" style="color:green;">
+				<div style="width:400px">{{ exercise.userexercise.exercise.name}}
+					<span style="color:black;float:right">{{exercise.points}}
+					</span>
+				</div>
+				</label>
+			{% endif %}
+			{% if exercise.prof != 0  %}
+		
+				<div style="padding-left: 50px;background-color:lightgoldenrodyellow" class="descEx">
+					<h4>Exercise Details</h4>
+					<div>Covers : {{ exercise.userexercise.exercise.covers }}</div>
+					<div>Author : {{ exercise.userexercise.exercise.author }}</div>
+					<div>Description : {{ exercise.userexercise.exercise.description }}</div>
+					{%if exercise.userexercise.exercise.ex_type == 'pe' %}
+						<div>Proficiency Percentage  :
+					{% else %}
+						<div>Score Required  :
+					{% endif%}
+
+					{{ exercise.userexercise.exercise.streak }}</div>
+					<div>Exercise Type : {{ exercise.userexercise.exercise.ex_type }}</div>
+					<h4>User Performance</h4>
+					<div>User Score : {{ exercise.userexercise.longest_streak }}</div>
+					<div>Total Correct : {{ exercise.userexercise.total_correct }}</div>
+					<div>Total Done : {{ exercise.userexercise.total_done  }}</div>
+
+				</div>
+
+			{% endif %}
 		</li>
 	{% endfor %}
+
+	{% endif %}
 	</ul>
-</li>	
-{% endfor %}
-</ul> 
+	</li>	
+	{% endfor %}
+	</ul> 
 </div>
 	<div id="tabs-2" aria-labelledby="ui-id-2" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; " aria-expanded="false" aria-hidden="true">
-		 
-<ul class="ProfExercls">
-		{% for exercise in profExecs %}
-			<li> 	
-		
-<div class="arrow collapsed"></div>
-<label class="titleExhdr" style="color:green;"><h4>{{ exercise.exercise.name }}</h4>
-<div style="padding-left: 50px;background-color:lightgoldenrodyellow;color:black" class="descEx">
-<h4>Exercise Details</h4>
-<div>Covers : {{ exercise.exercise.covers }}</div>
-<div>Author : {{ exercise.exercise.author }}</div>
-<div>Description : {{ exercise.exercise.description }}</div>
-<div>Streak : {{ exercise.exercise.streak }}</div>
-<h4>User Performance</h4>
-<div>Longest Streak : {{ exercise.longest_streak }}</div>
-<div>Total Correct : {{ exercise.total_correct }}</div>
-<div>Total Done : {{ exercise.total_done  }}</div>
+	<table>		 
+		<tr>
+		<td>Total</td>
+		<td><span style="padding-left:100px;">{{total}}</span></td>
+		<ul class="ProfExercls">
+		{% for profexercise in profExecs %}
+		<tr>			
+		<td><li> 
+		<label class="titleExhdr" style="color:green;"><span>{{ profexercise.userexercise.exercise.name }}</span>
+		</label>
+		<div style="padding-left: 50px;background-color:lightgoldenrodyellow;color:black" class="descEx">
+			<h4>Exercise Details</h4>
+			<div>Covers : {{ profexercise.userexercise.exercise.covers }}</div>
+			<div>Author : {{ profexercise.userexercise.exercise.author }}</div>
+			<div>Description : {{ profexercise.userexercise.exercise.description }}</div>
+			{%if profexercise.userexercise.exercise.ex_type == 'pe' %}
+			<div>Proficiency Percentage  :
+			{% else %}
+			<div>Score Required  :
+			{% endif%}
+
+			{{ profexercise.userexercise.exercise.streak }}</div>
+			<div>Exercise Type : {{ profexercise.userexercise.exercise.ex_type }}</div>
+			<h4>User Performance</h4>
+			<div>User Score : {{ profexercise.userexercise.longest_streak }}</div>
+			<div>Total Correct : {{ profexercise.userexercise.total_correct }}</div>
+			<div>Total Done : {{ profexercise.userexercise.total_done  }}</div>
+		</div>
+		</li>
+	</td>
+	<td><span style="padding-left:100px;">{{profexercise.points}}</span></td>
+	</tr>
+
+	{% endfor %}
+	</ul>
+	</table>
 </div>
-</li>
-		{% endfor %}
-		</ul>
-	</div>
-        <div id="tabs-3" aria-labelledby="ui-id-3" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; " aria-expanded="false" aria-hidden="true">
+<div id="tabs-3" aria-labelledby="ui-id-3" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; " aria-expanded="false" aria-hidden="true">
         <ul class="nonProfExercls">
 		{% for nonProfExercise in nonProfExecs %}
 			<li> 	
 		<div class="arrow collapsed"></div>
-		<label class="titleExhdr" style="color:red;"><h4>{{ nonProfExercise.exercise.exercise.name }}</h4>
+		<label class="titleExhdr" style="color:red;"><div>{{ nonProfExercise.exercise.exercise.name }}</div>
 	
-        <div style="padding-left: 50px;background-color:lightgoldenrodyellow;color:black" class="descEx">
-	<h4>Exercise Details</h4>
-	<div>Covers : {{ nonProfExercise.exercise.exercise.covers }}</div>
-	<div>Author : {{ nonProfExercise.exercise.exercise.author }}</div>
-	<div>Description : {{ nonProfExercise.exercise.exercise.description }}</div>
-	<div>Streak : {{ nonProfExercise.exercise.exercise.streak }}</div>
-	<h4>User Performance</h4>
-	<div>Longest Streak : {{ nonProfExercise.exercise.longest_streak }}</div>
-	<div>Total Correct : {{ nonProfExercise.exercise.total_correct }}</div>
-	<div>Total Done : {{ nonProfExercise.exercise.total_done  }}</div>
-	</div>
-</li>
-		{% endfor %}
-		</ul>
-<ul class="nonTakenExercls">
-		{% for nontakenExercise in nontakenExercs %}
-			<li> 	
+		<div style="padding-left: 50px;background-color:lightgoldenrodyellow;color:black" class="descEx">
+		<h4>Exercise Details</h4>
+		<div>Covers : {{ nonProfExercise.exercise.exercise.covers }}</div>
+		<div>Author : {{ nonProfExercise.exercise.exercise.author }}</div>
+		<div>Description : {{ nonProfExercise.exercise.exercise.description }}</div>
+		{%if nonProfExercise.exercise.ex_type == 'pe' %}
+		<div>Proficiency Percentage  :
+		{% else %}
+		<div>Score Required  :
+		{% endif%}
 
-		<label class="titleExhdr" style="color:grey;"><h4>{{ nontakenExercise.name }}</h4>
-<div style="padding-left: 50px;background-color:lightgoldenrodyellow;color:black" class="descEx">
-<h4>Exercise Details</h4>
-<div>Covers : {{ nontakenExercise.covers }}</div>
-<div>Author : {{ nontakenExercise.author }}</div>
-<div>Description : {{ nontakenExercise.description }}</div>
-<div>Streak : {{ nontakenExercise.streak }}</div>
-</div>
+		{{ nonProfExercise.exercise.streak }}</div>
+		<h4>User Performance</h4>
+		<div>User Score : {{ nonProfExercise.exercise.longest_streak }}</div>
+		<div>Total Correct : {{ nonProfExercise.exercise.total_correct }}</div>
+		<div>Total Done : {{ nonProfExercise.exercise.total_done  }}</div>
+	</div>
 	</li>
-{% endfor %}
-</ul>
+	{% endfor %}
+	</ul>
+	<ul class="nonTakenExercls">
+	{% for nontakenExercise in nontakenExercs %}
+	<li> 	
+	<label class="titleExhdr" style="color:grey;"><div>{{ nontakenExercise.name }}</div>
+	<div style="padding-left: 50px;background-color:lightgoldenrodyellow;color:black" class="descEx">
+	<h4>Exercise Details</h4>
+	<div>Covers : {{ nontakenExercise.covers }}</div>
+	<div>Author : {{ nontakenExercise.author }}</div>
+	<div>Description : {{ nontakenExercise.description }}</div>
+	{%if nontakenExercise.ex_type == 'pe' %}
+		<div>Proficiency Percentage  :
+		{% else %}
+		<div>Score Required  :
+		{% endif%}
+
+		{{ nontakenExercise.streak }}</div>
+	</div>
+		</li>
+	{% endfor %}
+	</ul>
 	</div>
 </div>
 
