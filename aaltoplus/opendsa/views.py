@@ -189,7 +189,6 @@ def xhr_test(request):
 def module_list(request):
      	book = Books.objects.all();
         username= request.META.get('USER')
-	username = 'shaffer'
         modules = Module.objects.all();
 	usermodules = UserModule.objects.all();
 	userExercs = []
