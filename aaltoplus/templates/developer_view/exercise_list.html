@@ -1,33 +1,16 @@
 <html>
 <head>
-	<title>Exercise List</title>
-
-<style>
-body {font-family:Arial; color: darkslateblue;}
-table {border: 2px solid darkslateblue;
-border-collapse: collapse;
-font-size: 10pt;
-}
-th {border: 2px solid darkslateblue;}
-tr {border: 2px solid darkslateblue; cursor: pointer; }
-tr.highlighted td{  border: 2px solid yellow;}
-
-</style>
-
+	<title>Module Summary & Exercise List</title>
 </head>
 
 <body>
-Exercises
-<table> 
-    <tbody> 
-    <th> 
+Exercise List
+<table style="border: solid 1px black;"> 
     {% for exercise in exercises %} 
-    	<tr>
-        <td><a href="/developer_view/exercise_detail/{{student}}/{{module}}/{{exercise.id}}/">{{ exercise.name }}</a></td>           
+    	<tr >
+        <td style="border: solid 1px black;"><a href="/developer_view/exercise_detail/{{student}}/{{module}}/{{exercise.id}}/">{{ exercise.name }}</a></td>           
         </tr>
     {% endfor %} 
-    </th> 
-    </tbody>
 </table>
 </body>
 </html>

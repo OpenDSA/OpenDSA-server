@@ -1,84 +1,19 @@
 <html>
 <head>
 	<title>Exercise Details</title>
+	<script>
+	{% include "./developer_view/dist/jquery.min.js" %}
+	{% include "./developer_view/dist/jquery.jqplot.min.js" %}
+	{% include "./developer_view/dist/plugins/jqplot.canvasTextRenderer.min.js" %}
+	{% include "./developer_view/dist/plugins/jqplot.canvasAxisLabelRenderer.min.js" %}
 
-<style>
-body {font-family:Arial; color: darkslateblue;}
-table {border: 2px solid darkslateblue;
-border-collapse: collapse;
-font-size: 10pt;
-}
-th {border: 2px solid darkslateblue;}
-tr {border: 2px solid darkslateblue; cursor: pointer; }
-tr.highlighted td{  border: 2px solid yellow;}
-
-</style>
-
+	</script>
 </head>
-
 <body>
-Exercise Details by Steps
-	<div id="graphDiv1"></div>
-	<br />
-	<!--[if IE]><script src="excanvas.js"></script><![endif]-->
-	<script src="http://www.williammalone.com/articles/html5-canvas-javascript-bar-graph/downloads/html5-canvas-bar-graph.js"></script>
-	<script>(function () {
-	
-		function createCanvas(divName) {
-			
-			var div = document.getElementById(divName);
-			var canvas = document.createElement('canvas');
-			div.appendChild(canvas);
-			if (typeof G_vmlCanvasManager != 'undefined') {
-				canvas = G_vmlCanvasManager.initElement(canvas);
-			}	
-			var ctx = canvas.getContext("2d");
-			return ctx;
-		}
-		
-		var ctx = createCanvas("graphDiv1");
-		
-		var graph = new BarGraph(ctx);
-		graph.maxValue = {{max}};
-		graph.margin = 10;
-		graph.width = {{number}} * 100;
-		graph.height = 200;
-		graph.colors = [];
-		{% for exe_step in exe_steps %} 
-		graph.xAxisLabelArr.push("{{exe_step.step_num}}");
-		{% if exe_step.is_backward == 'true' %} 
-		graph.colors.push("red");
-		{% elif exe_step.is_backward == 'false' %} 
-		graph.colors.push("blue");
-	    {% endif %} 
-	    {% endfor %} 
-	    var newArr = [];
-		{% for exe_step in exe_steps %} 
-		newArr.push("{{exe_step.time}}");
-	    {% endfor %} 
-		setInterval(function (){
-			graph.update(newArr, 10000);
-		}
-		);
 
-	}());
-		
-</script>
-<table> 
-    <tbody> 
-    <th> 
-    {% for exe_step in exe_steps %} 
-    	<tr>
-        <td>{{ exe_step.step_num }} {{ exe_step.time }} {{ exe_step.is_backward }}</td>           
-        </tr>
-    {% endfor %} 
-    </th> 
-    </tbody>
-</table>
-
-<br>Review Statistics</br>
-<br>proficient date: {{proficient_date}} </br>
-<br>review dates:</br>
+Exercise Summary
+<br>proficient date: {{proficient_date}}
+<br>review dates:
 <table> 
     <tbody> 
     <th> 
@@ -90,5 +25,115 @@ Exercise Details by Steps
     </th> 
     </tbody>
 </table>
+<br>Exercise Time Details by Steps
+
+<table style="border: solid 1px black;">
+    <tr valign=bottom>
+
+        <td align=center valign=bottom>
+		<div style="background:#58FA82;">time (sec.)</div>
+		<!--<div style="background:#F781F3;">no. of visits</div>-->
+		</td>	
+
+	{% for exe_step in exe_steps %} 
+
+	
+        <td align=center valign=bottom>
+        <div>{{exe_step.time}}</div>
+        <div valign=bottom style="width: 30; height: {{exe_step.get_time_print}}; background:#58FA82;"/>
+        </td>
+<!--         <td align=center valign=bottom>
+        <div>{{exe_step.click_num}}</div>
+        <div valign=bottom style="width: 25; height: {{exe_step.get_click_num_print}}; background:#F781F3;"/>
+        </td>
+         -->
+
+    {% endfor %} 
+    </tr>
+
+    <tr>
+ 
+        <td align=center valign=bottom>
+		<div style="background:#FA5882;">backward step</div>
+		<div style="background:#5882FA;">forward step</div>
+		</td>	
+
+		{% for exe_step in exe_steps %} 
+
+		{% if exe_step.is_backward == 'true' %} 
+        <td align=center style="width: 30; background: #FA5882;">{{exe_step.step_num}}</td>           
+		{% elif exe_step.is_backward == 'false' %} 
+        <td align=center style="width: 30; background: #5882FA;">{{exe_step.step_num}}</td>           
+	    {% endif %} 
+
+	{% endfor %} 
+
+    </tr>    
+</table>
+
+<br>Exercise Click Details by Steps
+
+<table style="border: solid 1px black;">
+    <tr valign=bottom>
+
+        <td align=center valign=bottom>
+		<div style="background:#F781F3;">no. of visits</div>
+		</td>	
+
+	{% for exe_step in exe_steps %} 
+
+        <td align=center valign=bottom>
+        <div>{{exe_step.click_num}}</div>
+        <div valign=bottom style="width: 25; height: {{exe_step.get_click_num_print}}; background:#F781F3;"/>
+        </td>
+
+    {% endfor %} 
+    </tr>
+
+    <tr>
+ 
+        <td align=center valign=bottom>
+		<div style="background:#FA5882;">backward step</div>
+		<div style="background:#5882FA;">forward step</div>
+		</td>	
+
+		{% for exe_step in exe_steps %} 
+
+		{% if exe_step.is_backward == 'true' %} 
+        <td align=center style="width: 30; background: #FA5882;">{{exe_step.step_num}}</td>           
+		{% elif exe_step.is_backward == 'false' %} 
+        <td align=center style="width: 30; background: #5882FA;">{{exe_step.step_num}}</td>           
+	    {% endif %} 
+
+	{% endfor %} 
+
+    </tr>    
+</table>
+
+<br>Exercise Step Line Graph
+<script class="code" type="text/javascript">
+$(document).ready(function(){
+  var data = [];
+  {% for line in lines %} 
+  data.push({{line}});
+
+{% endfor %} 
+
+var plot1 = $.jqplot ('chart1', data);
+});
+</script>
+  <div id="chart1" style="height:300px; width:500px;"></div>
+<div class="code prettyprint">
+<pre class="code prettyprint brush: js"></pre>
+</div>
+  
+
+    {% for line in lines %} 
+	    {% for point in line %} 
+	    {{point}}&nbsp
+	    {% endfor %} 
+	    <br>
+    {% endfor %} 
+
 </body>
 </html>

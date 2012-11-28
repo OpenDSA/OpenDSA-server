@@ -2,32 +2,23 @@
 <head>
 	<title>Student List</title>
 
-<style>
-body {font-family:Arial; color: darkslateblue;}
-table {border: 2px solid darkslateblue;
-border-collapse: collapse;
-font-size: 10pt;
-}
-th {border: 2px solid darkslateblue;}
-tr {border: 2px solid darkslateblue; cursor: pointer; }
-tr.highlighted td{  border: 2px solid yellow;}
-
-</style>
-
 </head>
 
 <body>
 Student List<br>
-<table> 
-    <tbody> 
-    <th> 
+<table style="border: solid 1px black;"> 
+    <tr>
+    	<td style="border: solid 1px black;"> id() </td>
+    	<td style="border: solid 1px black;"> user name </td>
+    	<td style="border: solid 1px black;"> email </td>
+    </tr>           
     {% for student in students %} 
-    	<tr>
-        <td><a href="../student_exercise/{{student.id}}/">{{ student.username }} id:{{student.id}}</a></td>           
-        </tr>
+    <tr>
+    	<td style="border: solid 1px black;">{{student.id}}</td>           
+        <td style="border: solid 1px black;"><a href="../student_exercise/{{student.id}}/">{{ student.username }}</a></td>           
+    	<td style="border: solid 1px black;">{{student.email}}</td>           
+    </tr>
     {% endfor %} 
-    </th> 
-    </tbody>
 </table>
 </body>
 </html>

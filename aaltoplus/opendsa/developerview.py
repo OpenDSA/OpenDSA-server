@@ -92,16 +92,16 @@ def exercises_time(request):
                 
     return render_to_response("developer_view/exercises_time.html", {'exercises': exercises })
 
+#This function responds student list (not staff or super user)
+#The student information includes id(in the database), user name, and email, etc
 def student_list(request):
-    users = UserProfile.objects.all();
+    userProfiles = UserProfile.objects.all();
     
     students = []
     
-    for user in users:
-        if not user.user.is_staff:
-            if not user.user.is_superuser:
-               # print(user.user.id)
-                students.append(user.user)
+    for profile in userProfiles:
+        if not profile.user.is_staff and not profile.user.is_superuser:
+                students.append(profile.user)
     
     return render_to_response("developer_view/student_list.html", {'students': students })
 
@@ -113,6 +113,22 @@ class document_ready_activity:
      
     def update_activity(self):
         self.activity_num = self.activity_num + 1
+        
+    def get_activity_num_print(self):
+        return self.activity_num*8
+    
+class proficient_exercises:
+    def __init__(self, date, exercises, number):
+        self.date = date
+        self.exercises = exercises
+        self.number = number
+        
+    def add_exercise(self,exercise):
+        self.exercises.append(exercise)
+        self.number = self.number + 1
+
+    def get_number_print(self):
+        return self.number*20
 
 def student_exercise(request, student):
     userButtons = UserButton.objects.filter(user=student)
@@ -126,8 +142,6 @@ def student_exercise(request, student):
             for activity in activities:
                 if activity.module == userButton.module:
                     activity.update_activity()
-                    if max < activity.activity_num:
-                        max = activity.activity_num
                     flag = 1
                     break
             if flag == 0:
@@ -137,9 +151,26 @@ def student_exercise(request, student):
          #   if userButton.name == 'jsav-forward' or userButton.name == 'jsav-backward':
          #       doc_activity.update_activity()
     
-    number = len(activities)
+    #number = len(activities)
+    
+    userExercises = UserExercise.objects.filter(user=student).order_by('proficient_date')
+    
+    exercises = []
+    
+    for userExercise in userExercises:
+        if userExercise.is_proficient():
+            flag = 0
+            date = userExercise.proficient_date.date()
+            for exercise in exercises:
+                if date == exercise.date:
+                    exercise.add_exercise(userExercise.exercise)
+                    flag = 1
+                    break
+            if flag == 0:
+                temp = [userExercise.exercise]
+                exercises.append(proficient_exercises(date, temp, 1))
         
-    return render_to_response("developer_view/student_exercise.html", {'activities': activities, 'number': number, 'max': max, 'student': student })
+    return render_to_response("developer_view/student_exercise.html", {'activities': activities, 'student': student, 'exercises': exercises })
 
 def exercise_list(request, student, module):
     userButtons = UserButton.objects.filter(user=student).filter(module=module)
@@ -158,12 +189,19 @@ def exercise_list(request, student, module):
     return render_to_response("developer_view/exercise_list.html", {'exercises': exercises, 'student': student, 'module':module })
 
 class exercise_step:
-    def __init__(self, step_num, time, is_backward):
+    def __init__(self, step_num, time, click_num, is_backward):
         
         self.step_num = step_num
+        self.click_num = click_num
         self.time = time
         self.is_backward = is_backward
-
+        
+    def get_time_print(self):
+        return self.time*5
+    
+    def get_click_num_print(self):
+        return self.click_num*10
+    
 def exercise_detail(request, student, module, exercise):
     userButtons = UserButton.objects.filter(user=student).filter(module=module).filter(exercise=exercise)
 
@@ -172,6 +210,8 @@ def exercise_detail(request, student, module, exercise):
     exe_steps = []
     current_time = 0
     current_step = 0
+    lines = []
+    line = []
 
     for userButton in userButtons:
         flag = 0
@@ -182,25 +222,32 @@ def exercise_detail(request, student, module, exercise):
             if current_time == 0 or userButton.action_time < current_time or not step - current_step == 1:
                 current_time = userButton.action_time
                 current_step = step
+                if line:
+                    lines.append(line)
+                    line = []
+                line.append(current_step)
                 continue
 
             for exe_step in exe_steps:
                 if exe_step.step_num == step:
                     exe_step.time = exe_step.time + int((userButton.action_time - current_time).total_seconds())
+                    exe_step.click_num = exe_step.click_num + 1
                     flag = 1
                     current_time = userButton.action_time
                     current_step = step
+                    line.append(current_step)
                     if max < exe_step.time:
                         max = exe_step.time
                     break
                 
             if flag == 0:
                 time_diff = int((userButton.action_time - current_time).total_seconds())
-                exe_steps.append(exercise_step(step, time_diff, 'false'))
+                exe_steps.append(exercise_step(step, time_diff, 1, 'false'))
                 if max < time_diff:
                      max = time_diff                
                 current_time = userButton.action_time
                 current_step = step
+                line.append(current_step)
                 
         if userButton.name == 'jsav-backward':
             step = int(userButton.description[:userButton.description.find('/')])
@@ -208,28 +255,40 @@ def exercise_detail(request, student, module, exercise):
             if current_time == 0 or userButton.action_time < current_time or not step - current_step == -1:
                 current_time = userButton.action_time
                 current_step = step
+                if line:
+                    lines.append(line)
+                    line = []
+                line.append(current_step)
                 continue            
             
             for exe_step in exe_steps:
                 if exe_step.step_num == step:
                     exe_step.time = exe_step.time + int((userButton.action_time - current_time).total_seconds())
+                    exe_step.click_num = exe_step.click_num + 1
                     if max < exe_step.time:
                         max = exe_step.time                    
                     exe_step.is_backward = 'true'
                     flag = 1
                     current_time = userButton.action_time
                     current_step = step
+                    line.append(current_step)
                     break
                 
             if flag == 0:
                 time_diff = int((userButton.action_time - current_time).total_seconds())                
-                exe_steps.append(exercise_step(step, time_diff, 'true'))  
+                exe_steps.append(exercise_step(step, time_diff, 1, 'true'))  
                 if max < time_diff:
                      max = time_diff
                 current_time = userButton.action_time
                 current_step = step
+                line.append(current_step)
+                
+    if line:
+        lines.append(line)
         
     number = len(exe_steps)
+    
+    exe_steps = sorted(exe_steps, key=lambda exercise_step:exercise_step.step_num)
                   
     #print(max)
     
@@ -237,7 +296,7 @@ def exercise_detail(request, student, module, exercise):
     
     review_dates = []
     
-    if len(userExercises) == 1:
+    if len(userExercises) == 1 and userExercises[0].is_proficient():
         
         proficient_date = userExercises[0].proficient_date
     
@@ -260,5 +319,5 @@ def exercise_detail(request, student, module, exercise):
     
     #print(proficificent_date)
     
-    return render_to_response("developer_view/exercise_detail.html", {'exe_steps': exe_steps, 'number':number, 'max': max, 'proficient_date': proficient_date, 'review_dates':review_dates })
+    return render_to_response("developer_view/exercise_detail.html", {'exe_steps': exe_steps, 'number':number, 'max': max, 'proficient_date': proficient_date, 'review_dates':review_dates, 'lines': lines })
 
