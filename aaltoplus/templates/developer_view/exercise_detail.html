@@ -58,12 +58,14 @@ Exercise Summary
 		<div style="background:#5882FA;">forward step</div>
 		</td>	
 
-		{% for exe_step in exe_steps %} 
+	{% for exe_step in exe_steps %} 
 
 		{% if exe_step.is_backward == 'true' %} 
         <td align=center style="width: 30; background: #FA5882;">{{exe_step.step_num}}</td>           
-		{% elif exe_step.is_backward == 'false' %} 
-        <td align=center style="width: 30; background: #5882FA;">{{exe_step.step_num}}</td>           
+		{% else %}	
+			{% if exe_step.is_backward == 'false' %} 
+        	<td align=center style="width: 30; background: #5882FA;">{{exe_step.step_num}}</td>     
+        	{% endif %}      
 	    {% endif %} 
 
 	{% endfor %} 
@@ -101,8 +103,10 @@ Exercise Summary
 
 		{% if exe_step.is_backward == 'true' %} 
         <td align=center style="width: 30; background: #FA5882;">{{exe_step.step_num}}</td>           
-		{% elif exe_step.is_backward == 'false' %} 
-        <td align=center style="width: 30; background: #5882FA;">{{exe_step.step_num}}</td>           
+		{% else %}	
+			{% if exe_step.is_backward == 'false' %} 
+        	<td align=center style="width: 30; background: #5882FA;">{{exe_step.step_num}}</td>     
+        	{% endif %}      
 	    {% endif %} 
 
 	{% endfor %} 

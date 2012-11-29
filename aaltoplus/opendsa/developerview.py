@@ -216,7 +216,7 @@ def exercise_detail(request, student, module, exercise):
     for userButton in userButtons:
         flag = 0
 
-        if userButton.name == 'jsav-forward':
+        if userButton.name == 'jsav-forward' and not userButton.description == 'description':
             step = int(userButton.description[:userButton.description.find('/')])
 
             if current_time == 0 or userButton.action_time < current_time or not step - current_step == 1:
@@ -249,7 +249,7 @@ def exercise_detail(request, student, module, exercise):
                 current_step = step
                 line.append(current_step)
                 
-        if userButton.name == 'jsav-backward':
+        if userButton.name == 'jsav-backward' and not userButton.description == 'description':
             step = int(userButton.description[:userButton.description.find('/')])
 
             if current_time == 0 or userButton.action_time < current_time or not step - current_step == -1:
@@ -306,7 +306,7 @@ def exercise_detail(request, student, module, exercise):
         
         for userButton in userButtons:
             if proficient_date.date() < userButton.action_time.date():
-                print(userButton.user_id)
+                #print(userButton.user_id)
                 review_dates.append(userButton.action_time.date())
                 
         proficient_date = proficient_date.date()
