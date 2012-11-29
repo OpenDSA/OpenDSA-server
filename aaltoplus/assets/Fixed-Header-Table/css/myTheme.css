@@ -1,0 +1,70 @@
+.exerciseTable td { 
+	/* appearance */
+	border: 1px solid #778899;
+	
+	/* size */
+	padding: 5px;
+}
+
+.exerciseTable th {
+	/* appearance */
+	border: 1px solid #778899;
+	
+	/* size */
+	padding: 5px;    
+}
+
+.exerciseTable {
+	/* text */
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.exerciseTable tbody tr td {
+	/* appearance */
+	background-color: #eef2f9;
+    
+	/* text */
+	color: #262c31;
+	font-size: 11px;
+}
+
+.exerciseTable tbody tr.odd td {
+	/* appearance */
+	background-color: #d6e0ef;
+}
+
+.exerciseTable thead tr th,
+.exerciseTable thead tr td,
+.exerciseTable tfoot tr th, 
+.exerciseTable tfoot tr td {    
+    
+    /* appearance */
+	background-color: #8ca9cf;
+	
+	/* text */
+	color: #121517;
+	font-size: 12px;
+	font-weight: bold;
+}
+ 
+#header {
+transform:rotate(-90deg);
+-ms-transform:rotate(-90deg);
+-webkit-transform: rotate(-90deg);
+-moz-transform: rotate(-90deg);
+-o-transform:rotate(-90deg);
+height: 200px;
+}
+       
+#inproficient { 
+background-color: tomato;
+}
+
+#proficient {
+background-color: lightgreen;
+}
+
+#none {
+background-color: lightgray;
+}
+	
