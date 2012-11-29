@@ -15,7 +15,7 @@ Student List<br>
     {% for student in students %} 
     <tr>
     	<td style="border: solid 1px black;">{{student.id}}</td>           
-        <td style="border: solid 1px black;"><a href="../student_exercise/{{student.id}}/">{{ student.username }}</a></td>           
+        <td style="border: solid 1px black;"><a href="./student_exercise/{{student.id}}/">{{ student.username }}</a></td>           
     	<td style="border: solid 1px black;">{{student.email}}</td>           
     </tr>
     {% endfor %} 
