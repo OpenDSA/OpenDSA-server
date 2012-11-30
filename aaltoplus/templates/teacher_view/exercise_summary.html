@@ -1,121 +1,69 @@
 <html>
 <head>
-<style>
-body {
-font-family:Arial; 
-color: darkslateblue; 
-padding: 20px;}
-
-table {
-border: 2px solid darkslateblue;
-border-collapse: collapse;
-font-size: 10pt;
-}
-
-th {
-border: 2px solid darkslateblue;
-max-width: 22px;
-height: 250px; 
-}
-
-#header {
-transform:rotate(-90deg);
--ms-transform:rotate(-90deg);
--webkit-transform: rotate(-90deg);
--moz-transform: rotate(-90deg);
--o-transform:rotate(-90deg);
-}
-
-#name {
-border-right: 2px solid darkslateblue; 
-min-width: 75px; 
-padding: 2px;
-}
-
-#score {
-border-right: 2px solid darkslateblue;
-}
-
-#inproficient { 
-border-right: 2px solid darkslateblue; 
-min-width: 22px; 
-background-color: tomato;
-}
-
-#proficient {
-border-right: 2px solid darkslateblue; 
-min-width: 22px; 
-background-color: lightgreen;
-}
-
-#none {
-border-right: 2px solid darkslateblue; 
-min-width: 22px; 
-background-color: lightgray;
-}
-
-tr {
-border: 2px solid darkslateblue; 
-cursor: pointer; 
-}
-tr.highlighted td{  
-border: 2px solid yellow;
-}
-</style>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}Fixed-Header-Table/jquery.fixedheadertable.js"></script>
+<link href="{{ STATIC_URL }}Fixed-Header-Table/css/defaultTheme.css" rel="stylesheet" media="screen" />
+<link href="{{ STATIC_URL }}Fixed-Header-Table/css/960.css" rel="stylesheet" media="screen" />
+<link href="{{ STATIC_URL }}Fixed-Header-Table/css/myTheme.css" rel="stylesheet" media="screen" />
 <script>
-$(document).ready(function(){
-  $("tr").click(function(){
-    $(this).toggleClass("highlighted");
-  });
-});
-</script>
+            $(document).ready(function() {
+                $('#myTable').fixedHeaderTable({ footer: true, fixedColumns: 2 }); 
+            });
+            
+        </script>
 <title>OpenDSA Exercise Summary</title>
 </head>
 
 <body>
 <h2>Exercise Summary</h2> 
-
-<div style="position:relative; overflow-x: auto; overflow-y: auto; width:90%; height:575px; margin-left: auto; margin-right:auto;">
-    <table style="position: absolute;">
-        <thead>
-            <tr> 
-                <th style="padding-left:74px;"><div id="header">&nbsp;</div></th>
-                <th><div id="header">Score</div></th>
-                {% for exercise in exercises %} 
-                    <th><div id="header">{{ exercise.name }}</div></th>
-                {% endfor %} 
-           </tr>          
-        </thead>
-    </table>
-    <div style="position: absolute; padding-right: 20px; top: 250px; overflow-y: auto; height: 300px;">
-        <table>     
-            <tbody>
-                {% for userVal in user_exerciseLst %} 
-                    <tr> 
-                        <td id="name">{{ userVal.name }}</td>
-                        {% for userD in userData %}
-                            {% if userD.user == userVal.name %}
-                                <td id="score"><div style="text-align:center;">{{ userD.points }}</div></td>
-                            {% endif %}
-                        {% endfor %}
-                        {% for userExecVal in userVal.userExecs %}
-                            {% if userExecVal.prof == -1 %}
+<div class="container">
+        	<div class="grid">
+        		<table class="exerciseTable" id="myTable" cellpadding="0" cellspacing="0">
+        		    <thead>
+        		        <tr>
+                           <th>Username</th>
+                           <th>Score</th>
+        		           {% for exercise in exercises %} 
+                           <th>{{ exercise.name }}</th>
+                           {% endfor %} 
+        		        </tr>
+        		    </thead>
+        		    <tfoot>
+        		        <tr>
+        		          <th>Username</th>
+                          <th>Score</th>
+        		          {% for exercise in exercises %} 
+                          <th>{{ exercise.name }}</th>
+                          {% endfor %} 
+        		        </tr>
+        		    </tfoot>
+        		    <tbody>
+        		        {% for userVal in user_exerciseLst %} 
+                        <tr> 
+                            <td>{{ userVal.name }}</td>
+                            {% for userD in userData %}
+                                {% if userD.user == userVal.name %}
+                                <td>{{ userD.points }}</td>
+                                {% endif %}
+                            {% endfor %}
+                            {% for userExecVal in userVal.userExecs %}
+                                {% if userExecVal.prof == -1 %}
                                 <td id="inproficient"></td> 
-                            {% endif %}
-                            {% if userExecVal.prof == 1 %} 
+                                {% endif %}
+                                {% if userExecVal.prof == 1 %} 
                                 <td id="proficient"></td>
-                            {% endif %}
-                            {% if userExecVal.prof == 0 %}
+                                {% endif %}
+                                {% if userExecVal.prof == 0 %}
                                 <td id="none"></td>
-                            {% endif %}  
-                       {% endfor %}   
-                    </tr> 
-                {% endfor %}    
-            </tbody> 
-        </table>
-    </div>
-</div>
+                                {% endif %}  
+                            {% endfor %}   
+                        </tr> 
+                        {% endfor %} 
+        		    </tbody>
+        		</table>
+        	</div>
+        	<div class="clear"></div>
+        </div>
 </body>
 
 </html>

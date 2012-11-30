@@ -37,7 +37,6 @@
 .exerciseTable thead tr td,
 .exerciseTable tfoot tr th, 
 .exerciseTable tfoot tr td {    
-    
     /* appearance */
 	background-color: #8ca9cf;
 	
@@ -46,16 +45,7 @@
 	font-size: 12px;
 	font-weight: bold;
 }
- 
-#header {
-transform:rotate(-90deg);
--ms-transform:rotate(-90deg);
--webkit-transform: rotate(-90deg);
--moz-transform: rotate(-90deg);
--o-transform:rotate(-90deg);
-height: 200px;
-}
-       
+
 #inproficient { 
 background-color: tomato;
 }

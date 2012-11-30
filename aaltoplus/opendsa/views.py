@@ -1,6 +1,7 @@
 # Python 
 from icalendar import Calendar, Event 
-import json  
+import csv
+
 # A+ 
 from userprofile.models import UserProfile 
  
@@ -12,9 +13,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response 
 from django.http import HttpResponse, HttpResponseForbidden 
 from course.context import CourseContext 
-from django.utils import simplejson
-from django.core import serializers
-
+from django.template import loader, Context
+from django.template.context import RequestContext
 
 class userExec:
 	def __init__(self, exercise,prof):
@@ -81,10 +81,11 @@ def exercise_summary(request):
 			userOutputFinVal.append(exercise,0)
 			execExist = True;
 	userOutputFinalVals.append(userOutputFinVal);
-				
-    return render_to_response("teacher_view/exercise_summary.html", 
-                             {'user_exerciseLst' : userOutputFinalVals, 'exercises' : exercises, 'userData' : userData })
+	context = RequestContext(request, {'user_exerciseLst' : userOutputFinalVals, 'exercises' : exercises, 'userData' : userData })
 
+    return render_to_response("teacher_view/exercise_summary.html", 
+                                     context)
+   
 class useruiExec:
 	def __init__(self, exercise, exectype,books):
 		if exectype == 0 :
