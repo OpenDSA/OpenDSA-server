@@ -1,5 +1,6 @@
 # Python 
 from icalendar import Calendar, Event 
+import json
 import csv
 
 # A+ 
@@ -15,6 +16,8 @@ from django.http import HttpResponse, HttpResponseForbidden
 from course.context import CourseContext 
 from django.template import loader, Context
 from django.template.context import RequestContext
+from django.utils import simplejson
+from django.core import serializers 
 
 class userExec:
 	def __init__(self, exercise,prof):
