@@ -189,27 +189,32 @@ def xhr_test(request):
         message = "Hello"
     return HttpResponse(message);
 
-
+@login_required
 def module_list(request):
      	book = Books.objects.all();
-        username= request.META.get('USER')
+        userName= request.META.get('USER')
+	currentUserVals = User.objects.filter(username = userName);
         modules = Module.objects.all();
-	usermodules = UserModule.objects.all();
-	userExercs = []
+	
+	currentUser = {}
+	for user in currentUserVals:
+		if user.username == userName: 
+			currentUser = user;
+			break;
+	userExercs = UserExercise.GetUserExerciseByUserId(currentUser.id)
 	userScore = 0;
-	userDataObjects = UserData.objects.all()
-	UserExercises = UserExercise.objects.all()
+	userDataObjects = UserData.GetUserDataByUserId(currentUser.id)
+
 	for userdata in userDataObjects:
-		if userdata.user.username == username:
+		if userdata.user.id == currentUser.id:
 			userScore = userdata.points;
 			break;
-	for userexerc in UserExercises :
-		if userexerc.user.username == username:
-			userExercs.append(userexerc);
+
+		
 	UserModuleDict = dict()
-	for usermod in usermodules:
-		if usermod.user.username == username:
-			UserModuleDict[usermod.module] =  usermod;
+	UserModules = UserModule.GetUserModuleByUserId(currentUser.id);
+	for usermod in UserModules:
+		UserModuleDict[usermod.module] =  usermod;
 
 	userOutputModules = []
 	for module in modules:

@@ -126,6 +126,14 @@ class UserModule(models.Model):
     first_done = models.DateTimeField(auto_now_add=True)
     last_done = models.DateTimeField(auto_now_add=True)
     proficient_date = models.DateTimeField(default="2012-01-01 00:00:00") 
+    
+    @staticmethod
+    def GetUserModuleByUserId(userId):
+        cur = connection.cursor();
+	cur.callproc('GetUserModuleByUser_Id',[userId,])
+	results = cur.fetchall()
+	cur.close()
+	return [UserModule(*row) for row in results]
 
     def is_proficient_at(self):
         return (self.proficient_date != datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))  
@@ -162,7 +170,13 @@ class UserData(models.Model):
     #uservideocss_version = models.IntegerField(default=0)
     #has_current_goals = models.BooleanField(default=False)
 
-
+    @staticmethod
+    def GetUserDataByUserId(userId):
+        cur = connection.cursor();
+	cur.callproc('GetUserDataByUser_Id',[userId,])
+	results = cur.fetchall()
+	cur.close()
+	return [UserData(*row) for row in results]
 
     def is_proficient_at(self, exid):
         if self.all_proficient_exercises is None:
@@ -345,7 +359,14 @@ class UserExercise(models.Model):
            user_data.save() 
            return True
         return False 
-
+     
+    @staticmethod
+    def GetUserExerciseByUserId(userId):
+        cur = connection.cursor();
+	cur.callproc('GetUserExerciseByUser_Id',[userId,])
+	results = cur.fetchall()
+	cur.close()
+	return [UserExercise(*row) for row in results]
     def update_proficiency_pe(self, correct):
         exercise = Exercise.objects.get(pk=self.exercise_id)
         user_data = UserData.objects.get(user=self.user)
