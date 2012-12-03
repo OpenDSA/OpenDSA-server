@@ -18,7 +18,8 @@ from django.template import loader, Context
 from django.template.context import RequestContext
 from django.utils import simplejson
 from django.core import serializers 
-
+from django.contrib.sessions.models import Session
+from django.contrib.auth.models import User
 class userExec:
 	def __init__(self, exercise,prof):
 		
@@ -220,26 +221,30 @@ def xhr_test(request):
 def module_list(request):
      	book = Books.objects.all();
         userName= request.META.get('USER')
+	
 	currentUserVals = User.objects.filter(username = userName);
         modules = Module.objects.all();
+	usermodules = UserModule.objects.all();
+	userId = 0
 	
-	currentUser = {}
-	for user in currentUserVals:
-		if user.username == userName: 
-			currentUser = user;
-			break;
-	userExercs = UserExercise.GetUserExerciseByUserId(currentUser.id)
+        if 'sessionid' in request.COOKIES:
+            s = Session.objects.get(pk=request.COOKIES['sessionid'])
+            if '_auth_user_id' in s.get_decoded():
+                u = User.objects.get(id=s.get_decoded()['_auth_user_id'])
+                userId = u.id
+        	
+	
+	userExercs = UserExercise.GetUserExerciseByUserId(userId)
 	userScore = 0;
-	userDataObjects = UserData.GetUserDataByUserId(currentUser.id)
+	userDataObjects = UserData.GetUserDataByUserId(userId)
 
 	for userdata in userDataObjects:
-		if userdata.user.id == currentUser.id:
+		if userdata.user.id == userId:
 			userScore = userdata.points;
 			break;
 
-		
 	UserModuleDict = dict()
-	UserModules = UserModule.GetUserModuleByUserId(currentUser.id);
+	UserModules = UserModule.GetUserModuleByUserId(userId);
 	for usermod in UserModules:
 		UserModuleDict[usermod.module] =  usermod;
 
