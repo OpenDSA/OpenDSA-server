@@ -16,6 +16,7 @@
 
 <body>
 <h2>Exercise Summary</h2> 
+<a href="export_csv">Export to CSV</a>
 <div class="container">
         	<div class="grid">
         		<table class="exerciseTable" id="myTable" cellpadding="0" cellspacing="0">
@@ -38,24 +39,20 @@
         		        </tr>
         		    </tfoot>
         		    <tbody>
-        		        {% for userVal in user_exerciseLst %} 
+        		        {% for user in users %} 
                         <tr> 
-                            <td>{{ userVal.name }}</td>
-                            {% for userD in userData %}
-                                {% if userD.user == userVal.name %}
-                                <td>{{ userD.points }}</td>
-                                {% endif %}
-                            {% endfor %}
-                            {% for userExecVal in userVal.userExecs %}
-                                {% if userExecVal.prof == -1 %}
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.score }}</td>
+                            {% for userVal in user.values %}
+                                {% if userVal == -1 %}
                                 <td id="inproficient"></td> 
                                 {% endif %}
-                                {% if userExecVal.prof == 1 %} 
+                                {% if userVal == 1 %} 
                                 <td id="proficient"></td>
                                 {% endif %}
-                                {% if userExecVal.prof == 0 %}
+                                {% if userVal == 0 %}
                                 <td id="none"></td>
-                                {% endif %}  
+                                {% endif %}
                             {% endfor %}   
                         </tr> 
                         {% endfor %} 

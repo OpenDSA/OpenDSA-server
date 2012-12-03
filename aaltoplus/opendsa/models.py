@@ -3,6 +3,7 @@ import datetime
 
 # Django
 from django.db import models
+from django.db import connection
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.db import transaction
@@ -48,6 +49,14 @@ class UserSummary(models.Model):
    grouping =  models.IntegerField()
    key = models.CharField(max_length=50)
    value = models.CharField(max_length=50)
+
+   @staticmethod
+   def GetUserSummaryByIds(userId, exerciseId):
+        cur = connection.cursor();
+	cur.callproc('GetUserSummaryByIds',[userId,exerciseId, ])
+	results = cur.fetchall()
+	cur.close()
+	return [UserSummary (*row) for row in results]
 
 
 #A map table between exercise and modules

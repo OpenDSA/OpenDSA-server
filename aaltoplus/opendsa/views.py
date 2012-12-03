@@ -37,11 +37,20 @@ class userOutput:
            self.userExecs.append(userExec(exercise, 0)); 
     
     def append(self, exercise, prof):
-           self.userExecs.append(userExec(exercise,prof));  
+           self.userExecs.append(userExec(exercise,prof));
+
+class userValue:
+        def __init__(self, name, score):
+                self.name = name
+                self.score = score
+                self.values = []
+        def append(self, value):
+                self.values.append(value)
+        
 
 @login_required
 def exercise_summary(request): 
-##    exercises = Exercise.objects.all()
+
     exercises = []
     BookModExercises = BookModuleExercise.objects.order_by('book', 'module').all()
     for bookmodex in BookModExercises:
@@ -49,45 +58,63 @@ def exercise_summary(request):
 
     userData = UserData.objects.order_by('user').all()
 
-    user_exercises = UserExercise.objects.order_by('user', 'exercise').all()
+    users = []      
+    for userdata in userData:
+            userVal = userValue(userdata.user, userdata.points)
+            for exercise in exercises:
+                    exId = str(exercise.id)
+                    userSum = UserSummary.GetUserSummaryByIds(userdata.user.id, exId)
+                    for userS in userSum:
+                            value = int(userS.value)
+                            userVal.append(value)
+            users.append(userVal)                  
 
-    userOutputVals = []
-    for user_exercise in user_exercises:
-            userexist = False;
-            for uservals in userOutputVals:
-                if uservals.name == user_exercise.user:
-                       userexist=True;
-		       if user_exercise.is_proficient():
-                       		uservals.append(user_exercise.exercise, 1);
-		       else:  
-				uservals.append(user_exercise.exercise, -1); 
-            if not userexist:
-                userOutputVal = userOutput(user_exercise.user);
-                if user_exercise.is_proficient():
-                       		userOutputVal.append(user_exercise.exercise, 1);
-		else:  
-				userOutputVal.append(user_exercise.exercise, -1); 
-                userOutputVals.append(userOutputVal)
+    context = RequestContext(request, {'users': users, 'exercises':exercises})
+     
+    return render_to_response("teacher_view/exercise_summary.html", context)     
 
-    userOutputFinalVals = []
-    
-    for useroutput in userOutputVals: 
-	userOutputFinVal = userOutput(useroutput.name);
-	execExist =False 
-	for exercise in exercises:
-		execExist =False   		
-		for userExe in useroutput.userExecs:
-			if exercise == userExe.exercise:
-				execExist = True;
-				userOutputFinVal.append(userExe.exercise, userExe.prof)
-		if not execExist:
-			userOutputFinVal.append(exercise,0)
-			execExist = True;
-	userOutputFinalVals.append(userOutputFinVal);
-	context = RequestContext(request, {'user_exerciseLst' : userOutputFinalVals, 'exercises' : exercises, 'userData' : userData })
+def export_csv(request):
 
-    return render_to_response("teacher_view/exercise_summary.html", 
-                                     context)
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="summary.csv"'
+
+    exercises = []
+    BookModExercises = BookModuleExercise.objects.order_by('book', 'module').all()
+    for bookmodex in BookModExercises:
+            exercises.append(bookmodex.exercise)
+
+    users = []
+    userData = UserData.objects.order_by('user').all()
+          
+    for userdata in userData:
+            userVal = userValue(userdata.user, userdata.points)
+            for exercise in exercises:
+                    exId = str(exercise.id)
+                    userSum = UserSummary.GetUserSummaryByIds(userdata.user.id, exId)
+                    for userS in userSum:
+                            value = int(userS.value)
+                            userVal.append(value)
+            users.append(userVal)                  
+    	
+    writer = csv.writer(response)
+    exerciseNames = []
+    exerciseNames.append('Username')
+    exerciseNames.append('Score')
+    for exer in exercises:
+            exerciseNames.append(exer.name)
+            
+    writer.writerow(exerciseNames)
+
+    for user in users:
+            uservalue = []
+            uservalue.append(user.name)
+            uservalue.append(user.score)
+            for userVal in user.values:
+                    uservalue.append(userVal)
+            writer.writerow(uservalue)
+
+    return response
+
    
 class useruiExec:
 	def __init__(self, exercise, exectype,books):
