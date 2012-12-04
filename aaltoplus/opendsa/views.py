@@ -47,11 +47,13 @@ def exercise_summary(request):
             userid = userdata.user.id
             for exercise in exercises:
                     exKey = str(exercise.id)
+                    value = 0
                     try:
                             userSum = userSummaries.get(grouping=userid, key=exKey)
+                            value = int(userSum.value)
                     except UserSummary.DoesNotExist:
                             value = 0
-                    userVal.append(int(userSum.value))                                    
+                    userVal.append(value)                                    
             users.append(userVal)                  
 
     context = RequestContext(request, {'users': users, 'exercises':exercises})
@@ -78,11 +80,13 @@ def export_csv(request):
             userid = userdata.user.id
             for exercise in exercises:
                     exKey = str(exercise.id)
+                    value = 0
                     try:
                             userSum = userSummaries.get(grouping=userid, key=exKey)
+                            value = int(userSum.value)
                     except UserSummary.DoesNotExist:
                             value = 0
-                    userVal.append(int(userSum.value))                                    
+                    userVal.append(value)                                    
             users.append(userVal)                       
     	
     writer = csv.writer(response)
