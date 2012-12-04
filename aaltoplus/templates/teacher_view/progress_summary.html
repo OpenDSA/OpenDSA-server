@@ -1,0 +1,89 @@
+<html>
+<head>
+<style>
+body {
+font-family:Arial; 
+color: darkslateblue; 
+padding: 20px;
+}
+
+table {
+margin-left: 20px;
+border: 2px solid darkslateblue;
+border-collapse: collapse;
+font-size: 10pt;
+}
+
+th {
+border: 2px solid darkslateblue;
+padding: 10px;
+}
+
+td {
+border: 2px solid darkslateblue;
+padding: 10px;
+}
+
+#inproficient { 
+
+background-color: tomato;
+}
+
+#proficient {
+
+background-color: lightgreen;
+}
+
+#none {
+
+background-color: lightgray;
+}
+
+tr {
+border: 2px solid darkslateblue; 
+}
+
+</style>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+<title>OpenDSA Progress Summary</title>
+</head>
+
+<body>
+<h2>Progress Summary</h2>
+
+<table>
+    <thead>
+          <tr>
+              <th>Exercise</th>
+              <th id="proficient">Proficient</th>
+              <th id="inproficient">Inproficient</th>
+              <th id="none">Not Started</th>
+         </tr>
+    </thead>
+     <tbody>
+        {% for progItem in progList %}
+         <tr>
+              <td>{{ progItem.name }}</td>
+                   <td id="proficient">
+                   {% for user in progItem.proficientUsers %}
+                   {{ user }}<br>
+                   {% endfor %}
+                   </td>
+                   <td id="inproficient">
+                   {% for user in progItem.inproficientUsers %}
+                   {{ user }}<br>
+                   {% endfor %}
+                   </td>
+                   <td id="none">
+                   {% for user in progItem.notStartedUsers %}
+                   {{ user }}<br>
+                   {% endfor %}
+                   </td>
+          </tr>
+          {% endfor %}
+      </tbody>
+</table>
+        	</div>
+        </div>
+</body>
+</html>

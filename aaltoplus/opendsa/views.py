@@ -20,25 +20,6 @@ from django.utils import simplejson
 from django.core import serializers 
 from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
-class userExec:
-	def __init__(self, exercise,prof):
-		
-		self.exercise = exercise
-		exerexist = False
-		self.prof = prof
-			
-
-class userOutput:
-    def __init__(self, name):
-
- 	   self.name = name
-	   self.userExecs = []
-    
-    def append(self, exercise):
-           self.userExecs.append(userExec(exercise, 0)); 
-    
-    def append(self, exercise, prof):
-           self.userExecs.append(userExec(exercise,prof));
 
 class userValue:
         def __init__(self, name, score):
@@ -58,22 +39,26 @@ def exercise_summary(request):
             exercises.append(bookmodex.exercise)
 
     userData = UserData.objects.order_by('user').all()
+    userSummaries = UserSummary.objects.order_by('grouping').all()
 
-    users = []      
+    users = []  
     for userdata in userData:
             userVal = userValue(userdata.user, userdata.points)
+            userid = userdata.user.id
             for exercise in exercises:
-                    exId = str(exercise.id)
-                    userSum = UserSummary.GetUserSummaryByIds(userdata.user.id, exId)
-                    for userS in userSum:
-                            value = int(userS.value)
-                            userVal.append(value)
+                    exKey = str(exercise.id)
+                    try:
+                            userSum = userSummaries.get(grouping=userid, key=exKey)
+                    except UserSummary.DoesNotExist:
+                            value = 0
+                    userVal.append(int(userSum.value))                                    
             users.append(userVal)                  
 
     context = RequestContext(request, {'users': users, 'exercises':exercises})
      
     return render_to_response("teacher_view/exercise_summary.html", context)     
 
+@login_required
 def export_csv(request):
 
     response = HttpResponse(mimetype='text/csv')
@@ -84,18 +69,21 @@ def export_csv(request):
     for bookmodex in BookModExercises:
             exercises.append(bookmodex.exercise)
 
-    users = []
     userData = UserData.objects.order_by('user').all()
-          
+    userSummaries = UserSummary.objects.order_by('grouping').all()
+
+    users = []  
     for userdata in userData:
             userVal = userValue(userdata.user, userdata.points)
+            userid = userdata.user.id
             for exercise in exercises:
-                    exId = str(exercise.id)
-                    userSum = UserSummary.GetUserSummaryByIds(userdata.user.id, exId)
-                    for userS in userSum:
-                            value = int(userS.value)
-                            userVal.append(value)
-            users.append(userVal)                  
+                    exKey = str(exercise.id)
+                    try:
+                            userSum = userSummaries.get(grouping=userid, key=exKey)
+                    except UserSummary.DoesNotExist:
+                            value = 0
+                    userVal.append(int(userSum.value))                                    
+            users.append(userVal)                       
     	
     writer = csv.writer(response)
     exerciseNames = []
@@ -116,6 +104,52 @@ def export_csv(request):
 
     return response
 
+class exerciseProgress:
+        def __init__(self, name):
+                self.name = name
+                self.proficientUsers = []
+                self.inproficientUsers = []
+                self.notStartedUsers = []
+        def append(self, value, user):
+                if value == 1:
+                        self.proficientUsers.append(user)
+                if value == -1:
+                        self.inproficientUsers.append(user)
+                if value == 0:
+                        self.notStartedUsers.append(user)
+
+@login_required
+def progress_summary(request):
+        exercises = []
+        BookModExercises = BookModuleExercise.objects.order_by('book', 'module').all()
+        for bookmodex in BookModExercises:
+                exercises.append(bookmodex.exercise)
+
+        userData = UserData.objects.order_by('user').all()
+        userSummaries = UserSummary.objects.order_by('grouping').all()
+
+        progList = []
+        for exercise in exercises:
+                exProg = exerciseProgress(exercise.name)
+                exKey = str(exercise.id)
+                exSummaries = userSummaries.filter(key=exKey)
+                for exSummary in exSummaries:
+                        userD = userData.get(user__id=exSummary.grouping)
+                        user = userD.user
+                        if exSummary.value == '0':
+                                exProg.append(0, user)
+                        if exSummary.value == '1':
+                                exProg.append(1, user)
+                        if exSummary.value == '-1':
+                                exProg.append(-1, user)
+                progList.append(exProg)
+
+        context = RequestContext(request, {'progList': progList})
+
+        return render_to_response("teacher_view/progress_summary.html", context)
+                
+                                
+        
    
 class useruiExec:
 	def __init__(self, exercise, exectype,books):

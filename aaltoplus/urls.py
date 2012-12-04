@@ -1,7 +1,7 @@
 # A+
 from views import login, home, verify_credentials
 from oauth_provider.views import protected_resource_example
-from opendsa.views import exercise_summary, module_list, export_csv
+from opendsa.views import exercise_summary, module_list, export_csv, progress_summary
 from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail
 # Django
 from django.conf.urls.defaults import *
@@ -20,7 +20,9 @@ urlpatterns = patterns('',
 
     # OpenDSA
     url(r'^teacher_view/$', exercise_summary),
-    url(r'^teacher_view/export_csv/$', export_csv),              
+    url(r'^teacher_view/exercise_summary/$', exercise_summary),       
+    url(r'^teacher_view/export_csv/$', export_csv),
+    url(r'^teacher_view/progress_summary/$', progress_summary),                   
     url(r'^student_view/', module_list),
     url(r'^developer_view/exercises_stat/$', exercises_stat),
     url(r'^developer_view/exercises_bargraph/$', exercises_bargraph),

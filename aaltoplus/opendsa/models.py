@@ -58,6 +58,14 @@ class UserSummary(models.Model):
 	cur.close()
 	return [UserSummary (*row) for row in results]
 
+   @staticmethod
+   def GetUserSummaryByExerciseId(exerciseId):
+       cur = connection.cursor()
+       cur.callproc('GetUserSummaryByExerciseId', [exerciseId, ])
+       results = cur.fetchall()
+       cur.close()
+       return [UserSummary (*row) for row in results]
+
 
 #A map table between exercise and modules
 class ExerciseModule(models.Model):
@@ -376,6 +384,15 @@ class UserExercise(models.Model):
 	results = cur.fetchall()
 	cur.close()
 	return [UserExercise(*row) for row in results]
+    
+    @staticmethod
+    def GetUserExerciseByExerciseId(exerciseId):
+        cur = connection.cursor()
+        cur.callproc('GetUserExerciseByExerciseId', [exerciseId, ])
+        results = cur.fetchall()
+        cur.close()
+        return [UserExercise(*row) for row in results]
+    
     def update_proficiency_pe(self, correct):
         exercise = Exercise.objects.get(pk=self.exercise_id)
         user_data = UserData.objects.get(user=self.user)
