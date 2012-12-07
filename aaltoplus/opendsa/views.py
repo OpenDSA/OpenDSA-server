@@ -20,15 +20,17 @@ from django.utils import simplejson
 from django.core import serializers 
 from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
-
+   
 class userValue:
         def __init__(self, name, score):
                 self.name = name
                 self.score = score
                 self.values = []
+                self.dict = dict()
+        def addDict(self, exercise, value):
+                self.dict[exercise] = value;
         def append(self, value):
                 self.values.append(value)
-        
 
 @login_required
 def exercise_summary(request): 
@@ -39,22 +41,25 @@ def exercise_summary(request):
             exercises.append(bookmodex.exercise)
 
     userData = UserData.objects.order_by('user').all()
-    userSummaries = UserSummary.objects.order_by('grouping').all()
+    userExercises = UserExercise.objects.all()               
 
-    users = []  
+    users = []
     for userdata in userData:
             userVal = userValue(userdata.user, userdata.points)
-            userid = userdata.user.id
+            for userExercise in userExercises:
+                    if userdata.user == userExercise.user:
+                            if userExercise.is_proficient():
+                                    userVal.addDict(userExercise.exercise, 1)
+                            else:
+                                    userVal.addDict(userExercise.exercise, -1)
+            users.append(userVal)
+
+    for user in users:
             for exercise in exercises:
-                    exKey = str(exercise.id)
-                    value = 0
-                    try:
-                            userSum = userSummaries.get(grouping=userid, key=exKey)
-                            value = int(userSum.value)
-                    except UserSummary.DoesNotExist:
-                            value = 0
-                    userVal.append(value)                                    
-            users.append(userVal)                  
+                    if exercise in user.dict.keys():
+                            user.append(user.dict[exercise])
+                    else:
+                            user.append(0)
 
     context = RequestContext(request, {'users': users, 'exercises':exercises})
      
@@ -72,39 +77,38 @@ def export_csv(request):
             exercises.append(bookmodex.exercise)
 
     userData = UserData.objects.order_by('user').all()
-    userSummaries = UserSummary.objects.order_by('grouping').all()
+    userExercises = UserExercise.objects.all()                
 
-    users = []  
+    users = []
     for userdata in userData:
             userVal = userValue(userdata.user, userdata.points)
-            userid = userdata.user.id
-            for exercise in exercises:
-                    exKey = str(exercise.id)
-                    value = 0
-                    try:
-                            userSum = userSummaries.get(grouping=userid, key=exKey)
-                            value = int(userSum.value)
-                    except UserSummary.DoesNotExist:
-                            value = 0
-                    userVal.append(value)                                    
-            users.append(userVal)                       
+            for userExercise in userExercises:
+                    if userdata.user == userExercise.user:
+                            if userExercise.is_proficient():
+                                    userVal.addDict(userExercise.exercise, 1)
+                            else:
+                                    userVal.addDict(userExercise.exercise, -1)
+            users.append(userVal)         
     	
     writer = csv.writer(response)
-    exerciseNames = []
+
+    exerciseNames =[]
     exerciseNames.append('Username')
     exerciseNames.append('Score')
-    for exer in exercises:
-            exerciseNames.append(exer.name)
-            
+    for exercise in exercises:
+            exerciseNames.append(exercise.name)
     writer.writerow(exerciseNames)
 
     for user in users:
             uservalue = []
             uservalue.append(user.name)
             uservalue.append(user.score)
-            for userVal in user.values:
-                    uservalue.append(userVal)
-            writer.writerow(uservalue)
+            for exercise in exercises:
+                    if exercise in user.dict.keys():
+                            uservalue.append(user.dict[exercise])
+                    else:
+                            uservalue.append(0)
+            writer.writerow(uservalue)  
 
     return response
 
