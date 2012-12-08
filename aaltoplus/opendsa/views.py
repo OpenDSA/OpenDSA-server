@@ -2,6 +2,8 @@
 from icalendar import Calendar, Event 
 import json
 import csv
+import array 
+from collections import OrderedDict
 
 # A+ 
 from userprofile.models import UserProfile 
@@ -26,41 +28,51 @@ class userValue:
                 self.name = name
                 self.score = score
                 self.values = []
-                self.dict = dict()
-        def addDict(self, exercise, value):
-                self.dict[exercise] = value;
-        def append(self, value):
-                self.values.append(value)
+                #self.dict = dict()
+        #def addDict(self, exercise, value):
+        #        self.dict[exercise] = value;
+        #def append(self, value):
+        #        self.values.append(value)
 
 @login_required
 def exercise_summary(request): 
 
     exercises = []
-    BookModExercises = BookModuleExercise.objects.order_by('book', 'module').all()
+    BookModExercises = BookModuleExercise.objects.select_related().order_by('book', 'module').all()
+    exercise_table = {}
+
     for bookmodex in BookModExercises:
             exercises.append(bookmodex.exercise)
-
-    userData = UserData.objects.order_by('user').all()
-    userExercises = UserExercise.objects.all()               
-
+    #remove duplicates
+    exercises = list(OrderedDict.fromkeys(exercises))
+    userData = UserData.objects.select_related().order_by('user').all()
+    userExercises = UserExercise.objects.select_related().all()               
     users = []
     for userdata in userData:
-            userVal = userValue(userdata.user, userdata.points)
+            userVal = userValue(userdata.user, userdata.points)  
+            #creates an array the size of number of exercises. initilized at 0  
+            userVal.values = array.array('i',(0,)*len(exercises))   
             for userExercise in userExercises:
                     if userdata.user == userExercise.user:
                             if userExercise.is_proficient():
-                                    userVal.addDict(userExercise.exercise, 1)
+                                    #userVal.addDict(userExercise.exercise, 1)
+                                    #updates the value in exercise array 
+                                    if userExercise.exercise in exercises:
+                                        userVal.values[exercises.index(userExercise.exercise)]= 1
                             else:
-                                    userVal.addDict(userExercise.exercise, -1)
+                                    #userVal.addDict(userExercise.exercise, -1)
+                                    if userExercise.exercise in exercises:
+                                        userVal.values[exercises.index(userExercise.exercise)]= -1
             users.append(userVal)
+    #print 'start treatment user  Exercises' 
+    #for user in users:
+    #        for exercise in exercises:
+    #                if exercise in user.dict.keys():
+    #                        user.append(user.dict[exercise])
+    #                else:
+    #                        user.append(0)
 
-    for user in users:
-            for exercise in exercises:
-                    if exercise in user.dict.keys():
-                            user.append(user.dict[exercise])
-                    else:
-                            user.append(0)
-
+    #print 'end treatment user  Exercises' 
     context = RequestContext(request, {'users': users, 'exercises':exercises})
      
     return render_to_response("teacher_view/exercise_summary.html", context)     
