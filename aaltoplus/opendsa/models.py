@@ -144,6 +144,9 @@ class UserModule(models.Model):
     last_done = models.DateTimeField(auto_now_add=True)
     proficient_date = models.DateTimeField(default="2012-01-01 00:00:00") 
     
+    class Meta:
+       unique_together = (("user", "module"),)
+
     @staticmethod
     def GetUserModuleByUserId(userId):
         cur = connection.cursor();
@@ -364,6 +367,8 @@ class UserExercise(models.Model):
     total_correct = models.IntegerField(default = 0)
     proficient_date = models.DateTimeField(default="2012-01-01 00:00:00")
     progress = models.DecimalField(default = 0, max_digits=3, decimal_places=2) 
+    class Meta:
+       unique_together = (("user", "exercise"),)
     def update_proficiency_ka(self, correct):
         exercise = Exercise.objects.get(pk=self.exercise_id)
         user_data = UserData.objects.get(user=self.user)
