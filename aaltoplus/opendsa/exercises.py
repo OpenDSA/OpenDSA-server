@@ -52,25 +52,26 @@ def make_wrong_attempt(user_data, user_exercise):
 def student_grade_all(user):
 
     #prof_list = user_data.get_prof_list()
-    student_data_id = UserSummary.objects.get(value = user.username)
-    student_data = UserSummary.objects.filter(grouping = student_data_id.grouping)  
+    student_data_id = UserData.objects.select_related().get(user = user)
+    proficient_exercises = student_data_id.get_prof_list() 
+    all_exercises = Exercise.objects.all()  
+    all_exercises_id = []
+    for aexer in all_exercises:  
+        all_exercises_id.append(aexer.id)
+    #list of non proficient exercises
+    not_proficient_exercises = diff (set(all_exercises_id),set(proficient_exercises))
     book = Books.objects.get(book_name="Fall2012")   #book name will be later send by the frontend
     modules =  Module.objects.all()
     user_grade = {}
     grade = []
-    for u_data in student_data:
-        if u_data.key != 'name' and  len(Exercise.objects.filter(name=u_data.key))>=1:
-           ex = Exercise.objects.filter(name=u_data.key)[0]
+    #proficient exercises
+    for pexer_id in proficient_exercises: 
+        #if u_data.key != 'name' and  len(Exercise.objects.filter(name=u_data.key))>=1:
+           ex = Exercise.objects.filter(id = pexer_id)[0]  #(name=u_data.key)[0]
            print 'exe name %s' %ex.name
-           #if  len(BookModuleExercise.objects.filter(exercise=ex))==0:
-           #   break 
-           #module_name = ''
-           print 'line   %s' %len(BookModuleExercise.objects.filter(exercise=ex)) 
-           if len(BookModuleExercise.objects.filter(exercise=ex))>=1:
-              module_name = BookModuleExercise.objects.filter(exercise=ex)[0].module.name  #ExerciseModule.objects.get(exercise=ex.name).module    
+           if len(BookModuleExercise.objects.select_related().filter(exercise=ex))>=1 and ex.ex_type <> '':
+              module_name = BookModuleExercise.objects.filter(exercise=ex)[0].module.name      
               print 'module_name  %s'  %module_name
-           #else: 
-           #   break 
               if ex.ex_type == 'ss':
                  points = Decimal(book.ss_points)
               elif ex.ex_type == 'pe':
@@ -83,8 +84,15 @@ def student_grade_all(user):
                  points = Decimal(book.pr_points)
               else:
                  points = Decimal(book.ss_points)
-              if int(u_data.value) != 1:
-                 points = 0
+              grade.append({'exercise':ex.name, 'description':ex.description,'type':ex.ex_type,'points':points,'module':module_name}) 
+    #non proficient exercises   
+    for npe in not_proficient_exercises:  
+           ex = Exercise.objects.filter(id = npe)[0]  
+           print 'exe name %s' %ex.name
+           if len(BookModuleExercise.objects.select_related().filter(exercise=ex))>=1 and ex.ex_type <> '':
+              module_name = BookModuleExercise.objects.filter(exercise=ex)[0].module.name  
+              print 'module_name  %s'  %module_name
+              points = 0  
               grade.append({'exercise':ex.name, 'description':ex.description,'type':ex.ex_type,'points':points,'module':module_name})
     user_grade['max_points'] = {"ss":book.ss_points,"ka":book.ka_points,"pe":book.pe_points, "ot":book.ot_points, "pr":book.pr_points}
     user_grade['grades'] = grade
