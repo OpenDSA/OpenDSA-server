@@ -5,14 +5,13 @@ from userprofile.api import UserProfileResource
 from exercise.api import ExerciseResource, CourseModuleResource, SubmissionResource, \
     LearningObjectResource
 from opendsa.api import ExerciseResource, UserexerciseResource, ProblemlogResource, UserResource, \
-    UserExerciseSummaryResource, UserDataResource, FeedbackResource, UserModuleResource      
+    UserExerciseSummaryResource, UserDataResource, ModuleResource, UserModuleResource      
 
 
 api = Api(api_name='v1')
 api.register(CourseResource())
 api.register(CourseInstanceResource())
 api.register(UserProfileResource())
-#api.register(ExerciseResource())
 api.register(CourseModuleResource())
 api.register(SubmissionResource())
 api.register(LearningObjectResource())
@@ -22,7 +21,7 @@ api.register(ProblemlogResource())
 api.register(UserResource())
 api.register(UserExerciseSummaryResource())
 api.register(UserDataResource())
-api.register(FeedbackResource())  
+api.register(ModuleResource())  
 api.register(UserModuleResource()) 
 
 

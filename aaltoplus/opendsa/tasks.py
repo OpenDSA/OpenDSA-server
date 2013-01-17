@@ -62,6 +62,9 @@ def make_wrong_attempt(user_data, user_exercise):
 @periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
 def book_module_exercise():
 
+   cursor = connection.cursor()
+   cursor.execute("TRUNCATE TABLE `opendsa_bookmoduleexercise`")
+
    modules = Module.objects.all() 
    book = Books.objects.get(book_name="Fall2012")  
    for mod in modules:
@@ -76,8 +79,8 @@ def book_module_exercise():
              bme.save()  
 
 
-@task()
-@periodic_task(run_every=crontab(hour="*", minute="*/8", day_of_week="*"))
+#@task()
+#@periodic_task(run_every=crontab(hour="*", minute="*/8", day_of_week="*"))
 def student_summary():
 
    #we empty the table first
@@ -175,8 +178,8 @@ def exercise_list_split(u_exe_list, mod):
               notstart.append(Exercise.objects.filter(id=mod_exe)[0].name)
     return notstart, started, prof  
 
-@task()
-@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
+#@task()
+#@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
 def student_module_summary():
 
    #we empty the table first
@@ -229,8 +232,8 @@ def student_module_summary():
 
 
 
-@task()
-@periodic_task(run_every=crontab(hour="*/3", minute="0", day_of_week="*"))
+#@task()
+#@periodic_task(run_every=crontab(hour="*/3", minute="0", day_of_week="*"))
 def exercise_module():
    #we empty the table first
    cursor = connection.cursor()
@@ -248,8 +251,8 @@ def exercise_module():
              ex_mod.save()
 
 
-@task()
-@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
+#@task()
+#@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
 def compute_points():
 
    user_data = UserData.objects.all()

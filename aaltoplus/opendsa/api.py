@@ -1,3 +1,4 @@
+import models 
 # Tastypie
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 from tastypie.authentication import Authentication, OAuthAuthentication, ApiKeyAuthentication
@@ -10,7 +11,8 @@ from tastypie.models import ApiKey
 
 
 # ODSA 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module, Feedback, UserModule     
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module, Feedback, UserModule, \
+                              BookModuleExercise, Books     
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout 
@@ -40,16 +42,18 @@ def create_key(username):
     hash_key = hmac.new(key, msg, sha1)
     return hash_key.digest().encode('hex')
 
+def get_user_by_key(key):
+    if  len(ApiKey.objects.filter(key=key))!=1:
+        return None
+    else:
+        return ApiKey.objects.get(key=key).user 
+
 class OpendsaAuthentication(ApiKeyAuthentication):
     def is_authenticated(self, request, **kwargs):
-        print '-----00000000-----OpendsaAuthentication ' 
         print '%s' %request 
         try:
-            print '000jkjkj0000'
             user = User.objects.get(username=request.POST['username']) or  User.objects.get(username=request.GET['username']) 
-            print 'user---%s\n' %(user)
             key  = request.POST['key'] or  request.GET['key']
-            print 'user---%s\nkey---%s' %(user,key)
             user_key = ApiKey.objects.get(user=user)
             return  user_key.key == key
         except:
@@ -164,16 +168,6 @@ class FeedbackResource(ModelResource):
         return [
             url(r"^(?P<resource_name>%s)/feedback%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logfeedback'), name="api_logfb"),
     ]
-#    def logfeedback(self, request, **kwargs):
-#            print 'toto'    #request.META['REMOTE_ADDR']   
-#            feedback, created = Feedback.objects.create(name=kusername)
-#                    request.META['REMOTE_ADDR'],
-#                 if correct:
-#                    return  self.create_response(request, user_exercise)
-#                 else:
-#                    return  self.create_response(request, {'error': 'attempt not logged'})
-#        return self.create_response(request, {'error': 'unauthorized action'})
-
 
 
 
@@ -209,9 +203,14 @@ class UserexerciseResource(ModelResource):
 
     def getprogress(self, request, **kwargs):
 
-        if request.POST['username']:    #request.user:
+        if  request.POST['key']:
+            if request.POST['key']=='phantom-key':
+                with transaction.commit_on_success():
+                    kusername, created = User.objects.get_or_create(username="phantom")
+            else:
+                kusername = get_user_by_key(request.POST['key'])    #request.user:
             kexercise =  Exercise.objects.get(name= request.POST['exercise']) 
-            kusername = User.objects.get(username=request.POST['username'])
+            #kusername = User.objects.get(username=request.POST['username'])
             if  len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==1:
                 user_exercise =  UserExercise.objects.get(user=kusername, exercise=kexercise)
             elif len(UserExercise.objects.filter(user=kusername, exercise=kexercise))>1:
@@ -225,7 +224,14 @@ class UserexerciseResource(ModelResource):
 
 
     def logavbutton(self, request, **kwargs):
-        if request.POST['username']:   
+        print request.POST  
+        if request.POST['key']:
+            if request.POST['key']=='phantom-key':
+                with transaction.commit_on_success():
+                    kusername, created = User.objects.get_or_create(username="phantom")   
+            else:    
+                kusername = get_user_by_key(request.POST['key'])    #request.POST['username']:   
+        if kusername:
             action =   request.POST['actions']
             actions = simplejson.loads(action)
             pe_name = get_pe_name_from_referer(request.META['HTTP_REFERER'])
@@ -246,7 +252,7 @@ class UserexerciseResource(ModelResource):
                else:
                    kexercise = Exercise(name = act['av'], streak=streak)
                    kexercise.save()       
-               kusername = User.objects.get(username=request.POST['username'])
+               #kusername = User.objects.get(username=request.POST['username'])
                with transaction.commit_on_success(): 
                    user_data, created = UserData.objects.get_or_create(user=kusername)
                module = None 
@@ -266,7 +272,6 @@ class UserexerciseResource(ModelResource):
                     )
                  if correct:
                     number_logs += 1 #return  self.create_response(request, user_button)
-            
             if number_logs == len(actions):
                 #user_data.is_proficient_at(kexercise) 
                 return  self.create_response(request,  {'success':True, 'message': '+all button action logged'})
@@ -277,38 +282,51 @@ class UserexerciseResource(ModelResource):
 
     def logpeexercise(self, request, **kwargs):
         print request 
-        if request.POST['username']:    
-            with transaction.commit_on_success():
-                av = request.POST['av']
-                if  len(Exercise.objects.filter(name= av))==1:
-                    kexercise =  Exercise.objects.get(name= av) 
-                else: 
-                    kexercise = Exercise.objects.get_or_create(name= av,covers="dsa",description="",ex_type= request.POST['type'],streak= request.POST['score[total]']) #streak = max number of correct steps
-   
-                kusername = User.objects.get(username=request.POST['username'])
-                if kusername and kexercise:
-                    user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0) 
+        if request.POST['key']:
+            if request.POST['key']=='phantom-key':
+                with transaction.commit_on_success():
+                    kusername, created = User.objects.get_or_create(username="phantom")
+            else:
+                kusername = get_user_by_key(request.POST['key'])   
+            jsav_exercise = request.POST['exercise']
+            if  len(Exercise.objects.filter(name= jsav_exercise))==1:
+                kexercise =  Exercise.objects.get(name= jsav_exercise) 
+            else: 
+                kexercise = None 
+                #    kexercise, added = Exercise.objects.get_or_create(name= jsav_exercise,covers="dsa",description="",ex_type= request.POST['type'],streak= 0) #streak not necessary for JSAV exercises 
+                #kusername = User.objects.get(username=request.POST['username'])
+            if kusername and kexercise:
+                user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0) 
+            else:   
+                return  self.create_response(request, {'error': 'attempt not logged'}) 
+            with transaction.commit_on_success(): 
                 user_data, created = UserData.objects.get_or_create(user=kusername)
-                module = Module.objects.get(name=request.POST['module_name'])  
-                user_module, exist =  UserModule.objects.get_or_create(user=kusername, module=module)
-                if user_exercise:
-                        user_exercise,correct = attempt_problem_pe(
-                           user_data,  
-                           user_exercise,
-                           request.POST['attempt'],
-                           1, #request.POST['complete'],
-                           int(request.POST['total_time']),
-                           request.POST['score[fix]'],
-                           int(request.POST['score[undo]']),
-                           int(request.POST['score[correct]']),
-                           int(request.POST['score[student]']),
-                           int(request.POST['score[total]']),
-                           request.POST['module_name'], 
-                           request.META['REMOTE_ADDR'],
-                           )
-                        return  self.create_response(request, {'success': True, 'proficient': correct})   
-                else:
-                        return  self.create_response(request, {'error': 'attempt not logged'})
+            module = Module.objects.get(name=request.POST['module']) 
+#            if request.POST['required']=='true' and kexercise.id not in module.exercise_list.split(","):  
+#                module.exercise_list += "%s," %kexercise.id 
+#            user_module, exist =  UserModule.objects.get_or_create(user=kusername, module=module) 
+#           required = False
+#            if request.POST['required']=='true':
+#               required = True
+            if user_exercise:
+                    bme = BookModuleExercise.objects.filter(module = module, exercise=kexercise)[0] #temporary need to find a way to associate student to course to book.
+                    user_exercise,correct = attempt_problem_pe(
+                       user_data,  
+                       user_exercise,
+                       request.POST['uiid'],
+                       1, #request.POST['complete'],
+                       int(request.POST['submit_time']),
+                       #request.POST['fix'],
+                       0, #int(request.POST['threshold']),
+                       int(request.POST['score']),
+                       #required,
+                       bme.points,  #request.POST['points'],
+                       request.POST['module'], 
+                       request.META['REMOTE_ADDR'],
+                       )
+                    return  self.create_response(request, {'success': True, 'proficient': correct})   
+            else:
+                    return  self.create_response(request, {'error': 'attempt not logged'})
         return self.create_response(request, {'error': 'unauthorized action'})
 
 
@@ -419,9 +437,20 @@ class UserDataResource(ModelResource):
      
     def isproficient(self, request, **kwargs):
 
-        if request.POST['username']:    #request.user:
-            kexercise = Exercise.objects.get(name= request.POST['exercise'])
-            kusername = User.objects.get(username=request.POST['username'])
+        if request.POST['key']:
+            if request.POST['key']=='phantom-key':
+                with transaction.commit_on_success():
+                    kusername, created = User.objects.get_or_create(username="phantom")
+            else:
+                kusername = get_user_by_key(request.POST['key'])      #request.POST['username']:    #request.user:
+            #with transaction.commit_on_success():
+            jsav_exercise = request.POST['exercise']
+            if  len(Exercise.objects.filter(name= jsav_exercise))==1:
+                kexercise =  Exercise.objects.get(name= jsav_exercise)
+            else:
+                kexercise = None #, added = Exercise.objects.get_or_create(name= jsav_exercise,covers="dsa",description="",ex_type= request.POST['type'],streak= 0) #streak not necessary for JSAV exercises
+            #kexercise = Exercise.objects.get(name= request.POST['exercise'])
+            #kusername = User.objects.get(username=request.POST['username'])
             user_data = UserData.objects.filter(user=kusername)[0]
             if kexercise:
                 return self.create_response(request, {'proficient': user_data.is_proficient_at(kexercise)}) 
@@ -439,6 +468,103 @@ class UserDataResource(ModelResource):
             self.create_response(request, {'grade': False})
         return self.create_response(request, {'grade': False})
 
+
+
+
+class ModuleResource(ModelResource):
+
+    def determine_format(self, request):
+        return "application/json"
+    class Meta:
+        queryset        = Module.objects.all()
+        resource_name   = 'module'
+        excludes        = []
+
+        # TODO: In this version, only GET requests are accepted and no
+        # permissions are checked.
+        allowed_methods = ['get','post']
+        authentication  = Authentication()
+        authorization   = ReadOnlyAuthorization()
+    def override_urls(self):
+        return [
+            url(r"^(?P<resource_name>%s)/loadmodule%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('loadmodule'), name="api_modproficient"),
+        ]
+
+    def loadmodule(self, request, **kwargs):
+        if request.POST['key']:
+
+            if request.POST['key']=='phantom-key':
+                with transaction.commit_on_success():
+                    kusername, created = User.objects.get_or_create(username="phantom")
+            else:
+                kusername = get_user_by_key(request.POST['key'])
+            if kusername:
+                response = {}
+                #get or create Book 
+                if len( Books.objects.filter(book_name=request.POST['book']))==0:  
+                    with transaction.commit_on_success():
+                        kbook,added = Books.objects.get_or_create(book_name= request.POST['book'], book_url = request.POST['url']) 
+                else:
+                    kbook = Books.objects.get(book_name= request.POST['book'])
+                #get or create module
+                if len( Module.objects.filter(name=request.POST['module']))==0:
+                    with transaction.commit_on_success():
+                        kmodule,added = Module.objects.get_or_create(name= request.POST['module'])
+                else:
+                    kmodule = Module.objects.get(name= request.POST['module'])
+                response[kmodule.name] = False
+                #get or create exercises
+                exercises =   request.POST['exercises']
+                mod_exes = simplejson.loads(exercises) 
+                print mod_exes  
+                for mod_exe in mod_exes:   
+                    if len( Exercise.objects.filter(name=mod_exe['exercise']))==0:
+                        with transaction.commit_on_success():
+                            kexercise, added = Exercise.objects.get_or_create(name= mod_exe['exercise'],covers="dsa",description="",ex_type= mod_exe['type'],streak= mod_exe['threshold'])     
+                        #add exercise to module proficiency model
+                        if mod_exe['required'] and (kexercise.id not in kmodule.get_required_exercises()):
+                            kmodule.add_required_exercise(kexercise.id) #exercise_list += "%s," %kexercise.id
+                            kmodule.save()
+                    else:
+                        kexercise = Exercise.objects.get(name= mod_exe['exercise'])  
+                    #response[kexercise.name] = {}
+                    #check exercise proficiency 
+                    if len(UserData.objects.filter(user=kusername))>0:
+                        user_data = UserData.objects.get(user=kusername)
+                        u_prof = user_data.is_proficient_at(kexercise)  
+                    #check student progress -- KA exercises
+                    if  len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==1:
+                        user_exercise =  UserExercise.objects.get(user=kusername, exercise=kexercise)
+                    elif len(UserExercise.objects.filter(user=kusername, exercise=kexercise))>1:
+                        user_exercise =UserExercise.objects.filter(user=kusername, exercise=kexercise)[0]
+                    else:
+                        user_exercise = None
+                    if user_exercise is not None:
+                        u_prog = user_exercise.progress
+                    else:
+                        u_prog = 0
+
+                    response[kexercise.name] = {'proficient':u_prof,'progress':u_prog}
+                    #Link exercise to module and books
+                    if len(BookModuleExercise.objects.filter(book = kbook, module = kmodule,exercise=kexercise))==0:
+                        with transaction.commit_on_success():
+                            bme = models.BookModuleExercise(book = kbook, module = kmodule, exercise = kexercise, points =  mod_exe['points'])
+                            bme.save()    
+
+
+                #check module proficiency
+                if  len(UserModule.objects.filter(user=kusername, module=kmodule))==1:
+                    user_module = UserModule.objects.get(user=kusername, module=kmodule)
+                elif len(UserModule.objects.filter(user=kusername, module=kmodule))>1:
+                    user_module = UserModule.objects.filter(user=kusername, module=kmodule)[0]
+                else:
+                    user_module = None
+                if user_module is not None:
+                    user_data, created = UserData.objects.get_or_create(user=kusername)
+                    update_module_proficiency(user_data, request.POST['module'], None)
+                    response[kmodule.name] = user_module.is_proficient_at()    
+                return  self.create_response(request, response)
+        return self.create_response(request, {'error': 'unauthorized action'})
 
 
 class UserModuleResource(ModelResource): 
@@ -461,21 +587,25 @@ class UserModuleResource(ModelResource):
         ]
 
     def ismoduleproficient(self, request, **kwargs):
-        if request.POST['username']:    #request.user:
-            with transaction.commit_on_success():
-                kmodule = Module.objects.get(name= request.POST['module'])
-                kusername = User.objects.get(username=request.POST['username'])
-                if  len(UserModule.objects.filter(user=kusername, module=kmodule))==1:  
-                    user_module = UserModule.objects.get(user=kusername, module=kmodule)
-                elif len(UserModule.objects.filter(user=kusername, module=kmodule))>1:
-                    user_module = UserModule.objects.filter(user=kusername, module=kmodule)[0]
-                else:
-                    user_module = None 
-                if user_module is not None:
+        if request.POST['key']:
+            print request.POST['key']
+            kusername = get_user_by_key(request.POST['key'])       #request.POST['username']:    #request.user:
+        if kusername:
+            #with transaction.commit_on_success():
+            kmodule = Module.objects.get(name= request.POST['module'])
+                #kusername = User.objects.get(username=request.POST['username'])
+            if  len(UserModule.objects.filter(user=kusername, module=kmodule))==1:  
+                user_module = UserModule.objects.get(user=kusername, module=kmodule)
+            elif len(UserModule.objects.filter(user=kusername, module=kmodule))>1:
+                user_module = UserModule.objects.filter(user=kusername, module=kmodule)[0]
+            else:
+                user_module = None 
+            if user_module is not None:
+                with transaction.commit_on_success():
                     user_data, created = UserData.objects.get_or_create(user=kusername) 
-                    update_module_proficiency(user_data, request.POST['module'], None)
-                    return self.create_response(request, {'proficient': user_module.is_proficient_at()})
-                self.create_response(request, {'proficient': False})
+                update_module_proficiency(user_data, request.POST['module'], None)
+                return self.create_response(request, {'proficient': user_module.is_proficient_at()})
+            self.create_response(request, {'proficient': False})
         return self.create_response(request, {'proficient': False})
 
 

@@ -15,14 +15,14 @@ import jsonpickle
 import math
 
 from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, \
-                           Books, UserSummary, ExerciseModule, BookModuleExercise 
+                           Books, UserSummary, BookModuleExercise 
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.utils import simplejson
 from django.contrib.sessions.models import Session
-from django.db import connection
+from django.db import connection, transaction 
 
 def diff(a, b):
     b = set(b)
@@ -110,7 +110,7 @@ def student_grade(user_data):
     for ex_prof in prof_list:
         ex = Exercise.objects.get(id=ex_prof)
         for mod in modules:
-            if ex.id in mod.get_proficiency_model(): 
+            if ex.id in mod.exercise_list:   #get_proficiency_model(): 
                module_name = mod.name
         if ex.ex_type == 'ss':
             points = Decimal(book.ss_points)
@@ -129,9 +129,10 @@ def update_module_proficiency(user_data, module, exercise):
     
     print '----------------update_module_proficiency---------------\n'  
     db_module = Module.objects.get(name=module)
-    module_ex_list = db_module.get_proficiency_model() 
-    user_prof = user_data.get_prof_list() 
-    user_module, exist =  UserModule.objects.get_or_create(user=user_data.user, module=db_module)
+    module_ex_list = db_module.exercise_list.split(',')   #get_proficiency_model() 
+    user_prof = user_data.get_prof_list()
+    with transaction.commit_on_success(): 
+        user_module, exist =  UserModule.objects.get_or_create(user=user_data.user, module=db_module)
     dt_now = datetime.datetime.now()
     if user_module: 
         if user_module.first_done == None:
@@ -168,7 +169,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
         user_exercise.last_done = dt_now
         # Build up problem log for deferred put
         problem_log = models.UserExerciseLog(
-                user=user_data, 
+                user=user_data.user, 
                 exercise=user_exercise.exercise,
                 time_taken=time_taken,
                 time_done=dt_now,
@@ -235,34 +236,36 @@ def attempt_problem(user_data, user_exercise, attempt_number,
 
 
 def attempt_problem_pe(user_data, user_exercise, attempt_number,
-    completed, time_taken, fix, undo, correct, student, total, module, ip_address):
+    completed, submit_time,  threshold, score, points, module, ip_address):
 
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         print user_exercise
-        dt_now = datetime.datetime.now()
+        dt_now =  date_from_timestamp(submit_time)   #datetime.datetime.now()
         exercise = user_exercise.exercise
         user_exercise.last_done = dt_now
         count_hints=0
         print ' exercise.name %s' %exercise.name
-        print ' exercise.streak %s' %exercise.streak
-        print ' total %s-\n' %total
-        print ' correct %s' %correct
-        print 'threshold  %s-\n' %((Decimal(exercise.streak)/100) * int(total))
-        threshold = (Decimal(exercise.streak)/100) * int(total)
-        # Build up problem log for deferred put
+        #print ' exercise.streak %s' %exercise.streak
+        #print ' total %s-\n' %total
+        #print ' correct %s' %correct
+        #print 'threshold  %s-\n' %((Decimal(exercise.streak)/100) * int(total))
+        #threshold = (Decimal(exercise.streak)/100) * int(total)
+        # Build up problem log 
         problem_log = models.UserExerciseLog(
-                user=user_data,
+                user=user_data.user,
                 exercise=user_exercise.exercise,
-                time_taken=time_taken,
+                time_taken=0,
                 time_done=dt_now,
                 count_hints=count_hints,
                 hint_used=int(count_hints) > 0,
-                correct=correct>= threshold,  
-                count_attempts=attempt_number,
+                correct=score>= threshold,  
+                count_attempts=0, #we should use uiid to get attempt_number,
                 ip_address=ip_address,
         )
 
-
+        #update list of started exercises
+        if not user_data.has_started(exercise): 
+            user_data.started(exercise.id)
 
         just_earned_proficiency = False
 
@@ -272,28 +275,31 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
         proficient = user_data.is_proficient_at(user_exercise.exercise)
         if problem_log.correct:
 
-                #proficient = user_data.is_proficient_at(user_exercise.exercise)
+                
 
-                problem_log.points_earned = total   
+                #problem_log.points_earned = points   
+                user_data.points += points
                 user_exercise.total_correct += 1
-                user_exercise.longest_streak = max(user_exercise.longest_streak, total)
+                user_exercise.longest_streak = 0 #max(user_exercise.longest_streak, total)
                 value = True  
                 if not proficient:
                    #if(total>=user_exercise.streak):
                         problem_log.earned_proficiency =  user_exercise.update_proficiency_pe(correct=True) 
-
+                user_data.earned_proficiency(exercise.id) 
+                user_data.add_points(points) 
         problem_log.save()  
-        pe_log = models.UserProfExerciseLog( 
-                                             problem_log=problem_log,  #user_exercise,
-                                             student = student,
-                                             correct = correct,
-                                             fix =fix,
-                                             undo = undo, 
-                                             total = total)
+        #pe_log = models.UserProfExerciseLog( 
+        #                                     problem_log=problem_log,  #user_exercise,
+        #                                     student = student,
+        #                                     correct = correct,
+        #                                     fix =fix,
+        #                                     undo = undo, 
+        #                                     total = total)
 
-        pe_log.save() 
-        user_exercise.save() 
-        if proficient or problem_log.earned_proficiency:
+        #pe_log.save() 
+        user_exercise.save()
+        user_data.save() 
+        if (proficient or problem_log.earned_proficiency): # and required:
             update_module_proficiency(user_data, module, user_exercise.exercise)
         return user_exercise,value  
 

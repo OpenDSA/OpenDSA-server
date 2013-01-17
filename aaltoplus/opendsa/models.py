@@ -31,17 +31,12 @@ class Exercise(models.Model):
     description = models.TextField()
     streak = models.IntegerField()
 
+
 class Books(models.Model):
-
     book_name = models.CharField(max_length=50)
-    course =  models.IntegerField(default = 0)  #will be later changed to  models.ForeignKey(course_instance) 
-    ss_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for mini slideshows av
-    pe_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for JSAV proficiency exercises
-    ka_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for KA exercises
-    pr_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for Programing exercises
-    ot_points =  models.DecimalField(default = 0, max_digits=3, decimal_places=2) #points for Other  exercises
-
-
+    book_url =  models.CharField(unique=False, max_length=80, blank=False,
+                                               validators=[RegexValidator(regex="^[\w\-\.]*$")],
+                                               help_text="Input an URL identifier for this book.") 
 
 #A table to hold user status (proficient, started, not started) for each exercise.
 class UserSummary(models.Model):
@@ -101,6 +96,10 @@ class Module(models.Model):
      raw_html = models.TextField()   
      exercise_list = models.TextField() 
 
+     def add_required_exercise(self, exid):
+         if exid not in self.exercise_list.split(','):
+             self.exercise_list += ',%s' %exid
+
      #function that returns list of id of exercises
      #will be compared to student list of proficiency exercises 
      def get_proficiency_model(self):
@@ -114,8 +113,19 @@ class Module(models.Model):
                 #else:
                 #    ex_id_list.append(0)
             return ex_id_list
-         return 
+         return None
 
+     def get_required_exercises(self):
+         if self.exercise_list != None:
+            ex_list = self.exercise_list.split(',')
+            ex_id_list = []
+            for ex in ex_list:
+                if ex.isdigit():
+                    if len(Exercise.objects.filter(id= ex))==1:
+                        ex_ = Exercise.objects.get(id=ex)
+                        ex_id_list.append(ex_)
+            return ex_id_list
+         return []  
 
 
 #A table to hold Book, modules , exercises data
@@ -123,6 +133,10 @@ class BookModuleExercise (models.Model):
     book = models.ForeignKey(Books)
     module = models.ForeignKey(Module)
     exercise = models.ForeignKey(Exercise) 
+    #points the exercise is worth
+    points = models.DecimalField(default = 0, max_digits=3, decimal_places=2) 
+    class Meta:
+        unique_together = (("book","module", "exercise"),)
 
 
 class UserButton(models.Model):
@@ -172,13 +186,13 @@ class UserData(models.Model):
     # user_id can be used as a unique identifier instead.
     user =   models.ForeignKey(User)
 
-    # Names of exercises in which the user is *explicitly* proficient
-    proficient_exercises = models.TextField()  #object_property.StringListCompatTsvField()
+    # ids of exercises started
+    started_exercises = models.TextField()  #object_property.StringListCompatTsvField()
 
-    # Names of all exercises in which the user is proficient
+    # ids of all exercises in which the user is proficient
     all_proficient_exercises = models.TextField() # object_property.StringListCompatTsvField()
 
-    points = models.IntegerField(default=0)
+    points = models.DecimalField(default = 0, max_digits=3, decimal_places=2) #models.IntegerField(default=0)
 
     #completed = models.IntegerField(default=-1)
     #last_daily_summary = models.DateTimeField()
@@ -198,6 +212,12 @@ class UserData(models.Model):
 	cur.close()
 	return [UserData(*row) for row in results]
 
+    def earned_proficiency(self, exid):
+        self.all_proficient_exercises += ',%s' %exid  
+
+    def started(self, exid):
+        self.started_exercises += ',%s' %exid
+
     def is_proficient_at(self, exid):
         if self.all_proficient_exercises is None:
             return False
@@ -208,24 +228,36 @@ class UserData(models.Model):
               prof_ex.append(int(ex))
         return (exid.id in prof_ex)
 
+    def has_started(self, exid):
+        if self.started_exercises is None:
+            return False
+        started_ex =[]
+        for ex in self.started_exercises.split(','):
+            if ex.isdigit():
+              number = int(ex)
+              started_ex.append(int(ex))
+        return (exid.id in started_ex)
+
 
     def get_prof_list(self):
         prof_ex =[] 
-        for ex in self.all_proficient_exercises[:-1].split(','):
+        for ex in self.all_proficient_exercises.split(','):
             if ex.isdigit():
               number = int(ex)
               prof_ex.append(int(ex))
-        return prof_ex 
-    def add_points(self, points):
-        if self.points is None:
-            self.points = 0
+        return prof_ex
 
-        if not hasattr(self, "_original_points"):
-            self._original_points = self.points
+ 
+    def add_points(self, points):
+        #if self.points is None:
+        #    self.points = 0
+
+        #if not hasattr(self, "_original_points"):
+        #    self._original_points = self.points
 
         # Check if we crossed an interval of 2500 points
-        if self.points % 2500 > (self.points + points) % 2500:
-            util_notify.update(self, user_exercise=None, threshold=True)
+        #if self.points % 2500 > (self.points + points) % 2500:
+        #    util_notify.update(self, user_exercise=None, threshold=True)
         self.points += points
 
     def original_points(self):
@@ -235,14 +267,14 @@ class UserData(models.Model):
 
 class UserExerciseLog(models.Model):
 
-    user =  models.ForeignKey(UserData)
+    user =  models.ForeignKey(User)
     exercise =  models.ForeignKey(Exercise)
     correct = models.BooleanField(default = False)
     time_done = models.DateTimeField(auto_now_add=True)
     time_taken = models.IntegerField(default = 0)
     count_hints = models.IntegerField(default = 0)
     hint_used = models.BooleanField(default = False)
-    points_earned = models.IntegerField(default = 0)
+    points_earned = models.DecimalField(default = 0, max_digits=3, decimal_places=2)  #models.IntegerField(default = 0)
     earned_proficiency = models.BooleanField(default = False) # True if proficiency was earned on this problem
     count_attempts = models.IntegerField(default = 0)
     ip_address = models.CharField(max_length=20)
@@ -405,7 +437,7 @@ class UserExercise(models.Model):
         if correct:
            self.proficient_date = dt_now
 
-           user_data.proficient_exercises += "%s," %self.exercise_id
+           #user_data.proficient_exercises += "%s," %self.exercise_id
            user_data.all_proficient_exercises += "%s," %self.exercise_id
            user_data.save()
            return True
