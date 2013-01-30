@@ -37,7 +37,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'opendsa_beta',         #g3et_path('test.db'),            # Or path to database file if using sqlite3.
+        'NAME': '',         #g3et_path('test.db'),            # Or path to database file if using sqlite3.
         'USER': '',                  # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
