@@ -6,12 +6,12 @@ from tastypie.authorization import DjangoAuthorization, ReadOnlyAuthorization, A
 from tastypie import fields
 from tastypie.utils import trailing_slash
 from tastypie.serializers import Serializer
-from tastypie.http import HttpUnauthorized, HttpForbidden  
+from tastypie.http import HttpUnauthorized, HttpForbidden, HttpBadRequest 
 from tastypie.models import ApiKey  
 
 
 # ODSA 
-from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module, Feedback, UserModule, \
+from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module, UserModule, \
                               BookModuleExercise, Books     
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
@@ -24,7 +24,7 @@ from django.db import transaction
 import jsonpickle  
 
 from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, \
-                       attempt_problem_pe, update_module_proficiency, student_grade, student_grade_all 
+                       attempt_problem_pe, update_module_proficiency, student_grade_all 
 
 
 # Key generation and verification
@@ -237,10 +237,10 @@ class UserexerciseResource(ModelResource):
                  if correct:
                     number_logs += 1 #return  self.create_response(request, user_button)
             if number_logs == len(actions):
-                return  self.create_response(request,  {'success':True, 'message': '+all button action logged'})
+                return  self.create_response(request,  {'success':True, 'message': 'all button action logged'})
             else:
-                    return  self.create_response(request, {'success':False, 'error': 'not all button action logged'})
-        return self.create_response(request, {'success':False, 'error': 'unauthorized action'})
+                    return  self.create_response(request, {'success':False, 'error': 'not all button action logged'}, HttpBadRequest)
+        return self.create_response(request, {'success':False, 'error': 'unauthorized action'}, HttpUnauthorized)
 
 
     def logpeexercise(self, request, **kwargs):
@@ -259,7 +259,7 @@ class UserexerciseResource(ModelResource):
             if kusername and kexercise:
                 user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0) 
             else:   
-                return  self.create_response(request, {'error': 'attempt not logged'}) 
+                return  self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized) 
             with transaction.commit_on_success(): 
                 user_data, created = UserData.objects.get_or_create(user=kusername)
             module = Module.objects.get(name=request.POST['module']) 
@@ -281,8 +281,8 @@ class UserexerciseResource(ModelResource):
                        )
                     return  self.create_response(request, {'success': True, 'proficient': correct})   
             else:
-                    return  self.create_response(request, {'error': 'attempt not logged'})
-        return self.create_response(request, {'error': 'unauthorized action'})
+                    return  self.create_response(request, {'error': 'attempt not logged'}, HttpBadRequest)
+        return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
 
 
 
@@ -314,8 +314,8 @@ class UserexerciseResource(ModelResource):
                         print jsonpickle.encode(user_exercise)
                         return  self.create_response(request, jsonpickle.encode(user_exercise) )           #    user_exercise) 
                      else:
-                        return  self.create_response(request, {'error': 'attempt not logged'})   
-        return self.create_response(request, {'error': 'unauthorized action'})
+                        return  self.create_response(request, {'error': 'attempt not logged'}, HttpBadRequest)   
+        return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
  
     def logexercisehint(self, request, **kwargs):
 
@@ -340,8 +340,8 @@ class UserexerciseResource(ModelResource):
                         print jsonpickle.encode(user_exercise)
                         return  self.create_response(request, jsonpickle.encode(user_exercise) )  
                      else:
-                        return  self.create_response(request, {'error': 'attempt not logged'})
-        return self.create_response(request, {'error': 'unauthorized action'})
+                        return  self.create_response(request, {'error': 'attempt not logged'}, HttpBadRequest)
+        return self.create_response(request, {'error': 'unauthorized action'},HttpUnauthorized)
 
 
     def obj_create(self, bundle, request=None, **kwargs):
@@ -531,7 +531,7 @@ class ModuleResource(ModelResource):
                     else: 
                         response[kmodule.name] = user_module.is_proficient_at()    
                 return  self.create_response(request, response)
-        return self.create_response(request, {'error': 'unauthorized action'})
+        return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
 
 
 class UserModuleResource(ModelResource): 
