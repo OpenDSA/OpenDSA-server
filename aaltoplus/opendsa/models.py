@@ -98,7 +98,10 @@ class Module(models.Model):
 
      def add_required_exercise(self, exid):
          if exid not in self.exercise_list.split(','):
-             self.exercise_list += ',%s' %exid
+             if len(self.exercise_list) == 0:
+                 self.exercise_list += '%s' %exid
+             else:
+                 self.exercise_list += ',%s' %exid
 
      #function that returns list of id of exercises
      #will be compared to student list of proficiency exercises 
@@ -107,9 +110,9 @@ class Module(models.Model):
             ex_list = self.exercise_list.split(',') 
             ex_id_list = []
             for ex in ex_list:
-                if len(Exercise.objects.filter(name= ex))==1:
-                    ex_id = Exercise.objects.get(name=ex)
-                    ex_id_list.append(int(ex_id.id))
+                if len(Exercise.objects.filter(id = ex))==1:
+                    #ex_id = Exercise.objects.get(name=ex)
+                    ex_id_list.append(int(ex))
                 #else:
                 #    ex_id_list.append(0)
             return ex_id_list
@@ -134,7 +137,7 @@ class BookModuleExercise (models.Model):
     module = models.ForeignKey(Module)
     exercise = models.ForeignKey(Exercise) 
     #points the exercise is worth
-    points = models.DecimalField(default = 0, max_digits=3, decimal_places=2) 
+    points = models.DecimalField(default = 0, max_digits=5, decimal_places=2) 
     class Meta:
         unique_together = (("book","module", "exercise"),)
 
@@ -192,7 +195,7 @@ class UserData(models.Model):
     # ids of all exercises in which the user is proficient
     all_proficient_exercises = models.TextField() # object_property.StringListCompatTsvField()
 
-    points = models.DecimalField(default = 0, max_digits=3, decimal_places=2) #models.IntegerField(default=0)
+    points = models.DecimalField(default = 0, max_digits=5, decimal_places=2) #models.IntegerField(default=0)
 
     #completed = models.IntegerField(default=-1)
     #last_daily_summary = models.DateTimeField()
@@ -213,10 +216,16 @@ class UserData(models.Model):
 	return [UserData(*row) for row in results]
 
     def earned_proficiency(self, exid):
-        self.all_proficient_exercises += ',%s' %exid  
+        if len(self.all_proficient_exercises)==0:
+            self.all_proficient_exercises += '%s' %exid
+        else:
+            self.all_proficient_exercises += ',%s' %exid  
 
     def started(self, exid):
-        self.started_exercises += ',%s' %exid
+        if len(self.started_exercises) ==0:
+            self.started_exercises += '%s' %exid
+        else:
+            self.started_exercises += ',%s' %exid
 
     def is_proficient_at(self, exid):
         if self.all_proficient_exercises is None:
@@ -274,7 +283,7 @@ class UserExerciseLog(models.Model):
     time_taken = models.IntegerField(default = 0)
     count_hints = models.IntegerField(default = 0)
     hint_used = models.BooleanField(default = False)
-    points_earned = models.DecimalField(default = 0, max_digits=3, decimal_places=2)  #models.IntegerField(default = 0)
+    points_earned = models.DecimalField(default = 0, max_digits=5, decimal_places=2)  #models.IntegerField(default = 0)
     earned_proficiency = models.BooleanField(default = False) # True if proficiency was earned on this problem
     count_attempts = models.IntegerField(default = 0)
     ip_address = models.CharField(max_length=20)
@@ -398,7 +407,7 @@ class UserExercise(models.Model):
     total_done = models.IntegerField(default = 0)
     total_correct = models.IntegerField(default = 0)
     proficient_date = models.DateTimeField(default="2012-01-01 00:00:00")
-    progress = models.DecimalField(default = 0, max_digits=3, decimal_places=2) 
+    progress = models.DecimalField(default = 0, max_digits=5, decimal_places=2) 
     class Meta:
        unique_together = (("user", "exercise"),)
     def update_proficiency_ka(self, correct):
@@ -408,8 +417,8 @@ class UserExercise(models.Model):
         if correct and (self.longest_streak >= exercise.streak):
            self.proficient_date = dt_now
            
-           user_data.proficient_exercises += "%s," %self.exercise_id
-           user_data.all_proficient_exercises += "%s," %self.exercise_id 
+           #user_data.proficient_exercises += "%s," %self.exercise_id
+           #user_data.all_proficient_exercises += "%s," %self.exercise_id 
            user_data.save() 
            return True
         return False 
@@ -438,7 +447,10 @@ class UserExercise(models.Model):
            self.proficient_date = dt_now
 
            #user_data.proficient_exercises += "%s," %self.exercise_id
-           user_data.all_proficient_exercises += "%s," %self.exercise_id
+           if len(user_data.all_proficient_exercises)==0:
+               user_data.all_proficient_exercises += "%s" %self.exercise_id 
+           else:
+               user_data.all_proficient_exercises += ",%s" %self.exercise_id
            user_data.save()
            return True
         return False

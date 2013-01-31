@@ -49,7 +49,7 @@ def make_wrong_attempt(user_data, user_exercise):
         return user_exercise
 
 
-def student_grade_all(user):
+def student_grade_all(user, book):
 
     #prof_list = user_data.get_prof_list()
     student_data_id = UserData.objects.select_related().get(user = user)
@@ -60,43 +60,56 @@ def student_grade_all(user):
         all_exercises_id.append(aexer.id)
     #list of non proficient exercises
     not_proficient_exercises = diff (set(all_exercises_id),set(proficient_exercises))
-    book = Books.objects.get(book_name="Fall2012")   #book name will be later send by the frontend
-    modules =  Module.objects.all()
+    #book = Books.objects.get(book_name="Fall2012")   #book name will be later send by the frontend
+    #modules =  Module.objects.all()
     user_grade = {}
     grade = []
-    #proficient exercises
-    for pexer_id in proficient_exercises: 
-        #if u_data.key != 'name' and  len(Exercise.objects.filter(name=u_data.key))>=1:
-           ex = Exercise.objects.filter(id = pexer_id)[0]  #(name=u_data.key)[0]
-           print 'exe name %s' %ex.name
-           if len(BookModuleExercise.objects.select_related().filter(exercise=ex))>=1 and ex.ex_type <> '':
-              module_name = BookModuleExercise.objects.filter(exercise=ex)[0].module.name      
-              print 'module_name  %s'  %module_name
-              if ex.ex_type == 'ss':
-                 points = Decimal(book.ss_points)
-              elif ex.ex_type == 'pe':
-                 points = Decimal(book.pe_points)
-              elif ex.ex_type == 'ka':
-                 points = Decimal(book.ka_points)
-              elif ex.ex_type == 'ot':
-                 points = Decimal(book.ot_points)
-              elif ex.ex_type == 'pr':
-                 points = Decimal(book.pr_points)
-              else:
-                 points = Decimal(book.ss_points)
-              grade.append({'exercise':ex.name, 'description':ex.description,'type':ex.ex_type,'points':points,'module':module_name}) 
-    #non proficient exercises   
-    for npe in not_proficient_exercises:  
-           ex = Exercise.objects.filter(id = npe)[0]  
-           print 'exe name %s' %ex.name
-           if len(BookModuleExercise.objects.select_related().filter(exercise=ex))>=1 and ex.ex_type <> '':
-              module_name = BookModuleExercise.objects.filter(exercise=ex)[0].module.name  
-              print 'module_name  %s'  %module_name
-              points = 0  
-              grade.append({'exercise':ex.name, 'description':ex.description,'type':ex.ex_type,'points':points,'module':module_name})
-    user_grade['max_points'] = {"ss":book.ss_points,"ka":book.ka_points,"pe":book.pe_points, "ot":book.ot_points, "pr":book.pr_points}
+
+    bme_list = BookModuleExercise.objects.select_related().filter(book=book)
+    for bme in bme_list:
+        if bme.exercise.id in proficient_exercises:
+            grade.append({'exercise':bme.exercise.name, 'description':bme.exercise.description,'type':bme.exercise.ex_type,'points':bme.points,'module':bme.module.name})
+        else:
+            grade.append({'exercise':bme.exercise.name, 'description':bme.exercise.description,'type':bme.exercise.ex_type,'points':0,'module':bme.module.name})
+
+    user_grade['max_points'] = {"ss":1,"ka":1,"pe":1, "ot":1, "pr":1}
     user_grade['grades'] = grade
     return user_grade
+
+
+    #proficient exercises
+    #for pexer_id in proficient_exercises: 
+        #if u_data.key != 'name' and  len(Exercise.objects.filter(name=u_data.key))>=1:
+           #ex = Exercise.objects.filter(id = pexer_id)[0]  #(name=u_data.key)[0]
+           #print 'exe name %s' %ex.name
+           #if len(BookModuleExercise.objects.select_related().filter(exercise=ex))>=1 and ex.ex_type <> '':
+              #module_name = BookModuleExercise.objects.filter(exercise=ex)[0].module.name      
+              #print 'module_name  %s'  %module_name
+              #if ex.ex_type == 'ss':
+              #   points = Decimal(book.ss_points)
+              #elif ex.ex_type == 'pe':
+               #  points = Decimal(book.pe_points)
+              #elif ex.ex_type == 'ka':
+               #  points = Decimal(book.ka_points)
+              #elif ex.ex_type == 'ot':
+               #  points = Decimal(book.ot_points)
+              #elif ex.ex_type == 'pr':
+               #  points = Decimal(book.pr_points)
+              #else:
+               #  points = Decimal(book.ss_points)
+              #grade.append({'exercise':ex.name, 'description':ex.description,'type':ex.ex_type,'points':points,'module':module_name}) 
+    #non proficient exercises   
+    #for npe in not_proficient_exercises:  
+     #      ex = Exercise.objects.filter(id = npe)[0]  
+      #     print 'exe name %s' %ex.name
+       #    if len(BookModuleExercise.objects.select_related().filter(exercise=ex))>=1 and ex.ex_type <> '':
+        #      module_name = BookModuleExercise.objects.filter(exercise=ex)[0].module.name  
+         #     print 'module_name  %s'  %module_name
+          #    points = 0  
+           #   grade.append({'exercise':ex.name, 'description':ex.description,'type':ex.ex_type,'points':points,'module':module_name})
+    #user_grade['max_points'] = {"ss":book.ss_points,"ka":book.ka_points,"pe":book.pe_points, "ot":book.ot_points, "pr":book.pr_points}
+    #user_grade['grades'] = grade
+    #return user_grade
 
 
  
@@ -129,7 +142,7 @@ def update_module_proficiency(user_data, module, exercise):
     
     print '----------------update_module_proficiency---------------\n'  
     db_module = Module.objects.get(name=module)
-    module_ex_list = db_module.exercise_list.split(',')   #get_proficiency_model() 
+    module_ex_list = db_module.get_proficiency_model()  # exercise_list.split(',')   #get_proficiency_model() 
     user_prof = user_data.get_prof_list()
     with transaction.commit_on_success(): 
         user_module, exist =  UserModule.objects.get_or_create(user=user_data.user, module=db_module)
@@ -138,29 +151,28 @@ def update_module_proficiency(user_data, module, exercise):
         if user_module.first_done == None:
             user_module.first_done = dt_now
         user_module.last_done = dt_now
-#        print 'diff == %s - Exercise == %s\n' %(diff(set(module_ex_list),set(user_prof)),[int(exercise.id)])
-#        print  '%s' %(diff(set(module_ex_list),set(user_prof))==[exercise.id])
-        print 'value .proficient_date  %s' %(user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))
-        if user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'):
-            if exercise is not None: 
-               is_last_exercise = diff(set(module_ex_list),set(user_prof))==[exercise.id]
-            else:
-               is_last_exercise = False 
-            if (set(module_ex_list).issubset(set(user_prof))) or is_last_exercise:
-                user_module.proficient_date = dt_now 
-                user_module.save()
-                return True
-            else:
-                user_module.save()
-                return False
-        user_module.save()   
-        return True 
+        is_last_exercise = False  
+        if exercise is not None:
+            if user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'):
+                diff_ex = diff(set(module_ex_list),set(user_prof))
+                if len(user_prof)==0: #user has no proficient exercise.
+                    return False
+                if (set(module_ex_list).issubset(set(user_prof))) or is_last_exercise:
+                    user_module.proficient_date = dt_now 
+                    user_module.save()
+                    return True
+                else:
+                    user_module.save()
+                    return False
+            return True 
+        else:
+            return False
     return False
 
     
 
 def attempt_problem(user_data, user_exercise, attempt_number,
-    completed, count_hints, time_taken, attempt_content, module, 
+    completed, count_hints, time_taken, attempt_content, module, points, 
     ip_address):
 
     if user_exercise:   # and user_exercise.belongs_to(user_data):
@@ -187,6 +199,9 @@ def attempt_problem(user_data, user_exercise, attempt_number,
             bingo('hints_keep_going_after_wrong')
 
         just_earned_proficiency = False
+        #update list of started exercises
+        if not user_data.has_started(user_exercise.exercise):
+            user_data.started(user_exercise.exercise.id)
 
         # Users can only attempt problems for themselves, so the experiment
         # bucket always corresponds to the one for this current user
@@ -202,7 +217,8 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 #proficient = user_data.is_proficient_at(user_exercise.exercise)
 
 
-                problem_log.points_earned +=1   #points.ExercisePointCalculator(user_exercise[0], suggested, proficient)
+                #problem_log.points_earned +=1   #points.ExercisePointCalculator(user_exercise[0], suggested, proficient)
+                #user_data.points += points  
                 # Streak only increments if problem was solved correctly (on first attempt)
                 user_exercise.total_correct += 1
                 user_exercise.streak += 1
@@ -210,6 +226,12 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)  
                 if not proficient: 
                         problem_log.earned_proficiency = user_exercise.update_proficiency_ka(correct=True)
+                        if user_exercise.progress >= 1:
+                            if len(user_data.all_proficient_exercises)==0:
+                                user_data.all_proficient_exercises += "%s" %user_exercise.exercise.id
+                            else:  
+                                user_data.all_proficient_exercises += ",%s" %user_exercise.exercise.id 
+                            user_data.points += points  
                 #if problem_log.earned_proficiency:
                 #    update_module_proficiency(user_data, module)
             else:  
@@ -228,7 +250,8 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                    bingo(['hints_wrong_problems', 'struggling_problems_wrong'])
         
         problem_log.save()
-        user_exercise.save() 
+        user_exercise.save()
+        user_data.save()    
         if proficient or problem_log.earned_proficiency:
             update_module_proficiency(user_data, module, user_exercise.exercise)
         return user_exercise,True      #, user_exercise_graph, goals_updated
