@@ -1,15 +1,15 @@
 <html>
 <head>
-	<title>Module Summary & Exercise List</title>
+  <title>Module Summary & Exercise List</title>
 </head>
 
 <body>
 Exercise List
 <table style="border: solid 1px black;"> 
     {% for exercise in exercises %} 
-    	<tr >
-        <td style="border: solid 1px black;"><a href="/developer_view/exercise_detail/{{student}}/{{module}}/{{exercise.id}}/">{{ exercise.name }}</a></td>           
-        </tr>
+      <tr >
+        <td style="border: solid 1px black;"><a href="/developer_view/exercise_detail/{{student}}/{{exercise.id}}/">{{ exercise.name }}</a></td>        
+      </tr>
     {% endfor %} 
 </table>
 </body>

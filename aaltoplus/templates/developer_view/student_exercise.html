@@ -28,9 +28,9 @@ Proficiency Dates for Exercises
         <td align=center valign=bottom>
         <div>{{exercise.number}}</div>
         <div valign=bottom style="width: 200; height: {{exercise.get_number_print}}; background:#2E9AFE;"/>
-    	{% for exe in exercise.exercises %} 
-         {{exe.name}} <br>
-    	{% endfor %}
+      {% for exe in exercise.exercises %} 
+         <a href="/developer_view/exercise_detail/{{student}}/{{exe.id}}/">{{exe.name}}</a> <br>
+      {% endfor %}
         </td>
     {% endfor %} 
     </tr>
@@ -40,6 +40,6 @@ Proficiency Dates for Exercises
     {% endfor %} 
     </tr>    
 </table>
-
+<a href="/developer_view/timeline_sum/{{student}}/">timeline</a>
 </body>
 </html>
