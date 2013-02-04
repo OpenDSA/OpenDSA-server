@@ -34,7 +34,13 @@
         <p class="errors">{{ form.password2.errors.as_text }}</p>
       {% endif %}
       {{ form.password2 }}
-      </label> 
+      </label>
+      <span>Select your course:{{form.courses}}-</span>
+      <select name="course">
+          {% for course in form.courses %}
+              <option value="{{course}}">{{course}}</option>
+          {% endfor %}
+      </select> 
       <p class="submit">
         <input type="submit" value="Register &rarr;">
       </p>

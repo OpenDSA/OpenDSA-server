@@ -480,7 +480,7 @@ class ModuleResource(ModelResource):
                 for mod_exe in mod_exes:   
                     if len( Exercise.objects.filter(name=mod_exe['exercise']))==0:
                         with transaction.commit_on_success():
-                            kexercise, added = Exercise.objects.get_or_create(name= mod_exe['exercise'],covers="dsa",description="",ex_type= mod_exe['type'],streak= mod_exe['threshold'])     
+                            kexercise, added = Exercise.objects.get_or_create(name= mod_exe['exercise'],covers="dsa",description= mod_exe['name'],ex_type= mod_exe['type'],streak= mod_exe['threshold'])     
                         #add exercise to module proficiency model
                         if mod_exe['required'] and (kexercise.id not in kmodule.get_required_exercises()):
                             kmodule.add_required_exercise(kexercise.id) #exercise_list += "%s," %kexercise.id
@@ -572,8 +572,8 @@ class UserModuleResource(ModelResource):
                     user_data, created = UserData.objects.get_or_create(user=kusername) 
                 update_module_proficiency(user_data, request.POST['module'], None)
                 return self.create_response(request, {'proficient': user_module.is_proficient_at()})
-            self.create_response(request, {'proficient': False})
-        return self.create_response(request, {'proficient': False})
+            return self.create_response(request, {'proficient': False})
+        return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
 
 
 

@@ -13,7 +13,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 
 #A+
-from course.models import Course
+from course.models import Course, CourseInstance
 import consts
 #from decorator import clamp 
 
@@ -38,7 +38,7 @@ class Books(models.Model):
     book_url =  models.CharField(unique=False, max_length=80, blank=False,
                                                validators=[RegexValidator(regex="^[\w\-\.]*$")],
                                                help_text="Input an URL identifier for this book.") 
-    courses = models.ManyToManyField(Course)
+    courses = models.ManyToManyField(CourseInstance)
 
 
 #A table to hold user status (proficient, started, not started) for each exercise.
