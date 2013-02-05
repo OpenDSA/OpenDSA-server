@@ -13,7 +13,7 @@ def get_path(filename):
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 #gist middleware variables
-XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta6.cc.vt.edu','http://algoviz.org']
+XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta6.cc.vt.edu','http://algoviz.org','http://algoviz-beta7.cc.vt.edu']
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
 XS_SHARING_ALLOWED_HEADERS = ["Content-Type"] 
 
@@ -115,9 +115,13 @@ TEMPLATE_LOADERS = (
 
 # Cache backends
 CACHES = {
+    #'default': {
+    #    'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+    #    'LOCATION': 'django_db_cache',
+    #}
     'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'django_db_cache',
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
     }
 }
 
@@ -130,6 +134,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'lib.middleware.SqlInjectionMiddleware',
     'middleware.django-crossdomainxhr-middleware.XsSharing',
+    'django_user_agents.middleware.UserAgentMiddleware',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -175,6 +180,7 @@ INSTALLED_APPS = (
     'registration',
     'kombu.transport.django',
     'djcelery',
+    'django_user_agents',
 )
 
 # OAuth settings
