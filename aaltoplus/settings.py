@@ -13,7 +13,7 @@ def get_path(filename):
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 #gist middleware variables
-XS_SHARING_ALLOWED_ORIGINS = 'http://algoviz.org'
+XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta6.cc.vt.edu','http://algoviz.org']
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
 XS_SHARING_ALLOWED_HEADERS = ["Content-Type"] 
 

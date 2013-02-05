@@ -40,10 +40,14 @@ class XsSharing(object):
 
     """
     def process_request(self, request):
-
         if 'HTTP_ACCESS_CONTROL_REQUEST_METHOD' in request.META:
             response = http.HttpResponse()
-            response['Access-Control-Allow-Origin']  = XS_SHARING_ALLOWED_ORIGINS 
+
+            if request.META['HTTP_ORIGIN'] in XS_SHARING_ALLOWED_ORIGINS: 
+                response['Access-Control-Allow-Origin']  = request.META['HTTP_ORIGIN']
+            else: 
+                response['Access-Control-Allow-Origin']  = XS_SHARING_ALLOWED_ORIGINS
+
             response['Access-Control-Allow-Methods'] = ",".join( XS_SHARING_ALLOWED_METHODS ) 
             response['Access-Control-Allow-Headers']  = ",".join( XS_SHARING_ALLOWED_HEADERS ) 
             response['Access-Control-Allow-Credentials']  = "true"
@@ -56,7 +60,11 @@ class XsSharing(object):
         if response.has_header('Access-Control-Allow-Origin'):
             return response
 
-        response['Access-Control-Allow-Origin']  = XS_SHARING_ALLOWED_ORIGINS 
+        response['Access-Control-Allow-Origin']  = XS_SHARING_ALLOWED_ORIGINS[0]
+        if 'HTTP_ORIGIN' in request.META:
+            if request.META['HTTP_ORIGIN'] in XS_SHARING_ALLOWED_ORIGINS:
+                response['Access-Control-Allow-Origin']  = request.META['HTTP_ORIGIN']
+
         response['Access-Control-Allow-Methods'] = ",".join( XS_SHARING_ALLOWED_METHODS )
         response['Access-Control-Allow-Credentials']  = "true"
 
