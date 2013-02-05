@@ -152,6 +152,11 @@ class UserButton(models.Model):
      name = models.CharField(max_length=50)
      description = models.TextField() 
      action_time = models.DateTimeField(default="2000-01-01 00:00:00")
+     browser_family = models.CharField(max_length=20)
+     browser_version = models.CharField(max_length=20)
+     os_family = models.CharField(max_length=50)
+     os_version = models.CharField(max_length=20)
+     device = models.CharField(max_length=50)
      ip_address = models.CharField(max_length=20)
 
 

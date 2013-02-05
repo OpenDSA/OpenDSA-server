@@ -232,6 +232,11 @@ class UserexerciseResource(ModelResource):
                     act['type'],
                     act['desc'], 
                     act['tstamp'],
+                    request.user_agent.browser.family,
+                    request.user_agent.browser.version_string,
+                    request.user_agent.os.family,
+                    request.user_agent.os.version_string,
+                    request.user_agent.device.family,
                     request.META['REMOTE_ADDR'],
                     )
                  if correct:

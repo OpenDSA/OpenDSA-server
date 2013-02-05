@@ -49,7 +49,11 @@
 				- sudo easy_install mimeparse
 				- sudo easy_install python-dateutil
 				- sudo easy_install django-tastypie
-			
+                                Install memcache
+				- pip install python-memcached
+                                Install user agent (http://pypi.python.org/pypi/django-user_agents)
+		 		- pip install pyyaml ua-parser user-agents
+				- pip install django-user-agents	
 			- git clone https://YOURGITHUBID@github.com/cashaffer/Aalto--.git Aalto
 			- cd Aalto/aaltoplus
 			
