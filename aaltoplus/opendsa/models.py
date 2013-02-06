@@ -109,7 +109,7 @@ class Module(models.Model):
      #function that returns list of id of exercises
      #will be compared to student list of proficiency exercises 
      def get_proficiency_model(self):
-         if self.exercise_list != None: 
+         if self.exercise_list != None and len(self.exercise_list)>1: 
             ex_list = self.exercise_list.split(',') 
             ex_id_list = []
             for ex in ex_list:
@@ -122,7 +122,7 @@ class Module(models.Model):
          return None
 
      def get_required_exercises(self):
-         if self.exercise_list != None:
+         if self.exercise_list != None and len(self.exercise_list)>0:
             ex_list = self.exercise_list.split(',')
             ex_id_list = []
             for ex in ex_list:
@@ -212,7 +212,7 @@ class UserData(models.Model):
             self.started_exercises += ',%s' %exid
 
     def is_proficient_at(self, exid):
-        if self.all_proficient_exercises is None:
+        if self.all_proficient_exercises is None or len(self.all_proficient_exercises)==0:
             return False
         prof_ex =[]
         for ex in self.all_proficient_exercises.split(','):
@@ -222,7 +222,7 @@ class UserData(models.Model):
         return (exid.id in prof_ex)
 
     def has_started(self, exid):
-        if self.started_exercises is None:
+        if self.started_exercises is None or len(self.started_exercises)==0:
             return False
         started_ex =[]
         for ex in self.started_exercises.split(','):
