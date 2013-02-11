@@ -215,16 +215,18 @@ class UserexerciseResource(ModelResource):
                if  len(Exercise.objects.filter(name= act['av']))==1:
                    kexercise =  Exercise.objects.get(name= act['av'])
                else:
-                   kexercise = Exercise(name = act['av'], streak=streak)
-                   kexercise.save()       
-               with transaction.commit_on_success(): 
-                   user_data, created = UserData.objects.get_or_create(user=kusername)
+                   with transaction.commit_on_success():
+                       kexercise = Exercise(name = act['av'], streak=streak)
+                       kexercise.save()       
+               with transaction.commit_on_success():
+                   kbook = Books.objects.get(book_name= request.POST['book'])
+                   user_data, created = UserData.objects.get_or_create(user=kusername,book=kbook)
                module = None 
                if len(Module.objects.filter(name=act['module']))>0: 
                   module = Module.objects.get(name=act['module'])  
                if kexercise and module:
                  with transaction.commit_on_success(): 
-                     user_module, exist =  UserModule.objects.get_or_create(user=kusername, module=module)  
+                     user_module, exist =  UserModule.objects.get_or_create(user=kusername, book=kbook,module=module)  
                  user_button,correct = log_button_action(
                     kusername,  
                     kexercise,
@@ -277,7 +279,7 @@ class UserexerciseResource(ModelResource):
             else:
                 ubook= None
             with transaction.commit_on_success(): 
-                user_data, created = UserData.objects.get_or_create(user=kusername)
+                user_data, created = UserData.objects.get_or_create(user=kusername,book=dsa_book)
             module = Module.objects.get(name=request.POST['module']) 
             if user_exercise and ubook:
                     bme = BookModuleExercise.objects.filter(book = ubook.book, module = module, exercise=kexercise)[0] #temporary need to find a way to associate student to course to book.
@@ -289,7 +291,7 @@ class UserexerciseResource(ModelResource):
                        int(request.POST['tstamp']),
                        #request.POST['fix'],
                        0, #int(request.POST['threshold']),
-                       int(request.POST['score']),
+                       (request.POST['score']),
                        #required,
                        bme.points,  #request.POST['points'],
                        request.POST['module'], 
@@ -332,7 +334,7 @@ class UserexerciseResource(ModelResource):
             else:
                 ubook= None
             with transaction.commit_on_success():
-                user_data, created = UserData.objects.get_or_create(user=kusername)
+                user_data, created = UserData.objects.get_or_create(user=kusername,book=dsa_book)
             module = Module.objects.get(name=request.POST['module_name'])
             if user_exercise and ubook:
                 bme = BookModuleExercise.objects.filter(book = ubook.book, module = module, exercise=kexercise)[0]
@@ -392,7 +394,7 @@ class UserexerciseResource(ModelResource):
             else:
                 ubook= None
             with transaction.commit_on_success():
-                user_data, created = UserData.objects.get_or_create(user=kusername)
+                user_data, created = UserData.objects.get_or_create(user=kusername,book=dsa_book)
             module = Module.objects.get(name=request.POST['module'])
             if user_exercise and ubook:
                 bme = BookModuleExercise.objects.filter(book = ubook.book, module = module, exercise=kexercise)[0]
@@ -482,8 +484,9 @@ class UserDataResource(ModelResource):
             if  len(Exercise.objects.filter(name= jsav_exercise))==1:
                 kexercise =  Exercise.objects.get(name= jsav_exercise)
             else:
-                kexercise = None 
-            user_data = UserData.objects.filter(user=kusername)[0]
+                kexercise = None
+            kbook = Books.objects.get(book_name= request.POST['book']) 
+            user_data = UserData.objects.filter(user=kusername,book=kbook)[0]
             if kexercise:
                 return self.create_response(request, {'proficient': user_data.is_proficient_at(kexercise)}) 
             self.create_response(request, {'proficient': False}) 
@@ -559,7 +562,10 @@ class ModuleResource(ModelResource):
                 exercises =   request.POST['exercises']
                 mod_exes = simplejson.loads(exercises) 
                 print mod_exes  
-                for mod_exe in mod_exes:   
+                for mod_exe in mod_exes:  
+                    print '******************'
+                    print mod_exe
+                    print '******************' 
                     if len( Exercise.objects.filter(name=mod_exe['exercise']))==0:
                         with transaction.commit_on_success():
                             kexercise, added = Exercise.objects.get_or_create(name= mod_exe['exercise'],covers="dsa",description= mod_exe['name'],ex_type= mod_exe['type'],streak= mod_exe['threshold'])     
@@ -568,9 +574,15 @@ class ModuleResource(ModelResource):
                             kmodule.add_required_exercise(kexercise.id) #exercise_list += "%s," %kexercise.id
                             kmodule.save()
                     else:
-                        kexercise = Exercise.objects.get(name= mod_exe['exercise'])  
-                    if len(UserData.objects.filter(user=kusername))>0:
-                        user_data = UserData.objects.get(user=kusername)
+                        with transaction.commit_on_success():
+                            kexercise = Exercise.objects.get(name= mod_exe['exercise'])  
+                            kexercise.covers="dsa"
+                            kexercise.description= mod_exe['name']
+                            kexercise.ex_type= mod_exe['type']
+                            kexercise.streak= mod_exe['threshold']
+                            kexercise.save()
+                    if len(UserData.objects.filter(user=kusername,book=kbook))>0:
+                        user_data = UserData.objects.get(user=kusername,book=kbook)
                         u_prof = user_data.is_proficient_at(kexercise)  
                     #check student progress -- KA exercises
                     if  len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==1:
@@ -597,15 +609,15 @@ class ModuleResource(ModelResource):
                         u_prog = 0
                     response[kexercise.name] = {'proficient':u_prof,'progress':u_prog}
                 #check module proficiency
-                if  len(UserModule.objects.filter(user=kusername, module=kmodule))==1:
-                    user_module = UserModule.objects.get(user=kusername, module=kmodule)
-                elif len(UserModule.objects.filter(user=kusername, module=kmodule))>1:
-                    user_module = UserModule.objects.filter(user=kusername, module=kmodule)[0]
+                if  len(UserModule.objects.filter(user=kusername,book=kbook, module=kmodule))==1:
+                    user_module = UserModule.objects.get(user=kusername, book=kbook, module=kmodule)
+                elif len(UserModule.objects.filter(user=kusername, book=kbook, module=kmodule))>1:
+                    user_module = UserModule.objects.filter(user=kusername, book=kbook, module=kmodule)[0]
                 else:
                     user_module = None
                 if user_module is not None:
                     with transaction.commit_on_success():
-                        user_data, created = UserData.objects.get_or_create(user=kusername)
+                        user_data, created = UserData.objects.get_or_create(user=kusername,book = kbook)
                     update_module_proficiency(user_data, request.POST['module'], None) 
                     #Module proficiency response
                     if len(BookModuleExercise.objects.filter(book = kbook, module = kmodule))==0:
@@ -642,16 +654,17 @@ class UserModuleResource(ModelResource):
         if kusername:
             #with transaction.commit_on_success():
             kmodule = Module.objects.get(name= request.POST['module'])
+            kbook = Books.objects.get(book_name= request.POST['book'])
                 #kusername = User.objects.get(username=request.POST['username'])
-            if  len(UserModule.objects.filter(user=kusername, module=kmodule))==1:  
-                user_module = UserModule.objects.get(user=kusername, module=kmodule)
-            elif len(UserModule.objects.filter(user=kusername, module=kmodule))>1:
-                user_module = UserModule.objects.filter(user=kusername, module=kmodule)[0]
+            if  len(UserModule.objects.filter(user=kusername, book=kbook, module=kmodule))==1:  
+                user_module = UserModule.objects.get(user=kusername, book=kbook, module=kmodule)
+            elif len(UserModule.objects.filter(user=kusername, book=kbook, module=kmodule))>1:
+                user_module = UserModule.objects.filter(user=kusername, book=kbook, module=kmodule)[0]
             else:
                 user_module = None 
             if user_module is not None:
                 with transaction.commit_on_success():
-                    user_data, created = UserData.objects.get_or_create(user=kusername) 
+                    user_data, created = UserData.objects.get_or_create(user=kusername, book=kbook) 
                 update_module_proficiency(user_data, request.POST['module'], None)
                 return self.create_response(request, {'proficient': user_module.is_proficient_at()})
             return self.create_response(request, {'proficient': False})

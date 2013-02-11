@@ -52,7 +52,7 @@ def make_wrong_attempt(user_data, user_exercise):
 def student_grade_all(user, book):
 
     #prof_list = user_data.get_prof_list()
-    student_data_id = UserData.objects.select_related().get(user = user)
+    student_data_id = UserData.objects.select_related().get(user = user,book=book)
     proficient_exercises = student_data_id.get_prof_list() 
     all_exercises = Exercise.objects.all()  
     all_exercises_id = []
@@ -74,8 +74,8 @@ def student_grade_all(user, book):
             grade.append({'exercise':bme.exercise.name, 'description':bme.exercise.description,'type':bme.exercise.ex_type,'points':0,'module':bme.module.name})
         if bme.module not in checked_modules:
             checked_modules.append(bme.module)
-            if len(UserModule.objects.filter(user = user, module = bme.module))>0:
-                user_mod = UserModule.objects.get(user = user, module = bme.module)
+            if len(UserModule.objects.filter(user = user,book=bme.book,  module = bme.module))>0:
+                user_mod = UserModule.objects.get(user = user, book=bme.book,module = bme.module)
                 modules.append({'module':bme.module.name, 'proficient':user_mod.is_proficient_at()})
             else:
                 modules.append({'module':bme.module.name, 'proficient':False})
@@ -92,7 +92,7 @@ def update_module_proficiency(user_data, module, exercise):
     module_ex_list = db_module.get_proficiency_model()  # exercise_list.split(',')   #get_proficiency_model() 
     user_prof = user_data.get_prof_list()
     with transaction.commit_on_success(): 
-        user_module, exist =  UserModule.objects.get_or_create(user=user_data.user, module=db_module)
+        user_module, exist =  UserModule.objects.get_or_create(user=user_data.user,book = user_data.book, module=db_module)
     dt_now = datetime.datetime.now()
     if user_module: 
         if user_module.first_done == None:
@@ -101,9 +101,13 @@ def update_module_proficiency(user_data, module, exercise):
         is_last_exercise = False  
         if exercise is not None:
             if user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'):
+                #diff_ex = diff(set(module_ex_list),set(user_prof))
+                if user_prof is None:  # or len(user_prof)==0: #user has no proficient exercise.
+                    user_prof =[]
+                    #return False
+                if module_ex_list is None:
+                    module_ex_list = []
                 diff_ex = diff(set(module_ex_list),set(user_prof))
-                if len(user_prof)==0: #user has no proficient exercise.
-                    return False
                 if (set(module_ex_list).issubset(set(user_prof))) or is_last_exercise:
                     user_module.proficient_date = dt_now 
                     user_module.save()
@@ -162,7 +166,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 user_exercise.longest_streak = max(user_exercise.longest_streak, user_exercise.streak)
                 user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)  
                 if not proficient: 
-                        problem_log.earned_proficiency = user_exercise.update_proficiency_ka(correct=True)
+                        problem_log.earned_proficiency = user_exercise.update_proficiency_ka(correct=True,ubook=user_data.book)
                         if user_exercise.progress >= 1:
                             if len(user_data.all_proficient_exercises)==0:
                                 user_data.all_proficient_exercises += "%s" %user_exercise.exercise.id
@@ -233,7 +237,7 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
                 user_exercise.longest_streak = 0 #max(user_exercise.longest_streak, total)
                 value = True  
                 if not proficient:
-                    problem_log.earned_proficiency =  user_exercise.update_proficiency_pe(correct=True) 
+                    problem_log.earned_proficiency =  user_exercise.update_proficiency_pe(correct=True,ubook=user_data.book) 
                     user_data.earned_proficiency(exercise.id) 
                     user_data.add_points(points)
                     user_data.save()   

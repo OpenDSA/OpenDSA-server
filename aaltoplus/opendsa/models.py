@@ -172,13 +172,14 @@ class UserButton(models.Model):
 class UserModule(models.Model):
 
     user = models.ForeignKey(User)
+    book = models.ForeignKey(Books)
     module =  models.ForeignKey(Module) #models.CharField(max_length=60)
     first_done = models.DateTimeField(auto_now_add=True)
     last_done = models.DateTimeField(auto_now_add=True)
     proficient_date = models.DateTimeField(default="2012-01-01 00:00:00") 
     
     class Meta:
-       unique_together = (("user", "module"),)
+       unique_together = (("user","book", "module"),)
 
     @staticmethod
     def GetUserModuleByUserId(userId):
@@ -197,6 +198,7 @@ class UserData(models.Model):
     # Canonical reference to the user entity. 
     user =   models.ForeignKey(User)
 
+    book = models.ForeignKey(Books) 
     # ids of exercises started
     started_exercises = models.TextField()  
 
@@ -301,9 +303,9 @@ class UserExercise(models.Model):
     class Meta:
        unique_together = (("user", "exercise"),)
 
-    def update_proficiency_ka(self, correct):
+    def update_proficiency_ka(self, correct, ubook):
         exercise = Exercise.objects.get(pk=self.exercise_id)
-        user_data = UserData.objects.get(user=self.user)
+        user_data = UserData.objects.get(user=self.user,book=ubook)
         dt_now = datetime.datetime.now() 
         if correct and (self.longest_streak >= exercise.streak):
            self.proficient_date = dt_now
@@ -313,9 +315,9 @@ class UserExercise(models.Model):
         return False 
      
     
-    def update_proficiency_pe(self, correct):
+    def update_proficiency_pe(self, correct,ubook):
         exercise = Exercise.objects.get(pk=self.exercise_id)
-        user_data = UserData.objects.get(user=self.user)
+        user_data = UserData.objects.get(user=self.user,book=ubook)
         dt_now = datetime.datetime.now()
         if correct:
            self.proficient_date = dt_now
