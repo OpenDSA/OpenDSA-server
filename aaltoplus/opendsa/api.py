@@ -12,7 +12,7 @@ from tastypie.models import ApiKey
 
 # ODSA 
 from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module, UserModule, \
-                              BookModuleExercise, Books     
+                              BookModuleExercise, Books, UserBook     
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout 
@@ -220,8 +220,8 @@ class UserexerciseResource(ModelResource):
                with transaction.commit_on_success(): 
                    user_data, created = UserData.objects.get_or_create(user=kusername)
                module = None 
-               if len(Module.objects.filter(name=act['module_name']))>0: 
-                  module = Module.objects.get(name=act['module_name'])  
+               if len(Module.objects.filter(name=act['module']))>0: 
+                  module = Module.objects.get(name=act['module'])  
                if kexercise and module:
                  with transaction.commit_on_success(): 
                      user_module, exist =  UserModule.objects.get_or_create(user=kusername, module=module)  
@@ -257,25 +257,36 @@ class UserexerciseResource(ModelResource):
             else:
                 kusername = get_user_by_key(request.POST['key'])   
             jsav_exercise = request.POST['exercise']
+            if len( Books.objects.filter(book_name=request.POST['book']))==1:
+                dsa_book = Books.objects.get(book_name=request.POST['book'])
+            else:
+                dsa_book = None
             if  len(Exercise.objects.filter(name= jsav_exercise))==1:
                 kexercise =  Exercise.objects.get(name= jsav_exercise) 
             else: 
-                kexercise = None 
+                kexercise = None
             if kusername and kexercise:
-                user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0) 
+                if len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==0:
+                    user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0) 
+                else:
+                    user_exercise = UserExercise.objects.get(user=kusername, exercise=kexercise)
             else:   
                 return  self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized) 
+            if len(UserBook.objects.filter(user=kusername,book=dsa_book))==1:
+                ubook = UserBook.objects.get(user=kusername,book=dsa_book)
+            else:
+                ubook= None
             with transaction.commit_on_success(): 
                 user_data, created = UserData.objects.get_or_create(user=kusername)
             module = Module.objects.get(name=request.POST['module']) 
-            if user_exercise:
-                    bme = BookModuleExercise.objects.filter(module = module, exercise=kexercise)[0] #temporary need to find a way to associate student to course to book.
+            if user_exercise and ubook:
+                    bme = BookModuleExercise.objects.filter(book = ubook.book, module = module, exercise=kexercise)[0] #temporary need to find a way to associate student to course to book.
                     user_exercise,correct = attempt_problem_pe(
                        user_data,  
                        user_exercise,
                        request.POST['uiid'],
                        1, #request.POST['complete'],
-                       int(request.POST['submit_time']),
+                       int(request.POST['tstamp']),
                        #request.POST['fix'],
                        0, #int(request.POST['threshold']),
                        int(request.POST['score']),
@@ -293,59 +304,120 @@ class UserexerciseResource(ModelResource):
 
  
     def logexercise(self, request, **kwargs):
-        if request.POST['user']:    #request.user:
+        #if request.POST['user']:    #request.user:
+        if request.POST['key']:
+            if request.POST['key']=='phantom-key':
+                with transaction.commit_on_success():
+                    kusername, created = User.objects.get_or_create(username="phantom")
+            else:
+                kusername = get_user_by_key(request.POST['key'])
+            ka_exercise = request.POST['sha1']
+            if len( Books.objects.filter(book_name=request.POST['book']))==1:
+                dsa_book = Books.objects.get(book_name=request.POST['book'])
+            else:
+                dsa_book = None
+            if  len(Exercise.objects.filter(name= ka_exercise))==1:
+                kexercise =  Exercise.objects.get(name= ka_exercise)
+            else:
+                kexercise = None
+            if kusername and kexercise:
+                 if len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==0:
+                    user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
+                 else:
+                    user_exercise = UserExercise.objects.get(user=kusername, exercise=kexercise)
+            else:
+                return  self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized)
+            if len(UserBook.objects.filter(user=kusername,book=dsa_book))==1:
+                ubook = UserBook.objects.get(user=kusername,book=dsa_book)
+            else:
+                ubook= None
             with transaction.commit_on_success():
-                kexercise = Exercise.objects.get(name= request.POST['sha1'])  
-                kusername = User.objects.get(username=request.POST['user']) 
-                user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise) 
                 user_data, created = UserData.objects.get_or_create(user=kusername)
-                module = Module.objects.get(name=request.POST['module_name'])
-                user_module, exist =  UserModule.objects.get_or_create(user=kusername, module=module) 
-                if user_exercise:
-                     bme = BookModuleExercise.objects.filter(module = module, exercise=kexercise)[0]
-                     user_exercise,correct = attempt_problem(
-                        user_data,  #kusername,
-                        user_exercise,
-                        request.POST['attempt_number'],
-                        request.POST['complete'],
-                        request.POST['count_hints'],
-                        int(request.POST['time_taken']),
-                        request.POST['attempt_content'],
-                        request.POST['module_name'],
-                        bme.points,
-                        request.META['REMOTE_ADDR'],
-                        )
-                     if correct:
-                        print jsonpickle.encode(user_exercise)
-                        return  self.create_response(request, jsonpickle.encode(user_exercise) )           #    user_exercise) 
-                     else:
-                        return  self.create_response(request, {'error': 'attempt not logged'}, HttpBadRequest)   
+            module = Module.objects.get(name=request.POST['module_name'])
+            if user_exercise and ubook:
+                bme = BookModuleExercise.objects.filter(book = ubook.book, module = module, exercise=kexercise)[0]
+            #with transaction.commit_on_success():
+                #kexercise = Exercise.objects.get(name= request.POST['sha1'])  
+                #kusername = User.objects.get(username=request.POST['user']) 
+                #user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise) 
+                #user_data, created = UserData.objects.get_or_create(user=kusername)
+                #module = Module.objects.get(name=request.POST['module_name'])
+                #user_module, exist =  UserModule.objects.get_or_create(user=kusername, module=module) 
+                #if user_exercise:
+                     #bme = BookModuleExercise.objects.filter(module = module, exercise=kexercise)[0]
+                #bme = BookModuleExercise.objects.filter(book = ubook.book, module = module, exercise=kexercise)[0]
+                user_exercise,correct = attempt_problem(
+                   user_data,  #kusername,
+                   user_exercise,
+                   request.POST['attempt_number'],
+                   request.POST['complete'],
+                   request.POST['count_hints'],
+                   int(request.POST['time_taken']),
+                   request.POST['attempt_content'],
+                   request.POST['module_name'],
+                   bme.points,
+                   request.META['REMOTE_ADDR'],
+                   )
+                if correct:
+                   print jsonpickle.encode(user_exercise)
+                   return  self.create_response(request, jsonpickle.encode(user_exercise) )           #    user_exercise) 
+                else:
+                   return  self.create_response(request, {'error': 'attempt not logged'}, HttpBadRequest)   
         return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
  
     def logexercisehint(self, request, **kwargs):
 
-        if request.POST['user']:    #request.user:
+#        if request.POST['user']:    #request.user:
+        if request.POST['key']:
+            if request.POST['key']=='phantom-key':
+                with transaction.commit_on_success():
+                    kusername, created = User.objects.get_or_create(username="phantom")
+            else:
+                kusername = get_user_by_key(request.POST['key'])
+            ka_exercise = request.POST['sha1']
+            dsa_book = request.POST['book']
+            if  len(Exercise.objects.filter(name= ka_exercise))==1:
+                kexercise =  Exercise.objects.get(name= ka_exercise)
+            else:
+                kexercise = None
+            if kusername and kexercise:
+                 if len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==0:
+                    user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
+                 else:
+                    user_exercise = UserExercise.objects.get(user=kusername, exercise=kexercise)
+            else:
+                return  self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized)
+            if len(UserBook.objects.filter(user=kusername,book=dsa_book))==1:
+                ubook = UserBook.objects.get(user=kusername,book=dsa_book)
+            else:
+                ubook= None
             with transaction.commit_on_success():
-                kexercise = Exercise.objects.get(name= request.POST['sha1'])
-                kusername = User.objects.get(username=request.POST['user'])
-                user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise)
                 user_data, created = UserData.objects.get_or_create(user=kusername)
-                if user_exercise:
-                     user_exercise,correct = attempt_problem(
-                        user_data,  #kusername,
-                        user_exercise,
-                        request.POST['attempt_number'],
-                        request.POST['complete'],
-                        request.POST['count_hints'],
-                        int(request.POST['time_taken']),
-                        request.POST['attempt_content'],
-                        request.META['REMOTE_ADDR'],
-                        )
-                     if correct:
-                        print jsonpickle.encode(user_exercise)
-                        return  self.create_response(request, jsonpickle.encode(user_exercise) )  
-                     else:
-                        return  self.create_response(request, {'error': 'attempt not logged'}, HttpBadRequest)
+            module = Module.objects.get(name=request.POST['module'])
+            if user_exercise and ubook:
+                bme = BookModuleExercise.objects.filter(book = ubook.book, module = module, exercise=kexercise)[0]
+
+            #with transaction.commit_on_success():
+                #kexercise = Exercise.objects.get(name= request.POST['sha1'])
+                #kusername = User.objects.get(username=request.POST['user'])
+                #user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise)
+                #user_data, created = UserData.objects.get_or_create(user=kusername)
+                #if user_exercise:
+                user_exercise,correct = attempt_problem(
+                   user_data,  #kusername,
+                   user_exercise,
+                   request.POST['attempt_number'],
+                   request.POST['complete'],
+                   request.POST['count_hints'],
+                   int(request.POST['time_taken']),
+                   request.POST['attempt_content'],
+                   request.META['REMOTE_ADDR'],
+                   )
+                if correct:
+                   print jsonpickle.encode(user_exercise)
+                   return  self.create_response(request, jsonpickle.encode(user_exercise) )  
+                else:
+                   return  self.create_response(request, {'error': 'attempt not logged'}, HttpBadRequest)
         return self.create_response(request, {'error': 'unauthorized action'},HttpUnauthorized)
 
 
@@ -465,12 +537,17 @@ class ModuleResource(ModelResource):
                 kusername = get_user_by_key(request.POST['key'])
             if kusername:
                 response = {}
-                #get or create Book 
+                #get or create Book & link a book to user  
                 if len( Books.objects.filter(book_name=request.POST['book']))==0:  
                     with transaction.commit_on_success():
-                        kbook,added = Books.objects.get_or_create(book_name= request.POST['book'], book_url = request.POST['url']) 
+                        kbook,added = Books.objects.get_or_create(book_name= request.POST['book'], book_url = request.POST['url'])
+                        ubook,created = UserBook.objects.get_or_create(user=kusername, book=kbook) 
                 else:
                     kbook = Books.objects.get(book_name= request.POST['book'])
+                    #link a book to user
+                    if len( UserBook.objects.filter(user=kusername, book=kbook))==0:
+                         with transaction.commit_on_success():
+                             ubook,created = UserBook.objects.get_or_create(user=kusername, book=kbook)    
                 #get or create module
                 if len( Module.objects.filter(name=request.POST['module']))==0:
                     with transaction.commit_on_success():

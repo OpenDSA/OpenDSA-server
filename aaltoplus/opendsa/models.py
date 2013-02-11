@@ -145,6 +145,14 @@ class BookModuleExercise (models.Model):
         unique_together = (("book","module", "exercise"),)
 
 
+class UserBook (models.Model):
+    user = models.ForeignKey(User)
+    book = models.ForeignKey(Books)
+    class Meta:
+        unique_together = (("user","book"),)
+
+
+
 class UserButton(models.Model):
      user = models.ForeignKey(User) 
      exercise = models.ForeignKey(Exercise)
