@@ -7,6 +7,7 @@ from collections import OrderedDict
 
 # A+ 
 from userprofile.models import UserProfile 
+from course.models import Course, CourseInstance
  
 # OpenDSA 
 from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserSummary, UserData
@@ -22,107 +23,83 @@ from django.utils import simplejson
 from django.core import serializers 
 from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
-   
-class userValue:
-        def __init__(self, name, score):
-                self.name = name
-                self.score = score
-                self.values = []
-                #self.dict = dict()
-        #def addDict(self, exercise, value):
-        #        self.dict[exercise] = value;
-        #def append(self, value):
-        #        self.values.append(value)
+from django.contrib.auth.decorators import user_passes_test   
+from django.views.generic import TemplateView, ListView
+from django.template import add_to_builtins
+
+
+
+ 
+def is_authorized(user, book, course):
+    obj_book = Books.objects.get(book_name=book)
+    print obj_book.courses.all()
+    print user.username   
+    user_prof = UserProfile.objects.get(user=user)
+    obj_course = CourseInstance.objects.get(instance_name=course)
+    print len(obj_book.courses.filter(course=obj_course))
+    if len(obj_book.courses.filter(course=obj_course))==1:
+        return obj_book.courses.get(course=obj_course).is_staff(user_prof)
+    else:
+        return False
+
 
 @login_required
-def exercise_summary(request): 
+def exercise_summary(request, book, course): 
+    if is_authorized(request.user,book,course): 
+        obj_book = Books.objects.get(book_name=book)
+        exercises = []
+        BookModExercises = BookModuleExercise.objects.select_related().filter(book=obj_book) 
+        exercise_table = {}
+        #we preparing the data for datatables jquery plugin
+        #List containing users data: [["username","points","exercise1 score", "exercise1 score",...]]
+        udata_list = []
+        udetails_list = []
+        #List containing column titles: [{"sTitle":"Username"},{"sTitle": "Exercise1"},{"sTitle":"Exercise1"},...]
+        columns_list = []
+        columns_list.append({"sTitle":"Username"})
+        columns_list.append({"sTitle":"Points"})        
 
-    exercises = []
-    BookModExercises = BookModuleExercise.objects.select_related().order_by('book', 'module').all()
-    exercise_table = {}
-
-    for bookmodex in BookModExercises:
+        for bookmodex in BookModExercises:
             exercises.append(bookmodex.exercise)
-    #remove duplicates
-    exercises = list(OrderedDict.fromkeys(exercises))
-    userData = UserData.objects.select_related().order_by('user').all()
-    userExercises = UserExercise.objects.select_related().all()               
-    users = []
-    for userdata in userData:
-            userVal = userValue(userdata.user, userdata.points)  
-            #creates an array the size of number of exercises. initilized at 0  
-            userVal.values = array.array('i',(0,)*len(exercises))   
-            for userExercise in userExercises:
-                    if userdata.user == userExercise.user:
-                            if userExercise.is_proficient():
-                                    #userVal.addDict(userExercise.exercise, 1)
-                                    #updates the value in exercise array 
-                                    if userExercise.exercise in exercises:
-                                        userVal.values[exercises.index(userExercise.exercise)]= 1
-                            else:
-                                    #userVal.addDict(userExercise.exercise, -1)
-                                    if userExercise.exercise in exercises:
-                                        userVal.values[exercises.index(userExercise.exercise)]= -1
-            users.append(userVal)
-    #print 'start treatment user  Exercises' 
-    #for user in users:
-    #        for exercise in exercises:
-    #                if exercise in user.dict.keys():
-    #                        user.append(user.dict[exercise])
-    #                else:
-    #                        user.append(0)
-
-    #print 'end treatment user  Exercises' 
-    context = RequestContext(request, {'users': users, 'exercises':exercises})
-     
-    return render_to_response("teacher_view/exercise_summary.html", context)     
-
-@login_required
-def export_csv(request):
-
-    response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="summary.csv"'
-
-    exercises = []
-    BookModExercises = BookModuleExercise.objects.order_by('book', 'module').all()
-    for bookmodex in BookModExercises:
-            exercises.append(bookmodex.exercise)
-
-    userData = UserData.objects.order_by('user').all()
-    userExercises = UserExercise.objects.all()                
-
-    users = []
-    for userdata in userData:
-            userVal = userValue(userdata.user, userdata.points)
-            for userExercise in userExercises:
-                    if userdata.user == userExercise.user:
-                            if userExercise.is_proficient():
-                                    userVal.addDict(userExercise.exercise, 1)
-                            else:
-                                    userVal.addDict(userExercise.exercise, -1)
-            users.append(userVal)         
-    	
-    writer = csv.writer(response)
-
-    exerciseNames =[]
-    exerciseNames.append('Username')
-    exerciseNames.append('Score')
-    for exercise in exercises:
-            exerciseNames.append(exercise.name)
-    writer.writerow(exerciseNames)
-
-    for user in users:
-            uservalue = []
-            uservalue.append(user.name)
-            uservalue.append(user.score)
-            for exercise in exercises:
-                    if exercise in user.dict.keys():
-                            uservalue.append(user.dict[exercise])
-                    else:
-                            uservalue.append(0)
-            writer.writerow(uservalue)  
-
-    return response
+            columns_list.append({"sTitle":str(bookmodex.exercise.description),"sClass": "center" }) 
+        #remove duplicates
+        exercises = list(OrderedDict.fromkeys(exercises))
+        userData = UserData.objects.select_related().order_by('user').filter(book=obj_book)
+        users = []
+        for userdata in userData:
+            u_data = [] 
+            u_data.append(str(userdata.user.username))
+            u_data.append(float(userdata.points))
+            u_details = []
+            u_details.append({'Username':str(userdata.user.username)})
+            u_details.append({'Points':float(userdata.points)})
+            #an array containing the status of the exercise: correct, started, not started
+            values = array.array('i',(0,)*len(exercises))   
+            #an array containing details about the user interaction with the exercise
+            details = [{'First done':'--','Last done':'--','Total done':'--','Total correct':'--','Proficiency date':'--'} for j in range(len(exercises))]
+            prof_ex = userdata.get_prof_list()
+            started_ex = userdata.get_started_list()
+            for p_ex in prof_ex:
+                exercise_t = Exercise.objects.get(id=p_ex)
+                if exercise_t in exercises:
+                    values[exercises.index(exercise_t)]= 1
+                    #get detailed information
+                    u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
+                    details[exercises.index(exercise_t)]={'First done':str(u_ex.first_done),'Last done':str(u_ex.last_done),'Total done':int(u_ex.total_done),'Total correct':int(u_ex.total_correct),'Proficiency date':str(u_ex.proficient_date)}
+            for s_ex in started_ex:
+                if Exercise.objects.get(id=s_ex) in exercises and s_ex not in  prof_ex:   
+                    exercise_t = Exercise.objects.get(id=s_ex)
+                    values[exercises.index(exercise_t)]= -1
+                    #get detailed information
+                    u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
+                    details[exercises.index(exercise_t)]={'First done':str(u_ex.first_done),'Last done':str(u_ex.last_done),'Total done':int(u_ex.total_done),'Total correct':'--','Proficiency date':'--'}
+            u_data = u_data + values.tolist()
+            udata_list.append(u_data)
+            udetails_list.append(u_details + details)
+        context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list,'details':udetails_list})
+        return render_to_response("opendsa/class_summary.html", context)
+    else:
+        return  HttpResponseForbidden('<h1>Page Forbidden</h1>')   
 
 class exerciseProgress:
         def __init__(self, name):

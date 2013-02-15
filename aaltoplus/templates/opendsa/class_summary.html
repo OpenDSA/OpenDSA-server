@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>OpenDSA Book Activity</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/media/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/TableTools.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/ZeroClipboard.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.js"></script> 
+    <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/media/css/demo_page.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/media/css/demo_table.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/extras/TableTools/media/css/TableTools.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}opendsa/css/activity.css" rel="stylesheet" media="screen" />
+    <script type="text/javascript" charset="utf-8">
+	$(document).ready(function() {
+            $('#demo').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>' );
+            var oTable = $('#example').dataTable( {
+                "sDom": 'T<"clear">lfrtip',
+                "oTableTools": {
+			"sSwfPath": "{{ STATIC_URL }}datatables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf"
+		},
+                "aaData": {{ udata_list|safe  }},
+                "aoColumns": {{ columns_list|safe  }} 
+            } ); 
+        
+            var i = 0;
+            var j = 0;
+            $('#example tbody td').each( function() {
+                var sTitle; 
+                var ttip = {{ details|safe  }};
+                var tsize = ttip.length - 1;
+                var ttip_size = ttip[0].length;
+                if(i<ttip.length && j < (ttip.length*ttip[0].length)){
+                    var ttip_data = jQuery.parseJSON(JSON.stringify(ttip[i][j]));
+                    var  text='';
+                    if(j==0){text='Username: '+ttip_data['Username'];}
+                    else if(j==1){text='Points: '+ttip_data['Points'];}
+                    else {text='Total done: '+ttip_data['Total done']+', Total correct: '+ttip_data['Total correct']+', Last done: "'+ttip_data['Last done']+'", First done: "'+ttip_data['First done']+'", Proficiency date: "'+ttip_data['Proficiency date']+'"'; }
+                    this.setAttribute( 'title', text );
+                    j++;
+                    if((j % ttip_size)==0){
+                        i++;
+                    } 
+                }
+            } );
+            oTable.$('td').tooltip( {
+                "delay": 0,
+                "track": true,
+                "fade": 200
+            } ); 
+	} );
+  </script>
+  </head>
+  <body>
+    <h1>Activity Summary</h1>
+    <h4>Course: {{course}}</h4>
+    <h4>Book: {{book}}</h4>
+    <hr>
+    <div id="demo">
+    
+
+    </div>
+  </body>
+</html>
+
+

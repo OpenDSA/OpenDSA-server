@@ -1,12 +1,13 @@
 # A+
 from views import login, home, verify_credentials
 from oauth_provider.views import protected_resource_example
-from opendsa.views import exercise_summary, module_list, export_csv, progress_summary
-from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail, timeline_sum, timeline_detail
+from opendsa.views import exercise_summary, module_list 
+from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail #,timeline_sum , timeline_detail
 # Django
 from django.conf.urls.defaults import *
 from django.contrib import admin
 from django.conf import settings
+from django.conf.urls import patterns, include, url
 
 admin.autodiscover()
 
@@ -19,10 +20,7 @@ urlpatterns = patterns('',
     url(r'^account/verify_credentials.json$', verify_credentials),
 
     # OpenDSA
-    url(r'^teacher_view/$', exercise_summary),
-    url(r'^teacher_view/exercise_summary/$', exercise_summary),       
-    url(r'^teacher_view/export_csv/$', export_csv),
-    url(r'^teacher_view/progress_summary/$', progress_summary),                   
+    url(r'^teacher_view/(?P<book>[\w]+)/(?P<course>[\w]+)/$', exercise_summary),
     url(r'^student_view/', module_list),
     url(r'^developer_view/exercises_stat/$', exercises_stat),
     url(r'^developer_view/exercises_bargraph/$', exercises_bargraph),
@@ -31,8 +29,8 @@ urlpatterns = patterns('',
     url(r'^developer_view/student_exercise/(?P<student>[\w]+)/$', student_exercise),
     url(r'^developer_view/exercise_list/(?P<student>[\w]+)/(?P<module>[\w]+)/$', exercise_list),      
     url(r'^developer_view/exercise_detail/(?P<student>[\w]+)/(?P<exercise>[\w]+)/$', exercise_detail),
-    url(r'^developer_view/timeline_sum/(?P<student>[\w]+)/$', timeline_sum),
-    url(r'^developer_view/timeline_detail/(?P<student>[\w]+)/(?P<module>[\w]+)/(?P<year>[\w]+)/(?P<month>[\w]+)/(?P<day>[\w]+)/$', timeline_detail),
+    #url(r'^developer_view/timeline_sum/(?P<student>[\w]+)/$', timeline_sum),
+    #url(r'^developer_view/timeline_detail/(?P<student>[\w]+)/(?P<module>[\w]+)/(?P<year>[\w]+)/(?P<month>[\w]+)/(?P<day>[\w]+)/$', timeline_detail),
 
     # A+
     (r'^$', home),

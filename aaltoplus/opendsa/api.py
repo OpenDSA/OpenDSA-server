@@ -24,7 +24,7 @@ from django.db import transaction
 import jsonpickle  
 
 from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, \
-                       attempt_problem_pe, update_module_proficiency, student_grade_all 
+                       attempt_problem_pe, update_module_proficiency, student_grade_all, date_from_timestamp 
 
 
 # Key generation and verification
@@ -269,7 +269,7 @@ class UserexerciseResource(ModelResource):
                 kexercise = None
             if kusername and kexercise:
                 if len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==0:
-                    user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0) 
+                    user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0, first_done=date_from_timestamp(int(request.POST['tstamp']))) 
                 else:
                     user_exercise = UserExercise.objects.get(user=kusername, exercise=kexercise)
             else:   

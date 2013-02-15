@@ -246,11 +246,17 @@ class UserData(models.Model):
         prof_ex =[] 
         for ex in self.all_proficient_exercises.split(','):
             if ex.isdigit():
-              number = int(ex)
               prof_ex.append(int(ex))
         return prof_ex
 
- 
+
+    def get_started_list(self):
+        start_ex =[]
+        for ex in self.started_exercises.split(','):
+            if ex.isdigit():
+              start_ex.append(int(ex))
+        return start_ex
+
     def add_points(self, points):
         self.points += points
 

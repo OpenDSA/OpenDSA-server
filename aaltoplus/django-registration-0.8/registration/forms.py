@@ -9,7 +9,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 #OpenDSA
-from opendsa.models import Books
+from course.models import CourseInstance
 
 # I put this on all required fields, because it's easier to pick up
 # on them with CSS or JavaScript if they have a class of "required"
@@ -70,11 +70,6 @@ class RegistrationForm(forms.Form):
                 raise forms.ValidationError(_("The two password fields didn't match."))
         return self.cleaned_data
 
-    def __init__(self, *args, **kwargs):
-        print 'passou no init'
-        super(RegistrationForm, self).__init__(*args, **kwargs)
-        all_courses = Books.objects.select_related('CourseInstance__instance_name')
-        self.fields['courses'] = forms.ModelChoiceField(queryset= all_courses.values('CourseInstance__instance_name'), empty_label="No Course", required = False)
 
 class RegistrationFormTermsOfService(RegistrationForm):
     """
