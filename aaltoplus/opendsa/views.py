@@ -74,7 +74,8 @@ def exercise_summary(request, book, course):
             u_details.append({'Username':str(userdata.user.username)})
             u_details.append({'Points':float(userdata.points)})
             #an array containing the status of the exercise: correct, started, not started
-            values = array.array('i',(0,)*len(exercises))   
+            #values = array.array('i',(0,)*len(exercises))   
+            values = ['--<span class="details" style="display:inline;" data-type="Not Started"></span>' for j in range(len(exercises))]
             #an array containing details about the user interaction with the exercise
             details = [{'First done':'--','Last done':'--','Total done':'--','Total correct':'--','Proficiency date':'--'} for j in range(len(exercises))]
             prof_ex = userdata.get_prof_list()
@@ -82,21 +83,21 @@ def exercise_summary(request, book, course):
             for p_ex in prof_ex:
                 exercise_t = Exercise.objects.get(id=p_ex)
                 if exercise_t in exercises:
-                    values[exercises.index(exercise_t)]= 1
                     #get detailed information
                     u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
-                    details[exercises.index(exercise_t)]={'First done':str(u_ex.first_done),'Last done':str(u_ex.last_done),'Total done':int(u_ex.total_done),'Total correct':int(u_ex.total_correct),'Proficiency date':str(u_ex.proficient_date)}
+                    #details[exercises.index(exercise_t)]={'First done':str(u_ex.first_done),'Last done':str(u_ex.last_done),'Total done':int(u_ex.total_done),'Total correct':int(u_ex.total_correct),'Proficiency date':str(u_ex.proficient_date)}
+                    values[exercises.index(exercise_t)]= 'Done<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
             for s_ex in started_ex:
                 if Exercise.objects.get(id=s_ex) in exercises and s_ex not in  prof_ex:   
                     exercise_t = Exercise.objects.get(id=s_ex)
-                    values[exercises.index(exercise_t)]= -1
                     #get detailed information
                     u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
-                    details[exercises.index(exercise_t)]={'First done':str(u_ex.first_done),'Last done':str(u_ex.last_done),'Total done':int(u_ex.total_done),'Total correct':'--','Proficiency date':'--'}
-            u_data = u_data + values.tolist()
+                    #details[exercises.index(exercise_t)]={'First done':str(u_ex.first_done),'Last done':str(u_ex.last_done),'Total done':int(u_ex.total_done),'Total correct':'--','Proficiency date':'--'}
+                    values[exercises.index(exercise_t)]= 'Started<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+            u_data = u_data + values
             udata_list.append(u_data)
-            udetails_list.append(u_details + details)
-        context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list,'details':udetails_list})
+            #udetails_list.append(u_details + details)
+        context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list}) #'details':udetails_list})
         return render_to_response("opendsa/class_summary.html", context)
     else:
         return  HttpResponseForbidden('<h1>Page Forbidden</h1>')   
