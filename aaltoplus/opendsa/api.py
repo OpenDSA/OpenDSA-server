@@ -8,6 +8,7 @@ from tastypie.utils import trailing_slash
 from tastypie.serializers import Serializer
 from tastypie.http import HttpUnauthorized, HttpForbidden, HttpBadRequest 
 from tastypie.models import ApiKey  
+from tastypie.exceptions import NotRegistered, BadRequest
 
 
 # ODSA 
@@ -20,7 +21,7 @@ from django.contrib.auth.models import User
 from django.utils import simplejson 
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse
-from django.db import transaction 
+from django.db import transaction, IntegrityError 
 import jsonpickle  
 
 from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, \
@@ -59,6 +60,29 @@ class OpendsaAuthentication(ApiKeyAuthentication):
         except:
             return self._unauthorized()
 
+#create new user
+class CreateUserResource(ModelResource):
+    def determine_format(self, request):
+        return "application/json"
+    class Meta:
+        allowed_methods = ['post']
+        object_class = User
+        resource_name   = 'newuser'
+        authentication = Authentication()
+        authorization = Authorization()
+        include_resource_uri = False
+        fields = ['username']
+
+    def obj_create(self, bundle, request=None, **kwargs):
+        print type(self)
+        try:
+            bundle = super(CreateUserResource, self).obj_create(bundle, request, **kwargs)
+            bundle.obj.set_password(bundle.data.get('password'))
+            bundle.obj.save()
+        except IntegrityError:
+            raise BadRequest('That username already exists')
+        return bundle
+
 
 #user authentication and registration through the api
 class UserResource(ModelResource):
@@ -85,10 +109,8 @@ class UserResource(ModelResource):
     def override_urls(self):
         return [
             url(r"^(?P<resource_name>%s)/login%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('login'), name="api_signin"),
-             url(r"^(?P<resource_name>%s)/logout%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logout'), name="api_signin"),
+            url(r"^(?P<resource_name>%s)/logout%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logout'), name="api_signin"),
         ]
-
-
 
 
     def login(self, request, **kwargs):

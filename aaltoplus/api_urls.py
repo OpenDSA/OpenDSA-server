@@ -5,7 +5,7 @@ from userprofile.api import UserProfileResource
 from exercise.api import ExerciseResource, CourseModuleResource, SubmissionResource, \
     LearningObjectResource
 from opendsa.api import ExerciseResource, UserexerciseResource, ProblemlogResource, UserResource, \
-    UserExerciseSummaryResource, UserDataResource, ModuleResource, UserModuleResource      
+    UserExerciseSummaryResource, UserDataResource, ModuleResource, UserModuleResource, CreateUserResource      
 
 
 api = Api(api_name='v1')
@@ -23,7 +23,7 @@ api.register(UserExerciseSummaryResource())
 api.register(UserDataResource())
 api.register(ModuleResource())  
 api.register(UserModuleResource()) 
-
+api.register(CreateUserResource())
 
 urlpatterns = patterns('',
     (r'^', include(api.urls)),
