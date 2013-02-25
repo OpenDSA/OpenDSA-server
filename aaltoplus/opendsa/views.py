@@ -53,15 +53,13 @@ def exercise_summary(request, book, course):
         #we preparing the data for datatables jquery plugin
         #List containing users data: [["username","points","exercise1 score", "exercise1 score",...]]
         udata_list = []
-        udetails_list = []
-        #List containing column titles: [{"sTitle":"Username"},{"sTitle": "Exercise1"},{"sTitle":"Exercise1"},...]
         columns_list = []
         columns_list.append({"sTitle":"Username"})
         columns_list.append({"sTitle":"Points"})        
 
         for bookmodex in BookModExercises:
             exercises.append(bookmodex.exercise)
-            columns_list.append({"sTitle":str(bookmodex.exercise.description),"sClass": "center" }) 
+            columns_list.append({"sTitle":str(bookmodex.exercise.name)+'<span class="details" style="display:inline;" data-type="'+str(bookmodex.exercise.description)+'"></span>',"sClass": "center" }) 
         #remove duplicates
         exercises = list(OrderedDict.fromkeys(exercises))
         userData = UserData.objects.select_related().order_by('user').filter(book=obj_book)
@@ -70,14 +68,7 @@ def exercise_summary(request, book, course):
             u_data = [] 
             u_data.append(str(userdata.user.username))
             u_data.append(float(userdata.points))
-            u_details = []
-            u_details.append({'Username':str(userdata.user.username)})
-            u_details.append({'Points':float(userdata.points)})
-            #an array containing the status of the exercise: correct, started, not started
-            #values = array.array('i',(0,)*len(exercises))   
             values = ['--<span class="details" style="display:inline;" data-type="Not Started"></span>' for j in range(len(exercises))]
-            #an array containing details about the user interaction with the exercise
-            details = [{'First done':'--','Last done':'--','Total done':'--','Total correct':'--','Proficiency date':'--'} for j in range(len(exercises))]
             prof_ex = userdata.get_prof_list()
             started_ex = userdata.get_started_list()
             for p_ex in prof_ex:
@@ -85,19 +76,16 @@ def exercise_summary(request, book, course):
                 if exercise_t in exercises:
                     #get detailed information
                     u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
-                    #details[exercises.index(exercise_t)]={'First done':str(u_ex.first_done),'Last done':str(u_ex.last_done),'Total done':int(u_ex.total_done),'Total correct':int(u_ex.total_correct),'Proficiency date':str(u_ex.proficient_date)}
                     values[exercises.index(exercise_t)]= 'Done<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
             for s_ex in started_ex:
                 if Exercise.objects.get(id=s_ex) in exercises and s_ex not in  prof_ex:   
                     exercise_t = Exercise.objects.get(id=s_ex)
                     #get detailed information
                     u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
-                    #details[exercises.index(exercise_t)]={'First done':str(u_ex.first_done),'Last done':str(u_ex.last_done),'Total done':int(u_ex.total_done),'Total correct':'--','Proficiency date':'--'}
                     values[exercises.index(exercise_t)]= 'Started<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
             u_data = u_data + values
             udata_list.append(u_data)
-            #udetails_list.append(u_details + details)
-        context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list}) #'details':udetails_list})
+        context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list}) 
         return render_to_response("opendsa/class_summary.html", context)
     else:
         return  HttpResponseForbidden('<h1>Page Forbidden</h1>')   
@@ -249,40 +237,88 @@ def xhr_test(request):
         message = "Hello"
     return HttpResponse(message);
 
+
+
 @login_required
-def module_list(request):
-     	book = Books.objects.all();
+def student_activity(request, student, book):
+
+    book = Books.objects.get(book_name=book)
+    user = User.objects.get(username=student)
+    userExercs = UserExercise.objects.filter(user=user) #GetUserExerciseByUserId(userId)
+    BookModExercises = BookModuleExercise.objects.select_related().filter(book=book)
+    userDataObjects = UserData.objects.get(user=user,book=book)  #GetUserDataByUserId(userId)
+    UserModules = UserModule.objects.select_related().filter(user=user,book=book)
+    modules = []
+    details = [] 
+    for bme in BookModExercises:
+        u_mod = {}
+        u_mod['module'] = bme.module.name
+        if (UserModule.objects.filter(user=user, module= bme.module).count() > 0) :
+            user_module = UserModule.objects.get(user=user, module= bme.module)
+            u_mod['first_done'] = user_module.first_done
+            u_mod['last_done'] = user_module.last_done
+            u_mod['proficiency'] = user_module.proficient_date
+            u_exercises = []
+            for exerc_id in bme.module.get_required_exercises():  
+                ex = Exercise.objects.get(id=exerc_id)
+                u_exer = UserExercise.objects.get(user=user,exercise=ex) 
+                u_exercises.append({'exercise':ex.name, 'first_done':u_exer.first_done, 'last_done':u_exer.last_done,'total_done':u_exer.total_done,'total_correct':u_exer.total_correct,'proficiency':u_exer.proficient_date })
+            u_mod['exer_mod'] = u_exercises    
+        else:
+            u_mod['first_done'] = 'Not Started'
+            u_mod['last_done'] = 'Not Started'
+            u_mod['proficiency'] = 'Not Started'
+            u_exercises = []
+            for exerc_id in bme.module.get_required_exercises():
+                ex = Exercise.objects.get(id=exerc_id)
+                u_exer = UserExercise.objects.get(user=user,exercise=ex)
+                u_exercises.append({'exercise':ex.name, 'first_done':'Not Started', 'last_done':'Not Started','total_done':'Not Started','total_correct':'Not Started','proficiency':'Not Started' })
+            u_mod['exer_mod'] = u_exercises
+
+        modules.append(u_mod)   
+
+    context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list})
+    return render_to_response("student_view/module_list.html",context)
+
+      
+
+@login_required
+def module_list(request, student, book):
+     	book = Books.objects.get(book_name=book) 
+        user = User.objects.get(username=student)
+
         userName= request.META.get('USER')
 	
-	currentUserVals = User.objects.filter(username = userName);
-        modules = Module.objects.all();
-	usermodules = UserModule.objects.all();
-	userId = 0
+	#currentUserVals = User.objects.filter(username = userName);
+        #modules = Module.objects.all();
+	#usermodules = UserModule.objects.all();
+	#userId = 0
 	
-        if 'sessionid' in request.COOKIES:
-            s = Session.objects.get(pk=request.COOKIES['sessionid'])
-            if '_auth_user_id' in s.get_decoded():
-                u = User.objects.get(id=s.get_decoded()['_auth_user_id'])
-                userId = u.id
+        #if 'sessionid' in request.COOKIES:
+        #    s = Session.objects.get(pk=request.COOKIES['sessionid'])
+        #    if '_auth_user_id' in s.get_decoded():
+        #        u = User.objects.get(id=s.get_decoded()['_auth_user_id'])
+        #        userId = u.id
         	
 	
-	userExercs = UserExercise.GetUserExerciseByUserId(userId)
-	userScore = 0;
-	userDataObjects = UserData.GetUserDataByUserId(userId)
+	userExercs = UserExercise.objects.filter(user=user) #GetUserExerciseByUserId(userId)
+        BookModExercises = BookModuleExercise.objects.select_related().filter(book=book)
+	userDataObjects = UserData.objects.get(user=user,book=book)  #GetUserDataByUserId(userId)
 
-	for userdata in userDataObjects:
-		if userdata.user.id == userId:
-			userScore = userdata.points;
-			break;
+	#for userdata in userDataObjects:
+	#	if userdata.user.id == userId:
+	#		userScore = userdata.points;
+	#		break;
 
 	UserModuleDict = dict()
-	UserModules = UserModule.GetUserModuleByUserId(userId);
+	UserModules = UserModule.objects.select_related().filter(user=user,book=book)  #GetUserModuleByUserId(userId);
 	for usermod in UserModules:
 		UserModuleDict[usermod.module] =  usermod;
 
 	userOutputModules = []
-	for module in modules:
-		if module.exercise_list.split(',').count > 0:
+	for bme in BookModExercises:
+                module = bme.module
+		if module.get_proficiency_model() and len(bme.module.get_proficiency_model()) > 0:
 			userOptMod = userOutputModule(module,userExercs,book)
 			if userOptMod.countExec > 0:
 				moduleexist = False;

@@ -21,7 +21,7 @@ urlpatterns = patterns('',
 
     # OpenDSA
     url(r'^teacher_view/(?P<book>[\w]+)/(?P<course>[\w]+)/$', exercise_summary),
-    url(r'^student_view/', module_list),
+    url(r'^student_view/(?P<student>[\w]+)/(?P<book>[\w]+)/$', module_list),
     url(r'^developer_view/exercises_stat/$', exercises_stat),
     url(r'^developer_view/exercises_bargraph/$', exercises_bargraph),
     url(r'^developer_view/exercises_time/$', exercises_time),

@@ -16,12 +16,13 @@
     <link href="{{ STATIC_URL }}opendsa/css/activity.css" rel="stylesheet" media="screen" />
     <script type="text/javascript" charset="utf-8">
 	$(document).ready(function() {
-            $('#demo').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>' );
+            $('#demo').html( '<table cellpadding="0" cellspacing="1" border="1" class="display" id="example"></table>' );
             var oTable = $('#example').dataTable( {
                 "sDom": 'T<"clear">lfrtip',
                 "oTableTools": {
 			"sSwfPath": "{{ STATIC_URL }}datatables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf"
 		},
+                "sPaginationType": "full_numbers",
                 "aaData": {{ udata_list|safe  }},
                 "aoColumns": {{ columns_list|safe  }},
             } ); 
@@ -34,7 +35,23 @@
                     alert(kids[0].getAttribute("data-type")); 
                 }
 		} );
-            $('#example tbody td').each( function() {
+            $('#example tbody td ').each( function(e) {
+                if ($(this).text()=="Done" ){ 
+                    $(this).css('backgroundColor', '#FF99FF');
+                } 
+                else if ($(this).text()=="Started"){
+                    $(this).css('backgroundColor', '#CCFFCC');
+                }
+                else {
+                    $(this).css('backgroundColor', '#CCFFFF');
+                }
+                if ( $(this).children(".details").length > 0) {
+                    var kids = $(this).children(".details");
+                    var text = kids[0].getAttribute("data-type");
+                    this.setAttribute( 'title', text );
+                }
+            } );
+            $('#example thead th ').each( function(e) {
                 if ( $(this).children(".details").length > 0) {
                     var kids = $(this).children(".details");
                     var text = kids[0].getAttribute("data-type");
@@ -46,6 +63,11 @@
                 "track": true,
                 "fade": 200
             } );
+            oTable.$('th').tooltip( {
+                "delay": 0,
+                "track": true,
+                "fade": 200
+            } ); 
 	} );
   </script>
   </head>
