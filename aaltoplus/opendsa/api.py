@@ -75,8 +75,7 @@ class CreateUserResource(ModelResource):
 
     def obj_create(self, bundle, request=None, **kwargs):
         try:
-            bundle = super(CreateUserResource, self).obj_create(bundle, request, **kwargs)
-            bundle.obj.set_password(bundle.data.get('password'))
+            bundle.obj = User.objects.create_user(bundle.data.get('username'), bundle.data.get('email'), bundle.data.get('password'))
             bundle.obj.save()
         except IntegrityError:
             raise BadRequest('That username already exists')
