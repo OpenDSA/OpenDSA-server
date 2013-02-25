@@ -74,7 +74,6 @@ class CreateUserResource(ModelResource):
         fields = ['username']
 
     def obj_create(self, bundle, request=None, **kwargs):
-        print type(self)
         try:
             bundle = super(CreateUserResource, self).obj_create(bundle, request, **kwargs)
             bundle.obj.set_password(bundle.data.get('password'))
