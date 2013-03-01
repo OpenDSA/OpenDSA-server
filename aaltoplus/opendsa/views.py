@@ -31,14 +31,11 @@ from django.template import add_to_builtins
 
  
 def is_authorized(user, book, course):
-    obj_book = Books.objects.get(book_name=book)
-    print obj_book.courses.all()
-    print user.username   
+    obj_book = Books.objects.select_related().get(book_name=book)
     user_prof = UserProfile.objects.get(user=user)
     obj_course = CourseInstance.objects.get(instance_name=course)
-    print len(obj_book.courses.filter(course=obj_course))
-    if len(obj_book.courses.filter(course=obj_course))==1:
-        return obj_book.courses.get(course=obj_course).is_staff(user_prof)
+    if obj_course in obj_book.courses.all(): 
+        return obj_course.is_staff(user_prof)
     else:
         return False
 
