@@ -177,7 +177,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 user_exercise.total_done += 1
                 user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak) 
         else:
-            if ((int(count_hints) ==0) or (attempt_content!='hint')):
+            if ((int(count_hints) ==0) or (attempt_content!='hint')) and (int(attempt_number) == 1):
             # Only count wrong answer at most once per problem
                if user_exercise.streak - 1 > 0:
                    user_exercise.streak = user_exercise.streak - 1
