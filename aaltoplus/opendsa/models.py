@@ -161,7 +161,7 @@ class UserButton(models.Model):
      name = models.CharField(max_length=50)
      description = models.TextField() 
      action_time = models.DateTimeField(default="2000-01-01 00:00:00")
-     uiid = models.CharField(max_length=20)  
+     uiid = models.BigIntegerField(default = 0)  
      browser_family = models.CharField(max_length=20)
      browser_version = models.CharField(max_length=20)
      os_family = models.CharField(max_length=50)
@@ -276,7 +276,7 @@ class UserExerciseLog(models.Model):
     hint_used = models.BooleanField(default = False)
     points_earned = models.DecimalField(default = 0, max_digits=5, decimal_places=2)  
     earned_proficiency = models.BooleanField(default = False) # True if proficiency was earned on this problem
-    count_attempts = models.IntegerField(default = 0)
+    count_attempts = models.BigIntegerField(default = 0)
     ip_address = models.CharField(max_length=20)
 
 

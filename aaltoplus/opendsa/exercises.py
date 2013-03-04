@@ -213,7 +213,7 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
                 count_hints=count_hints,
                 hint_used=int(count_hints) > 0,
                 correct=score>= threshold,  
-                count_attempts=0, #we should use uiid to get attempt_number,
+                count_attempts=attempt_number, 
                 ip_address=ip_address,
         )
 
