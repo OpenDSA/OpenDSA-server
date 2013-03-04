@@ -1,4 +1,5 @@
 import models 
+from decimal import Decimal
 # Tastypie
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 from tastypie.authentication import Authentication, OAuthAuthentication, ApiKeyAuthentication
@@ -224,7 +225,6 @@ class UserexerciseResource(ModelResource):
         if kusername:
             action =   request.POST['actions']
             actions = simplejson.loads(action)
-            pe_name = get_pe_name_from_referer(request.META['HTTP_REFERER'])
             number_logs = 0
             for act in actions:
                if 'score[total]' in request.POST:
@@ -251,9 +251,11 @@ class UserexerciseResource(ModelResource):
                     kusername,  
                     kexercise,
                     module,
+                    kbook, 
                     act['type'],
                     act['desc'], 
                     act['tstamp'],
+                    act['uiid'],
                     request.user_agent.browser.family,
                     request.user_agent.browser.version_string,
                     request.user_agent.os.family,
@@ -295,7 +297,7 @@ class UserexerciseResource(ModelResource):
                     user_exercise = UserExercise.objects.get(user=kusername, exercise=kexercise)
             else:   
                 return  self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized) 
-            if len(UserBook.objects.filter(user=kusername,book=dsa_book))==1:
+            if UserBook.objects.filter(user=kusername,book=dsa_book).count()==1:
                 ubook = UserBook.objects.get(user=kusername,book=dsa_book)
             else:
                 ubook= None
@@ -311,8 +313,8 @@ class UserexerciseResource(ModelResource):
                        1, #completed
                        int(request.POST['tstamp']), #submit_time
                        request.POST['total_time'],   #time_taken
-                       0, #threshold
-                       int(request.POST['score']), #score
+                       kexercise.streak, #threshold
+                       Decimal(request.POST['score']), #score
                        bme.points,  #request.POST['points'],
                        request.POST['module'], 
                        request.META['REMOTE_ADDR'],
@@ -596,7 +598,7 @@ class ModuleResource(ModelResource):
                             kexercise.covers="dsa"
                             kexercise.description= mod_exe['name']
                             kexercise.ex_type= mod_exe['type']
-                            kexercise.streak= mod_exe['threshold']
+                            kexercise.streak= Decimal(mod_exe['threshold'])
                             kexercise.save()
                     if UserData.objects.filter(user=kusername,book=kbook).count()>0:
                         user_data = UserData.objects.get(user=kusername,book=kbook)

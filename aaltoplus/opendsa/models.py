@@ -30,7 +30,7 @@ class Exercise(models.Model):
     author = models.CharField(max_length=50)
     ex_type = models.CharField(max_length=50)
     description = models.TextField()
-    streak = models.IntegerField()
+    streak = models.DecimalField(default = 0, max_digits=5, decimal_places=2)   
 
 
 class Books(models.Model):
@@ -154,12 +154,14 @@ class UserBook (models.Model):
 
 
 class UserButton(models.Model):
-     user = models.ForeignKey(User) 
+     user = models.ForeignKey(User)
+     book = models.ForeignKey(Books) 
      exercise = models.ForeignKey(Exercise)
      module =  models.ForeignKey(Module)
      name = models.CharField(max_length=50)
      description = models.TextField() 
      action_time = models.DateTimeField(default="2000-01-01 00:00:00")
+     uiid = models.CharField(max_length=20)  
      browser_family = models.CharField(max_length=20)
      browser_version = models.CharField(max_length=20)
      os_family = models.CharField(max_length=50)

@@ -248,17 +248,19 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
         return user_exercise,value  
 
 
-
-def log_button_action( user, exercise, module, name, description, action_time,browser_family, browser_version, os_family, os_version, device, ip_address):
+                                              
+def log_button_action( user, exercise, module, book, name, description, action_time, uiid, browser_family, browser_version, os_family, os_version, device, ip_address):
     if device is None:
         device = 'PC'
     button_log = models.UserButton(
                         user = user,
                         exercise = exercise,
                         module = module,
+                        book = book,
                         name = name,
                         description = description,
                         action_time =  date_from_timestamp(action_time),
+                        uiid = uiid,
                         browser_family = browser_family,
 			browser_version = browser_version,
  			os_family = os_family,
