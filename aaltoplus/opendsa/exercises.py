@@ -74,7 +74,7 @@ def student_grade_all(user, book):
             grade.append({'exercise':bme.exercise.name, 'description':bme.exercise.description,'type':bme.exercise.ex_type,'points':0,'module':bme.module.name})
         if bme.module not in checked_modules:
             checked_modules.append(bme.module)
-            if len(UserModule.objects.filter(user = user,book=bme.book,  module = bme.module))>0:
+            if UserModule.objects.filter(user = user,book=bme.book,  module = bme.module).count()>0:
                 user_mod = UserModule.objects.get(user = user, book=bme.book,module = bme.module)
                 modules.append({'module':bme.module.name, 'proficient':user_mod.is_proficient_at()})
             else:
@@ -197,7 +197,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
 
 
 def attempt_problem_pe(user_data, user_exercise, attempt_number,
-    completed, submit_time,  threshold, score, points, module, ip_address):
+    completed, submit_time, time_taken, threshold, score, points, module, ip_address):
 
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         dt_now =  date_from_timestamp(submit_time)   #datetime.datetime.now()
@@ -208,7 +208,7 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
         problem_log = models.UserExerciseLog(
                 user=user_data.user,
                 exercise=user_exercise.exercise,
-                time_taken=0,
+                time_taken=time_taken,
                 time_done=dt_now,
                 count_hints=count_hints,
                 hint_used=int(count_hints) > 0,

@@ -201,9 +201,9 @@ class UserexerciseResource(ModelResource):
             else:
                 kusername = get_user_by_key(request.POST['key'])    #request.user:
             kexercise =  Exercise.objects.get(name= request.POST['exercise']) 
-            if  len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==1:
+            if  UserExercise.objects.filter(user=kusername, exercise=kexercise).count()==1:
                 user_exercise =  UserExercise.objects.get(user=kusername, exercise=kexercise)
-            elif len(UserExercise.objects.filter(user=kusername, exercise=kexercise))>1:
+            elif UserExercise.objects.filter(user=kusername, exercise=kexercise).count()>1:
                   user_exercise =UserExercise.objects.filter(user=kusername, exercise=kexercise)[0]  
             else:
                 user_exercise = None
@@ -232,7 +232,7 @@ class UserexerciseResource(ModelResource):
                else:
                   streak = 0 
 
-               if  len(Exercise.objects.filter(name= act['av']))==1:
+               if  Exercise.objects.filter(name= act['av']).count()==1:
                    kexercise =  Exercise.objects.get(name= act['av'])
                else:
                    with transaction.commit_on_success():
@@ -242,7 +242,7 @@ class UserexerciseResource(ModelResource):
                    kbook = Books.objects.get(book_name= request.POST['book'])
                    user_data, created = UserData.objects.get_or_create(user=kusername,book=kbook)
                module = None 
-               if len(Module.objects.filter(name=act['module']))>0: 
+               if Module.objects.filter(name=act['module']).count()>0: 
                   module = Module.objects.get(name=act['module'])  
                if kexercise and module:
                  with transaction.commit_on_success(): 
@@ -279,17 +279,18 @@ class UserexerciseResource(ModelResource):
             else:
                 kusername = get_user_by_key(request.POST['key'])   
             jsav_exercise = request.POST['exercise']
-            if len( Books.objects.filter(book_name=request.POST['book']))==1:
+            if Books.objects.filter(book_name=request.POST['book']).count()==1:
                 dsa_book = Books.objects.get(book_name=request.POST['book'])
             else:
                 dsa_book = None
-            if  len(Exercise.objects.filter(name= jsav_exercise))==1:
+            if  Exercise.objects.filter(name= jsav_exercise).count()==1:
                 kexercise =  Exercise.objects.get(name= jsav_exercise) 
             else: 
                 kexercise = None
             if kusername and kexercise:
-                if len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==0:
-                    user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0, first_done=date_from_timestamp(int(request.POST['tstamp']))) 
+                if UserExercise.objects.filter(user=kusername, exercise=kexercise).count()==0:
+                    with transaction.commit_on_success():
+                        user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0, first_done=date_from_timestamp(int(request.POST['tstamp']))) 
                 else:
                     user_exercise = UserExercise.objects.get(user=kusername, exercise=kexercise)
             else:   
@@ -302,17 +303,16 @@ class UserexerciseResource(ModelResource):
                 user_data, created = UserData.objects.get_or_create(user=kusername,book=dsa_book)
             module = Module.objects.get(name=request.POST['module']) 
             if user_exercise and ubook:
-                    bme = BookModuleExercise.objects.filter(book = ubook.book, module = module, exercise=kexercise)[0] #temporary need to find a way to associate student to course to book.
+                    bme = BookModuleExercise.objects.filter(book = ubook.book, module = module, exercise=kexercise)[0]
                     user_exercise,correct = attempt_problem_pe(
                        user_data,  
                        user_exercise,
-                       request.POST['uiid'],
-                       1, #request.POST['complete'],
-                       int(request.POST['tstamp']),
-                       #request.POST['fix'],
-                       0, #int(request.POST['threshold']),
-                       (request.POST['score']),
-                       #required,
+                       request.POST['uiid'],  #attempt_number
+                       1, #completed
+                       int(request.POST['tstamp']), #submit_time
+                       request.POST['total_time'],   #time_taken
+                       0, #threshold
+                       int(request.POST['score']), #score
                        bme.points,  #request.POST['points'],
                        request.POST['module'], 
                        request.META['REMOTE_ADDR'],
@@ -334,22 +334,22 @@ class UserexerciseResource(ModelResource):
             else:
                 kusername = get_user_by_key(request.POST['key'])
             ka_exercise = request.POST['sha1']
-            if len( Books.objects.filter(book_name=request.POST['book']))==1:
+            if Books.objects.filter(book_name=request.POST['book']).count()==1:
                 dsa_book = Books.objects.get(book_name=request.POST['book'])
             else:
                 dsa_book = None
-            if  len(Exercise.objects.filter(name= ka_exercise))==1:
+            if  Exercise.objects.filter(name= ka_exercise).count()==1:
                 kexercise =  Exercise.objects.get(name= ka_exercise)
             else:
                 kexercise = None
             if kusername and kexercise:
-                 if len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==0:
+                 if UserExercise.objects.filter(user=kusername, exercise=kexercise).count()==0:
                     user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
                  else:
                     user_exercise = UserExercise.objects.get(user=kusername, exercise=kexercise)
             else:
                 return  self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized)
-            if len(UserBook.objects.filter(user=kusername,book=dsa_book))==1:
+            if UserBook.objects.filter(user=kusername,book=dsa_book).count()==1:
                 ubook = UserBook.objects.get(user=kusername,book=dsa_book)
             else:
                 ubook= None
@@ -398,18 +398,18 @@ class UserexerciseResource(ModelResource):
                 kusername = get_user_by_key(request.POST['key'])
             ka_exercise = request.POST['sha1']
             dsa_book = request.POST['book']
-            if  len(Exercise.objects.filter(name= ka_exercise))==1:
+            if  Exercise.objects.filter(name= ka_exercise).count()==1:
                 kexercise =  Exercise.objects.get(name= ka_exercise)
             else:
                 kexercise = None
             if kusername and kexercise:
-                 if len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==0:
+                 if UserExercise.objects.filter(user=kusername, exercise=kexercise).count()==0:
                     user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
                  else:
                     user_exercise = UserExercise.objects.get(user=kusername, exercise=kexercise)
             else:
                 return  self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized)
-            if len(UserBook.objects.filter(user=kusername,book=dsa_book))==1:
+            if UserBook.objects.filter(user=kusername,book=dsa_book).count()==1:
                 ubook = UserBook.objects.get(user=kusername,book=dsa_book)
             else:
                 ubook= None
@@ -501,7 +501,7 @@ class UserDataResource(ModelResource):
                 kusername = get_user_by_key(request.POST['key'])      #request.POST['username']:    #request.user:
             #with transaction.commit_on_success():
             jsav_exercise = request.POST['exercise']
-            if  len(Exercise.objects.filter(name= jsav_exercise))==1:
+            if  Exercise.objects.filter(name= jsav_exercise).count()==1:
                 kexercise =  Exercise.objects.get(name= jsav_exercise)
             else:
                 kexercise = None
@@ -561,18 +561,18 @@ class ModuleResource(ModelResource):
             if kusername:
                 response = {}
                 #get or create Book & link a book to user  
-                if len( Books.objects.filter(book_name=request.POST['book']))==0:  
+                if Books.objects.filter(book_name=request.POST['book']).count()==0:  
                     with transaction.commit_on_success():
                         kbook,added = Books.objects.get_or_create(book_name= request.POST['book'], book_url = request.POST['url'])
                         ubook,created = UserBook.objects.get_or_create(user=kusername, book=kbook) 
                 else:
                     kbook = Books.objects.get(book_name= request.POST['book'])
                     #link a book to user
-                    if len( UserBook.objects.filter(user=kusername, book=kbook))==0:
+                    if UserBook.objects.filter(user=kusername, book=kbook).count()==0:
                          with transaction.commit_on_success():
                              ubook,created = UserBook.objects.get_or_create(user=kusername, book=kbook)    
                 #get or create module
-                if len( Module.objects.filter(name=request.POST['module']))==0:
+                if Module.objects.filter(name=request.POST['module']).count()==0:
                     with transaction.commit_on_success():
                         kmodule,added = Module.objects.get_or_create(name= request.POST['module'])
                 else:
@@ -583,10 +583,7 @@ class ModuleResource(ModelResource):
                 mod_exes = simplejson.loads(exercises) 
                 print mod_exes  
                 for mod_exe in mod_exes:  
-                    print '******************'
-                    print mod_exe
-                    print '******************' 
-                    if len( Exercise.objects.filter(name=mod_exe['exercise']))==0:
+                    if Exercise.objects.filter(name=mod_exe['exercise']).count()==0:
                         with transaction.commit_on_success():
                             kexercise, added = Exercise.objects.get_or_create(name= mod_exe['exercise'],covers="dsa",description= mod_exe['name'],ex_type= mod_exe['type'],streak= mod_exe['threshold'])     
                         #add exercise to module proficiency model
@@ -601,13 +598,13 @@ class ModuleResource(ModelResource):
                             kexercise.ex_type= mod_exe['type']
                             kexercise.streak= mod_exe['threshold']
                             kexercise.save()
-                    if len(UserData.objects.filter(user=kusername,book=kbook))>0:
+                    if UserData.objects.filter(user=kusername,book=kbook).count()>0:
                         user_data = UserData.objects.get(user=kusername,book=kbook)
                         u_prof = user_data.is_proficient_at(kexercise)  
                     #check student progress -- KA exercises
-                    if  len(UserExercise.objects.filter(user=kusername, exercise=kexercise))==1:
+                    if  UserExercise.objects.filter(user=kusername, exercise=kexercise).count()==1:
                         user_exercise =  UserExercise.objects.get(user=kusername, exercise=kexercise)
-                    elif len(UserExercise.objects.filter(user=kusername, exercise=kexercise))>1:
+                    elif UserExercise.objects.filter(user=kusername, exercise=kexercise).count()>1:
                         user_exercise =UserExercise.objects.filter(user=kusername, exercise=kexercise)[0]
                     else:
                         user_exercise = None
@@ -618,20 +615,20 @@ class ModuleResource(ModelResource):
 
                     #response[kexercise.name] = {'proficient':u_prof,'progress':u_prog}
                     #Link exercise to module and books
-                    if len(BookModuleExercise.objects.filter(book = kbook, module = kmodule,exercise=kexercise))==0:
+                    if BookModuleExercise.objects.filter(book = kbook, module = kmodule,exercise=kexercise).count()==0:
                         with transaction.commit_on_success():
                             bme = models.BookModuleExercise(book = kbook, module = kmodule, exercise = kexercise, points =  mod_exe['points'])
                             bme.save()    
 
                     #exercise proficiency response
-                    if len(BookModuleExercise.objects.filter(book = kbook, exercise=kexercise))==0:
+                    if BookModuleExercise.objects.filter(book = kbook, exercise=kexercise).count()==0:
                         u_prof = False
                         u_prog = 0
                     response[kexercise.name] = {'proficient':u_prof,'progress':u_prog}
                 #check module proficiency
-                if  len(UserModule.objects.filter(user=kusername,book=kbook, module=kmodule))==1:
+                if  UserModule.objects.filter(user=kusername,book=kbook, module=kmodule).count()==1:
                     user_module = UserModule.objects.get(user=kusername, book=kbook, module=kmodule)
-                elif len(UserModule.objects.filter(user=kusername, book=kbook, module=kmodule))>1:
+                elif UserModule.objects.filter(user=kusername, book=kbook, module=kmodule).count()>1:
                     user_module = UserModule.objects.filter(user=kusername, book=kbook, module=kmodule)[0]
                 else:
                     user_module = None
@@ -640,7 +637,7 @@ class ModuleResource(ModelResource):
                         user_data, created = UserData.objects.get_or_create(user=kusername,book = kbook)
                     update_module_proficiency(user_data, request.POST['module'], None) 
                     #Module proficiency response
-                    if len(BookModuleExercise.objects.filter(book = kbook, module = kmodule))==0:
+                    if BookModuleExercise.objects.filter(book = kbook, module = kmodule).count()==0:
                         response[kmodule.name] = False
                     else: 
                         response[kmodule.name] = user_module.is_proficient_at()    
@@ -676,9 +673,9 @@ class UserModuleResource(ModelResource):
             kmodule = Module.objects.get(name= request.POST['module'])
             kbook = Books.objects.get(book_name= request.POST['book'])
                 #kusername = User.objects.get(username=request.POST['username'])
-            if  len(UserModule.objects.filter(user=kusername, book=kbook, module=kmodule))==1:  
+            if  UserModule.objects.filter(user=kusername, book=kbook, module=kmodule).count()==1:  
                 user_module = UserModule.objects.get(user=kusername, book=kbook, module=kmodule)
-            elif len(UserModule.objects.filter(user=kusername, book=kbook, module=kmodule))>1:
+            elif UserModule.objects.filter(user=kusername, book=kbook, module=kmodule).count()>1:
                 user_module = UserModule.objects.filter(user=kusername, book=kbook, module=kmodule)[0]
             else:
                 user_module = None 
