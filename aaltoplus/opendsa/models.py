@@ -208,7 +208,8 @@ class UserData(models.Model):
     all_proficient_exercises = models.TextField() 
 
     points = models.DecimalField(default = 0, max_digits=5, decimal_places=2) 
-
+    class Meta:
+       unique_together = (("user", "book"),)
 
 
     def earned_proficiency(self, exid):
