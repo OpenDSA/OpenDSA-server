@@ -360,16 +360,6 @@ class UserexerciseResource(ModelResource):
             module = Module.objects.get(name=request.POST['module_name'])
             if user_exercise and ubook:
                 bme = BookModuleExercise.objects.filter(book = ubook.book, module = module, exercise=kexercise)[0]
-            #with transaction.commit_on_success():
-                #kexercise = Exercise.objects.get(name= request.POST['sha1'])  
-                #kusername = User.objects.get(username=request.POST['user']) 
-                #user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise) 
-                #user_data, created = UserData.objects.get_or_create(user=kusername)
-                #module = Module.objects.get(name=request.POST['module_name'])
-                #user_module, exist =  UserModule.objects.get_or_create(user=kusername, module=module) 
-                #if user_exercise:
-                     #bme = BookModuleExercise.objects.filter(module = module, exercise=kexercise)[0]
-                #bme = BookModuleExercise.objects.filter(book = ubook.book, module = module, exercise=kexercise)[0]
                 user_exercise,correct = attempt_problem(
                    user_data,  #kusername,
                    user_exercise,
@@ -390,8 +380,6 @@ class UserexerciseResource(ModelResource):
         return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
  
     def logexercisehint(self, request, **kwargs):
-
-#        if request.POST['user']:    #request.user:
         if request.POST['key']:
             if request.POST['key']=='phantom-key':
                 with transaction.commit_on_success():
@@ -399,7 +387,10 @@ class UserexerciseResource(ModelResource):
             else:
                 kusername = get_user_by_key(request.POST['key'])
             ka_exercise = request.POST['sha1']
-            dsa_book = request.POST['book']
+            if Books.objects.filter(book_name=request.POST['book']).count()==1:
+                dsa_book = Books.objects.get(book_name=request.POST['book'])
+            else:
+                dsa_book = None   
             if  Exercise.objects.filter(name= ka_exercise).count()==1:
                 kexercise =  Exercise.objects.get(name= ka_exercise)
             else:
@@ -417,24 +408,20 @@ class UserexerciseResource(ModelResource):
                 ubook= None
             with transaction.commit_on_success():
                 user_data, created = UserData.objects.get_or_create(user=kusername,book=dsa_book)
-            module = Module.objects.get(name=request.POST['module'])
+            module = Module.objects.get(name=request.POST['module_name'])
             if user_exercise and ubook:
                 bme = BookModuleExercise.objects.filter(book = ubook.book, module = module, exercise=kexercise)[0]
 
-            #with transaction.commit_on_success():
-                #kexercise = Exercise.objects.get(name= request.POST['sha1'])
-                #kusername = User.objects.get(username=request.POST['user'])
-                #user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise)
-                #user_data, created = UserData.objects.get_or_create(user=kusername)
-                #if user_exercise:
                 user_exercise,correct = attempt_problem(
-                   user_data,  #kusername,
+                   user_data,  
                    user_exercise,
                    request.POST['attempt_number'],
                    request.POST['complete'],
                    request.POST['count_hints'],
                    int(request.POST['time_taken']),
                    request.POST['attempt_content'],
+                   request.POST['module_name'],
+                   bme.points,
                    request.META['REMOTE_ADDR'],
                    )
                 if correct:
