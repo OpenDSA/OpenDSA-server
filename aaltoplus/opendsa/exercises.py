@@ -208,7 +208,7 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
         problem_log = models.UserExerciseLog(
                 user=user_data.user,
                 exercise=user_exercise.exercise,
-                time_taken=time_taken,
+                time_taken=int(round(int(time_taken)/1000)),
                 time_done=dt_now,
                 count_hints=count_hints,
                 hint_used=int(count_hints) > 0,
