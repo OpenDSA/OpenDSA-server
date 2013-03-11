@@ -319,7 +319,7 @@ class UserexerciseResource(ModelResource):
                        request.POST['module'], 
                        request.META['REMOTE_ADDR'],
                        )
-                    return  self.create_response(request, {'success': True, 'proficient': correct})   
+                    return  self.create_response(request, {'success': True, 'proficient': user_exercise.is_proficient()})    
             else:
                     return  self.create_response(request, {'error': 'attempt not logged'}, HttpBadRequest)
         return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
