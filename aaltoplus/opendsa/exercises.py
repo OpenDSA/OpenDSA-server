@@ -99,15 +99,15 @@ def update_module_proficiency(user_data, module, exercise):
             user_module.first_done = dt_now
         user_module.last_done = dt_now
         is_last_exercise = False
-        if exercise is not None:
-            if user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'):
-                #diff_ex = diff(set(module_ex_list),set(user_prof))
-                if user_prof is None:  # or len(user_prof)==0: #user has no proficient exercise.
+        if user_module.proficient_date == datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'):
+                if user_prof is None:  
                     user_prof =[]
-                    #return False
                 if module_ex_list is None:
                     module_ex_list = []
                 diff_ex = diff(set(module_ex_list),set(user_prof))
+                if exercise is not None and diff_ex is not None:
+                    if diff_ex==exercise:
+                        is_last_exercise = True
                 if (set(module_ex_list).issubset(set(user_prof))) or is_last_exercise:
                     user_module.proficient_date = dt_now
                     user_module.save()
@@ -115,9 +115,8 @@ def update_module_proficiency(user_data, module, exercise):
                 else:
                     user_module.save()
                     return False
-            return True
         else:
-            return False
+                return True
     return False
 
 
