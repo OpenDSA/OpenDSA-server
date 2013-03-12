@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 #A+
 from course.models import Course, CourseInstance
 import consts
-#from decorator import clamp 
+#from decorator import clamp
 
 # Create your models here.
 
@@ -25,19 +25,19 @@ import consts
 class Exercise(models.Model):
 
     name = models.CharField(max_length=50)
-    description = models.TextField() 
+    description = models.TextField()
     covers = models.TextField()
     author = models.CharField(max_length=50)
     ex_type = models.CharField(max_length=50)
     description = models.TextField()
-    streak = models.DecimalField(default = 0, max_digits=5, decimal_places=2)   
+    streak = models.DecimalField(default = 0, max_digits=5, decimal_places=2)
 
 
 class Books(models.Model):
     book_name = models.CharField(max_length=50)
     book_url =  models.CharField(unique=False, max_length=80, blank=False,
                                                validators=[RegexValidator(regex="^[\w\-\.]*$")],
-                                               help_text="Input an URL identifier for this book.") 
+                                               help_text="Input an URL identifier for this book.")
     courses = models.ManyToManyField(CourseInstance)
 
 
@@ -51,10 +51,10 @@ class UserSummary(models.Model):
    @staticmethod
    def GetUserSummaryByIds(userId, exerciseId):
         cur = connection.cursor();
-	cur.callproc('GetUserSummaryByIds',[userId,exerciseId, ])
-	results = cur.fetchall()
-	cur.close()
-	return [UserSummary (*row) for row in results]
+        cur.callproc('GetUserSummaryByIds',[userId,exerciseId, ])
+        results = cur.fetchall()
+        cur.close()
+        return [UserSummary (*row) for row in results]
 
    @staticmethod
    def GetUserSummaryByExerciseId(exerciseId):
@@ -72,8 +72,7 @@ class ExerciseModule(models.Model):
 
 
 #Table summarizing all students module activities
-class UserModuleSummary(models.Model): 
-
+class UserModuleSummary(models.Model):
     user =  models.CharField(max_length=50)
     module = models.CharField(max_length=60)
     module_status =  models.CharField(max_length=3)
@@ -86,22 +85,20 @@ class UserModuleSummary(models.Model):
 
 
 class Module(models.Model):
-
      short_display_name = models.CharField(max_length=50)  #name
-     name = models.TextField()  #decription 
-     covers = models.TextField() 
-     author = models.CharField(max_length=50)  
-     creation_date = models.DateTimeField(default="2012-01-01 00:00:00") 
+     name = models.TextField()  #decription
+     covers = models.TextField()
+     author = models.CharField(max_length=50)
+     creation_date = models.DateTimeField(default="2012-01-01 00:00:00")
      h_position = models.IntegerField(default = 0)
-     v_position = models.IntegerField(default = 0) 
-     last_modified = models.DateTimeField(default="2012-01-01 00:00:00") 
-     prerequisites = models.TextField() 
-     raw_html = models.TextField()   
-     exercise_list = models.TextField() 
-
+     v_position = models.IntegerField(default = 0)
+     last_modified = models.DateTimeField(default="2012-01-01 00:00:00")
+     prerequisites = models.TextField()
+     raw_html = models.TextField()
+     exercise_list = models.TextField()
 
      #function that returns list of id of exercises we get it from BookModuleExercise table
-     #will be compared to student list of proficiency exercises 
+     #will be compared to student list of proficiency exercises
      def get_proficiency_model(self, book):
          if BookModuleExercise.objects.filter(book=book,module=self).count()==0:
              return None
@@ -110,7 +107,6 @@ class Module(models.Model):
              for bme in  BookModuleExercise.objects.filter(book=book,module=self):
                  ex_id_list.append(int(bme.exercise.id))
              return ex_id_list
-         
 
 
 
@@ -118,11 +114,12 @@ class Module(models.Model):
 class BookModuleExercise (models.Model):
     book = models.ForeignKey(Books)
     module = models.ForeignKey(Module)
-    exercise = models.ForeignKey(Exercise) 
+    exercise = models.ForeignKey(Exercise)
     #points the exercise is worth
-    points = models.DecimalField(default = 0, max_digits=5, decimal_places=2) 
+    points = models.DecimalField(default = 0, max_digits=5, decimal_places=2)
     class Meta:
         unique_together = (("book","module", "exercise"),)
+
 
 
 class UserBook (models.Model):
@@ -135,13 +132,13 @@ class UserBook (models.Model):
 
 class UserButton(models.Model):
      user = models.ForeignKey(User)
-     book = models.ForeignKey(Books) 
+     book = models.ForeignKey(Books)
      exercise = models.ForeignKey(Exercise)
      module =  models.ForeignKey(Module)
      name = models.CharField(max_length=50)
-     description = models.TextField() 
+     description = models.TextField()
      action_time = models.DateTimeField(default="2000-01-01 00:00:00")
-     uiid = models.BigIntegerField(default = 0)  
+     uiid = models.BigIntegerField(default = 0)
      browser_family = models.CharField(max_length=20)
      browser_version = models.CharField(max_length=20)
      os_family = models.CharField(max_length=50)
@@ -152,42 +149,41 @@ class UserButton(models.Model):
 
 
 class UserModule(models.Model):
-
     user = models.ForeignKey(User)
     book = models.ForeignKey(Books)
     module =  models.ForeignKey(Module) #models.CharField(max_length=60)
     first_done = models.DateTimeField(auto_now_add=True)
     last_done = models.DateTimeField(auto_now_add=True)
-    proficient_date = models.DateTimeField(default="2012-01-01 00:00:00") 
-    
+    proficient_date = models.DateTimeField(default="2012-01-01 00:00:00")
+
     class Meta:
        unique_together = (("user","book", "module"),)
 
     @staticmethod
     def GetUserModuleByUserId(userId):
         cur = connection.cursor();
-	cur.callproc('GetUserModuleByUser_Id',[userId,])
-	results = cur.fetchall()
-	cur.close()
-	return [UserModule(*row) for row in results]
+        cur.callproc('GetUserModuleByUser_Id',[userId,])
+        results = cur.fetchall()
+        cur.close()
+        return [UserModule(*row) for row in results]
 
     def is_proficient_at(self):
-        return (self.proficient_date != datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))  
+        return (self.proficient_date != datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))
 
 
 
 class UserData(models.Model):
-    # Canonical reference to the user entity. 
+    # Canonical reference to the user entity.
     user =   models.ForeignKey(User)
 
-    book = models.ForeignKey(Books) 
+    book = models.ForeignKey(Books)
     # ids of exercises started
-    started_exercises = models.TextField()  
+    started_exercises = models.TextField()
 
     # ids of all exercises in which the user is proficient
-    all_proficient_exercises = models.TextField() 
+    all_proficient_exercises = models.TextField()
 
-    points = models.DecimalField(default = 0, max_digits=5, decimal_places=2) 
+    points = models.DecimalField(default = 0, max_digits=5, decimal_places=2)
     class Meta:
        unique_together = (("user", "book"),)
 
@@ -196,7 +192,7 @@ class UserData(models.Model):
         if len(self.all_proficient_exercises)==0:
             self.all_proficient_exercises += '%s' %exid
         else:
-            self.all_proficient_exercises += ',%s' %exid  
+            self.all_proficient_exercises += ',%s' %exid
 
     def started(self, exid):
         if len(self.started_exercises) ==0:
@@ -226,7 +222,7 @@ class UserData(models.Model):
 
 
     def get_prof_list(self):
-        prof_ex =[] 
+        prof_ex =[]
         for ex in self.all_proficient_exercises.split(','):
             if ex.isdigit():
               prof_ex.append(int(ex))
@@ -247,7 +243,6 @@ class UserData(models.Model):
 
 
 class UserExerciseLog(models.Model):
-
     user =  models.ForeignKey(User)
     exercise =  models.ForeignKey(Exercise)
     correct = models.BooleanField(default = False)
@@ -255,11 +250,10 @@ class UserExerciseLog(models.Model):
     time_taken = models.IntegerField(default = 0)
     count_hints = models.IntegerField(default = 0)
     hint_used = models.BooleanField(default = False)
-    points_earned = models.DecimalField(default = 0, max_digits=5, decimal_places=2)  
+    points_earned = models.DecimalField(default = 0, max_digits=5, decimal_places=2)
     earned_proficiency = models.BooleanField(default = False) # True if proficiency was earned on this problem
     count_attempts = models.BigIntegerField(default = 0)
     ip_address = models.CharField(max_length=20)
-
 
     def put(self):
         models.Model.put(self)
@@ -268,17 +262,15 @@ class UserExerciseLog(models.Model):
 
 
 class UserProfExerciseLog(models.Model):
-
     problem_log =  models.ForeignKey(UserExerciseLog)
     student =  models.IntegerField(default = 0)
     correct =  models.IntegerField(default = 0)
-    fix =  models.IntegerField(default = 0) 
-    undo =  models.IntegerField(default = 0) 
-    total =  models.IntegerField(default = 0) 
+    fix =  models.IntegerField(default = 0)
+    undo =  models.IntegerField(default = 0)
+    total =  models.IntegerField(default = 0)
 
 
 class UserExercise(models.Model):
-
     user = models.ForeignKey(User)
     exercise =  models.ForeignKey(Exercise) #models.CharField(max_length=60)
     streak = models.IntegerField(default = 0)
@@ -288,22 +280,22 @@ class UserExercise(models.Model):
     total_done = models.IntegerField(default = 0)
     total_correct = models.IntegerField(default = 0)
     proficient_date = models.DateTimeField(default="2012-01-01 00:00:00")
-    progress = models.DecimalField(default = 0, max_digits=5, decimal_places=2) 
+    progress = models.DecimalField(default = 0, max_digits=5, decimal_places=2)
+
     class Meta:
        unique_together = (("user", "exercise"),)
 
     def update_proficiency_ka(self, correct, ubook):
         exercise = Exercise.objects.get(pk=self.exercise_id)
         user_data = UserData.objects.get(user=self.user,book=ubook)
-        dt_now = datetime.datetime.now() 
+        dt_now = datetime.datetime.now()
         if correct and (self.longest_streak >= exercise.streak):
            self.proficient_date = dt_now
-           
-           user_data.save() 
+
+           user_data.save()
            return True
-        return False 
-     
-    
+        return False
+
     def update_proficiency_pe(self, correct,ubook):
         exercise = Exercise.objects.get(pk=self.exercise_id)
         user_data = UserData.objects.get(user=self.user,book=ubook)
@@ -312,13 +304,13 @@ class UserExercise(models.Model):
            self.proficient_date = dt_now
 
            if len(user_data.all_proficient_exercises)==0:
-               user_data.all_proficient_exercises += "%s" %self.exercise_id 
+               user_data.all_proficient_exercises += "%s" %self.exercise_id
            else:
                user_data.all_proficient_exercises += ",%s" %self.exercise_id
            user_data.save()
            return True
         return False
-   
+
     def is_proficient(self):
         return (self.proficient_date != datetime.datetime.strptime('2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))
-  
+
