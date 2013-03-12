@@ -383,6 +383,9 @@ class UserexerciseResource(ModelResource):
 
             if kusername and kexercise:
                 user_exercise = get_user_exercise(kusername, kexercise)
+                
+                if user_exercise is None:
+                  user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
             else:
                 return self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized)
 
