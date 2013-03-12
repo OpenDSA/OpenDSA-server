@@ -12,6 +12,7 @@ from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, Bo
  
 # Django
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import get_object_or_404, render_to_response 
 from django.http import HttpResponse, HttpResponseForbidden 
 from course.context import CourseContext 
@@ -25,7 +26,7 @@ class exeStat:
 
 #function to display the statistics of exercises
 #return the percentage of people that have achieved proficiency for each exercise
-@login_required
+@staff_member_required
 def exercises_stat(request):
     
     userExercise = UserExercise.objects.order_by('exercise').all();
@@ -48,7 +49,7 @@ def exercises_stat(request):
 
 #function to display a graph for the statistics of exercises
 #return the total number of proficiency achieved for each exercise
-@login_required
+@staff_member_required
 def exercises_bargraph(request):
     
     userExercise = UserExercise.objects.order_by('exercise').all();
@@ -72,7 +73,7 @@ def exercises_bargraph(request):
 #function to display a time distribution graph for the statistics of exercises
 #return the average time taken for an exercise
 #TODO: debug
-@login_required
+@staff_member_required
 def exercises_time(request):
     
     userExerciseLog = UserExerciseLog.objects.order_by('exercise').all();
@@ -97,7 +98,7 @@ def exercises_time(request):
 
 #This function responds student list (not staff or super user)
 #The student information includes id(in the database), user name, and email, etc
-@login_required
+@staff_member_required
 def student_list(request):
     userProfiles = UserProfile.objects.all();
     
@@ -138,7 +139,7 @@ class proficient_exercises:
     def get_number_print(self):
         return self.number*20
 
-@login_required
+@staff_member_required
 def student_exercise(request, student):
     userButtons = UserButton.objects.filter(user=student).filter(name='document-ready')
 
@@ -187,7 +188,7 @@ def student_exercise(request, student):
         
     return render_to_response("developer_view/student_exercise.html", {'activities': activities, 'student': student, 'exercises': exercises, 'max': max })
 
-@login_required
+@staff_member_required
 def exercise_list(request, student, module):
     userButtons = UserButton.objects.filter(user=student).filter(module=module)
     
@@ -226,7 +227,7 @@ class exercise_step:
         return float(self.click_num)/float(self.max_click)*500.0
 
 
-@login_required    
+@staff_member_required    
 def exercise_detail(request, student, exercise):
     #The activities of a user and an exercise
     userButtons = UserButton.objects.filter(user=student).filter(exercise=exercise)
@@ -380,7 +381,7 @@ class docready_event():
         return 0;
 
 #The first time line model
-@login_required
+@staff_member_required
 def timeline_sum(request, student):
     #This query fetches the document ready activities of a user
     userButtons = UserButton.objects.filter(user=student).filter(name='document-ready')
@@ -417,7 +418,7 @@ class general_event():
         
 
 #time line detail model
-@login_required
+@staff_member_required
 def timeline_detail(request, student, module, year, month, day):
     
     #This query fetches the activities of a user, a model, an action date except the document ready actions
