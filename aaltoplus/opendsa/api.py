@@ -643,8 +643,8 @@ class ModuleResource(ModelResource):
                     else:
                         u_prog = 0
 
-                    #Link exercise to module and books
-                    if BookModuleExercise.objects.filter(book=kbook, module=kmodule, exercise=kexercise).count() == 0:
+                    #Link exercise to module and books only if the exercise is required
+                    if BookModuleExercise.objects.filter(book=kbook, module=kmodule, exercise=kexercise).count() == 0 and mod_exe['required']:
                         with transaction.commit_on_success():
                             bme = models.BookModuleExercise(book=kbook, module=kmodule, exercise=kexercise, points=mod_exe['points'])
                             bme.save()
