@@ -579,10 +579,6 @@ class ModuleResource(ModelResource):
                     if Exercise.objects.filter(name=mod_exe['exercise']).count()==0:
                         with transaction.commit_on_success():
                             kexercise, added = Exercise.objects.get_or_create(name= mod_exe['exercise'],covers="dsa",description= mod_exe['name'],ex_type= mod_exe['type'],streak= mod_exe['threshold'])     
-                        #add exercise to module proficiency model
-                        if mod_exe['required'] and (kexercise.id not in kmodule.get_proficiency_model(kbook)):
-                            kmodule.add_required_exercise(kexercise.id) #exercise_list += "%s," %kexercise.id
-                            kmodule.save()
                     else:
                         with transaction.commit_on_success():
                             kexercise = Exercise.objects.get(name= mod_exe['exercise'])  

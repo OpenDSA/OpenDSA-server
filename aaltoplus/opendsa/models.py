@@ -99,12 +99,6 @@ class Module(models.Model):
      raw_html = models.TextField()   
      exercise_list = models.TextField() 
 
-     def add_required_exercise(self, exid):
-         if exid not in self.exercise_list.split(','):
-             if len(self.exercise_list) == 0:
-                 self.exercise_list += '%s' %exid
-             else:
-                 self.exercise_list += ',%s' %exid
 
      #function that returns list of id of exercises we get it from BookModuleExercise table
      #will be compared to student list of proficiency exercises 
