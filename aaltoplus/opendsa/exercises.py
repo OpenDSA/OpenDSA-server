@@ -66,7 +66,7 @@ def student_grade_all(user, book):
     modules = []
     checked_modules = []
 
-    bme_list = BookModuleExercise.objects.select_related().filter(book=book)
+    bme_list = BookModuleExercise.components.select_related().filter(book=book)
     for bme in bme_list:
         if bme.exercise.id in proficient_exercises:
             grade.append({'exercise':bme.exercise.name, 'description':bme.exercise.description,'type':bme.exercise.ex_type,'points':bme.points,'module':bme.module.name})

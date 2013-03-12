@@ -392,7 +392,7 @@ class UserexerciseResource(ModelResource):
             ubook = get_user_book(kusername, dsa_book)
             module = get_module(request.POST['module'])
             if user_exercise and ubook:
-                bme = BookModuleExercise.objects.filter(book=ubook.book, module=module, exercise=kexercise)[0]
+                bme = BookModuleExercise.components.filter(book=ubook.book, module=module, exercise=kexercise)[0]
                 user_exercise,correct = attempt_problem_pe(
                     user_data,
                     user_exercise,
@@ -434,7 +434,7 @@ class UserexerciseResource(ModelResource):
             module = get_module(request.POST['module_name'])
 
             if user_exercise and ubook:
-                bme = BookModuleExercise.objects.filter(book=ubook.book, module=module, exercise=kexercise)[0]
+                bme = BookModuleExercise.components.filter(book=ubook.book, module=module, exercise=kexercise)[0]
                 user_exercise,correct = attempt_problem(
                     user_data,  #kusername,
                     user_exercise,
@@ -478,7 +478,7 @@ class UserexerciseResource(ModelResource):
             module = get_module(request.POST['module_name'])
 
             if user_exercise and ubook:
-                bme = BookModuleExercise.objects.filter(book=ubook.book, module=module, exercise=kexercise)[0]
+                bme = BookModuleExercise.components.filter(book=ubook.book, module=module, exercise=kexercise)[0]
 
                 user_exercise,correct = attempt_problem(
                     user_data,
@@ -622,6 +622,7 @@ class ModuleResource(ModelResource):
                 #get or create exercises
                 mod_exes = simplejson.loads(request.POST['exercises'])
                 print mod_exes
+                exers_ = []
                 for mod_exe in mod_exes:
                     if Exercise.objects.filter(name=mod_exe['exercise']).count() == 0:
                         # Add new exercise
@@ -636,7 +637,8 @@ class ModuleResource(ModelResource):
                             kexercise.ex_type=mod_exe['type']
                             kexercise.streak=Decimal(mod_exe['threshold'])
                             kexercise.save()
-
+                    #add exercise in list of module exercises
+                    exers_.append(kexercise)
                     if UserData.objects.filter(user=kusername,book=kbook).count() > 0:
                         user_data = UserData.objects.get(user=kusername, book=kbook)
                         u_prof = user_data.is_proficient_at(kexercise)
@@ -654,12 +656,17 @@ class ModuleResource(ModelResource):
                         u_prog = 0
                     
                     #Link exercise to module and books only if the exercise is required
-                    if BookModuleExercise.objects.filter(book=kbook, module=kmodule, exercise=kexercise).count() == 0 and mod_exe['required']:
+                    if BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=kexercise).count() == 0 and mod_exe['required']:
                         with transaction.commit_on_success():
                             bme = models.BookModuleExercise(book=kbook, module=kmodule, exercise=kexercise, points=mod_exe['points'])
                             bme.save()
-
                     response[kexercise.name] = {'proficient': u_prof, 'progress': u_prog}
+
+                # Remove exercises that are no longer part of this book / module
+                for exer in BookModuleExercise.components.get_exercise_list(kbook):                         
+                  if exer not in exers_:                                   
+                    BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=exer).delete()
+
                 #check module proficiency
                 user_module = get_user_module(user=kusername, book=kbook, module=kmodule)
 
@@ -670,7 +677,7 @@ class ModuleResource(ModelResource):
                     update_module_proficiency(user_data, request.POST['module'], None)
 
                     #Module proficiency response
-                    if BookModuleExercise.objects.filter(book=kbook, module=kmodule).count() == 0:
+                    if BookModuleExercise.components.filter(book=kbook, module=kmodule).count() == 0:
                         response[kmodule.name] = False
                     else:
                         response[kmodule.name] = user_module.is_proficient_at()

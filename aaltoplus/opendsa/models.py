@@ -100,13 +100,30 @@ class Module(models.Model):
      #function that returns list of id of exercises we get it from BookModuleExercise table
      #will be compared to student list of proficiency exercises
      def get_proficiency_model(self, book):
-         if BookModuleExercise.objects.filter(book=book,module=self).count()==0:
+         if BookModuleExercise.components.filter(book=book,module=self).count()==0:
              return None
          else:
              ex_id_list = []
-             for bme in  BookModuleExercise.objects.filter(book=book,module=self):
+             for bme in  BookModuleExercise.components.filter(book=book,module=self):
                  ex_id_list.append(int(bme.exercise.id))
              return ex_id_list
+
+#manager to get book's modules and exercise
+class ModuleExerciseManager(models.Manager):
+    def get_query_set(self):
+        return super(ModuleExerciseManager,self).get_query_set()
+
+    def get_module_list(self, book):
+        module_list =[]
+        for bme in super(ModuleExerciseManager,self).get_query_set().filter(book=book):
+            module_list.append(bme.module)
+        return module_list
+
+    def get_exercise_list(self, book):
+        exercise_list =[]
+        for bme in super(ModuleExerciseManager,self).get_query_set().filter(book=book):
+            exercise_list.append(bme.exercise)
+        return exercise_list 
 
 
 
@@ -117,6 +134,8 @@ class BookModuleExercise (models.Model):
     exercise = models.ForeignKey(Exercise)
     #points the exercise is worth
     points = models.DecimalField(default = 0, max_digits=5, decimal_places=2)
+    #reference to manager 
+    components = ModuleExerciseManager()
     class Meta:
         unique_together = (("book","module", "exercise"),)
 
