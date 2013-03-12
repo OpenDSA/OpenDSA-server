@@ -106,32 +106,18 @@ class Module(models.Model):
              else:
                  self.exercise_list += ',%s' %exid
 
-     #function that returns list of id of exercises
+     #function that returns list of id of exercises we get it from BookModuleExercise table
      #will be compared to student list of proficiency exercises 
-     def get_proficiency_model(self):
-         if self.exercise_list != None and len(self.exercise_list)>1: 
-            ex_list = self.exercise_list.split(',') 
-            ex_id_list = []
-            for ex in ex_list:
-                if len(Exercise.objects.filter(id = ex))==1:
-                    #ex_id = Exercise.objects.get(name=ex)
-                    ex_id_list.append(int(ex))
-                #else:
-                #    ex_id_list.append(0)
-            return ex_id_list
-         return None
+     def get_proficiency_model(self, book):
+         if BookModuleExercise.objects.filter(book=book,module=self).count()==0:
+             return None
+         else:
+             ex_id_list = []
+             for bme in  BookModuleExercise.objects.filter(book=book,module=self):
+                 ex_id_list.append(int(bme.exercise.id))
+             return ex_id_list
+         
 
-     def get_required_exercises(self):
-         if self.exercise_list != None and len(self.exercise_list)>0:
-            ex_list = self.exercise_list.split(',')
-            ex_id_list = []
-            for ex in ex_list:
-                if ex.isdigit():
-                    if len(Exercise.objects.filter(id= ex))==1:
-                        ex_ = Exercise.objects.get(id=ex)
-                        ex_id_list.append(ex_)
-            return ex_id_list
-         return []  
 
 
 #A table to hold Book, modules , exercises data

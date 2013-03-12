@@ -156,11 +156,15 @@ class ExerciseResource(ModelResource):
         # TODO: In this version, only GET requests are accepted and no 
         # permissions are checked.
         allowed_methods = ['get']
-        authentication  = OpendsaAuthentication()   #Authentication()
+        authentication  = Authentication()   
         authorization   = ReadOnlyAuthorization()
         filtering = {
             'name': ('exact',), 
         }
+
+    def get_object_list(self, request):
+        return super(ExerciseResource, self).get_object_list(request)
+
  
 
 class UserexerciseResource(ModelResource):
@@ -576,7 +580,7 @@ class ModuleResource(ModelResource):
                         with transaction.commit_on_success():
                             kexercise, added = Exercise.objects.get_or_create(name= mod_exe['exercise'],covers="dsa",description= mod_exe['name'],ex_type= mod_exe['type'],streak= mod_exe['threshold'])     
                         #add exercise to module proficiency model
-                        if mod_exe['required'] and (kexercise.id not in kmodule.get_required_exercises()):
+                        if mod_exe['required'] and (kexercise.id not in kmodule.get_proficiency_model(kbook)):
                             kmodule.add_required_exercise(kexercise.id) #exercise_list += "%s," %kexercise.id
                             kmodule.save()
                     else:
