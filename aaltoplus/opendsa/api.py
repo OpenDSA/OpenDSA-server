@@ -32,6 +32,7 @@ from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_refe
 # Key generation and verification
 import hmac
 import datetime
+import time
 try:
     from hashlib import sha1
 except ImportError:
@@ -236,6 +237,39 @@ class ExerciseResource(ModelResource):
         }
 
     def get_object_list(self, request):
+        #Store KA exercise content load in UserButton table
+        if request.GET['key']:
+            kusername = get_username(request.GET['key'])
+        if kusername:
+            if  Exercise.objects.filter(name=request.GET['name']).count()==1:
+                kexercise = Exercise.objects.get(name=request.GET['name'])
+
+                with transaction.commit_on_success():
+                    kbook = Books.objects.get(book_name= request.GET['book'])
+                    user_data, created = UserData.objects.get_or_create(user=kusername,book=kbook)
+                module = get_module(request.GET['module'])
+
+                if kexercise and module:
+                    with transaction.commit_on_success():
+                        user_module, exist =  UserModule.objects.get_or_create(user=kusername, book=kbook,module=module)
+                    text = 'User loaded %s exercise' %request.GET['name']  
+                    user_button,correct = log_button_action(
+                        kusername,
+                        kexercise,
+                        module,
+                        kbook,
+                        'Load KA Exercise',
+                        text,
+                        time.time()*1000,
+                        None,
+                        request.user_agent.browser.family,
+                        request.user_agent.browser.version_string,
+                        request.user_agent.os.family,
+                        request.user_agent.os.version_string,
+                        request.user_agent.device.family,
+                        request.META['REMOTE_ADDR'],
+                        )
+
         return super(ExerciseResource, self).get_object_list(request)
 
 
@@ -593,7 +627,7 @@ class ModuleResource(ModelResource):
                     else:
                         # Update existing exercise
                         with transaction.commit_on_success():
-                            kexercise = get_exercise(name=mod_exe['exercise'])
+                            kexercise = get_exercise(mod_exe['exercise'])
                             kexercise.covers="dsa"
                             kexercise.description=mod_exe['name']
                             kexercise.ex_type=mod_exe['type']
@@ -612,8 +646,8 @@ class ModuleResource(ModelResource):
                     else:
                         u_prog = 0
 
-                    #Link exercise to module and books
-                    if BookModuleExercise.objects.filter(book=kbook, module kmodule, exercise=kexercise).count() == 0:
+                    #Link exercise to module and books only if the exercise is required
+                    if BookModuleExercise.objects.filter(book=kbook, module=kmodule, exercise=kexercise).count() == 0 and mod_exe['required']:
                         with transaction.commit_on_success():
                             bme = models.BookModuleExercise(book=kbook, module=kmodule, exercise=kexercise, points=mod_exe['points'])
                             bme.save()
