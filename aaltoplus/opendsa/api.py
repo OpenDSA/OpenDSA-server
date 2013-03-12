@@ -178,7 +178,7 @@ class UserResource(ModelResource):
         resource_name   = 'users'
         excludes        = []
         serializer = Serializer(formats=['json'])
-        
+
     def override_urls(self):
         return [
             url(r"^(?P<resource_name>%s)/login%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('login'), name="api_signin"),
@@ -229,11 +229,15 @@ class ExerciseResource(ModelResource):
         # TODO: In this version, only GET requests are accepted and no
         # permissions are checked.
         allowed_methods = ['get']
-        authentication  = OpendsaAuthentication()   #Authentication()
+        authentication  = Authentication()
         authorization   = ReadOnlyAuthorization()
         filtering = {
             'name': ('exact',),
         }
+
+    def get_object_list(self, request):
+        return super(ExerciseResource, self).get_object_list(request)
+
 
 
 class UserexerciseResource(ModelResource):
@@ -271,7 +275,7 @@ class UserexerciseResource(ModelResource):
             kusername = get_username(request.POST['key'])
             kexercise = Exercise.objects.get(name=request.POST['exercise'])
             user_exercise = get_user_exercise(kusername, kexercise)
-            
+
             if user_exercise is not None:
                 return self.create_response(request, {'progress': user_exercise.progress})
         return self.create_response(request, {'progress': 0})
@@ -280,7 +284,7 @@ class UserexerciseResource(ModelResource):
         print request.POST
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
-            
+
         if kusername:
             actions = simplejson.loads(request.POST['actions'])
             number_logs = 0
@@ -323,7 +327,7 @@ class UserexerciseResource(ModelResource):
                         )
                     if correct:
                         number_logs += 1
-            
+
             if number_logs == len(actions):
                 return self.create_response(request, {'success': True, 'message': 'all button action logged'})
             else:
@@ -336,20 +340,20 @@ class UserexerciseResource(ModelResource):
             kusername = get_username(request.POST['key'])
             dsa_book = get_book(request.POST['book'])
             kexercise = get_exercise(request.POST['exercise'])
-            
+
             if kusername and kexercise:
                 user_exercise = get_user_exercise(kusername, kexercise)
-              
+
                 # Create a new UserExercise object if necessary
                 if user_exercise is None:
                     with transaction.commit_on_success():
                         user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0, first_done=date_from_timestamp(int(request.POST['tstamp'])))
             else:
                 return self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized)
-            
+
             with transaction.commit_on_success():
                 user_data, created = UserData.objects.get_or_create(user=kusername, book=dsa_book)
-            
+
             ubook = get_user_book(kusername, dsa_book)
             module = get_module(request.POST['module'])
             if user_exercise and ubook:
@@ -376,20 +380,20 @@ class UserexerciseResource(ModelResource):
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
             kexercise = get_exercise(request.POST['sha1'])
-            
+
             if kusername and kexercise:
                 user_exercise = get_user_exercise(kusername, kexercise)
             else:
                 return self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized)
-            
+
             dsa_book = get_book(request.POST['book'])
             ubook = get_user_book(kusername, dsa_book)
-            
+
             with transaction.commit_on_success():
                 user_data, created = UserData.objects.get_or_create(user=kusername, book=dsa_book)
-            
+
             module = get_module(request.POST['module_name'])
-            
+
             if user_exercise and ubook:
                 bme = BookModuleExercise.objects.filter(book=ubook.book, module=module, exercise=kexercise)[0]
                 user_exercise,correct = attempt_problem(
@@ -404,7 +408,7 @@ class UserexerciseResource(ModelResource):
                     bme.points,
                     request.META['REMOTE_ADDR'],
                     )
-                  
+
                 if correct:
                     print jsonpickle.encode(user_exercise)
                     return  self.create_response(request, jsonpickle.encode(user_exercise))
@@ -416,7 +420,7 @@ class UserexerciseResource(ModelResource):
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
             kexercise = get_exercise(request.POST['sha1'])
-            
+
             if kusername and kexercise:
                  if UserExercise.objects.filter(user=kusername, exercise=kexercise).count()==0:
                     user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
@@ -424,15 +428,15 @@ class UserexerciseResource(ModelResource):
                     user_exercise = UserExercise.objects.get(user=kusername, exercise=kexercise)
             else:
                 return  self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized)
-            
+
             dsa_book = get_book(request.POST['book'])
             ubook = get_user_book(kusername, dsa_book)
-            
+
             with transaction.commit_on_success():
                 user_data, created = UserData.objects.get_or_create(user=kusername,book=dsa_book)
-            
+
             module = get_module(request.POST['module_name'])
-            
+
             if user_exercise and ubook:
                 bme = BookModuleExercise.objects.filter(book=ubook.book, module=module, exercise=kexercise)[0]
 
@@ -448,7 +452,7 @@ class UserexerciseResource(ModelResource):
                     bme.points,
                     request.META['REMOTE_ADDR'],
                     )
-                    
+
                 if correct:
                     print jsonpickle.encode(user_exercise)
                     return  self.create_response(request, jsonpickle.encode(user_exercise) )
@@ -511,9 +515,9 @@ class UserDataResource(ModelResource):
             kusername = get_username(request.POST['key'])
             kexercise = get_exercise(request.POST['exercise'])
             dsa_book = get_book(request.POST['book'])
-            
+
             user_data = UserData.objects.filter(user=kusername, book=dsa_book)[0]
-            
+
             if kexercise:
                 return self.create_response(request, {'proficient': user_data.is_proficient_at(kexercise)})
         return self.create_response(request, {'proficient': False})
@@ -523,7 +527,7 @@ class UserDataResource(ModelResource):
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
             dsa_book = get_book(request.POST['book'])
-            
+
             if kusername:
                 return self.create_response(request, student_grade_all(kusername, dsa_book))
         return self.create_response(request, {'grade': False})
@@ -553,12 +557,12 @@ class ModuleResource(ModelResource):
     def loadmodule(self, request, **kwargs):
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
-            
+
             if kusername:
                 response = {}
                 #get or create Book & link a book to user
                 kbook = get_book(request.POST['book'])
-                
+
                 if kbook is None:
                     with transaction.commit_on_success():
                         kbook, added = Books.objects.get_or_create(book_name= request.POST['book'], book_url = request.POST['url'])
@@ -566,15 +570,15 @@ class ModuleResource(ModelResource):
                 else:
                     #link a book to user
                     ubook = get_user_book(kusername, kbook)
-                    
+
                     if ubook is None:
                          with transaction.commit_on_success():
                              ubook, created = UserBook.objects.get_or_create(user=kusername, book=kbook)
-                             
+
                 #get or create module
                 kmodule = get_module(request.POST['module'])
                 response[kmodule.name] = False
-                
+
                 #get or create exercises
                 mod_exes = simplejson.loads(request.POST['exercises'])
                 print mod_exes
@@ -592,14 +596,14 @@ class ModuleResource(ModelResource):
                             kexercise.ex_type=mod_exe['type']
                             kexercise.streak=Decimal(mod_exe['threshold'])
                             kexercise.save()
-                            
+
                     if UserData.objects.filter(user=kusername,book=kbook).count() > 0:
                         user_data = UserData.objects.get(user=kusername, book=kbook)
                         u_prof = user_data.is_proficient_at(kexercise)
-                        
+
                     #check student progress -- KA exercises
                     user_exercise = get_user_exercise(user=kusername, exercise=kexercise)
-                    
+
                     if user_exercise is not None:
                         u_prog = user_exercise.progress
                     else:
@@ -622,9 +626,9 @@ class ModuleResource(ModelResource):
                 if user_module is not None:
                     with transaction.commit_on_success():
                         user_data, created = UserData.objects.get_or_create(user=kusername,book = kbook)
-                        
+
                     update_module_proficiency(user_data, request.POST['module'], None)
-                    
+
                     #Module proficiency response
                     if BookModuleExercise.objects.filter(book=kbook, module=kmodule).count() == 0:
                         response[kmodule.name] = False
@@ -661,14 +665,14 @@ class UserModuleResource(ModelResource):
             kmodule = get_module(request.POST['module'])
             kbook = get_book(request.POST['book'])
             user_module = get_user_module(kusername, kbook, kmodule)
-            
+
             if user_module is not None:
                 with transaction.commit_on_success():
                     user_data, created = UserData.objects.get_or_create(user=kusername, book=kbook)
-                
+
                 update_module_proficiency(user_data, request.POST['module'], None)
                 return self.create_response(request, {'proficient': user_module.is_proficient_at()})
-            
+
             return self.create_response(request, {'proficient': False})
         return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
 

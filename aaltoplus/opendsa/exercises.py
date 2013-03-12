@@ -89,7 +89,7 @@ def student_grade_all(user, book):
 def update_module_proficiency(user_data, module, exercise):
     
     db_module = Module.objects.get(name=module)
-    module_ex_list = db_module.get_proficiency_model()  # exercise_list.split(',')   #get_proficiency_model() 
+    module_ex_list = db_module.get_proficiency_model(user_data.book)   
     user_prof = user_data.get_prof_list()
     with transaction.commit_on_success(): 
         user_module, exist =  UserModule.objects.get_or_create(user=user_data.user,book = user_data.book, module=db_module)
