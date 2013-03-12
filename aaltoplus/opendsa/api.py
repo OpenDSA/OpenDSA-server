@@ -196,7 +196,8 @@ class UserResource(ModelResource):
             if user.is_active:
                 login(request, user)
                 hash_key = create_key(username)
-                user_key, created = ApiKey.objects.get_or_create(user=user)
+                with transaction.commit_on_success():
+                    user_key, created = ApiKey.objects.get_or_create(user=user)
                 user_key.key = hash_key
                 user_key.save()
                 return self.create_response(request, {'success': True, 'key':hash_key })
@@ -419,7 +420,8 @@ class UserexerciseResource(ModelResource):
                 user_exercise = get_user_exercise(kusername, kexercise)
                 
                 if user_exercise is None:
-                  user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
+                    with transaction.commit_on_success():
+                        user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
             else:
                 return self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized)
 
@@ -459,10 +461,11 @@ class UserexerciseResource(ModelResource):
             kexercise = get_exercise(request.POST['sha1'])
 
             if kusername and kexercise:
-                 if UserExercise.objects.filter(user=kusername, exercise=kexercise).count()==0:
-                    user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
-                 else:
-                    user_exercise = UserExercise.objects.get(user=kusername, exercise=kexercise)
+                user_exercise = get_user_exercise(kusername, kexercise)
+                
+                if user_exercise is None:
+                    with transaction.commit_on_success():
+                        user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
             else:
                 return  self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized)
 
