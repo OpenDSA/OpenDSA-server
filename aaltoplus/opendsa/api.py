@@ -24,7 +24,6 @@ from django.contrib.sessions.models import Session
 from django.http import HttpResponse
 from django.db import transaction, IntegrityError
 import jsonpickle
-from urlparse import urlparse, parse_qs
 
 from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, \
                       attempt_problem_pe, update_module_proficiency, student_grade_all, date_from_timestamp
