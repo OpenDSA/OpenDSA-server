@@ -677,10 +677,7 @@ class ModuleResource(ModelResource):
                     update_module_proficiency(user_data, request.POST['module'], None)
 
                     #Module proficiency response
-                    if BookModuleExercise.components.filter(book=kbook, module=kmodule).count() == 0:
-                        response[kmodule.name] = False
-                    else:
-                        response[kmodule.name] = user_module.is_proficient_at()
+                    response[kmodule.name] = user_module.is_proficient_at()
                 return self.create_response(request, response)
         return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
 
