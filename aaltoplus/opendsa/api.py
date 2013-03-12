@@ -259,7 +259,7 @@ class ExerciseResource(ModelResource):
                         kexercise,
                         module,
                         kbook,
-                        'Load KA Exercise',
+                        'load-ka',
                         text,
                         time.time()*1000,
                         None,
@@ -646,19 +646,19 @@ class ModuleResource(ModelResource):
 
                     if user_exercise is not None:
                         u_prog = user_exercise.progress
+                        if user_exercise.is_proficient() and not user_data.is_proficient_at(kexercise):
+                            user_data.earned_proficiency(kexercise.id)
+                            user_data.save() 
+                            u_prof = True
                     else:
                         u_prog = 0
-
+                    
                     #Link exercise to module and books only if the exercise is required
                     if BookModuleExercise.objects.filter(book=kbook, module=kmodule, exercise=kexercise).count() == 0 and mod_exe['required']:
                         with transaction.commit_on_success():
                             bme = models.BookModuleExercise(book=kbook, module=kmodule, exercise=kexercise, points=mod_exe['points'])
                             bme.save()
 
-                    #exercise proficiency response
-                    if BookModuleExercise.objects.filter(book=kbook, exercise=kexercise).count() == 0:
-                        u_prof = False
-                        u_prog = 0
                     response[kexercise.name] = {'proficient': u_prof, 'progress': u_prog}
                 #check module proficiency
                 user_module = get_user_module(user=kusername, book=kbook, module=kmodule)

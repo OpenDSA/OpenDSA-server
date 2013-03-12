@@ -203,12 +203,10 @@ class UserData(models.Model):
     def is_proficient_at(self, exid):
         if self.all_proficient_exercises is None or len(self.all_proficient_exercises)==0:
             return False
-        prof_ex =[]
         for ex in self.all_proficient_exercises.split(','):
-            if ex.isdigit():
-              number = int(ex)
-              prof_ex.append(int(ex))
-        return (exid.id in prof_ex)
+            if ex.isdigit() and int(ex) == exid.id:
+                return True  
+        return False
 
     def has_started(self, exid):
         if self.started_exercises is None or len(self.started_exercises)==0:
