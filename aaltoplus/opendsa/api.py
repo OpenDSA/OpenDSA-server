@@ -253,7 +253,7 @@ class ExerciseResource(ModelResource):
                 if kexercise and module:
                     with transaction.commit_on_success():
                         user_module, exist =  UserModule.objects.get_or_create(user=kusername, book=kbook,module=module)
-                    text = 'User loaded %s exercise' %request.GET['name']  
+                    text = 'User loaded %s exercise' %request.GET['name']
                     user_button,correct = log_button_action(
                         kusername,
                         kexercise,
@@ -418,7 +418,7 @@ class UserexerciseResource(ModelResource):
 
             if kusername and kexercise:
                 user_exercise = get_user_exercise(kusername, kexercise)
-                
+
                 if user_exercise is None:
                     with transaction.commit_on_success():
                         user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
@@ -462,7 +462,7 @@ class UserexerciseResource(ModelResource):
 
             if kusername and kexercise:
                 user_exercise = get_user_exercise(kusername, kexercise)
-                
+
                 if user_exercise is None:
                     with transaction.commit_on_success():
                         user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
@@ -650,11 +650,11 @@ class ModuleResource(ModelResource):
                         u_prog = user_exercise.progress
                         if user_exercise.is_proficient() and not user_data.is_proficient_at(kexercise):
                             user_data.earned_proficiency(kexercise.id)
-                            user_data.save() 
+                            user_data.save()
                             u_prof = True
                     else:
                         u_prog = 0
-                    
+
                     #Link exercise to module and books only if the exercise is required
                     if BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=kexercise).count() == 0 and mod_exe['required']:
                         with transaction.commit_on_success():
@@ -663,8 +663,8 @@ class ModuleResource(ModelResource):
                     response[kexercise.name] = {'proficient': u_prof, 'progress': u_prog}
 
                 # Remove exercises that are no longer part of this book / module
-                for exer in BookModuleExercise.components.get_exercise_list(kbook):                         
-                  if exer not in exers_:                                   
+                for exer in BookModuleExercise.components.get_exercise_list(kbook):
+                  if exer not in exers_:
                     BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=exer).delete()
 
                 #check module proficiency
