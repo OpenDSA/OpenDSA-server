@@ -639,7 +639,7 @@ class ModuleResource(ModelResource):
                             kexercise.save()
                     #add exercise in list of module exercises
                     exers_.append(kexercise)
-                    if UserData.objects.filter(user=kusername,book=kbook).count() > 0:
+                    if UserData.objects.filter(user=kusername, book=kbook).count() > 0:
                         user_data = UserData.objects.get(user=kusername, book=kbook)
                         u_prof = user_data.is_proficient_at(kexercise)
 
