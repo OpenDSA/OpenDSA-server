@@ -402,7 +402,6 @@ class UserexerciseResource(ModelResource):
                     request.POST['total_time'],   #time_taken
                     kexercise.streak, #threshold
                     Decimal(request.POST['score']), #score
-                    bme.points,  #request.POST['points'],
                     request.POST['module'],
                     request.META['REMOTE_ADDR'],
                     )
@@ -444,7 +443,6 @@ class UserexerciseResource(ModelResource):
                     int(request.POST['time_taken']),
                     request.POST['attempt_content'],
                     request.POST['module_name'],
-                    bme.points,
                     request.META['REMOTE_ADDR'],
                     )
 
@@ -489,7 +487,6 @@ class UserexerciseResource(ModelResource):
                     int(request.POST['time_taken']),
                     request.POST['attempt_content'],
                     request.POST['module_name'],
-                    bme.points,
                     request.META['REMOTE_ADDR'],
                     )
 

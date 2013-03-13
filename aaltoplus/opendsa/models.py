@@ -202,7 +202,6 @@ class UserData(models.Model):
     # ids of all exercises in which the user is proficient
     all_proficient_exercises = models.TextField()
 
-    points = models.DecimalField(default = 0, max_digits=5, decimal_places=2)
     class Meta:
        unique_together = (("user", "book"),)
 
@@ -253,8 +252,6 @@ class UserData(models.Model):
               start_ex.append(int(ex))
         return start_ex
 
-    def add_points(self, points):
-        self.points += points
 
 
 

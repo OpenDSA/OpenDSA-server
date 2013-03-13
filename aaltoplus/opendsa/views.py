@@ -4,6 +4,7 @@ import json
 import csv
 import array 
 from collections import OrderedDict
+from decimal import *
 
 # A+ 
 from userprofile.models import UserProfile 
@@ -44,7 +45,9 @@ def is_authorized(user, book, course):
 def exercise_summary(request, book, course): 
     if is_authorized(request.user,book,course): 
         obj_book = Books.objects.get(book_name=book)
+        #we create 2 lists the same size: one for all the exercises in the book and one containing exercise points
         exercises = []
+        exercises_points_list =[]
         BookModExercises = BookModuleExercise.components.select_related().filter(book=obj_book) 
         exercise_table = {}
         #we preparing the data for datatables jquery plugin
@@ -56,15 +59,16 @@ def exercise_summary(request, book, course):
 
         for bookmodex in BookModExercises:
             exercises.append(bookmodex.exercise)
+            exercises_points_list.append(bookmodex.points)
             columns_list.append({"sTitle":str(bookmodex.exercise.name)+'<span class="details" style="display:inline;" data-type="'+str(bookmodex.exercise.description)+'"></span>',"sClass": "center" }) 
         #remove duplicates
         exercises = list(OrderedDict.fromkeys(exercises))
         userData = UserData.objects.select_related().order_by('user').filter(book=obj_book)
         users = []
         for userdata in userData:
+            u_points = 0
             u_data = [] 
             u_data.append(str(userdata.user.username))
-            u_data.append(float(userdata.points))
             values = ['--<span class="details" style="display:inline;" data-type="Not Started"></span>' for j in range(len(exercises))]
             prof_ex = userdata.get_prof_list()
             started_ex = userdata.get_started_list()
@@ -74,12 +78,15 @@ def exercise_summary(request, book, course):
                     #get detailed information
                     u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
                     values[exercises.index(exercise_t)]= 'Done<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+                    u_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
+                     
             for s_ex in started_ex:
                 if Exercise.objects.get(id=s_ex) in exercises and s_ex not in  prof_ex:   
                     exercise_t = Exercise.objects.get(id=s_ex)
                     #get detailed information
                     u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
                     values[exercises.index(exercise_t)]= 'Started<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+            u_data.append(float(u_points))
             u_data = u_data + values
             udata_list.append(u_data)
         context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list}) 

@@ -122,7 +122,7 @@ def update_module_proficiency(user_data, module, exercise):
 
 
 def attempt_problem(user_data, user_exercise, attempt_number,
-    completed, count_hints, time_taken, attempt_content, module, points,
+    completed, count_hints, time_taken, attempt_content, module,   
     ip_address):
 
     if user_exercise:   # and user_exercise.belongs_to(user_data):
@@ -171,7 +171,6 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                                 user_data.all_proficient_exercises += "%s" %user_exercise.exercise.id
                             else:
                                 user_data.all_proficient_exercises += ",%s" %user_exercise.exercise.id
-                            user_data.points += points
             else:
                 user_exercise.total_done += 1
                 user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)
@@ -196,7 +195,8 @@ def attempt_problem(user_data, user_exercise, attempt_number,
 
 
 def attempt_problem_pe(user_data, user_exercise, attempt_number,
-    completed, submit_time, time_taken, threshold, score, points, module, ip_address):
+    completed, submit_time, time_taken, threshold, score,      
+    module, ip_address):
 
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         dt_now =  date_from_timestamp(submit_time)   #datetime.datetime.now()
@@ -226,15 +226,12 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
         value = False
         proficient = user_data.is_proficient_at(user_exercise.exercise)
         if problem_log.correct:
-                #problem_log.points_earned = points
-                user_data.points += points
                 user_exercise.total_correct += 1
                 user_exercise.longest_streak = 0 #max(user_exercise.longest_streak, total)
                 value = True
                 if not proficient:
                     problem_log.earned_proficiency =  user_exercise.update_proficiency_pe(correct=True,ubook=user_data.book)
                     user_data.earned_proficiency(exercise.id)
-                    user_data.add_points(points)
                     user_data.save()
         problem_log.save()
         user_exercise.save()
