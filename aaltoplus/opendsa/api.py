@@ -95,7 +95,7 @@ def get_exercise(exercise):
 def get_user_book(user, book):
     if UserBook.objects.filter(user=user, book=book).count() == 1:
         ubook = UserBook.objects.get(user=user, book=book)
-    elif Books.objects.filter(user=user, book=book).count() > 1:
+    elif UserBook.objects.filter(user=user, book=book).count() > 1:
         ubook = UserBook.objects.filter(user=user, book=book)[0]
     else:
         ubook = None
