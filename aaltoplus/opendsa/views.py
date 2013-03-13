@@ -45,7 +45,7 @@ def exercise_summary(request, book, course):
     if is_authorized(request.user,book,course): 
         obj_book = Books.objects.get(book_name=book)
         exercises = []
-        BookModExercises = BookModuleExercise.objects.select_related().filter(book=obj_book) 
+        BookModExercises = BookModuleExercise.components.select_related().filter(book=obj_book) 
         exercise_table = {}
         #we preparing the data for datatables jquery plugin
         #List containing users data: [["username","points","exercise1 score", "exercise1 score",...]]
@@ -104,7 +104,7 @@ class exerciseProgress:
 @login_required
 def progress_summary(request):
         exercises = []
-        BookModExercises = BookModuleExercise.objects.order_by('book', 'module').all()
+        BookModExercises = BookModuleExercise.components.order_by('book', 'module').all()
         for bookmodex in BookModExercises:
                 exercises.append(bookmodex.exercise)
 
@@ -242,7 +242,7 @@ def student_activity(request, student, book):
     book = Books.objects.get(book_name=book)
     user = User.objects.get(username=student)
     userExercs = UserExercise.objects.filter(user=user) #GetUserExerciseByUserId(userId)
-    BookModExercises = BookModuleExercise.objects.select_related().filter(book=book)
+    BookModExercises = BookModuleExercise.components.select_related().filter(book=book)
     userDataObjects = UserData.objects.get(user=user,book=book)  #GetUserDataByUserId(userId)
     UserModules = UserModule.objects.select_related().filter(user=user,book=book)
     modules = []
@@ -299,7 +299,7 @@ def module_list(request, student, book):
         	
 	
 	userExercs = UserExercise.objects.filter(user=user) #GetUserExerciseByUserId(userId)
-        BookModExercises = BookModuleExercise.objects.select_related().filter(book=book)
+        BookModExercises = BookModuleExercise.components.select_related().filter(book=book)
 	userDataObjects = UserData.objects.get(user=user,book=book)  #GetUserDataByUserId(userId)
 
 	#for userdata in userDataObjects:
