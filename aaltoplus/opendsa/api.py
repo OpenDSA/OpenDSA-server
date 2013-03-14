@@ -392,7 +392,6 @@ class UserexerciseResource(ModelResource):
             ubook = get_user_book(kusername, dsa_book)
             module = get_module(request.POST['module'])
             if user_exercise and ubook:
-                bme = BookModuleExercise.components.filter(book=ubook.book, module=module, exercise=kexercise)[0]
                 user_exercise,correct = attempt_problem_pe(
                     user_data,
                     user_exercise,
@@ -433,7 +432,6 @@ class UserexerciseResource(ModelResource):
             module = get_module(request.POST['module_name'])
 
             if user_exercise and ubook:
-                bme = BookModuleExercise.components.filter(book=ubook.book, module=module, exercise=kexercise)[0]
                 user_exercise,correct = attempt_problem(
                     user_data,  #kusername,
                     user_exercise,
