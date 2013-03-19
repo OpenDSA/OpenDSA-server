@@ -123,7 +123,7 @@ def update_module_proficiency(user_data, module, exercise):
 
 def attempt_problem(user_data, user_exercise, attempt_number,
     completed, count_hints, time_taken, attempt_content, module,   
-    ip_address):
+    ex_question, ip_address):
 
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         dt_now = datetime.datetime.now()
@@ -139,6 +139,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 hint_used=int(count_hints) > 0,
                 correct=str2bool(completed) and not str2bool(count_hints) and (int(attempt_number) == 1),
                 count_attempts=attempt_number,
+                ex_question=ex_question,
                 ip_address=ip_address,
         )
 

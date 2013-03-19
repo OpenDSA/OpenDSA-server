@@ -432,6 +432,9 @@ class UserexerciseResource(ModelResource):
             module = get_module(request.POST['module_name'])
 
             if user_exercise and ubook:
+                ex_question = request.POST['sha1']
+                if str(request.POST['problem_type'])!='0':
+                    ex_question = request.POST['non_summative']
                 user_exercise,correct = attempt_problem(
                     user_data,  #kusername,
                     user_exercise,
@@ -441,6 +444,7 @@ class UserexerciseResource(ModelResource):
                     int(request.POST['time_taken']),
                     request.POST['attempt_content'],
                     request.POST['module_name'],
+                    ex_question,
                     request.META['REMOTE_ADDR'],
                     )
 
