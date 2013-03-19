@@ -245,7 +245,7 @@ def log_button_action( user, exercise, module, book, name, description, action_t
     if device is None:
         device = 'PC'
     #update list of started exercises
-    user_data = UserData.objects.select_related().get(user = user,book=book)
+    user_data, created = UserData.objects.get_or_create(user = user,book=book)
     if not user_data.has_started(exercise):
         user_data.started(exercise.id)
     button_log = models.UserButton(
