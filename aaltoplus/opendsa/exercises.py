@@ -244,6 +244,10 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
 def log_button_action( user, exercise, module, book, name, description, action_time, uiid, browser_family, browser_version, os_family, os_version, device, ip_address):
     if device is None:
         device = 'PC'
+    #update list of started exercises
+    user_data = UserData.objects.select_related().get(user = user,book=book)
+    if not user_data.has_started(exercise):
+        user_data.started(exercise.id)
     button_log = models.UserButton(
                         user = user,
                         exercise = exercise,
