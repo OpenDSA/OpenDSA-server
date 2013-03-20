@@ -1,0 +1,43 @@
+<html>
+<head>
+  <title>Non-required Exercise Use Analysis</title>
+</head>
+
+<body>
+Non-required Exercise Use Analysis
+<table style="border: solid 1px black;">
+  <thead>
+    <tr>
+      <th></th>
+      {% for user_data in user_exer_data %}
+        <th style="border: solid 1px black;">{{ user_data }}</th>
+      {% endfor %} 
+    </tr>
+  </thead>
+  <tbody>
+  {% for exercise in exercises %} 
+    <tr >
+      <td style="border: solid 1px black;">{{ exercise.name }}</td>
+      {% for user_data, exer_data in user_exer_data.items %}
+        {% if exercise.id in exer_data.prof_exers %}
+          <td style="background-color: green"></td>
+        {% elif exercise.id in exer_data.started_exers %}
+          <td style="background-color: yellow"></td>
+        {% else %}
+          <td></td>
+        {% endif %}
+      {% endfor %} 
+    </tr>
+  {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <th>Total</th>
+      {% for user_data, exer_data in user_exer_data.items %}
+        <th style="border: solid 1px black;">{{ exer_data.prof_exers|length }} / {{ exer_data.started_exers|length }}</th>
+      {% endfor %} 
+    </tr>
+  </tfoot>
+</table>
+</body>
+</html>

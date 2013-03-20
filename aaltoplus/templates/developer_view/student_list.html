@@ -8,15 +8,15 @@
 Student List<br>
 <table style="border: solid 1px black;"> 
     <tr>
-    	<td style="border: solid 1px black;"> id </td>
-    	<td style="border: solid 1px black;"> user name </td>
-    	<td style="border: solid 1px black;"> email </td>
-    </tr>           
+      <td style="border: solid 1px black;"> id </td>
+      <td style="border: solid 1px black;"> user name </td>
+      <td style="border: solid 1px black;"> email </td>
+    </tr>
     {% for student in students %} 
     <tr>
-    	<td style="border: solid 1px black;">{{student.id}}</td>           
+      <td style="border: solid 1px black;">{{student.id}}</td>           
         <td style="border: solid 1px black;"><a href="./student_exercise/{{student.id}}/">{{ student.username }}</a></td>           
-    	<td style="border: solid 1px black;">{{student.email}}</td>           
+      <td style="border: solid 1px black;">{{student.email}}</td>           
     </tr>
     {% endfor %} 
 </table>

@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from userprofile.models import UserProfile 
  
 # OpenDSA 
-from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserSummary, ExerciseModule, UserExerciseLog, UserButton
+from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserSummary, ExerciseModule, UserExerciseLog, UserButton, UserData
  
 # Django
 from django.contrib.auth.decorators import login_required
@@ -16,11 +16,12 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import get_object_or_404, render_to_response 
 from django.http import HttpResponse, HttpResponseForbidden 
 from course.context import CourseContext 
+from collections import OrderedDict
+import time
 
 #exeStat class: exercise, and average proficiency score
 class exeStat:
     def __init__(self, exercise, score):
-        
         self.exercise = exercise
         self.score = score
 
@@ -28,7 +29,6 @@ class exeStat:
 #return the percentage of people that have achieved proficiency for each exercise
 @staff_member_required
 def exercises_stat(request):
-    
     userExercise = UserExercise.objects.order_by('exercise').all();
         
     temp = ''   
@@ -141,7 +141,7 @@ class proficient_exercises:
 
 @staff_member_required
 def student_exercise(request, student):
-    userButtons = UserButton.objects.filter(user=student).filter(name='document-ready')
+    userButtons = UserButton.objects.filter(user=student, name='document-ready')
 
     activities = []
     max = 0
@@ -189,21 +189,174 @@ def student_exercise(request, student):
     return render_to_response("developer_view/student_exercise.html", {'activities': activities, 'student': student, 'exercises': exercises, 'max': max })
 
 @staff_member_required
-def exercise_list(request, student, module):
-    userButtons = UserButton.objects.filter(user=student).filter(module=module)
+def exercise_list(request, student):
+  interesting_events = ['jsav-end', 'jsav-forward', 'jsav-array-click', 'odsa-award-credit']
+  
+  userButtons = UserButton.objects.filter(user=student, name__in=interesting_events).only('exercise', 'module', 'name', 'action_time').order_by('action_time')
+  
+  user_exercises = dict(UserExercise.objects.filter(user=student).values_list('exercise', 'proficient_date'))
+  
+  print userButtons.query
+  
+  exercises = OrderedDict()
+  
+  for userButton in userButtons:
+    if userButton.exercise.name not in exercises:
+      #print userButton.exercise
+      exercises[userButton.exercise.name] = {}
+      exercises[userButton.exercise.name]['id'] = userButton.exercise.id
+      exercises[userButton.exercise.name]['module'] = userButton.module.name
+      exercises[userButton.exercise.name]['type'] = userButton.exercise.ex_type
+      exercises[userButton.exercise.name]['start_time'] = userButton.action_time
+      if userButton.exercise.id in user_exercises:
+        exercises[userButton.exercise.name]['proficient_time'] = user_exercises[userButton.exercise.id]
+      else:
+        exercises[userButton.exercise.name]['proficient_time'] = ''
+  
+  #print [ u.exercise.name for u in userButtons]
+  #print exercises
+
+  return render_to_response("developer_view/exercise_list.html", {'exercises': exercises, 'student': student})
+
+@staff_member_required
+def non_required_exercise_use(request):
+  # Get all slideshow exercises (the ones that are not required)
+  exercises = Exercise.objects.filter(ex_type='ss')
+  exer_ids = [x.id for x in exercises]
+  
+  user_exer_data = OrderedDict()
+  
+  for user_data in UserData.objects.filter(book=5):
+    started_exer_ids = UserButton.objects.filter(user=user_data.user, exercise__ex_type='ss').values_list('exercise_id', flat=True)
     
-    exercises = []
+    # Eliminate duplicates
+    seen = set()
+    seen_add = seen.add
+    started_exer_ids = [ x for x in started_exer_ids if x not in seen and not seen_add(x)]
     
-    for userButton in userButtons:
-        flag = 0
-        for exercise in exercises:
-            if userButton.exercise == exercise:
-                flag = 1
-                break
-        if flag == 0 and not userButton.exercise.id == 50 :
-            exercises.append(userButton.exercise)
+    prof_exer_ids = []
+    
+    for exer_id in user_data.all_proficient_exercises.split(','):
+      if exer_id.isdigit() and long(exer_id) in exer_ids:
+        prof_exer_ids.append(int(exer_id))
+    
+    user_exer_data[user_data.user.id] = {}
+    user_exer_data[user_data.user.id]['started_exers'] = started_exer_ids
+    user_exer_data[user_data.user.id]['prof_exers'] = prof_exer_ids
+  
+  return render_to_response("developer_view/non_req_exercises.html", {'exercises': exercises, 'user_exer_data': user_exer_data})
+
+@staff_member_required
+def slideshow_cheating(request, student):
+  # Count of how many times the student completed each slideshow
+  exer_count = OrderedDict()
+  
+  # Maps an exercise ID to the uiid of the first instance of the exercise where the student obtained proficiency
+  exer_uiids = OrderedDict()
+  cheated_exer_names = []
+  
+  # Filter UserExerciseLog by user and slideshows where the user gained proficiency
+  # Possible to also limit by a time threshold (to reduce the number of results that require processing, but then we can't determine the total number of completions (time_taken__lte=2)
+  user_exercise_logs = UserExerciseLog.objects.filter(user=student, exercise__ex_type='ss', earned_proficiency=1).order_by('time_done').only('exercise', 'time_taken', 'count_attempts')
+  
+  #print user_exercise_logs.query
+  #print 'Count: ' + str(user_exercise_logs.count())
+  #print user_exercise_logs.values('id', 'time_taken')
+  
+  for uel in user_exercise_logs:
+    # We only care about the first time a user gets proficiency with an exercise
+    if uel.exercise.name not in exer_uiids.keys():
+      # Initialize the completion counter for the exercise
+      exer_count[uel.exercise.name] = 0
+      
+      # Get the uiid of the exercise instance where the user first obtained proficiency
+      exer_uiids[uel.exercise.name] = uel.count_attempts
+    
+    exer_count[uel.exercise.name] += 1
+    
+  # Load a single user's slideshow event data (limited to the exercises and uiids found above)
+  ss_events = UserButton.objects.filter(user=student, name__in=['jsav-forward', 'jsav-backward', 'jsav-begin', 'jsav-end'], exercise__name__in=exer_uiids.keys(), uiid__in=exer_uiids.values()).order_by('action_time')
+  
+  for exer_name, uiid in exer_uiids.items():
+    # Get the descriptions of events from a specific exercise instance
+    descriptions = ss_events.filter(exercise__name=exer_name, uiid=uiid).values_list('description', flat=True)
+    
+    print descriptions
+    
+    if len(descriptions) > 0:
+      # Parse the total number of slides from the description
+      num_slides = descriptions[0].split(' / ')[1]
+      
+      # Ensure every slide was viewed
+      for i in range(1, int(num_slides) + 1):
+        if str(i) + ' / ' + num_slides not in descriptions:
+          cheated_exer_names.append(exer_name)
+          print 'CHEAT'
+          break
+    
+    print '\n\n'
+  
+  return render_to_response("developer_view/slideshow_cheating.html", {'exer_count': exer_count, 'exer_uiids': exer_uiids, 'cheated_exer_names': cheated_exer_names})
+
+
+
+@staff_member_required
+def total_module_time(request):
+  events = ['document-ready', 'window-unload', 'window-blur', 'window-focus']
+  
+  user_data = OrderedDict()
+  
+  modules = []
+  
+  # Loop through all students
+  for ud in UserData.objects.filter(book__in=[5, 6]):
+    user_buttons = UserButton.objects.filter(user=ud.user, name__in=events).order_by('action_time')
+    
+    uid = ud.user.id
+    
+    user_data[uid] = {}
+    
+    for i in range(0, len(user_buttons)):
+      if user_buttons[i].name == 'document-ready':
+        mod_name = user_buttons[i].module.name
         
-    return render_to_response("developer_view/exercise_list.html", {'exercises': exercises, 'student': student, 'module':module })
+        if mod_name not in modules:
+          modules.append(mod_name)
+      
+        # Initialize the module time
+        if mod_name not in user_data[uid]:
+          user_data[uid][mod_name] = 0
+        
+        last_event_time = user_buttons[i].action_time
+        
+        # Look ahead for a matching 'window-unload' event, subtracting time when the module doesn't have focus
+        for j in range(i, len(user_buttons)):
+          if user_buttons[j].module.name == mod_name:
+            if user_buttons[j].name in ['window-blur', 'window-unload']:
+              # Calculate the difference (in seconds) between the time of this event and the previous one
+              user_data[uid][mod_name] += time.mktime(user_buttons[j].action_time.timetuple()) - time.mktime(last_event_time.timetuple())
+              
+              # Break out of the look-ahead loop when a matching 'window-unload' event has been found
+              if user_buttons[j].name == 'window-unload':
+                break
+            elif user_buttons[j].name == 'window-focus':
+              last_event_time = user_buttons[j].action_time
+  
+  return render_to_response("developer_view/total_module_time.html", {'modules': modules, 'user_data': user_data})
+
+    
+    
+    
+    
+        
+      
+  
+
+  # Loop through all users, for each user get UserButton objects document-ready and window-unload, for a document-ready object look ahead until a matching window-unload object is found
+  user_buttons = UserButton.objects.filter()
+  
+
+
 
 #class of detailed exercise steps
 class exercise_step:

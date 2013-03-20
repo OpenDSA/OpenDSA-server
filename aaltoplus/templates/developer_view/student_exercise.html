@@ -6,39 +6,39 @@
 <body>
 Module Loading Statistics
 <table style="border: solid 1px black;">
-    <tr>
-        <td style="border: solid 1px black;">Module Name</td>
-        <td style="border: solid 1px black;">No. of Loading</td>
-    </tr>
-    {% for activity in activities %} 
+  <tr>
+    <td style="border: solid 1px black;">Module Name</td>
+    <td style="border: solid 1px black;">No. of Loading</td>
+  </tr>
+  {% for activity in activities %} 
     <tr height=25>
-        <td style="border: solid 1px black;"><a href="/developer_view/exercise_list/{{student}}/{{activity.module.id}}/"> {{ activity.module.name }}</a> </td>
-        <td style="border: solid 1px black;">
+      <td style="border: solid 1px black;"><a href="/developer_view/exercise_list/{{student}}/"> {{ activity.module.name }}</a> </td>
+      <td style="border: solid 1px black;">
         <div style="width: {{activity.get_activity_num_print}}; background:green;"/> 
         <div> {{activity.activity_num}} </div>
-        </td>
+      </td>
     </tr>
-    {% endfor %} 
+  {% endfor %} 
 </table>
 <br>
 Proficiency Dates for Exercises
 <table style="border: solid 1px black;">
-    <tr>
-    {% for exercise in exercises %} 
-        <td align=center valign=bottom>
-        <div>{{exercise.number}}</div>
-        <div valign=bottom style="width: 200; height: {{exercise.get_number_print}}; background:#2E9AFE;"/>
+  <tr>
+  {% for exercise in exercises %} 
+    <td align=center valign=bottom>
+      <div>{{exercise.number}}</div>
+      <div valign=bottom style="width: 200; height: {{exercise.get_number_print}}; background:#2E9AFE;"/>
       {% for exe in exercise.exercises %} 
-         <a href="/developer_view/exercise_detail/{{student}}/{{exe.id}}/">{{exe.name}}</a> <br>
+        <a href="/developer_view/exercise_detail/{{student}}/{{exe.id}}/">{{exe.name}}</a> <br>
       {% endfor %}
-        </td>
-    {% endfor %} 
-    </tr>
-    <tr>
+    </td>
+  {% endfor %} 
+  </tr>
+  <tr>
     {% for exercise in exercises %} 
-        <td align=center>{{exercise.date}}</td>
+      <td align=center>{{exercise.date}}</td>
     {% endfor %} 
-    </tr>    
+  </tr>    
 </table>
 <a href="/developer_view/timeline_sum/{{student}}/">timeline</a>
 </body>

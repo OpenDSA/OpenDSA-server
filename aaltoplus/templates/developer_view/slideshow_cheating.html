@@ -1,0 +1,29 @@
+﻿<html>
+<head>
+  <title>Slideshow Cheating Analysis</title>
+</head>
+
+<body>
+
+<table style="border: solid 1px black;" class="sortable">
+  <thead>
+    <tr><th style="border: solid 1px black;">Exercise</th><th style="border: solid 1px black;">Times Completed</th><th style="border: solid 1px black;">Cheated to Get Proficiency</th></tr>
+  </thead>
+  <tbody>
+    {% for exer_name, exer_count in exer_count.items %}
+      <tr >
+        <td style="border: solid 1px black;">{{ exer_name }}</td>
+        <td style="border: solid 1px black;">{{ exer_count }}</td>
+        {% if exer_name in cheated_exer_names %}
+          <td style="border: solid 1px black; background-color: red"></td>
+        {% else %}
+          <td></td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+</body>
+</html>

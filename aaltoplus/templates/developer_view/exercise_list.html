@@ -1,16 +1,48 @@
 <html>
 <head>
-  <title>Module Summary & Exercise List</title>
+  <title>Exercise List</title>
+  <script>
+    <!-- /* HTML comments prevent tags in the JS file comments from ending the script block */
+    {% include "./developer_view/dist/sorttable.js" %}
+    -->
+  </script>
+  <style>
+    /* Sortable tables */
+    table.sortable thead {
+      background-color:#444;
+      color:#ccc;
+      font-weight: bold;
+      cursor: default;
+    }
+  </style>
 </head>
 
 <body>
-Exercise List
-<table style="border: solid 1px black;"> 
-    {% for exercise in exercises %} 
+<p>
+  <b>Instructions</b>: Click a column header to sort the table by that column
+</p>
+
+<table style="border: solid 1px black;" class="sortable">
+  <thead>
+    <tr><th>Exercise</th><th>Module</th><th>Type</th><th>Start Time</th><th>Proficient Time</th></tr>
+  </thead>
+  <tbody>
+    {% for exercise, exer_data in exercises.items %}
       <tr >
-        <td style="border: solid 1px black;"><a href="/developer_view/exercise_detail/{{student}}/{{exercise.id}}/">{{ exercise.name }}</a></td>        
+        <td style="border: solid 1px black;">
+          {% if exer_data.type != 'ka' %}
+            <a href="/developer_view/exercise_detail/{{student}}/{{exer_data.id}}/">{{ exercise }}</a>
+          {% else %}
+            {{ exercise }}
+          {% endif %}
+        </td>
+        <td style="border: solid 1px black;">{{ exer_data.module }}</td>
+        <td style="border: solid 1px black;">{{ exer_data.type }}</td>
+        <td style="border: solid 1px black;">{{ exer_data.start_time|date:"Y-m-d H:i:s" }}</td>
+        <td style="border: solid 1px black;">{{ exer_data.proficient_time|date:"Y-m-d H:i:s" }}</td>
       </tr>
-    {% endfor %} 
+    {% endfor %}
+  </tbody>
 </table>
 </body>
 </html>

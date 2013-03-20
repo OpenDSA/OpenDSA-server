@@ -1,0 +1,40 @@
+﻿<html>
+<head>
+  <title>Total Module Time</title>
+  <script>
+    <!-- /* HTML comments prevent tags in the JS file comments from ending the script block */
+    {% include "./developer_view/dist/sorttable.js" %}
+    -->
+  </script>
+</head>
+<body>
+<table style="border: solid 1px black;" class="sortable">
+  <thead>
+    <tr>
+      <th></th>
+      {% for user in user_data %}
+        <th style="border: solid 1px black;">{{ user }}</th>
+      {% endfor %} 
+    </tr>
+  </thead>
+  <tbody>
+  {% for module in modules %} 
+    <tr >
+      <td style="border: solid 1px black;">{{ module }}</td>
+      {% for user, time_data in user_data.items %}
+        {% if module in time_data %}
+          {% for mod_name, time in time_data.items %}
+            {% if mod_name == module %}
+              <td style="border: solid 1px black;">{{ time }}</td>
+            {% endif %}
+          {% endfor %} 
+        {% else %}
+          <td></td>
+        {% endif %}
+      {% endfor %} 
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</body>
+</html>
