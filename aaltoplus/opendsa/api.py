@@ -433,7 +433,7 @@ class UserexerciseResource(ModelResource):
 
             if user_exercise and ubook:
                 ex_question = request.POST['sha1']
-                if str(request.POST['problem_type'])!='0':
+                if 'non_summative' in request.POST:
                     ex_question = request.POST['non_summative']
                 user_exercise,correct = attempt_problem(
                     user_data,  #kusername,
