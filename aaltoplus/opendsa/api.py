@@ -616,6 +616,11 @@ class ModuleResource(ModelResource):
 
                 #get or create module
                 kmodule = get_module(request.POST['module'])
+                
+                if kmodule is None:
+                    with transaction.commit_on_success():
+                        kmodule, added = Module.objects.get_or_create(name=request.POST['module'])
+                
                 response[kmodule.name] = False
 
                 #get or create exercises
