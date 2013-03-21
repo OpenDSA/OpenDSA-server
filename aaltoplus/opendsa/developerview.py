@@ -248,12 +248,11 @@ def non_required_exercise_use(request):
 
 @staff_member_required
 def slideshow_cheating(request, student):
-  # Count of how many times the student completed each slideshow
-  exer_count = OrderedDict()
+  # Maps an exercise name to a dictionary which which stores the number of times a student completed the slideshow (key: 'completed' and the number of times they cheated on the slideshow ('cheated')
+  exer_data = OrderedDict()
   
-  # Maps an exercise ID to the uiid of the first instance of the exercise where the student obtained proficiency
-  exer_uiids = OrderedDict()
-  cheated_exer_names = []
+  # List of exercise names where the student cheated to obtain proficiency
+  cheated_for_prof_names = []
   
   # Filter UserExerciseLog by user and slideshows where the user gained proficiency
   # Possible to also limit by a time threshold (to reduce the number of results that require processing, but then we can't determine the total number of completions (time_taken__lte=2)
@@ -263,25 +262,25 @@ def slideshow_cheating(request, student):
   #print 'Count: ' + str(user_exercise_logs.count())
   #print user_exercise_logs.values('id', 'time_taken')
   
-  for uel in user_exercise_logs:
-    # We only care about the first time a user gets proficiency with an exercise
-    if uel.exercise.name not in exer_uiids.keys():
-      # Initialize the completion counter for the exercise
-      exer_count[uel.exercise.name] = 0
-      
-      # Get the uiid of the exercise instance where the user first obtained proficiency
-      exer_uiids[uel.exercise.name] = uel.count_attempts
-    
-    exer_count[uel.exercise.name] += 1
-    
   # Load a single user's slideshow event data (limited to the exercises and uiids found above)
-  ss_events = UserButton.objects.filter(user=student, name__in=['jsav-forward', 'jsav-backward', 'jsav-begin', 'jsav-end'], exercise__name__in=exer_uiids.keys(), uiid__in=exer_uiids.values()).order_by('action_time')
+  ss_events = UserButton.objects.filter(user=student, name__in=['jsav-forward', 'jsav-backward', 'jsav-begin', 'jsav-end']).order_by('action_time')
   
-  for exer_name, uiid in exer_uiids.items():
-    # Get the descriptions of events from a specific exercise instance
-    descriptions = ss_events.filter(exercise__name=exer_name, uiid=uiid).values_list('description', flat=True)
+  for uel in user_exercise_logs:
+    exer_name = uel.exercise.name
+    exer_uiid = uel.count_attempts
     
+    # Get the descriptions of events from a specific exercise instance
+    descriptions = ss_events.filter(exercise__name=exer_name, uiid=exer_uiid).values_list('description', flat=True)
     print descriptions
+    
+    # Initialize the completed and cheated counters for the exercise
+    if exer_name not in exer_data:
+      exer_data[exer_name] = OrderedDict()
+      exer_data[exer_name]['cheated'] = 0
+      exer_data[exer_name]['completed'] = 0
+    
+    # Increment the completed counter
+    exer_data[exer_name]['completed'] += 1
     
     if len(descriptions) > 0:
       # Parse the total number of slides from the description
@@ -290,13 +289,18 @@ def slideshow_cheating(request, student):
       # Ensure every slide was viewed
       for i in range(1, int(num_slides) + 1):
         if str(i) + ' / ' + num_slides not in descriptions:
-          cheated_exer_names.append(exer_name)
+          exer_data[exer_name]['cheated'] += 1
+          
+          # Record whether or not the user cheated the first time they obtained proficiency
+          if exer_data[exer_name]['completed'] == 1:
+            cheated_for_prof_names.append(exer_name)
+          
           print 'CHEAT'
           break
     
     print '\n\n'
   
-  return render_to_response("developer_view/slideshow_cheating.html", {'exer_count': exer_count, 'exer_uiids': exer_uiids, 'cheated_exer_names': cheated_exer_names})
+  return render_to_response("developer_view/slideshow_cheating.html", {'exer_data': exer_data, 'cheated_for_prof': cheated_for_prof_names})
 
 
 
