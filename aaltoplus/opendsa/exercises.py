@@ -137,7 +137,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 time_done=dt_now,
                 count_hints=count_hints,
                 hint_used=int(count_hints) > 0,
-                correct=str2bool(completed) and not str2bool(count_hints) and (int(attempt_number) == 1),
+                correct=str2bool(completed) and (int(count_hints)==0) and (int(attempt_number) == 1),
                 count_attempts=attempt_number,
                 ex_question=ex_question,
                 ip_address=ip_address,
@@ -176,7 +176,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 user_exercise.total_done += 1
                 user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)
         else:
-            if ((int(count_hints) ==0) or (attempt_content!='hint')) and (int(attempt_number) == 1):
+            if (int(count_hints) ==0) and (attempt_content!='hint') and (int(attempt_number) == 1):
             # Only count wrong answer at most once per problem
                if user_exercise.streak - 1 > 0:
                    user_exercise.streak = user_exercise.streak - 1
