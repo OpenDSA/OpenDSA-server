@@ -479,7 +479,9 @@ class UserexerciseResource(ModelResource):
 
             if user_exercise and ubook:
                 bme = BookModuleExercise.components.filter(book=ubook.book, module=module, exercise=kexercise)[0]
-
+                ex_question = request.POST['sha1']
+                if 'non_summative' in request.POST:
+                    ex_question = request.POST['non_summative']
                 user_exercise,correct = attempt_problem(
                     user_data,
                     user_exercise,
@@ -489,6 +491,7 @@ class UserexerciseResource(ModelResource):
                     int(request.POST['time_taken']),
                     request.POST['attempt_content'],
                     request.POST['module_name'],
+                    ex_question, 
                     request.META['REMOTE_ADDR'],
                     )
 
