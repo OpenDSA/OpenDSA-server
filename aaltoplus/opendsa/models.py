@@ -268,7 +268,7 @@ class UserExerciseLog(models.Model):
     earned_proficiency = models.BooleanField(default = False) # True if proficiency was earned on this problem
     count_attempts = models.BigIntegerField(default = 0)
     ip_address = models.CharField(max_length=20)
-    ex_question = models.CharField(max_length=20)
+    ex_question = models.CharField(max_length=50)
 
     def put(self):
         models.Model.put(self)
