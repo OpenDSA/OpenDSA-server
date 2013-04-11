@@ -69,7 +69,7 @@ def exercises_logs():
                                                   GROUP BY date
                                                   ORDER BY date ASC''')
     #user usage per day (interactions)
-    user_use_log = UserButton.objects.raw('''SELECT id, COUNT(DISTINCT user_id) As users,
+    user_use_log = UserButton.objects.raw('''SELECT id, COUNT(user_id) As users,
                                                          DATE(action_time) As date
                                                   FROM opendsa_userbutton
                                                   GROUP BY date
@@ -173,6 +173,7 @@ def exercises_logs():
 
 @login_required
 def daily_summary(request):
+    #exercises_logs()
     context = RequestContext(request, {'daily_stats': str(settings.STATIC_URL + 'daily_stats.json')})
     return render_to_response("opendsa/daily-ex-stats.html", context)
 
