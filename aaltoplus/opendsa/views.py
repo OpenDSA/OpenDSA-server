@@ -29,7 +29,8 @@ from django.views.generic import TemplateView, ListView
 from django.template import add_to_builtins
 import jsonpickle
 import datetime
-import settings
+from django.conf import settings
+import os
 
  
 def is_authorized(user, book, course):
@@ -132,7 +133,7 @@ def exercises_logs():
         #distinct users registration
         for url in user_reg_log:
             if (day.date == url.date):
-                ex_logs['registrations'] = int(udl.regs)
+                ex_logs['registrations'] = int(url.regs)
         #total proficient  
         for apl in all_prof_log:
             if (day.date == apl.date):
@@ -163,7 +164,7 @@ def exercises_logs():
         
     #write data into a file
     try:
-        ofile = open('daily_stats.json','w')
+        ofile = open(settings.STATICFILES_DIRS[0] + '/daily_stats.json','ab+')
         ofile.writelines(str(all_daily_logs).replace("'",'"'))
         ofile.close
     except IOError as e:
@@ -172,12 +173,7 @@ def exercises_logs():
 
 @login_required
 def daily_summary(request):
-    exercises = get_active_exercises()
-    exe_lst = []
-    for ex in exercises:
-        #exe_lst.append(ex.__dict__)    
-        exe_lst.append(jsonpickle.encode(ex))
-    context = RequestContext(request, {'all_exe':exe_lst,'exe_logs': exercises_logs()})
+    context = RequestContext(request, {'daily_stats': str(settings.STATIC_URL + 'daily_stats.json')})
     return render_to_response("opendsa/daily-ex-stats.html", context)
 
 

@@ -1,7 +1,7 @@
 # A+
 from views import login, home, verify_credentials
 from oauth_provider.views import protected_resource_example
-from opendsa.views import exercise_summary, module_list
+from opendsa.views import exercise_summary, module_list, daily_summary
 from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail, non_required_exercise_use, total_module_time, slideshow_cheating #,timeline_sum , timeline_detail
 # Django
 from django.conf.urls.defaults import *
@@ -23,6 +23,7 @@ urlpatterns = patterns('',
     url(r'^teacher_view/(?P<book>[\w]+)/(?P<course>[\w]+)/$', exercise_summary),
     url(r'^student_view/(?P<student>[\w]+)/(?P<book>[\w]+)/$', module_list),
     url(r'^developer_view/exercises_stat/$', exercises_stat),
+    url(r'^developer_view/daily_stat/$', daily_summary),
     url(r'^developer_view/non_required_exercise_use/$', non_required_exercise_use),
     url(r'^developer_view/slideshow_cheating/(?P<student>[\w]+)/$', slideshow_cheating),
     url(r'^developer_view/total_module_time/$', total_module_time),
