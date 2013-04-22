@@ -10,8 +10,8 @@ from decimal import *
 from userprofile.models import UserProfile
 from course.models import Course, CourseInstance
 
-# OpenDSA
-from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserSummary, UserData
+# OpenDSA 
+from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserSummary, UserData, UserExerciseLog, UserButton
 
 # Django
 from django.contrib.auth.decorators import login_required
@@ -27,8 +27,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 from django.views.generic import TemplateView, ListView
 from django.template import add_to_builtins
-
-
+import jsonpickle
+import datetime
+from django.conf import settings
+import os
 
 
 def is_authorized(user, book, course):
@@ -39,6 +41,141 @@ def is_authorized(user, book, course):
         return obj_course.is_staff(user_prof)
     else:
         return False
+
+def get_active_exercises():
+    BookModExercises = BookModuleExercise.components.select_related().all()
+    active_exe =[]
+    for bme in BookModExercises:
+        if bme.exercise not in active_exe:
+            active_exe.append(bme.exercise)
+    return active_exe
+
+def exercises_logs():
+    #days rage, now all dayys the book was used
+    day_list = UserExerciseLog.objects.raw('''SELECT id, DATE(time_done) As date
+                                                  FROM opendsa_userexerciselog
+                                                  GROUP BY date
+                                                  ORDER BY date ASC''')
+    #distinct user exercise attempts
+    user_day_log = UserExerciseLog.objects.raw('''SELECT id, COUNT(DISTINCT user_id) As users,
+                                                         DATE(time_done) As date
+                                                  FROM opendsa_userexerciselog
+                                                  GROUP BY date
+                                                  ORDER BY date ASC''')
+    #user registration per day 
+    user_reg_log = User.objects.raw('''SELECT id, COUNT(id) As regs,
+                                                         DATE(date_joined) As date
+                                                  FROM auth_user
+                                                  GROUP BY date
+                                                  ORDER BY date ASC''')
+    #user usage per day (interactions)
+    user_use_log = UserButton.objects.raw('''SELECT id, COUNT(user_id) As users,
+                                                         DATE(action_time) As date
+                                                  FROM opendsa_userbutton
+                                                  GROUP BY date
+                                                  ORDER BY date ASC''')
+    #distinct all proficiency per day per exercise
+    all_prof_log = UserExerciseLog.objects.raw('''SELECT id, COUNT(earned_proficiency) AS profs,
+                                                          DATE(time_done) AS date
+                                                   FROM  opendsa_userexerciselog 
+                                                   WHERE earned_proficiency = 1
+                                                   GROUP BY date   
+                                                   ORDER BY date ASC''')
+    #number of exercises attempted
+    all_exe_log = UserExerciseLog.objects.raw('''SELECT id, COUNT(exercise_id) AS exe, 
+                                                             DATE(time_done) AS date
+                                                      FROM  opendsa_userexerciselog 
+                                                      GROUP BY date 
+                                                      ORDER BY date ASC''')
+    #total number of ss 
+    all_ss_log = UserExerciseLog.objects.raw('''SELECT `opendsa_userexerciselog`.`id`, COUNT(`opendsa_userexerciselog`.`exercise_id`) AS ss_exe,
+                                                       DATE(`opendsa_userexerciselog`.`time_done`)  AS date 
+                                                       FROM `opendsa_userexerciselog`
+                                                       JOIN `opendsa_exercise`
+                                                       ON `opendsa_userexerciselog`.`exercise_id` = `opendsa_exercise`.`id`
+                                                       WHERE `opendsa_exercise`.`ex_type`='ss'
+                                                       GROUP BY date
+                                                       ORDER BY date ASC''')
+    #total number of ka 
+    all_ka_log = UserExerciseLog.objects.raw('''SELECT `opendsa_userexerciselog`.`id`, COUNT(`opendsa_userexerciselog`.`exercise_id`) AS ka_exe,
+                                                       DATE(`opendsa_userexerciselog`.`time_done`)  AS date 
+                                                       FROM `opendsa_userexerciselog`
+                                                       JOIN `opendsa_exercise`
+                                                       ON `opendsa_userexerciselog`.`exercise_id` = `opendsa_exercise`.`id`
+                                                       WHERE `opendsa_exercise`.`ex_type`='ka'
+                                                       GROUP BY date
+                                                       ORDER BY date ASC''')    
+    #total number of pe 
+    all_pe_log = UserExerciseLog.objects.raw('''SELECT `opendsa_userexerciselog`.`id`, COUNT(`opendsa_userexerciselog`.`exercise_id`) AS pe_exe,
+                                                       DATE(`opendsa_userexerciselog`.`time_done`)  AS date 
+                                                       FROM `opendsa_userexerciselog`
+                                                       JOIN `opendsa_exercise`
+                                                       ON `opendsa_userexerciselog`.`exercise_id` = `opendsa_exercise`.`id`
+                                                       WHERE `opendsa_exercise`.`ex_type`='pe'
+                                                       GROUP BY date
+                                                       ORDER BY date ASC''')
+    all_daily_logs=[]
+    for day in day_list:
+        ex_logs={}
+        ex_logs['dt'] = day.date.strftime('%Y-%m-%d')
+        ex_logs['d_attempts']=0
+        ex_logs['registrations']=0
+        ex_logs['proficients']=0
+        ex_logs['a_attempts']=0
+        ex_logs['interactions']=0
+        ex_logs['ss']=0
+        ex_logs['ka']=0
+        ex_logs['pe']=0
+        #distinct users attempts
+        for udl in user_day_log:
+            if (day.date == udl.date):
+                ex_logs['d_attempts'] = int(udl.users)
+        #distinct users registration
+        for url in user_reg_log:
+            if (day.date == url.date):
+                ex_logs['registrations'] = int(url.regs)
+        #total proficient  
+        for apl in all_prof_log:
+            if (day.date == apl.date):
+                ex_logs['proficients'] = int(apl.profs)
+        #all exercises attempts (all questions)
+        for ael in all_exe_log:
+            if (day.date == ael.date):
+                ex_logs['a_attempts'] = int(ael.exe)
+        #all interactions
+        for uul in user_use_log:
+            if (day.date == uul.date):
+                ex_logs['interactions'] = int(uul.users)
+        #all ss attempts
+        for asl in all_ss_log:
+            if (day.date == asl.date):
+                ex_logs['ss'] = int(asl.ss_exe)
+        #all ka attempts
+        for akl in all_ka_log:
+            if (day.date == akl.date):
+                ex_logs['ka'] = int(akl.ka_exe)
+        #all pe attempts
+        for apl in all_pe_log:
+            if (day.date == apl.date):
+                ex_logs['pe'] = int(apl.pe_exe)
+
+
+        all_daily_logs.append(ex_logs)         
+        
+    #write data into a file
+    try:
+        ofile = open(settings.STATICFILES_DIRS[0] + '/daily_stats.json','ab+')
+        ofile.writelines(str(all_daily_logs).replace("'",'"'))
+        ofile.close
+    except IOError as e:
+        print "error ({0}) written file : {1}".format(e.errno, e.strerror)
+    return all_daily_logs
+
+@login_required
+def daily_summary(request):
+    #exercises_logs()
+    context = RequestContext(request, {'daily_stats': str(settings.STATIC_URL + 'daily_stats.json')})
+    return render_to_response("opendsa/daily-ex-stats.html", context)
 
 
 @login_required
