@@ -2,7 +2,7 @@
 from views import login, home, verify_credentials
 from oauth_provider.views import protected_resource_example
 from opendsa.views import exercise_summary, module_list
-from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail, non_required_exercise_use, total_module_time, slideshow_cheating #,timeline_sum , timeline_detail
+from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail, non_required_exercise_use, total_module_time, slideshow_cheating, work_order, skipping_text, slideshow_stats, time_required, cheating_exercises #,timeline_sum , timeline_detail
 # Django
 from django.conf.urls.defaults import *
 from django.contrib import admin
@@ -25,6 +25,11 @@ urlpatterns = patterns('',
     url(r'^developer_view/exercises_stat/$', exercises_stat),
     url(r'^developer_view/non_required_exercise_use/$', non_required_exercise_use),
     url(r'^developer_view/slideshow_cheating/(?P<student>[\w]+)/$', slideshow_cheating),
+    url(r'^developer_view/work_order/(?P<book>[\w]+)/$', work_order),
+    url(r'^developer_view/skipping_text/(?P<book>[\w]+)/$', skipping_text),
+    url(r'^developer_view/slideshow_stats/(?P<book>[\w]+)/$', slideshow_stats),
+    url(r'^developer_view/time_required/(?P<book>[\w]+)/$', time_required),
+    url(r'^developer_view/cheating_exercises/(?P<book>[\w]+)/$', cheating_exercises),
     url(r'^developer_view/total_module_time/$', total_module_time),
     url(r'^developer_view/exercises_bargraph/$', exercises_bargraph),
     url(r'^developer_view/exercises_time/$', exercises_time),

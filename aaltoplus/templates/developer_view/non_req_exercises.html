@@ -4,6 +4,11 @@
 </head>
 
 <body>
+<b>Instructions</b>: The following chart displays student usage of each non-required exercise (in this case, all slideshows).  Yellow indicates a user has started the exercise and green indicates they have completed it (at least once).  The Total row at the bottom provides the ratio of number completed to number started for each user.  
+<br /><br />
+Unfortunately, some missing data has been detected, so the detectable number of missing exercises (those where the user is proficient, but not listed as started) is displayed in the Number Missing row.
+<br /><br />
+
 Non-required Exercise Use Analysis
 <table style="border: solid 1px black;">
   <thead>
@@ -17,11 +22,11 @@ Non-required Exercise Use Analysis
   <tbody>
   {% for exercise in exercises %} 
     <tr >
-      <td style="border: solid 1px black;">{{ exercise.name }}</td>
+      <td style="border: solid 1px black;">{{ exercise }}</td>
       {% for user_data, exer_data in user_exer_data.items %}
-        {% if exercise.id in exer_data.prof_exers %}
+        {% if exercise in exer_data.prof_exers %}
           <td style="background-color: green"></td>
-        {% elif exercise.id in exer_data.started_exers %}
+        {% elif exercise in exer_data.started_exers %}
           <td style="background-color: yellow"></td>
         {% else %}
           <td></td>
@@ -31,6 +36,12 @@ Non-required Exercise Use Analysis
   {% endfor %}
   </tbody>
   <tfoot>
+    <tr>
+      <th>Number Missing</th>
+      {% for user_data, exer_data in user_exer_data.items %}
+        <th class="num_missing" style="border: solid 1px black; {% if exer_data.num_missing > 0 %}background-color: red{% endif %}">{{ exer_data.num_missing }}</th>
+      {% endfor %} 
+    </tr>
     <tr>
       <th>Total</th>
       {% for user_data, exer_data in user_exer_data.items %}
