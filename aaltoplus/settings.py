@@ -37,9 +37,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'odsa_SP13',         #g3et_path('test.db'),            # Or path to database file if using sqlite3.
-        'USER': 'dbadmin',                  # Not used with sqlite3.
-        'PASSWORD': 'sedv+3114',                  # Not used with sqlite3.
+        'NAME': '',         #g3et_path('test.db'),            # Or path to database file if using sqlite3.
+        'USER': '',                  # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -65,7 +65,7 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/var/www/media/'   #get_path("media/")
+MEDIA_ROOT = get_path("media/")
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -208,19 +208,3 @@ SHIB_ATTRIBUTE_MAP = {
 }
 SHIB_USERNAME = "eppn"
 SHIB_EMAIL = "email"
-
-#EMAIL
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-# Host for sending e-mail.
-EMAIL_HOST = 'opendsa.cc.vt.edu'
-
-# Port for sending e-mail.
-EMAIL_PORT = 587
-
-# Optional SMTP authentication information for EMAIL_HOST.
-DEFAULT_FROM_EMAIL = 'opendsa.cc.vt.edu <noreply@opendsa.cc.vt.edu>'
-EMAIL_HOST_USER = 'root'
-EMAIL_HOST_PASSWORD = '' #'5k2_asdo'
-EMAIL_USE_TLS = True
-

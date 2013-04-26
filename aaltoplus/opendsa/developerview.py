@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from userprofile.models import UserProfile 
  
 # OpenDSA 
-from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserSummary, ExerciseModule, UserExerciseLog, UserButton, UserData
+from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserSummary, ExerciseModule, UserExerciseLog, UserButton, UserData, UserBook
  
 # Django
 from django.contrib.auth.decorators import login_required
@@ -17,7 +17,836 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponse, HttpResponseForbidden 
 from course.context import CourseContext 
 from collections import OrderedDict
+from django.db.models import Q
 import time
+import datetime
+import os
+
+# For convenience we store the name of the course mapped to book number
+course_name = {4: 'CS223', 5:'CS3114A', 6:'CS3114B'}
+
+# Lists specific account IDs to ignore (includes instructor accounts and abandoned accounts)
+# Book 4
+#   - 20 - instructor account
+#   - 40 - abandoned
+#   - 41 - abandoned
+#   - 42 - abandoned
+#   - 43 - abandoned
+#   - 45 - abandoned
+#   - 54 - abandoned?, only completed 1 exercise
+#   - 88 - test account
+#   - 89 - test account
+#   - 222 - abandoned
+#   - 547 - has UserBook entry for CS223 and CS3114A, since he supposedly lives in Blacksburg and completed the sorting chapter which isn't part of the CS223 book, I'm removing him from the CS223 data and leaving him in CS3114A
+
+# Book 5
+#   - 30 - instructor account
+#   - 510 - abandoned, 57 exercises completed (only 6 unique ones), 4 events, entirely load-ka
+#   - 626 - abandoned
+
+# Book 6
+#   - 29 - instructor
+#   - 462 - abandoned / test
+#   - 471 - abandoned / test
+#   - 473 - abandoned / test
+#   - 481 - abandoned (no module, exercise, event, or user data)
+#   - 499 - abandoned
+#   - 538 - has UserBook associations for both 5 and 6 but is in CS3114A (book 5)
+#   - 592 - abandoned?, only completed 2 exercises
+#   - 617 - no exercises (user registered and looked at the gradebook, that's it)
+accounts_to_ignore = {4: [20, 40, 41, 42, 43, 45, 54, 88, 89, 222, 547], 5:[30, 510, 626], 6:[29, 462, 471, 473, 481, 499, 538, 592, 617]}
+
+# Specify slideshow order
+ss_order = ["InssortCON1", "InssortCON2", "InssortCON3", "insertionsortAV", "BubsortCON1", "BubsortCON2", "bubblesortAV", "SelsortCON1", "SelsortCON2", "selectionsortAV", "shellsortCON1", "shellsortCON2", "shellsortCON4", "shellsortCON5", "shellsortCON7", "shellsortCON9", "shellsortAV", "mergesortAV", "mergesortCON1", "mergeImplCON1", "mergeImplCON2", "quicksortAV", "QuicksortCON1", "heapsortCON", "BinsortCON1", "BinsortCON2", "radixLinkAV", "radixArrayAV", "hashIntroCON1", "hashFuncExCON1", "hashFuncExCON2", "buckethashCON1", "buckethashCON2", "linProbeCON1", "linProbeCON2", "collisionCON1", "collisionCON2", "collisionCON3", "collisionCON4", "collisionCON5", "collisionCON6", "collisionCON7", "collisionCON8", "hashdelCON1"]
+
+# Specify proficiency exercise order
+pe_order = ["ShellsortProficiency", "ShellsortPerformance", "mergesortProficiency", "quicksortProficiency", "heapsortProficiency", "Birthday", "MidSquare", "StringSimple", "StringSfold", "hashAV", "HashingDeleteProficiency"]
+
+# Specify exercise order
+ka_order = ["SortIntroSumm", "InssortPRO", "InssortSumm", "BubsortPRO", "BubsortSumm", "SelsortPRO", "SelsortSumm", "SortCompareSumm", "FindInversionsPRO", "ExchangeSumm", "ShellsortSublist", "ShellsortSeries", "ShellsortSumm", "MergesortPRO", "MergesortSumm", "QuicksortPivotPRO", "QuicksortPartitPRO", "QuicksortSumm", "HeapsortPRO", "HeapsortSumm", "RadixsortPRO", "RadixSortSumm", "SortAlgCompSumm", "SortBoundSumm", "ChapterSumm", "HashFuncPROSumm", "HashFuncSumm", "OpenHashPRO", "HashingBucketPRO", "HashingBucket2PRO", "HashingLinearProbePRO", "HashingLinearStepProbePRO", "HashingPseudoRandomProbePRO", "HashingQuadraticProbePRO", "HashingDoubleProbePRO", "HashAnalSumm", "HashDelSumm", "HashChapterSumm"]
+
+@staff_member_required
+def work_order(request, book):
+  # Select all users of a given book, except staff accounts, the phantom (guest) account and abandoned accounts
+  users = UserBook.objects.filter(book=book, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
+  users = [user for user in users]
+  users.sort()
+    
+  mod_order = ['SortIntro', 'InsertionSort', 'InsertOpt', 'BubbleSort', 'SelectionSort', 'SortCompare', 'ExchangeSort', 'Shellsort', 'Mergesort', 'MergesortImpl', 'Quicksort', 'Heapsort', 'BinSort', 'RadixSort', 'SortingEmpirical', 'SortingLowerBound', 'SortSumm', 'HashIntro', 'HashFunc', 'HashFuncExamp', 'OpenHash', 'BucketHash', 'HashCSimple', 'HashCImproved', 'HashAnal', 'HashDel', 'HashSumm']
+  
+  user_mod_data = OrderedDict()
+  
+  # Get UserModule objects
+  user_modules = UserModule.objects.filter(book=book, user__in=users).order_by('user').only('user', 'module', 'first_done', 'proficient_date')
+  
+  unknown_mods = set()
+  
+  for um in user_modules:
+    # The first time we encounter a student, initialize their module list with empty tuples
+    if um.user.id not in user_mod_data:
+      user_mod_data[um.user.id] = [('', '')] * len(mod_order)
+    
+    # Find the index of the module to save the time stamps of
+    if um.module.name in mod_order:
+      mod_index = mod_order.index(um.module.name)
+      user_mod_data[um.user.id][mod_index] = (um.first_done, um.proficient_date)
+    else:
+      unknown_mods.add(um.module.name)
+        
+  # Print a list of unknown modules that were encountered (make sure we don't miss any we are interested in)
+  if len(unknown_mods) > 0:
+    print 'ERROR: Unknown modules'
+    
+    for mod in unknown_mods:
+      print '  ' + mod
+    
+  # Create the CSV directory if necessary
+  if not os.path.exists('CSV'):
+    os.mkdir('CSV')
+  
+  # Write data out to appropriate CSV files
+  with open('CSV/' + book + '_mod_order_started.csv', 'w') as started, open('CSV/' + book + '_mod_order_finished.csv', 'w') as finished:
+    #started.write('Module Order Started (' + course_name[int(book)] + ')\n')
+    #started.write('Module Number,' + ','.join(str(user_id) for user_id in user_mod_data.keys()) + '\n')
+    #finished.write('Module Order Completed (' + course_name[int(book)] + ')\n')
+    #finished.write('Module Number,' + ','.join(str(user_id) for user_id in user_mod_data.keys()) + '\n')
+    
+    # Order modules 1 thru N
+    #for i in xrange(1, len(mod_order) + 1):
+    #  started.write(str(i) + ',' + ','.join([str(mod_list[i - 1][0]) for id, mod_list in user_mod_data.items() if str(mod_list[i - 1][0]) != '2012-01-01 00:00:00']) + '\n')
+    #  finished.write(str(i) + ',' + ','.join([str(mod_list[i - 1][1]) for id, mod_list in user_mod_data.items() if str(mod_list[i - 1][1]) != '2012-01-01 00:00:00']) + '\n')
+      
+    started.write('Module Order Started (' + course_name[int(book)] + ')\n')
+    started.write('User,' + ','.join(mod_order) + '\n')
+    finished.write('Module Order Completed (' + course_name[int(book)] + ')\n')
+    finished.write('User,' + ','.join(mod_order) + '\n')
+
+    for id, mod_list in user_mod_data.items():
+      # Ignore default dates
+      started.write(str(id) + ',' + ','.join([str(start_time) if str(start_time) != '2012-01-01 00:00:00' else '' for start_time, finish_time in mod_list]) + '\n')
+      finished.write(str(id) + ',' + ','.join([str(finish_time) if str(finish_time) != '2012-01-01 00:00:00' else '' for start_time, finish_time in mod_list]) + '\n')
+
+  exer_order = ["SortIntroSumm", "InssortCON1", "InssortCON2", "InssortCON3", "insertionsortAV", "InssortPRO", "InssortSumm", "BubsortCON1", "BubsortCON2", "bubblesortAV", "BubsortPRO", "BubsortSumm", "SelsortCON1", "SelsortCON2", "selectionsortAV", "SelsortPRO", "SelsortSumm", "SortCompareSumm", "FindInversionsPRO", "ExchangeSumm", "shellsortCON1", "shellsortCON2", "shellsortCON4", "shellsortCON5", "shellsortCON7", "shellsortCON9", "ShellsortSublist", "shellsortAV", "ShellsortSeries", "ShellsortProficiency", "ShellsortPerformance", "ShellsortSumm", "mergesortAV", "mergesortCON1", "MergesortPRO", "mergesortProficiency", "mergeImplCON1", "mergeImplCON2", "MergesortSumm", "QuicksortPivotPRO", "quicksortAV", "QuicksortCON1", "QuicksortPartitPRO", "quicksortProficiency", "QuicksortSumm", "heapsortCON", "HeapsortPRO", "heapsortProficiency", "HeapsortSumm", "BinsortCON1", "BinsortCON2", "radixLinkAV", "RadixsortPRO", "radixArrayAV", "RadixSortSumm", "SortAlgCompSumm", "SortBoundSumm", "ChapterSumm", "hashIntroCON1", "Birthday", "hashFuncExCON1", "hashFuncExCON2", "MidSquare", "StringSimple", "StringSfold", "HashFuncPROSumm", "HashFuncSumm", "OpenHashPRO", "buckethashCON1", "buckethashCON2", "HashingBucketPRO", "HashingBucket2PRO", "linProbeCON1", "linProbeCON2", "HashingLinearProbePRO", "collisionCON1", "collisionCON2", "HashingLinearStepProbePRO", "collisionCON3", "HashingPseudoRandomProbePRO", "collisionCON4", "collisionCON5", "HashingQuadraticProbePRO", "collisionCON6", "collisionCON7", "collisionCON8", "HashingDoubleProbePRO", "HashAnalSumm", "hashdelCON1", "HashingDeleteProficiency", "HashDelSumm", "HashChapterSumm"]
+
+  # User exercise data
+  ued = OrderedDict()
+  
+  user_exers = UserExercise.objects.filter(user__in=users).order_by('user')
+
+  unknown_exers = set()
+  
+  for ue in user_exers:
+      # The first time we encounter a student, initialize their exercise list with empty tuples
+      if ue.user.id not in ued:
+        ued[ue.user.id] = [('', '')] * len(exer_order)
+      
+      # Find the index of the module to save the time stamps of
+      if ue.exercise.name in exer_order:
+        exer_index = exer_order.index(ue.exercise.name)
+        ued[ue.user.id][exer_index] = (ue.first_done, ue.proficient_date)
+      else:
+        unknown_exers.add(ue.exercise.name)
+        
+  # Print a list of unknown exercises that were encountered (make sure we don't miss any we are interested in)
+  if len(unknown_exers) > 0:
+    print 'ERROR: Unknown exercises'
+    
+    for exer in unknown_exers:
+      print '  ' + exer
+    
+  # Write data out to appropriate CSV files
+  with open('CSV/' + book + '_exer_order_started.csv', 'w') as started, open('CSV/' + book + '_exer_order_finished.csv', 'w') as finished:
+    started.write('Exercise Order Started (' + course_name[int(book)] + ')\n')
+    started.write('User,' + ','.join(exer_order) + '\n')
+    finished.write('Exercise Order Completed (' + course_name[int(book)] + ')\n')
+    finished.write('User,' + ','.join(exer_order) + '\n')
+    
+    for id, exer_list in ued.items():
+      # Ignore default dates
+      started.write(str(id) + ',' + ','.join([str(start_time) if str(start_time) != '2012-01-01 00:00:00' else '' for start_time, finish_time in exer_list]) + '\n') 
+      finished.write(str(id) + ',' + ','.join([str(finish_time)  if str(finish_time) != '2012-01-01 00:00:00' else '' for start_time, finish_time in exer_list]) + '\n')
+
+  return render_to_response("developer_view/default_csv_view.html")
+
+# TODO: This is SLOOOOWWWWW!!
+@staff_member_required
+def time_required(request, book):
+  # Compute average for each exercise across all students who complete it
+  # Compute average for each student across all exercises they computer
+  
+  # Select all users of a given book, except staff accounts, the phantom (guest) account and abandoned accounts
+  users = UserBook.objects.filter(book=book, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
+  users = [user for user in users]
+  users.sort()
+  
+  user_exercise_logs = UserExerciseLog.objects.filter(user__in=users).order_by('time_done').only('user', 'exercise', 'time_taken', 'earned_proficiency', 'count_attempts')
+  
+  user_data = OrderedDict()
+  
+  for uel in user_exercise_logs:
+    user = uel.user.id
+    exer_name = uel.exercise.name
+    time_taken = uel.time_taken
+    
+    # Initialize dictionary of exercises (and counters) for each user
+    if user not in user_data:
+      user_data[user] = {'ss_sum': 0, 'pe_sum': 0, 'ka_sum': 0, 'ss_count': 0, 'pe_count': 0, 'ka_count': 0}
+    
+    # Initialize dictionary of stats for each exercise
+    if exer_name not in user_data[user]:
+      user_data[user][exer_name] = {'time_required': 0, 'proficient': False}
+    
+    # Correct time_taken, if necessary
+    if time_taken > 1000000:
+      # Since uel.count_attempts is the UIID which is a timestamp taken when the page loads which is equal to the value subtracted from the end time to calculate time_taken, we can approximate a corrected value
+      time_taken = int(time_taken - uel.count_attempts / 1000)
+      print 'Corrected time: ' + str(time_taken)
+    
+    if not user_data[user][exer_name]['proficient']:
+      # If the user is not yet proficient with the exercise we add the time taken by the exercise
+      user_data[user][exer_name]['time_required'] += time_taken
+      
+      # Add time_taken to exercise type sum
+      user_data[user][uel.exercise.ex_type + '_sum'] += time_taken
+      
+      # Mark the exercise as proficient (stop counting the time for it)
+      if uel.earned_proficiency == 1:
+        # Increment the count of each exercise type with which the student gained proficiency
+        user_data[user][uel.exercise.ex_type + '_count'] += 1
+        user_data[user][exer_name]['proficient'] = True
+  
+  # Create the CSV directory if necessary
+  if not os.path.exists('CSV'):
+    os.mkdir('CSV')
+  
+  with open('CSV/' + book + '_time_required_by_student.csv', 'w') as file:
+    file.write('Time (in seconds) Required by Student (' + course_name[int(book)] + ')\n')
+    file.write('User,SS Average, PE Average, KA Average\n')
+  
+    for user in users:
+      ss_avg = 0
+      pe_avg = 0
+      ka_avg = 0
+    
+      if user in user_data:
+        if user_data[user]['ss_count'] > 0:
+          ss_avg = user_data[user]['ss_sum'] / float(user_data[user]['ss_count'])
+        
+        if user_data[user]['pe_count'] > 0:
+          pe_avg = user_data[user]['pe_sum'] / float(user_data[user]['pe_count'])
+        
+        if user_data[user]['ka_count'] > 0:
+          ka_avg = user_data[user]['ka_sum'] / float(user_data[user]['ka_count'])
+      
+      file.write(','.join(str(x) for x in [user, ss_avg, pe_avg, ka_avg]) + '\n')
+
+  with open('CSV/' + book + '_time_required_by_exercise.csv', 'w') as file:
+    file.write('Time (in seconds) Required By Exercise (' + course_name[int(book)] + ')\n\n')
+    
+    file.write(','.join(ss_order) + '\n')
+    for ss in ss_order:
+      ss_times = [ user_data[ud][ss]['time_required'] for ud in user_data if ss in user_data[ud] ]
+      
+      avg = 0
+      if len(ss_times) > 0:
+        avg = sum(ss_times) / float(len(ss_times))
+      
+      file.write(str(avg) + ',')
+    file.write('\n\n')
+    
+    file.write(','.join(pe_order) + '\n')
+    for pe in pe_order:
+      pe_times = [ user_data[ud][pe]['time_required'] for ud in user_data  if pe in user_data[ud] ]
+      
+      avg = 0
+      if len(pe_times) > 0:
+        avg = sum(pe_times) / float(len(pe_times))
+      
+      file.write(str(avg) + ',')
+    file.write('\n\n')
+    
+    file.write(','.join(ka_order) + '\n')
+    for ka in ka_order:
+      ka_times = [ user_data[ud][ka]['time_required'] for ud in user_data  if ka in user_data[ud] ]
+      
+      avg = 0
+      if len(ka_times) > 0:
+        avg = sum(ka_times) / float(len(ka_times))
+      
+      file.write(str(avg) + ',')
+    file.write('\n')
+  
+  return render_to_response("developer_view/default_csv_view.html")
+
+def skipping_text(request, book):
+  # Select all users of a given book, except staff accounts, the phantom (guest) account and abandoned accounts
+  users = UserBook.objects.filter(book=book, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
+  users = [user for user in users]
+  users.sort()
+
+  #user_modules = UserModule.objects.filter(user__in=users, book=book).order_by('user').only('user', 'module', 'first_done')
+  
+  # Assume student left the page open and / or is not actively working if average is above 'threshold' minutes
+  #threshold = 50
+  
+  # Create the CSV directory if necessary
+  if not os.path.exists('CSV'):
+    os.mkdir('CSV')
+  
+  # Write data out to appropriate CSV files
+  with open('CSV/' + book + '_skipping_text.csv', 'w') as file:
+    file.write('Skipping Text (' + course_name[int(book)] + ')\n')
+    file.write('User,Avg Minutes to First Exercise Event\n')
+    
+    for user in users:
+      # Get the user's event data, specifically page load and unload events and showhide button events
+      user_buttons = UserButton.objects.filter(user=user, book=book).filter(Q(name__contains='_showhide_btn') | Q(name='document-ready') | Q(name='window-unload')).order_by('action_time')
+      
+      sum = 0
+      count = 0
+      modules_seen = []
+      
+      # Loop through events, the first time a module is loaded, look ahead for a showhide button before the matching window unload event
+      for i in xrange(len(user_buttons)):
+        ub = user_buttons[i]
+        
+        if ub.name == 'document-ready' and ub.module not in modules_seen:
+          modules_seen.append(ub.module)
+          
+          # Look ahead for an unload event or showbutton event
+          for j in xrange(i, len(user_buttons)):
+            ub2 = user_buttons[j]
+            
+            if ub2.name == 'window-unload' and ub2.module == ub.module:
+              break
+            elif '_showhide_btn' in ub2.name and ub2.module == ub.module:
+              num_seconds = time.mktime(ub2.action_time.timetuple()) - time.mktime(ub.action_time.timetuple())
+              sum += num_seconds
+              count += 1
+              break
+      
+      # Safely calculate the average
+      avg = 0
+      if count > 0:
+        avg = sum / count
+      
+      # Convert seconds to minutes
+      avg = avg / 60
+  
+      # Write the last student's average to the file if its below the threshold
+      file.write(str(user) + ',' + str(avg) + '\n')
+      
+      
+      #break  # TESTING
+  
+  return render_to_response("developer_view/default_csv_view.html")
+
+@staff_member_required
+def slideshow_stats(request, book):
+  # Needs to count the total number of slideshows a student attempts, the number they complete, the number they cheat on and the average time
+
+  # Select all users of a given book, except staff accounts, the phantom (guest) account and abandoned accounts
+  users = UserBook.objects.filter(book=book, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
+  users = [user for user in users]
+  users.sort()
+    
+  # Filter events to show only slideshow data
+  ss_events_query = UserButton.objects.filter(book=book, name__in=['jsav-forward', 'jsav-backward', 'jsav-begin', 'jsav-end']).order_by('action_time')
+  
+  # Create the CSV directory if necessary
+  if not os.path.exists('CSV'):
+    os.mkdir('CSV')
+  
+  with open('CSV/' + book + '_slideshow_stats.csv', 'w') as file:
+    file.write('Slideshows Stats (' + course_name[int(book)] + ')\n')
+    file.write('User,Total Attempted,Unique Attempted,Total Completed,Unique Completed,Number of Slideshows Missing Some Event Data,Number of Slideshows Missing All Event Data,Total Number of Slideshows Missing Event Data,Cheated for Credit,Average Seconds Per Slide\n')
+  
+    for user in users:
+      # Filter UserExerciseLog by user and slideshows where the user gained proficiency
+      # Possible to also limit by a time threshold (to reduce the number of results that require processing, but then we can't determine the total number of completions (time_taken__lte=2)
+      user_exercise_logs = UserExerciseLog.objects.filter(user=user, exercise__ex_type='ss', earned_proficiency=1).order_by('time_done').only('exercise', 'time_taken', 'count_attempts')
+      
+      # Initialize counters
+      total_attempted = 0
+      unique_attempted = 0
+      total_completed = 0
+      unique_completed = 0
+      cheated_for_credit = 0
+      num_missing_some_data = 0
+      avg_time_per_step = 0
+      
+      # Used to keep track of exercises seen so we only calculate the average time per step for the first time a user completes the exercise
+      exercises_seen = []
+      
+      # Keep track of times for each unique instance
+      ss_time = {}
+      
+      # Get the total time from UserExerciseLog because its more accurate than calculating it
+      for uel in user_exercise_logs:
+        uiid = uel.count_attempts
+        exer = uel.exercise.id
+        time_taken = uel.time_taken
+        
+        # Perform the following actions for all unique (exercise, uiid) pairs, allows different exercises with the same UIID such as mini-slideshows on the same module page and the same exercise with different UIIDs such as multiple attempts at the same exercise
+        if (exer, uiid) not in ss_time.keys():
+          # Count the total number of unique slideshow instances completed
+          total_completed += 1
+            
+          # Correct time_taken, if necessary
+          if time_taken > 1000000:
+            # Since uel.count_attempts is the UIID which is a timestamp taken when the page loads which is equal to the value subtracted from the end time to calculate time_taken, we can approximate a corrected value
+            time_taken = int(time_taken - uiid / 1000)
+            print 'Corrected time: ' + str(time_taken)
+        
+          ss_time[(exer, uiid)] = time_taken
+          
+          if exer not in exercises_seen:
+            # Count the number of unique slideshows completed
+            unique_completed += 1
+            exercises_seen.append(exer)
+      
+      # Reset list of exercises
+      exer_uiid_pairs_seen = set()
+      exercises_seen = []
+      uiids_seen = set()
+      
+      # List to keep track of average time per step of each exercise
+      avg_times = []
+      
+      # Get all the event's for a specific user
+      ss_events = ss_events_query.filter(user=user).values('uiid', 'exercise', 'description')
+      
+      for event in ss_events:
+        exercise = event['exercise']
+        
+        # If the event belongs to a unique instance, denoted by a unique (exercise, uiid) pair...
+        if 'uiid' in event and event['uiid'] != None and (exercise, event['uiid']) not in exer_uiid_pairs_seen:
+          uiid = event['uiid']
+          
+          # Count the attempt
+          total_attempted += 1
+          exer_uiid_pairs_seen.add((exercise, uiid))
+          
+          # Increment the count of unique attempts if the exercise has not been seen before
+          if exercise not in exercises_seen:
+            unique_attempted += 1
+            exercises_seen.append(exercise)
+          
+          # If the user obtained proficiency on this attempt
+          if (exercise, uiid) in ss_time:
+            # Determine if the user cheated on this instance
+            
+            # Parse the total number of slides from the description
+            num_slides = int(event['description'].split(' / ')[1])
+            
+            # Get the descriptions of events from a specific exercise instance
+            descriptions = ss_events_query.filter(user=user, exercise=exercise, uiid=uiid).values_list('description', flat=True)
+            
+            # If the last step (which triggers proficency) is logged, ensure all steps were logged
+            if ' / '.join([str(num_slides)] * 2) not in descriptions:
+              # If the last step wasn't logged, we know event data is missing because the user obtained proficiency which means they finished
+              num_missing_some_data += 1
+              #print 'Corrupt: (user: ' + str(user) + ', exer: ' + str(exercise) + ', uiid: ' +  str(uiid) + ')'
+              
+            # Ensure every slide (except the last) was viewed, we know they viewed the last because that's what triggers getting credit, allows a little bit more flexibility for dealing with corrupt data
+            for i in xrange(1, num_slides):
+              if ' / '.join([str(i), str(num_slides)]) not in descriptions:
+                cheated_for_credit += 1
+                print 'Cheated: (user: ' + str(user) + ', exer: ' + str(exercise) + ', uiid: ' +  str(uiid) + ')'
+                break
+            
+            
+            # Calculate average time spent on each slide
+            if ss_time[(exercise, uiid)] == 0:
+              avg_times.append(0)
+            else:
+              avg_times.append(ss_time[(exercise, uiid)] / float(num_slides))
+      
+      # Compute the average time per step for a user
+      if len(avg_times) > 0:
+        avg_time_per_step = sum(avg_times) / float(len(avg_times))
+      else:
+        avg_time_per_step = 0
+      
+      # Calculate the number of proficient slideshows for which there is no event data at all
+      missing_pairs = set(ss_time.keys()) - exer_uiid_pairs_seen
+      num_missing_all_data = len(missing_pairs)
+      
+      #if num_missing_some_data > 0:
+        #print 'ss_time: ' + str(keys)
+        #print 'exer_uiid_pairs_seen: ' + str(pairs)
+        #print 'diff: ' + str(missing_pairs)
+        #print 'num_missing_some_data: ' + str(num_missing_some_data) + '\n\n\n'
+      
+      
+      file.write(','.join(str(x) for x in [user, total_attempted, unique_attempted, total_completed, unique_completed, num_missing_some_data, num_missing_all_data, (num_missing_some_data + num_missing_all_data), cheated_for_credit, avg_time_per_step]) + '\n')
+  
+  return render_to_response("developer_view/default_csv_view.html")
+
+@staff_member_required
+def cheating_exercises(request, book):
+  # Calculate total number of times each proficiency exercise is completed (with respect to the current book)
+  # Calculate total number of times each proficiency exercise is cheated on
+  
+  # Calculate total number of proficiency exercises each user completes
+  # Calculate total number of proficiency exercises each user cheats on
+
+  # Maps proficiency exercises to the AV that could be used to cheat on them (some PE don't have a matching AV and are therefore excluded)
+  # 11 (mergesortProficiency) -> 64 (mergesortAV)
+  # 16 (ShellsortProficiency) -> 15 (shellsortAV)
+  # 47 (quicksortProficiency) -> 46 (quicksortAV)
+  pe_av_map = {11: 64, 16: 15, 47: 46}
+  
+  # Select all users of a given book, except staff accounts, the phantom (guest) account and abandoned accounts
+  users = UserBook.objects.filter(book=book, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
+  users = [user for user in users]
+  users.sort()
+
+  # Filter event to show only events from proficiency exercises that can be cheated on and their associated AVs
+  user_buttons_query = UserButton.objects.filter(book=book, exercise__in=(pe_av_map.keys() + pe_av_map.values()), name__in=['odsa-exercise-init', 'jsav-exercise-reset', 'window-unload', 'jsav-exercise-grade-change']).order_by('action_time').values('name', 'exercise', 'uiid', 'description')
+  
+  pe_data = OrderedDict()
+  user_data = {}
+  
+  # Initialize the structure which holds the total number of times an exercise (that could be cheated on) was attempted, completed or cheated on
+  for pe in pe_av_map.keys():
+    pe_data[pe] = {'cheated': 0, 'proficient': 0, 'completed': 0, 'attempted': 0}
+
+  # Initialize the structure which holds the total number of proficiency exercises (that could be cheated on) a user attempted, completed or cheated on
+  for user in users:
+    user_data[user] = {'cheated': 0, 'proficient': 0, 'completed': 0, 'attempted': 0}
+    
+    # Show events belonging to a single user
+    user_buttons = user_buttons_query.filter(user=user)
+    
+    for i in xrange(len(user_buttons)):
+      ub = user_buttons[i]
+      ub_exer_id = ub['exercise']
+      
+      # If the event is the init event of a proficiency exercise, look ahead for a matching AV init event or a suitable end event
+      if ub_exer_id in pe_av_map.keys() and ub['name'] == 'odsa-exercise-init':
+        # Increment the attempt counters
+        pe_data[ub_exer_id]['attempted'] += 1
+        user_data[user]['attempted'] += 1
+      
+        # Look ahead from current location
+        for j in xrange(i, len(user_buttons)):
+          ub2 = user_buttons[j]
+          
+          # Stop looking if the user finished the proficiency exercise (encountered a reset, window-unload or a 'jsav-exercise-grade-change' event where "complete: 1.0" for the given instance of the proficency exercise)
+          if ub2['exercise'] == ub_exer_id and \
+             ('uiid' in ub and 'uiid' in ub2 and ub['uiid'] == ub2['uiid']) and \
+             (ub2['name'] == 'jsav-exercise-reset' or \
+             ub2['name'] == 'window-unload' or \
+             (ub2['name'] == 'jsav-exercise-grade-change' and '"complete":1' in ub2['description'])):
+            
+            if ub2['name'] == 'jsav-exercise-grade-change':
+              pe_data[ub_exer_id]['completed'] += 1
+              user_data[user]['completed'] += 1
+              
+              # Parse score data from the event description
+              score_text = '"score":'
+              start_index = ub2['description'].find(score_text) + len(score_text)
+              end_index = ub2['description'].find(',', start_index)
+              score = float(ub2['description'][start_index:end_index])
+              
+              # If score is above the proficiency threshold, increment the proficient count (all PE thresholds are currently 0.9)
+              if score >= 0.90:
+                pe_data[ub_exer_id]['proficient'] += 1
+                user_data[user]['proficient'] += 1
+
+            break
+          
+          # Find an init event for the proficiency exercise's matching AV
+          elif ub2['exercise'] == pe_av_map[ub_exer_id] and ub2['name'] == 'odsa-exercise-init':
+            
+            # Parse the list of array values from the description field of ub
+            gen_arr_text = '"gen_array":['
+            start_index = ub['description'].find(gen_arr_text) + 4 # Eliminate the '"gen'
+            end_index = ub['description'].find(']', start_index) + 1 # Include the trailing ']'
+            
+            pe_init_arr = ub['description'][start_index:end_index]
+            av_init_text = '"user' + pe_init_arr
+            
+            # Search for the list of array values (as a user generated array) in the description of ub2
+            if av_init_text in ub2['description']:
+              # User 'cheated', increment the user and exercise cheat counts
+              user_data[user]['cheated'] += 1
+              pe_data[ub_exer_id]['cheated'] += 1
+              
+              print 'Match - pe: ' + str(ub_exer_id) + ', uiid: ' + str(ub['uiid']) + ', av: ' + str(ub2['exercise']) + ', uiid: ' + str(ub2['uiid'])
+
+  # Create the CSV directory if necessary
+  if not os.path.exists('CSV'):
+    os.mkdir('CSV')
+  
+  with open('CSV/' + book + '_exercises_cheated_by_student.csv', 'w') as file:
+    file.write('User,Cheated,Completed,Attempted\n')
+    
+    for user in users:
+      file.write(','.join(str(x) for x in [user, user_data[user]['cheated'], user_data[user]['completed'], user_data[user]['attempted']]) + '\n')
+  
+  with open('CSV/' + book + '_exercises_cheated_by_exercise.csv', 'w') as file:
+    file.write('Exercise,Cheated,Completed,Attempted\n')
+    
+    for pe in pe_data.keys():
+      file.write(','.join(str(x) for x in [pe, pe_data[pe]['cheated'], pe_data[pe]['completed'], pe_data[pe]['attempted']]) + '\n')
+  
+  return render_to_response("developer_view/default_csv_view.html")
+
+@staff_member_required
+def non_required_exercise_use(request):
+  book = 5
+  
+  # Select all users of a given book, except staff accounts, the phantom (guest) account and abandoned accounts
+  users = UserBook.objects.filter(book=book, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
+  users = [user for user in users]
+  users.sort()
+  
+  # Get slideshow events
+  started_exers = UserButton.objects.filter(book=book, user__in=users, exercise__ex_type='ss', name__in=['jsav-forward', 'jsav-backward', 'jsav-begin', 'jsav-end']).order_by('user').values_list('user_id', 'exercise__name')
+  prof_exers = UserExercise.objects.filter(user__in=users, exercise__ex_type='ss', proficient_date__gt=datetime.date(2012,1,1)).order_by('user').values_list('user_id', 'exercise__name')
+  
+  # Create an ordered dictionary to start user exercise data, so the order will always be the same when the template iterates through the list (make sure all the columns line up properly)
+  ued = OrderedDict()
+  
+  for user_id in users:
+    ued[user_id] = OrderedDict()
+    ued[user_id]['started_exers'] = set()
+    ued[user_id]['prof_exers'] = set()
+  
+  for user_id, exercise in started_exers:
+    ued[user_id]['started_exers'].add(exercise)
+    
+  for user_id, exercise in prof_exers:
+    ued[user_id]['prof_exers'].add(exercise)
+  
+  # Create the CSV directory if necessary
+  if not os.path.exists('CSV'):
+    os.mkdir('CSV')
+  
+  # Write data out to appropriate CSV files
+  with open('CSV/non_required_exercise_use.csv', 'w') as file:
+    file.write('Non-Required Exercise Use (CS3114A),,Started = Started - Complete (for easy stacked graphs)\n')
+    file.write('User,Completed,Started,Missing\n')
+    
+    for user_id in users:
+      # Calculate the number of exercises that appear in the proficient list but not the started list
+      missing_exers = ued[user_id]['prof_exers'] - ued[user_id]['started_exers']
+      
+      # Correct the list of started exercises to include the missing ones
+      ued[user_id]['started_exers'] = ued[user_id]['started_exers'].union(missing_exers)
+      
+      # Add a count of missing exercises to user exercise data object
+      ued[user_id]['num_missing'] = len(missing_exers)
+      
+      if len(missing_exers) > 0:
+        print 'User ' + str(user_id) + ' is missing data from ' + str(len(missing_exers)) + ' exercises'
+      
+      
+      id = str(user_id)
+      num_prof = str(len(ued[user_id]['prof_exers']))
+      num_missing = str(len(missing_exers))
+      
+      # Set num_started to be the difference between the number of started exercises and proficient exercises
+      # so Excel will create the stacked column graph appropriately
+      num_started = str(len(ued[user_id]['started_exers']) - len(ued[user_id]['prof_exers']))
+      
+      file.write(','.join([id, num_prof, num_started, num_missing]) + '\n')
+  
+  return render_to_response("developer_view/non_req_exercises.html", {'exercises': ss_order, 'user_exer_data': ued})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Return a list of unique elements from the given list
+def get_unique(list):
+  # Eliminate duplicates
+  seen = set()
+  seen_add = seen.add
+  list = [ x for x in list if x not in seen and not seen_add(x)]
+  return list
+
+@staff_member_required
+def exercise_list(request, student):
+  interesting_events = ['jsav-end', 'jsav-forward', 'jsav-array-click', 'odsa-award-credit']
+  
+  userButtons = UserButton.objects.filter(user=student, name__in=interesting_events).only('exercise', 'module', 'name', 'action_time').order_by('action_time')
+  
+  user_exercises = dict(UserExercise.objects.filter(user=student).values_list('exercise', 'proficient_date'))
+  
+  exercises = OrderedDict()
+  
+  for userButton in userButtons:
+    if userButton.exercise.name not in exercises:
+      #print userButton.exercise
+      exercises[userButton.exercise.name] = {}
+      exercises[userButton.exercise.name]['id'] = userButton.exercise.id
+      exercises[userButton.exercise.name]['module'] = userButton.module.name
+      exercises[userButton.exercise.name]['type'] = userButton.exercise.ex_type
+      exercises[userButton.exercise.name]['start_time'] = userButton.action_time
+      if userButton.exercise.id in user_exercises:
+        exercises[userButton.exercise.name]['proficient_time'] = user_exercises[userButton.exercise.id]
+      else:
+        exercises[userButton.exercise.name]['proficient_time'] = ''
+  
+  #print [ u.exercise.name for u in userButtons]
+  #print exercises
+
+  return render_to_response("developer_view/exercise_list.html", {'exercises': exercises, 'student': student})
+
+@staff_member_required
+def slideshow_cheating(request, student):
+  # Maps an exercise name to a dictionary which which stores the number of times a student completed the slideshow (key: 'completed' and the number of times they cheated on the slideshow ('cheated')
+  exer_data = OrderedDict()
+  
+  # List of exercise names where the student cheated to obtain proficiency
+  cheated_for_prof_names = []
+  
+  # Filter UserExerciseLog by user and slideshows where the user gained proficiency
+  # Possible to also limit by a time threshold (to reduce the number of results that require processing, but then we can't determine the total number of completions (time_taken__lte=2)
+  user_exercise_logs = UserExerciseLog.objects.filter(user=student, exercise__ex_type='ss', earned_proficiency=1).order_by('time_done').only('exercise', 'time_taken', 'count_attempts')
+  
+  #print user_exercise_logs.query
+  #print 'Count: ' + str(user_exercise_logs.count())
+  #print user_exercise_logs.values('id', 'time_taken')
+  
+  # Load a single user's slideshow event data (limited to the exercises and uiids found above)
+  ss_events = UserButton.objects.filter(user=student, name__in=['jsav-forward', 'jsav-backward', 'jsav-begin', 'jsav-end']).order_by('action_time')
+  
+  for uel in user_exercise_logs:
+    exer_name = uel.exercise.name
+    exer_uiid = uel.count_attempts
+    
+    # Get the descriptions of events from a specific exercise instance
+    descriptions = ss_events.filter(exercise__name=exer_name, uiid=exer_uiid).values_list('description', flat=True)
+    print descriptions
+    
+    # Initialize the completed and cheated counters for the exercise
+    if exer_name not in exer_data:
+      exer_data[exer_name] = OrderedDict()
+      exer_data[exer_name]['cheated'] = 0
+      exer_data[exer_name]['completed'] = 0
+    
+    # Increment the completed counter
+    exer_data[exer_name]['completed'] += 1
+    
+    if len(descriptions) > 0:
+      # Parse the total number of slides from the description
+      num_slides = descriptions[0].split(' / ')[1]
+      
+      # Ensure every slide was viewed
+      for i in range(1, int(num_slides) + 1):
+        if str(i) + ' / ' + num_slides not in descriptions:
+          exer_data[exer_name]['cheated'] += 1
+          
+          # Record whether or not the user cheated the first time they obtained proficiency
+          if exer_data[exer_name]['completed'] == 1:
+            cheated_for_prof_names.append(exer_name)
+          
+          print 'CHEAT'
+          break
+    
+    print '\n\n'
+  
+  return render_to_response("developer_view/slideshow_cheating.html", {'exer_data': exer_data, 'cheated_for_prof': cheated_for_prof_names})
+
+@staff_member_required
+def total_module_time(request):
+  events = ['document-ready', 'window-unload', 'window-blur', 'window-focus']
+  
+  user_data = OrderedDict()
+  
+  modules = []
+  
+  # Loop through all students
+  for ud in UserData.objects.filter(book__in=[5, 6]):
+    user_buttons = UserButton.objects.filter(user=ud.user, name__in=events).order_by('action_time')
+    
+    uid = ud.user.id
+    
+    user_data[uid] = {}
+    
+    for i in range(0, len(user_buttons)):
+      if user_buttons[i].name == 'document-ready':
+        mod_name = user_buttons[i].module.name
+        
+        if mod_name not in modules:
+          modules.append(mod_name)
+      
+        # Initialize the module time
+        if mod_name not in user_data[uid]:
+          user_data[uid][mod_name] = 0
+        
+        last_event_time = user_buttons[i].action_time
+        
+        # Look ahead for a matching 'window-unload' event, subtracting time when the module doesn't have focus
+        for j in range(i, len(user_buttons)):
+          if user_buttons[j].module.name == mod_name:
+            if user_buttons[j].name in ['window-blur', 'window-unload']:
+              # Calculate the difference (in seconds) between the time of this event and the previous one
+              user_data[uid][mod_name] += time.mktime(user_buttons[j].action_time.timetuple()) - time.mktime(last_event_time.timetuple())
+              
+              # Break out of the look-ahead loop when a matching 'window-unload' event has been found
+              if user_buttons[j].name == 'window-unload':
+                break
+            elif user_buttons[j].name == 'window-focus':
+              last_event_time = user_buttons[j].action_time
+  
+  return render_to_response("developer_view/total_module_time.html", {'modules': modules, 'user_data': user_data})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #exeStat class: exercise, and average proficiency score
 class exeStat:
@@ -187,180 +1016,6 @@ def student_exercise(request, student):
                 exercises.append(proficient_exercises(date, temp, 1))
         
     return render_to_response("developer_view/student_exercise.html", {'activities': activities, 'student': student, 'exercises': exercises, 'max': max })
-
-@staff_member_required
-def exercise_list(request, student):
-  interesting_events = ['jsav-end', 'jsav-forward', 'jsav-array-click', 'odsa-award-credit']
-  
-  userButtons = UserButton.objects.filter(user=student, name__in=interesting_events).only('exercise', 'module', 'name', 'action_time').order_by('action_time')
-  
-  user_exercises = dict(UserExercise.objects.filter(user=student).values_list('exercise', 'proficient_date'))
-  
-  print userButtons.query
-  
-  exercises = OrderedDict()
-  
-  for userButton in userButtons:
-    if userButton.exercise.name not in exercises:
-      #print userButton.exercise
-      exercises[userButton.exercise.name] = {}
-      exercises[userButton.exercise.name]['id'] = userButton.exercise.id
-      exercises[userButton.exercise.name]['module'] = userButton.module.name
-      exercises[userButton.exercise.name]['type'] = userButton.exercise.ex_type
-      exercises[userButton.exercise.name]['start_time'] = userButton.action_time
-      if userButton.exercise.id in user_exercises:
-        exercises[userButton.exercise.name]['proficient_time'] = user_exercises[userButton.exercise.id]
-      else:
-        exercises[userButton.exercise.name]['proficient_time'] = ''
-  
-  #print [ u.exercise.name for u in userButtons]
-  #print exercises
-
-  return render_to_response("developer_view/exercise_list.html", {'exercises': exercises, 'student': student})
-
-@staff_member_required
-def non_required_exercise_use(request):
-  # Get all slideshow exercises (the ones that are not required)
-  exercises = Exercise.objects.filter(ex_type='ss')
-  exer_ids = [x.id for x in exercises]
-  
-  user_exer_data = OrderedDict()
-  
-  for user_data in UserData.objects.filter(book=5):
-    started_exer_ids = UserButton.objects.filter(user=user_data.user, exercise__ex_type='ss').values_list('exercise_id', flat=True)
-    
-    # Eliminate duplicates
-    seen = set()
-    seen_add = seen.add
-    started_exer_ids = [ x for x in started_exer_ids if x not in seen and not seen_add(x)]
-    
-    prof_exer_ids = []
-    
-    for exer_id in user_data.all_proficient_exercises.split(','):
-      if exer_id.isdigit() and long(exer_id) in exer_ids:
-        prof_exer_ids.append(int(exer_id))
-    
-    user_exer_data[user_data.user.id] = {}
-    user_exer_data[user_data.user.id]['started_exers'] = started_exer_ids
-    user_exer_data[user_data.user.id]['prof_exers'] = prof_exer_ids
-  
-  return render_to_response("developer_view/non_req_exercises.html", {'exercises': exercises, 'user_exer_data': user_exer_data})
-
-@staff_member_required
-def slideshow_cheating(request, student):
-  # Maps an exercise name to a dictionary which which stores the number of times a student completed the slideshow (key: 'completed' and the number of times they cheated on the slideshow ('cheated')
-  exer_data = OrderedDict()
-  
-  # List of exercise names where the student cheated to obtain proficiency
-  cheated_for_prof_names = []
-  
-  # Filter UserExerciseLog by user and slideshows where the user gained proficiency
-  # Possible to also limit by a time threshold (to reduce the number of results that require processing, but then we can't determine the total number of completions (time_taken__lte=2)
-  user_exercise_logs = UserExerciseLog.objects.filter(user=student, exercise__ex_type='ss', earned_proficiency=1).order_by('time_done').only('exercise', 'time_taken', 'count_attempts')
-  
-  #print user_exercise_logs.query
-  #print 'Count: ' + str(user_exercise_logs.count())
-  #print user_exercise_logs.values('id', 'time_taken')
-  
-  # Load a single user's slideshow event data (limited to the exercises and uiids found above)
-  ss_events = UserButton.objects.filter(user=student, name__in=['jsav-forward', 'jsav-backward', 'jsav-begin', 'jsav-end']).order_by('action_time')
-  
-  for uel in user_exercise_logs:
-    exer_name = uel.exercise.name
-    exer_uiid = uel.count_attempts
-    
-    # Get the descriptions of events from a specific exercise instance
-    descriptions = ss_events.filter(exercise__name=exer_name, uiid=exer_uiid).values_list('description', flat=True)
-    print descriptions
-    
-    # Initialize the completed and cheated counters for the exercise
-    if exer_name not in exer_data:
-      exer_data[exer_name] = OrderedDict()
-      exer_data[exer_name]['cheated'] = 0
-      exer_data[exer_name]['completed'] = 0
-    
-    # Increment the completed counter
-    exer_data[exer_name]['completed'] += 1
-    
-    if len(descriptions) > 0:
-      # Parse the total number of slides from the description
-      num_slides = descriptions[0].split(' / ')[1]
-      
-      # Ensure every slide was viewed
-      for i in range(1, int(num_slides) + 1):
-        if str(i) + ' / ' + num_slides not in descriptions:
-          exer_data[exer_name]['cheated'] += 1
-          
-          # Record whether or not the user cheated the first time they obtained proficiency
-          if exer_data[exer_name]['completed'] == 1:
-            cheated_for_prof_names.append(exer_name)
-          
-          print 'CHEAT'
-          break
-    
-    print '\n\n'
-  
-  return render_to_response("developer_view/slideshow_cheating.html", {'exer_data': exer_data, 'cheated_for_prof': cheated_for_prof_names})
-
-
-
-@staff_member_required
-def total_module_time(request):
-  events = ['document-ready', 'window-unload', 'window-blur', 'window-focus']
-  
-  user_data = OrderedDict()
-  
-  modules = []
-  
-  # Loop through all students
-  for ud in UserData.objects.filter(book__in=[5, 6]):
-    user_buttons = UserButton.objects.filter(user=ud.user, name__in=events).order_by('action_time')
-    
-    uid = ud.user.id
-    
-    user_data[uid] = {}
-    
-    for i in range(0, len(user_buttons)):
-      if user_buttons[i].name == 'document-ready':
-        mod_name = user_buttons[i].module.name
-        
-        if mod_name not in modules:
-          modules.append(mod_name)
-      
-        # Initialize the module time
-        if mod_name not in user_data[uid]:
-          user_data[uid][mod_name] = 0
-        
-        last_event_time = user_buttons[i].action_time
-        
-        # Look ahead for a matching 'window-unload' event, subtracting time when the module doesn't have focus
-        for j in range(i, len(user_buttons)):
-          if user_buttons[j].module.name == mod_name:
-            if user_buttons[j].name in ['window-blur', 'window-unload']:
-              # Calculate the difference (in seconds) between the time of this event and the previous one
-              user_data[uid][mod_name] += time.mktime(user_buttons[j].action_time.timetuple()) - time.mktime(last_event_time.timetuple())
-              
-              # Break out of the look-ahead loop when a matching 'window-unload' event has been found
-              if user_buttons[j].name == 'window-unload':
-                break
-            elif user_buttons[j].name == 'window-focus':
-              last_event_time = user_buttons[j].action_time
-  
-  return render_to_response("developer_view/total_module_time.html", {'modules': modules, 'user_data': user_data})
-
-    
-    
-    
-    
-        
-      
-  
-
-  # Loop through all users, for each user get UserButton objects document-ready and window-unload, for a document-ready object look ahead until a matching window-unload object is found
-  user_buttons = UserButton.objects.filter()
-  
-
-
 
 #class of detailed exercise steps
 class exercise_step:
