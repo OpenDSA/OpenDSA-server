@@ -50,6 +50,136 @@ def get_active_exercises():
             active_exe.append(bme.exercise)
     return active_exe
 
+
+def class_data():
+
+     #days rage, now all dayys the book was used
+    day_list = UserExerciseLog.objects.raw('''SELECT id, DATE(time_done) As date
+                                                  FROM opendsa_t1061220
+                                                  GROUP BY date
+                                                  ORDER BY date ASC''')
+    #distinct user exercise attempts
+    user_day_log = UserExerciseLog.objects.raw('''SELECT id, COUNT(DISTINCT user_id) As users,
+                                                         DATE(time_done) As date
+                                                  FROM opendsa_t1061220
+                                                  GROUP BY date
+                                                  ORDER BY date ASC''')
+    #user registration per day 
+    user_reg_log = User.objects.raw('''SELECT auth_user.id, COUNT(auth_user.id) As regs,
+                                                         DATE(auth_user.date_joined) As date
+                                                  FROM auth_user
+                                                  JOIN opendsa_userbook
+                                                  ON opendsa_userbook.user_id = auth_user.id
+                                                  WHERE opendsa_userbook.book_id = 2 
+                                                  GROUP BY date
+                                                  ORDER BY date ASC''')
+    #user usage per day (interactions)
+    user_use_log = UserButton.objects.raw('''SELECT id, COUNT(user_id) As users,
+                                                         DATE(action_time) As date
+                                                  FROM opendsa_userbutton
+                                                  WHERE book_id = 2 
+                                                  GROUP BY date
+                                                  ORDER BY date ASC''')
+    #distinct all proficiency per day per exercise
+    all_prof_log = UserExerciseLog.objects.raw('''SELECT id, COUNT(earned_proficiency) AS profs,
+                                                          DATE(time_done) AS date
+                                                   FROM  opendsa_t1061220 
+                                                   WHERE earned_proficiency = 1
+                                                   GROUP BY date   
+                                                   ORDER BY date ASC''')
+
+    #number of exercises attempted
+    all_exe_log = UserExerciseLog.objects.raw('''SELECT id, COUNT(exercise_id) AS exe, 
+                                                             DATE(time_done) AS date
+                                                      FROM  opendsa_t1061220 
+                                                      GROUP BY date 
+                                                      ORDER BY date ASC''')
+    #total number of ss 
+    all_ss_log = UserExerciseLog.objects.raw('''SELECT `opendsa_t1061220`.`id`, COUNT(`opendsa_t1061220`.`exercise_id`) AS ss_exe,
+                                                       DATE(`opendsa_t1061220`.`time_done`)  AS date 
+                                                       FROM `opendsa_t1061220`
+                                                       JOIN `opendsa_exercise`
+                                                       ON `opendsa_t1061220`.`exercise_id` = `opendsa_exercise`.`id`
+                                                       WHERE `opendsa_exercise`.`ex_type`='ss'
+                                                       GROUP BY date
+                                                       ORDER BY date ASC''')
+    #total number of ka 
+    all_ka_log = UserExerciseLog.objects.raw('''SELECT `opendsa_t1061220`.`id`, COUNT(`opendsa_t1061220`.`exercise_id`) AS ka_exe,
+                                                       DATE(`opendsa_t1061220`.`time_done`)  AS date 
+                                                       FROM `opendsa_t1061220`
+                                                       JOIN `opendsa_exercise`
+                                                       ON `opendsa_t1061220`.`exercise_id` = `opendsa_exercise`.`id`
+                                                       WHERE `opendsa_exercise`.`ex_type`='ka'
+                                                       GROUP BY date
+                                                       ORDER BY date ASC''')
+    #total number of pe 
+    all_pe_log = UserExerciseLog.objects.raw('''SELECT `opendsa_t1061220`.`id`, COUNT(`opendsa_t1061220`.`exercise_id`) AS pe_exe,
+                                                       DATE(`opendsa_t1061220`.`time_done`)  AS date 
+                                                       FROM `opendsa_t1061220`
+                                                       JOIN `opendsa_exercise`
+                                                       ON `opendsa_t1061220`.`exercise_id` = `opendsa_exercise`.`id`
+                                                       WHERE `opendsa_exercise`.`ex_type`='pe'
+                                                       GROUP BY date
+                                                       ORDER BY date ASC''')
+
+
+    all_daily_logs=[]
+    for day in day_list:
+        ex_logs={}
+        ex_logs['dt'] = day.date.strftime('%Y-%m-%d')
+        ex_logs['d_attempts']=0
+        ex_logs['registrations']=0
+        ex_logs['proficients']=0
+        ex_logs['a_attempts']=0
+        ex_logs['interactions']=0
+        ex_logs['ss']=0
+        ex_logs['ka']=0
+        ex_logs['pe']=0
+        #distinct users attempts
+        for udl in user_day_log:
+            if (day.date == udl.date):
+                ex_logs['d_attempts'] = int(udl.users)
+        #distinct users registration
+        for url in user_reg_log:
+            if (day.date == url.date):
+                ex_logs['registrations'] = int(url.regs)
+        #total proficient  
+        for apl in all_prof_log:
+            if (day.date == apl.date):
+                ex_logs['proficients'] = int(apl.profs)
+        #all exercises attempts (all questions)
+        for ael in all_exe_log:
+            if (day.date == ael.date):
+                ex_logs['a_attempts'] = int(ael.exe)
+        #all interactions
+        for uul in user_use_log:
+            if (day.date == uul.date):
+                ex_logs['interactions'] = int(uul.users)
+        #all ss attempts
+        for asl in all_ss_log:
+            if (day.date == asl.date):
+                ex_logs['ss'] = int(asl.ss_exe)
+        #all ka attempts
+        for akl in all_ka_log:
+            if (day.date == akl.date):
+                ex_logs['ka'] = int(akl.ka_exe)
+        #all pe attempts
+        for apl in all_pe_log:
+            if (day.date == apl.date):
+                ex_logs['pe'] = int(apl.pe_exe)
+
+        all_daily_logs.append(ex_logs)
+
+    #write data into a file
+    try:
+        ofile = open(settings.MEDIA_ROOT + 'daily_stats_t1061220.json','w') #'ab+')
+        ofile.writelines(str(all_daily_logs).replace("'",'"'))
+        ofile.close
+    except IOError as e:
+        print "error ({0}) written file : {1}".format(e.errno, e.strerror)
+
+
+
 def exercises_logs():
     #days rage, now all dayys the book was used
     day_list = UserExerciseLog.objects.raw('''SELECT id, DATE(time_done) As date
@@ -164,7 +294,7 @@ def exercises_logs():
         
     #write data into a file
     try:
-        ofile = open(settings.STATICFILES_DIRS[0] + '/daily_stats.json','ab+')
+        ofile = open(settings.MEDIA_ROOT + 'daily_stats.json','w') #'ab+')
         ofile.writelines(str(all_daily_logs).replace("'",'"'))
         ofile.close
     except IOError as e:
@@ -174,7 +304,8 @@ def exercises_logs():
 @login_required
 def daily_summary(request):
     #exercises_logs()
-    context = RequestContext(request, {'daily_stats': str(settings.STATIC_URL + 'daily_stats.json')})
+    #class_data()
+    context = RequestContext(request, {'daily_stats': str(settings.MEDIA_URL + 'daily_stats.json')})
     return render_to_response("opendsa/daily-ex-stats.html", context)
 
 
@@ -187,16 +318,30 @@ def exercise_summary(request, book, course):
         exercises_points_list =[]
         BookModExercises = BookModuleExercise.components.select_related().filter(book=obj_book) 
         exercise_table = {}
+        total_sorting = 0
+        total_hashing = 0
+        sorting_exe = []
+        hashing_exe = []
         #we preparing the data for datatables jquery plugin
         #List containing users data: [["username","points","exercise1 score", "exercise1 score",...]]
         udata_list = []
         columns_list = []
         columns_list.append({"sTitle":"Username"})
-        columns_list.append({"sTitle":"Points"})        
+        columns_list.append({"sTitle":"Points"})      
+        columns_list.append({"sTitle":"Sorting"})   
+        columns_list.append({"sTitle":"Hashing"})    
 
+        sorting = [2,3,5,6,7,8,12,13,14,15,16,17,18,20,37]
+        hashing = [21,22,23,24,25,26,28,29,30,31,32]
         for bookmodex in BookModExercises:
             exercises.append(bookmodex.exercise)
             exercises_points_list.append(bookmodex.points)
+            if bookmodex.module.id in sorting:
+                total_sorting += Decimal(bookmodex.points)
+                sorting_exe.append(bookmodex.exercise.id)
+            if bookmodex.module.id in hashing:
+                total_hashing += Decimal(bookmodex.points)
+                hashing_exe.append(bookmodex.exercise.id)
             columns_list.append({"sTitle":str(bookmodex.exercise.name)+'<span class="details" style="display:inline;" data-type="'+str(bookmodex.exercise.description)+'"></span>',"sClass": "center" }) 
         #remove duplicates
         exercises = list(OrderedDict.fromkeys(exercises))
@@ -205,6 +350,9 @@ def exercise_summary(request, book, course):
         for userdata in userData:
             if not userdata.user.is_staff:
                 u_points = 0
+                s_points = 0
+                h_points = 0
+                sh_data = []
                 u_data = [] 
                 u_data.append(str(userdata.user.username))
                 values = ['--<span class="details" style="display:inline;" data-type="Not Started"></span>' for j in range(len(exercises))]
@@ -217,14 +365,22 @@ def exercise_summary(request, book, course):
                         u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
                         values[exercises.index(exercise_t)]= 'Done<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
                         u_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
-                     
+                        if exercise_t.id in sorting_exe:
+                            s_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
+                        if exercise_t.id in hashing_exe:
+                            h_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
+
                 for s_ex in started_ex:
                     if Exercise.objects.get(id=s_ex) in exercises and s_ex not in  prof_ex:   
                         exercise_t = Exercise.objects.get(id=s_ex)
                         #get detailed information
                         u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
                         values[exercises.index(exercise_t)]= 'Started<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+                sh_score = '%s/%s' %(s_points,total_sorting)
                 u_data.append(float(u_points))
+                u_data.append(sh_score)
+                sh_score = '%s/%s' %(h_points,total_hashing)
+                u_data.append(sh_score)
                 u_data = u_data + values
                 udata_list.append(u_data)
         context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list}) 

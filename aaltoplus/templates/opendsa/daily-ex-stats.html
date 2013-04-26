@@ -11,14 +11,26 @@
 
 <!-- TODO(jace): Avoid the repeated use of inline style -->
 <div id="page-header" style="width:1600px; margin: 40px auto;">
-	<h1>Daily Statistics</h1>
+	<h1 id="page-title">Daily Statistics</h1>
 </div>
 
 
 
 <div id="ex_chart_container" style="width:1600px; margin: 40px auto;"></div>
 
+<div id="class_container" style="width:1600px; margin: 40px auto;">
+        <h5>Class</h5>
+        <select title="Classes" id="classlist">
+            <option value="all">All</option>
+            <option value="egypt">CS223</option>
+            <option value="cao">CS3114a</option>
+            <option value="barnette">CS3114b</option>
+            <option value="finland">T1061220</option>
+        </select>
+</div>
+
 <div id="ex_input_container" style="width:1600px; margin: 40px auto;">
+        <h5>Statistics</h5>
 	<select title="Exercise" id="exerciselist" size="20"></select>
 	<br><br>
 </div>
@@ -54,12 +66,35 @@ var exChartOptions = {
     series: []
 };
 
+var classFile = "/media/daily_stats.json";
+
 $(document).ready(function() {
 
     var SORT_BY_DATE = JSON.stringify({"dt": 1});
 
     var chart;
-    var url = "{{ daily_stats|safe }}";
+    var url = classFile;   //"{{ daily_stats|safe }}";
+
+
+    var setClass = function() { 
+        var className = $("#classlist").val();
+        $("#page-title").text(function(i, oldText) {
+            return  "Daily Statistics"+" - "+ className;
+        }); 
+        if (className=="egypt") {
+            classFile = "/media/daily_stats_egypt.json";    
+        }
+        if (className=="barnette") {
+            classFile = "/media/daily_stats_cs3114b.json";
+        }
+        if (className=="cao") {
+            classFile = "/media/daily_stats_cs3114a.json";
+        }
+        if (className=="finland") {
+            classFile = "/media/daily_stats_t1061220.json";
+        }
+
+    };
     var setExChart = function() {
 
         var exName = $("#exerciselist").val();
@@ -76,7 +111,7 @@ $(document).ready(function() {
                 "sort": SORT_BY_DATE,
                 "batch_size": 15000
         };
-        var url = "{{ daily_stats|safe }}";
+        var url = classFile;  //"{{ daily_stats|safe }}";
         deferreds[deferreds.length] = $.getJSON(url, params, function(sdata) {
                 series = sdata;
                 // this function takes the result of the mongodb simple REST api
@@ -149,6 +184,7 @@ $(document).ready(function() {
     }
 
     $("#exerciselist").change(function(event) {setExChart();});
+    $("#class_container").change(function(event) {setClass();}); 
 
 });
 

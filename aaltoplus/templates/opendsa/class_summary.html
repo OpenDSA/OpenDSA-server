@@ -22,7 +22,7 @@
                 "oTableTools": {
 			"sSwfPath": "{{ STATIC_URL }}datatables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf"
 		},
-                "sPaginationType": "full_numbers",
+                "bPaginate": false,
                 "aaData": {{ udata_list|safe  }},
                 "aoColumns": {{ columns_list|safe  }},
             } ); 
