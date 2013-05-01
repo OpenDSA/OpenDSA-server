@@ -327,20 +327,16 @@ def exercise_summary(request, book, course):
         udata_list = []
         columns_list = []
         columns_list.append({"sTitle":"Username"})
-<<<<<<< HEAD
         columns_list.append({"sTitle":"Points"})      
         columns_list.append({"sTitle":"Sorting"})   
         columns_list.append({"sTitle":"Hashing"})    
-=======
         columns_list.append({"sTitle":"Points"})
->>>>>>> 6950e8516a46ce63fb1434e08ef55c113d685fba
 
         sorting = [2,3,5,6,7,8,12,13,14,15,16,17,18,20,37]
         hashing = [21,22,23,24,25,26,28,29,30,31,32]
         for bookmodex in BookModExercises:
             exercises.append(bookmodex.exercise)
             exercises_points_list.append(bookmodex.points)
-<<<<<<< HEAD
             if bookmodex.module.id in sorting:
                 total_sorting += Decimal(bookmodex.points)
                 sorting_exe.append(bookmodex.exercise.id)
@@ -348,15 +344,12 @@ def exercise_summary(request, book, course):
                 total_hashing += Decimal(bookmodex.points)
                 hashing_exe.append(bookmodex.exercise.id)
             columns_list.append({"sTitle":str(bookmodex.exercise.name)+'<span class="details" style="display:inline;" data-type="'+str(bookmodex.exercise.description)+'"></span>',"sClass": "center" }) 
-=======
             columns_list.append({"sTitle":str(bookmodex.exercise.name)+'<span class="details" style="display:inline;" data-type="'+str(bookmodex.exercise.description)+'"></span>',"sClass": "center" })
->>>>>>> 6950e8516a46ce63fb1434e08ef55c113d685fba
         #remove duplicates
         exercises = list(OrderedDict.fromkeys(exercises))
         userData = UserData.objects.select_related().filter(book=obj_book, user__is_staff=0).order_by('user')
         users = []
         for userdata in userData:
-<<<<<<< HEAD
             if not userdata.user.is_staff:
                 u_points = 0
                 s_points = 0
@@ -393,32 +386,30 @@ def exercise_summary(request, book, course):
                 u_data = u_data + values
                 udata_list.append(u_data)
         context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list}) 
-=======
-            u_points = 0
-            u_data = []
-            u_data.append(str(userdata.user.username))
-            values = ['--<span class="details" style="display:inline;" data-type="Not Started"></span>' for j in range(len(exercises))]
-            prof_ex = userdata.get_prof_list()
-            started_ex = userdata.get_started_list()
-            for p_ex in prof_ex:
-                exercise_t = Exercise.objects.get(id=p_ex)
-                if exercise_t in exercises:
+#            u_points = 0
+#            u_data = []
+#            u_data.append(str(userdata.user.username))
+#            values = ['--<span class="details" style="display:inline;" data-type="Not Started"></span>' for j in range(len(exercises))]
+#            prof_ex = userdata.get_prof_list()
+#            started_ex = userdata.get_started_list()
+#            for p_ex in prof_ex:
+#                exercise_t = Exercise.objects.get(id=p_ex)
+#                if exercise_t in exercises:
                     #get detailed information
-                    u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
-                    values[exercises.index(exercise_t)]= 'Done<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
-                    u_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
+#                    u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
+#                    values[exercises.index(exercise_t)]= 'Done<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+#                    u_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
 
-            for s_ex in started_ex:
-                if Exercise.objects.get(id=s_ex) in exercises and s_ex not in  prof_ex:
-                    exercise_t = Exercise.objects.get(id=s_ex)
+#            for s_ex in started_ex:
+#                if Exercise.objects.get(id=s_ex) in exercises and s_ex not in  prof_ex:
+#                    exercise_t = Exercise.objects.get(id=s_ex)
                     #get detailed information
-                    u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
-                    values[exercises.index(exercise_t)]= 'Started<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
-            u_data.append(float(u_points))
-            u_data = u_data + values
-            udata_list.append(u_data)
-        context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list})
->>>>>>> 6950e8516a46ce63fb1434e08ef55c113d685fba
+#                    u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
+#                    values[exercises.index(exercise_t)]= 'Started<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+#            u_data.append(float(u_points))
+#            u_data = u_data + values
+#            udata_list.append(u_data)
+#        context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list})
         return render_to_response("opendsa/class_summary.html", context)
     else:
         return  HttpResponseForbidden('<h1>Page Forbidden</h1>')
