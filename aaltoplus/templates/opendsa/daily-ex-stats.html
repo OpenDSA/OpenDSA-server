@@ -84,14 +84,17 @@ $(document).ready(function() {
         if (className=="egypt") {
             classFile = "/media/daily_stats_egypt.json";    
         }
-        if (className=="barnette") {
+        else if (className=="barnette") {
             classFile = "/media/daily_stats_cs3114b.json";
         }
-        if (className=="cao") {
+        else if (className=="cao") {
             classFile = "/media/daily_stats_cs3114a.json";
         }
-        if (className=="finland") {
+        else if (className=="finland") {
             classFile = "/media/daily_stats_t1061220.json";
+        }
+        else {
+            classFile = "/media/daily_stats.json";
         }
 
     };
@@ -184,7 +187,7 @@ $(document).ready(function() {
     }
 
     $("#exerciselist").change(function(event) {setExChart();});
-    $("#class_container").change(function(event) {setClass();}); 
+    $("#class_container").change(function(event) {setClass(); setExChart();}); 
 
 });
 
