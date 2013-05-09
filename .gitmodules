@@ -1,0 +1,3 @@
+[submodule "ODSA-django/QBank"]
+	path = ODSA-django/QBank
+	url = https://efouh@github.com/OpenDSA/QBank.git
