@@ -1,2 +1,4 @@
 #ignore compiled Python files
-*.pycsettings.py
+*.pyc
+*.pyc 
+settings.py
