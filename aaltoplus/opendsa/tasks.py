@@ -219,7 +219,7 @@ def class_data():
             if (day.date == apl.date):
                 ex_logs['pe'] = int(apl.pe_exe)
 
-        all_daily_logs.append(ex_logs)
+        #all_daily_logs.append(ex_logs)
 
     #write data into a file
     try:
