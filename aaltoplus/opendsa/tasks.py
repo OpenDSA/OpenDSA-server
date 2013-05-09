@@ -7,6 +7,7 @@ import logging
 
 
 import datetime
+from datetime import timedelta
 import models
 import simplejson as json
 import time
@@ -24,12 +25,10 @@ from django.utils import simplejson
 from django.contrib.sessions.models import Session
 from django.db import connection
 
-#Celery task
-#from celery import Celery
 from celery import task 
 from celery.task.schedules import crontab  
 from celery.decorators import periodic_task 
-
+from django.conf import settings
 
 def diff(a, b):
     b = set(b)
@@ -56,224 +55,181 @@ def make_wrong_attempt(user_data, user_exercise):
 
 
 
+@task()
+@periodic_task(run_every=crontab(hour="*", minute="*/15", day_of_week="*"))
+def user_exercises():
+    now = datetime.datetime.now()
+    yesterday = now - timedelta(1)    
+    c_user = 0
+    c_exer = 0
+    #c_user = User.objects.all().count()
+    user_reg_log = User.objects.raw('''SELECT id, COUNT(id) As regs,
+                                                      DATE(date_joined) As date
+                                                      FROM auth_user
+                                                      WHERE DATE(date_joined) = %s
+                                                      GROUP BY date
+                                                      ORDER BY date ASC''',[yesterday.date().strftime('%Y-%m-%d')])
+    all_exe_log = UserExerciseLog.objects.raw('''SELECT id, COUNT(exercise_id) AS exe, 
+                                                             DATE(time_done) AS date
+                                                      FROM  opendsa_userexerciselog 
+                                                      WHERE DATE(time_done) = %s
+                                                      GROUP BY date 
+                                                      ORDER BY date ASC''',[yesterday.date().strftime('%Y-%m-%d')])
+   
+    for url in user_reg_log: 
+        if not url.is_staff: 
+            c_user+=1
+
+    #c_exer = UserExerciseLog.objects.all().count()
+    for ael in all_exe_log:
+        c_exer += ael.exe
+
+    #write data into a file
+    try:
+        json_data = open(settings.MEDIA_ROOT + 'widget_stats.json')
+        data = json.load(json_data)
+        data['users'] = int(data['users']) + c_user 
+        data['exercises'] = int(data['exercises']) + c_exer
+
+        ofile = open(settings.MEDIA_ROOT + 'widget_stats.json','w')
+        ofile.writelines(str(data).replace("'",'"'))
+        ofile.close
+    except IOError as e:
+        print "error ({0}) written file : {1}".format(e.errno, e.strerror)
 
 
 @task()
-@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
-def book_module_exercise():
+@periodic_task(run_every=crontab(hour="1", minute="0", day_of_week="*"))
+def class_data():
+    
+    day_list = []
+    now = datetime.datetime.now()
+    yesterday = now - timedelta(1)
+    day_list.append(yesterday)
 
-   cursor = connection.cursor()
-   cursor.execute("TRUNCATE TABLE `opendsa_bookmoduleexercise`")
+    #distinct user exercise attempts
+    user_day_log = UserExerciseLog.objects.raw('''SELECT id, COUNT(DISTINCT user_id) As users,
+                                                         DATE(time_done) As date
+                                                  FROM opendsa_userexerciselog
+                                                  WHERE DATE(time_done) = %s 
+                                                  GROUP BY date
+                                                  ORDER BY date ASC''', [yesterday.date().strftime('%Y-%m-%d')])
+    #user registration per day 
+    user_reg_log = User.objects.raw('''SELECT id, COUNT(id) As regs,
+                                                      DATE(date_joined) As date
+                                                      FROM auth_user
+                                                      WHERE DATE(date_joined) = %s
+                                                      GROUP BY date
+                                                      ORDER BY date ASC''', [yesterday.date().strftime('%Y-%m-%d')])
+    #user usage per day (interactions)
+    user_use_log = UserButton.objects.raw('''SELECT id, COUNT(user_id) As users,
+                                                             DATE(action_time) As date
+                                                      FROM opendsa_userbutton
+                                                      WHERE DATE(action_time) = %s
+                                                      GROUP BY date
+                                                      ORDER BY date ASC''', [yesterday.date().strftime('%Y-%m-%d')])
 
-   modules = Module.objects.all() 
-   book = Books.objects.get(book_name="Fall2012")  
-   for mod in modules:
-      exe_list = mod.get_proficiency_model()
-      for exer in exe_list:
-          if len( Exercise.objects.filter(id=exer))>0:
-             bme = BookModuleExercise(  
-                      book= book,
-                      module= mod,
-                      exercise = Exercise.objects.get(id=exer) 
-             )    
-             bme.save()  
+    #distinct all proficiency per day per exercise
+    all_prof_log = UserExerciseLog.objects.raw('''SELECT id, COUNT(earned_proficiency) AS profs,
+                                                          DATE(time_done) AS date
+                                                   FROM  opendsa_userexerciselog 
+                                                   WHERE earned_proficiency = 1 AND DATE(time_done) = %s
+                                                   GROUP BY date   
+                                                   ORDER BY date ASC''', [yesterday.date().strftime('%Y-%m-%d')])
 
+    #number of exercises attempted
+    all_exe_log = UserExerciseLog.objects.raw('''SELECT id, COUNT(exercise_id) AS exe, 
+                                                             DATE(time_done) AS date
+                                                      FROM  opendsa_userexerciselog 
+                                                      WHERE DATE(time_done) = %s
+                                                      GROUP BY date 
+                                                      ORDER BY date ASC''', [yesterday.date().strftime('%Y-%m-%d')])
 
-#@task()
-#@periodic_task(run_every=crontab(hour="*", minute="*/8", day_of_week="*"))
-def student_summary():
-
-   #we empty the table first
-   cursor = connection.cursor()
-   cursor.execute("TRUNCATE TABLE `opendsa_usersummary`")
-
-   user_exercises = UserExercise.objects.order_by('user').all()
-   exercises =Exercise.objects.all()
-   exe_list = []
-   u_exe_list = []
-
-   cur_user = 0
-   grouping = 0
-   for exer in exercises:
-      exe_list.append(exer)
-   for u_exe in user_exercises:
-      #u_exe_list.append(u_exe.exercise.id)
-      if cur_user != u_exe.user and grouping == 0:
-         cur_user = u_exe.user
-         grouping += 1
-         #u_exe_list.append(u_exe.exercise)
-      elif cur_user != u_exe.user and grouping != 0:
-         exe_not_started = diff(set(exe_list),set(u_exe_list))
-         for ex in exe_not_started:
-            if len(UserSummary.objects.filter(grouping=grouping, key=ex.name))==0 and ex.name!="":
-               u_summary1 = models.UserSummary(
-                   grouping = grouping,
-                   key = ex.name,
-                   value = '-1',
-               )
-               u_summary1.save()
-         cur_user = u_exe.user
-         grouping += 1
-         del u_exe_list[:]
-      if u_exe.is_proficient():
-             value = '1'
-      else:
-             value = '0'
-
-      if not UserSummary.objects.filter(value=u_exe.user.username):
-         u_summary = models.UserSummary(
-              grouping = grouping,
-              key = 'user',
-              value = u_exe.user.username,
-         )
-         u_summary.save()
-         if u_exe.exercise.name !="":
-            u_summary2 = models.UserSummary(
-                   grouping = grouping,
-                   key = u_exe.exercise.name,
-                   value = value,
-            )
-            u_summary2.save()
-      else:
-         if len(UserSummary.objects.filter(grouping=grouping, key=u_exe.exercise.name))==0:
-            u_summary1 = models.UserSummary(
-                 grouping = grouping,
-                 key = u_exe.exercise.name,
-                 value = value,
-            )
-            u_summary1.save()
-         else:
-            u_summary1 = UserSummary.objects.filter(grouping=grouping, key=u_exe.exercise.name)[0]
-            if int(u_summary1.value)<int(value):  
-               u_summary1.value = value
-               u_summary1.save()  
-      u_exe_list.append(u_exe.exercise.id)
-   u_exe_list.append(u_exe.exercise.id)
-   exe_not_started = diff(set(exe_list),set(u_exe_list))
-   for ex in exe_not_started:
-       if len(UserSummary.objects.filter(grouping=grouping, key=ex.name))==0 and ex.name!="":
-          u_summary1 = models.UserSummary(
-               grouping = grouping,
-               key = ex.name,
-               value = '-1',
-          )
-          u_summary1.save()
+   #total number of ss 
+    all_ss_log = UserExerciseLog.objects.raw('''SELECT `opendsa_userexerciselog`.`id`, COUNT(`opendsa_userexerciselog`.`exercise_id`) AS ss_exe,
+                                                       DATE(`opendsa_userexerciselog`.`time_done`)  AS date 
+                                                       FROM `opendsa_userexerciselog`
+                                                       JOIN `opendsa_exercise`
+                                                       ON `opendsa_userexerciselog`.`exercise_id` = `opendsa_exercise`.`id`
+                                                       WHERE `opendsa_exercise`.`ex_type`='ss' AND DATE(`opendsa_userexerciselog`.`time_done`) = %s
+                                                       GROUP BY date
+                                                       ORDER BY date ASC''', [yesterday.date().strftime('%Y-%m-%d')])
+    #total number of ka 
+    all_ka_log = UserExerciseLog.objects.raw('''SELECT `opendsa_userexerciselog`.`id`, COUNT(`opendsa_userexerciselog`.`exercise_id`) AS ka_exe,
+                                                       DATE(`opendsa_userexerciselog`.`time_done`)  AS date 
+                                                       FROM `opendsa_userexerciselog`
+                                                       JOIN `opendsa_exercise`
+                                                       ON `opendsa_userexerciselog`.`exercise_id` = `opendsa_exercise`.`id`
+                                                       WHERE `opendsa_exercise`.`ex_type`='ka' AND DATE(`opendsa_userexerciselog`.`time_done`) = %s
+                                                       GROUP BY date
+                                                       ORDER BY date ASC''', [yesterday.date().strftime('%Y-%m-%d')])
+    #total number of pe 
+    all_pe_log = UserExerciseLog.objects.raw('''SELECT `opendsa_userexerciselog`.`id`, COUNT(`opendsa_userexerciselog`.`exercise_id`) AS pe_exe,
+                                                       DATE(`opendsa_userexerciselog`.`time_done`)  AS date 
+                                                       FROM `opendsa_userexerciselog`
+                                                       JOIN `opendsa_exercise`
+                                                       ON `opendsa_userexerciselog`.`exercise_id` = `opendsa_exercise`.`id`
+                                                       WHERE `opendsa_exercise`.`ex_type`='pe' AND DATE(`opendsa_userexerciselog`.`time_done`) = %s
+                                                       GROUP BY date
+                                                       ORDER BY date ASC''', [yesterday.date().strftime('%Y-%m-%d')])
 
 
-#given a user exercise activity list returs 3 list conataining not started, started and proficient exercises respectively.
-def exercise_list_split(u_exe_list, mod):
-    prof =[]
-    started = []
-    notstart = []
-    exe_in_table = []
-    for ue in u_exe_list:
-       if ue.exercise.id in mod.get_proficiency_model():
-          exe_in_table.append(ue.exercise.name)  
-          if ue.is_proficient:
-             prof.append(ue.exercise.name)
-          else:
-             started.append(ue.exercise.name)
-    for mod_exe in mod.get_proficiency_model():
-          if mod_exe not in prof and mod_exe not in started and len(Exercise.objects.filter(id=mod_exe))>0: 
-              notstart.append(Exercise.objects.filter(id=mod_exe)[0].name)
-    return notstart, started, prof  
+    all_daily_logs=[]
+    for day in day_list:
+        ex_logs={}
+        ex_logs['dt'] = day.date().strftime('%Y-%m-%d')
+        ex_logs['d_attempts']=0
+        ex_logs['registrations']=0
+        ex_logs['proficients']=0
+        ex_logs['a_attempts']=0
+        ex_logs['interactions']=0
+        ex_logs['ss']=0
+        ex_logs['ka']=0
+        ex_logs['pe']=0
+        #distinct users attempts
+        for udl in user_day_log:
+            if (day.date == udl.date):
+                ex_logs['d_attempts'] = int(udl.users)
+        #distinct users registration
+        for url in user_reg_log:
+            if (day.date == url.date):
+                ex_logs['registrations'] = int(url.regs)
+        #total proficient  
+        for apl in all_prof_log:
+            if (day.date == apl.date):
+                ex_logs['proficients'] = int(apl.profs)
+        #all exercises attempts (all questions)
+        for ael in all_exe_log:
+            if (day.date == ael.date):
+                ex_logs['a_attempts'] = int(ael.exe)
+        #all interactions
+        for uul in user_use_log:
+            if (day.date == uul.date):
+                ex_logs['interactions'] = int(uul.users)
+        #all ss attempts
+        for asl in all_ss_log:
+            if (day.date == asl.date):
+                ex_logs['ss'] = int(asl.ss_exe)
+        #all ka attempts
+        for akl in all_ka_log:
+            if (day.date == akl.date):
+                ex_logs['ka'] = int(akl.ka_exe)
+        #all pe attempts
+        for apl in all_pe_log:
+            if (day.date == apl.date):
+                ex_logs['pe'] = int(apl.pe_exe)
 
-#@task()
-#@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
-def student_module_summary():
+        all_daily_logs.append(ex_logs)
 
-   #we empty the table first
-   cursor = connection.cursor()
-   cursor.execute("TRUNCATE TABLE `opendsa_usermodulesummary`")
-  
-   users = User.objects.all()
-   modules = Module.objects.all()
-   exercises = Exercise.objects.all() 
-   for user in users: 
-       for mod in modules:
-           if len(UserModule.objects.filter(user=user,module=mod))==0: #module not started
-               if mod.exercise_list=="":
-                  exe_list ='None' 
-               u_mod_s = models.UserModuleSummary( 
-                       user = user.username,
-                       module = mod.name,
-                       module_status = "-1",
-                       proficient_exe = "",
-                       started_exe = "",
-                       notstarted_exe = exe_list,
-               )
-               u_mod_s.save()
-           else:  
-               u_mod = UserModule.objects.get(user=user,module=mod)
-               if u_mod.is_proficient_at():
-                   stat = "1"
-               else:
-                   stat = "0"
-               u_exe = UserExercise.objects.filter(user=user)
-               notstart, start, prof = exercise_list_split(u_exe, mod) 
-               
-               u_mod_s = models.UserModuleSummary(
-                       user = user.username,
-                       module = mod.name,
-                       module_status = stat,
-                       first_done = u_mod.first_done,
-                       last_done = u_mod.last_done,
-                       proficient_date = u_mod.proficient_date,
-                       proficient_exe = ",".join(prof),
-                       started_exe = ",".join(start),
-                       notstarted_exe = ",".join(notstart),
-               )
-               u_mod_s.save()
+    #write data into a file
+    try:
+        json_data = open(settings.MEDIA_ROOT + 'daily_stats1.json')
+        data = json.load(json_data)
+        data.append(ex_logs)        
+    
+        ofile = open(settings.MEDIA_ROOT + 'daily_stats1.json','w') 
+        ofile.writelines(str(data).replace("'",'"'))
+        ofile.close
+    except IOError as e:
+        print "error ({0}) written file : {1}".format(e.errno, e.strerror)
 
-
-     
-
-
-
-
-
-#@task()
-#@periodic_task(run_every=crontab(hour="*/3", minute="0", day_of_week="*"))
-def exercise_module():
-   #we empty the table first
-   cursor = connection.cursor()
-   cursor.execute("TRUNCATE TABLE `opendsa_exercisemodule`")
-   exercises = Exercise.objects.all() 
-   modules = Module.objects.all() 
-
-   for exer in exercises: 
-      for mod in modules: 
-         if exer.id in mod.get_proficiency_model() and  exer.name!='' and  mod.name!='': 
-             ex_mod = models.ExerciseModule(
-                  exercise = exer.name,
-                  module = mod.name,
-             )
-             ex_mod.save()
-
-
-#@task()
-#@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
-def compute_points():
-
-   user_data = UserData.objects.all()
-   book = Books.objects.get(book_name="Fall2012")
-   for u_data in user_data:
-      grade = 0 
-      prof_list = u_data.get_prof_list()
-      for exercise_id in prof_list:
-          exercise = Exercise.objects.get(id=exercise_id)
-          if exercise.ex_type == 'ss':
-                 points = Decimal(book.ss_points)
-          elif exercise.ex_type == 'pe':
-                 points = Decimal(book.pe_points)
-          elif exercise.ex_type == 'ka':
-                 points = Decimal(book.ka_points)
-          elif exercise.ex_type == 'ot':
-                 points = Decimal(book.ot_points)
-          elif exercise.ex_type == 'pr':
-                 points = Decimal(book.pr_points)
-          else:
-                 points = 0 
-          grade += points
-      u_data.points = Decimal(format(Decimal(grade), '.2f'))  #grade 
-      u_data.save()
