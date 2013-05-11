@@ -670,7 +670,7 @@ class ModuleResource(ModelResource):
                     response[kexercise.name] = {'proficient': u_prof, 'progress': u_prog}
 
                 # Remove exercises that are no longer part of this book / module
-                for exer in BookModuleExercise.components.get_exercise_list(kbook):
+                for exer in BookModuleExercise.components.get_mod_exercise_list(kbook,kmodule): #get_exercise_list(kbook):
                   if exer not in exers_:
                     BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=exer).delete()
 

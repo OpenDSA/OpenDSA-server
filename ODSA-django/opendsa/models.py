@@ -125,6 +125,11 @@ class ModuleExerciseManager(models.Manager):
             exercise_list.append(bme.exercise)
         return exercise_list 
 
+    def get_mod_exercise_list(self, book, mod):
+        exercise_list =[]
+        for bme in super(ModuleExerciseManager,self).get_query_set().filter(book=book,module=mod):
+            exercise_list.append(bme.exercise)
+        return exercise_list
 
 
 #A table to hold Book, modules , exercises data
