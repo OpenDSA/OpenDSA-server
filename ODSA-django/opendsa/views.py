@@ -49,8 +49,15 @@ def get_active_exercises():
             active_exe.append(bme.exercise)
     return active_exe
 
-
-
+def convert(input):
+    if isinstance(input, dict):
+        return {convert(key): convert(value) for key, value in input.iteritems()}
+    elif isinstance(input, list):
+        return [convert(element) for element in input]
+    elif isinstance(input, unicode):
+        return input.encode('utf-8')
+    else:
+        return input
 
 def exercises_logs():
     #days rage, now all dayys the book was used
@@ -179,6 +186,32 @@ def daily_summary(request):
     context = RequestContext(request, {'daily_stats': str(settings.MEDIA_URL + 'daily_stats.json')})
     return render_to_response("opendsa/daily-ex-stats.html", context)
 
+def all_statistics(request):
+    #we only run the whole computaion if the statistic file is older than an hour
+    now = datetime.datetime.now()
+    stat_file = str(settings.MEDIA_ROOT + 'daily_stats.json')
+    statbuf = os.stat(stat_file)
+    last_modif = datetime.datetime.fromtimestamp(statbuf.st_mtime)
+    diff = now - last_modif
+    data = [] 
+    if diff > datetime.timedelta(0, 3600, 0):
+        stats =  exercises_logs()
+        context = RequestContext(request, {'daily_stats': stats})
+    else:
+        try:
+          f_handle = open(stat_file)
+          logs = convert(json.load(f_handle))
+          for t in logs:
+              data_0 = []
+              for key, value in t.iteritems():
+                  data_0.append(value)
+              data.append(data_0)
+          f_handle.close()
+        except IOError as e:
+          print "error ({0}) reading file : {1}".format(e.errno, e.strerror)
+
+        context = RequestContext(request, {'daily_stats': data})
+    return render_to_response("opendsa/all-stats.html", context) 
 
 @login_required
 def exercise_summary(request, book, course):
