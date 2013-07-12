@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>OpenDSA Widget</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+    <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}opendsa/css/activity.css" rel="stylesheet" media="screen" />
+  </head>
+  <body>
+    <h1>OpenDSA Statistics Widget</h1>
+    <hr>
+    <div id="data">
+       <h3>{{ exercises }} Exercises performed.</h3>
+       <h3>{{ users }} Registered users.</h3>  
+    </div>
+    <hr>
+    Copy the code below in your webpage to embed OpenDSA 
+    statistics widget.
+    <p></p>
+    <div id="code">
+    <textarea style="resize: none;width: auto;" id="codearea" wrap="hard" cols="100" rows="3">
+     <div id="widget-container"></div>
+     <script type="text/javascript" src="https://opensa.cc.vt.edu/media/widget.js"></script>
+    </textarea>
+    </div>
+  </body>
+</html>
+
+

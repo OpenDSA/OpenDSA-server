@@ -2,7 +2,7 @@
 from views import login, home, verify_credentials
 from oauth_provider.views import protected_resource_example
 
-from opendsa.views import exercise_summary, module_list, daily_summary, all_statistics
+from opendsa.views import exercise_summary, module_list, daily_summary, all_statistics, widget_data
 from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail, non_required_exercise_use, total_module_time, slideshow_cheating, work_order, skipping_text, slideshow_stats, time_required, cheating_exercises, work_distribution #,timeline_sum , timeline_detail
 
 # Django
@@ -27,6 +27,7 @@ urlpatterns = patterns('',
     url(r'^developer_view/exercises_stat/$', exercises_stat),
     url(r'^developer_view/daily_stat/$', daily_summary),
     url(r'^developer_view/stats/$', all_statistics),
+    url(r'^developer_view/widget/$', widget_data),
     url(r'^developer_view/non_required_exercise_use/$', non_required_exercise_use),
     url(r'^developer_view/slideshow_cheating/(?P<student>[\w]+)/$', slideshow_cheating),
     url(r'^developer_view/work_distribution/(?P<book>[\w]+)/(?P<bin_size>[\w]+)$', work_distribution),

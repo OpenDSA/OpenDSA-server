@@ -59,6 +59,50 @@ def convert(input):
     else:
         return input
 
+
+#function that checks if a file is older than the limit
+def is_file_old_enough(filename, limit): #limit in seconds
+    #we only run the whole computaion if the statistic file is older than an hour
+    now = datetime.datetime.now()
+    stat_file = str(settings.MEDIA_ROOT + filename)
+    statbuf = os.stat(stat_file)
+    last_modif = datetime.datetime.fromtimestamp(statbuf.st_mtime)
+    diff = now - last_modif
+    data = []
+    return  diff > datetime.timedelta(0, limit, 0)
+
+def widget_data(request):
+
+    if is_file_old_enough('widget_stats.json', 3600):
+        #number of exercises attempted
+        exe = UserExerciseLog.objects.count()
+
+        #number of registered attempted
+        user = User.objects.filter(is_staff=0).count()   
+ 
+        w_table = {}
+        w_table['exercises'] = exe
+        w_table['users'] = user
+
+        #write data into a file
+        try:
+            ofile = open(settings.MEDIA_ROOT + 'widget_stats.json','w') #'ab+')
+            ofile.writelines(str(w_table).replace("'",'"'))
+            ofile.close
+        except IOError as e:
+            print "error ({0}) written file : {1}".format(e.errno, e.strerror)
+
+    try:
+          f_handle = open(settings.MEDIA_ROOT + 'widget_stats.json')
+          logs = convert(json.load(f_handle))
+    except IOError as e:
+          print "error ({0}) reading file : {1}".format(e.errno, e.strerror)
+
+    context = RequestContext(request, {'exercises':logs['exercises'], 'users':logs['users']})
+    return render_to_response("opendsa/widget.html", context)
+
+
+
 def exercises_logs():
     #days rage, now all dayys the book was used
     day_list = UserExerciseLog.objects.raw('''SELECT id, DATE(time_done) As date
