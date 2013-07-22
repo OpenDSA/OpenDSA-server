@@ -317,17 +317,21 @@ class UserexerciseResource(ModelResource):
 
     def logavbutton(self, request, **kwargs):
         print request.POST
-        if request.POST['key']:
-            kusername = get_username(request.POST['key'])
+        #if request.POST['key']:
+        #    kusername = get_username(request.POST['key'])
 
-        if kusername:
-            actions = simplejson.loads(request.POST['actions'])
+        #if kusername:
+        #    actions = simplejson.loads(request.POST['actions'])
+            actions = simplejson.loads(request.POST)
             number_logs = 0
             for act in actions:
                 if 'score[total]' in request.POST:
                     streak = request.POST['score[total]']
                 else:
                     streak = 0
+                 
+                with transaction.commit_on_success():
+                    kusername, created = User.objects.get_or_create(username=act['user'])
 
                 if  Exercise.objects.filter(name=act['av']).count()==1:
                     kexercise = Exercise.objects.get(name=act['av'])
@@ -337,7 +341,7 @@ class UserexerciseResource(ModelResource):
                         kexercise.save()
 
                 with transaction.commit_on_success():
-                    kbook = Books.objects.get(book_name= request.POST['book'])
+                    kbook = Books.objects.get(book_name= act['book']) #request.POST['book'])
                     user_data, created = UserData.objects.get_or_create(user=kusername,book=kbook)
                 module = get_module(act['module'])
 
