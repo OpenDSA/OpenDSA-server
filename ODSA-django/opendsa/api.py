@@ -23,7 +23,7 @@ from django.utils import simplejson
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse
 from django.db import transaction, IntegrityError
-import jsonpickle
+import jsonpickle, json
 
 from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, \
                       attempt_problem_pe, update_module_proficiency, student_grade_all, date_from_timestamp
@@ -317,12 +317,14 @@ class UserexerciseResource(ModelResource):
 
     def logavbutton(self, request, **kwargs):
         print request.POST
+        for key,value in request.POST.iteritems():
         #if request.POST['key']:
         #    kusername = get_username(request.POST['key'])
 
         #if kusername:
         #    actions = simplejson.loads(request.POST['actions'])
-            actions = simplejson.loads(request.POST)
+        #actions = simplejson.loads(request.POST)
+            actions = json.loads(key) 
             number_logs = 0
             for act in actions:
                 if 'score[total]' in request.POST:
@@ -367,9 +369,9 @@ class UserexerciseResource(ModelResource):
                     if correct:
                         number_logs += 1
 
-            if number_logs == len(actions):
+        if number_logs == len(actions):
                 return self.create_response(request, {'success': True, 'message': 'all button action logged'})
-            else:
+        else:
                 return self.create_response(request, {'success': False, 'error': 'not all button action logged'}, HttpBadRequest)
         return self.create_response(request, {'success': False, 'error': 'unauthorized action'}, HttpUnauthorized)
 
