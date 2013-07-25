@@ -71,26 +71,37 @@ def is_file_old_enough(filename, limit): #limit in seconds
     data = []
     return  diff > datetime.timedelta(0, limit, 0)
 
+def get_widget_data():
+    exe = UserExerciseLog.objects.count()
+
+    #number of registered attempted
+    user = User.objects.filter(is_staff=0).count()
+
+    #get data from old databse
+    try:
+        old_handle = open(settings.MEDIA_ROOT + 'widget_stats1.json')
+        old_logs = convert(json.load(old_handle))
+        old_handle.close
+    except IOError as e:
+        print "error ({0}) written file : {1}".format(e.errno, e.strerror)
+
+    w_table = {}
+    w_table['exercises'] = int(exe) + int(old_logs['exercises'])
+    w_table['users'] = int(user) + int(old_logs['users'])
+
+    #write data into a file
+    try:
+        ofile = open(settings.MEDIA_ROOT + 'widget_stats.json','w') #'ab+')
+        ofile.writelines(str(w_table).replace("'",'"'))
+        ofile.close
+    except IOError as e:
+        print "error ({0}) written file : {1}".format(e.errno, e.strerror)
+
+
 def widget_data(request):
 
     if is_file_old_enough('widget_stats.json', 3600):
-        #number of exercises attempted
-        exe = UserExerciseLog.objects.count()
-
-        #number of registered attempted
-        user = User.objects.filter(is_staff=0).count()   
- 
-        w_table = {}
-        w_table['exercises'] = exe
-        w_table['users'] = user
-
-        #write data into a file
-        try:
-            ofile = open(settings.MEDIA_ROOT + 'widget_stats.json','w') #'ab+')
-            ofile.writelines(str(w_table).replace("'",'"'))
-            ofile.close
-        except IOError as e:
-            print "error ({0}) written file : {1}".format(e.errno, e.strerror)
+        get_widget_data()
 
     try:
           f_handle = open(settings.MEDIA_ROOT + 'widget_stats.json')
@@ -217,6 +228,13 @@ def exercises_logs():
         
     #write data into a file
     try:
+        ffile = open(settings.MEDIA_ROOT + 'daily_stats1.json')
+        fall12_data = ffile.readlines()
+        ffile.close()
+        all_daily_logs = fall12_data[0][1:-1] + ',' + str(all_daily_logs).replace("'",'"')[1:-1]
+        all_daily_logs = all_daily_logs.replace("[","").replace("]","")
+        all_daily_logs = '[' + all_daily_logs + ']' 
+        
         ofile = open(settings.MEDIA_ROOT + 'daily_stats.json','w') #'ab+')
         ofile.writelines(str(all_daily_logs).replace("'",'"'))
         ofile.close
@@ -238,7 +256,7 @@ def all_statistics(request):
     last_modif = datetime.datetime.fromtimestamp(statbuf.st_mtime)
     diff = now - last_modif
     data = [] 
-    if diff > datetime.timedelta(0, 3600, 0):
+    if diff > datetime.timedelta(0, 86400, 0): 
         stats =  exercises_logs()
         context = RequestContext(request, {'daily_stats': stats})
     else:
