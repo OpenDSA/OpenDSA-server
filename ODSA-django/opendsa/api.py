@@ -237,6 +237,16 @@ class ExerciseResource(ModelResource):
             'name': ('exact',),
         }
 
+    def dehydrate(self, bundle):
+        if  bundle.request.GET['key']:
+            kusername = get_username(bundle.request.GET['key'])
+            kexercise = get_exercise(bundle.request.GET['name'])
+            if(kusername and kexercise):
+                user_exercise = get_user_exercise(kusername, kexercise)
+                if(user_exercise):
+                    bundle.data['progress_streak'] = user_exercise.streak
+        return bundle
+
     def get_object_list(self, request):
         #Store KA exercise content load in UserButton table
         if request.GET['key']:
