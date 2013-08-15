@@ -266,3 +266,4 @@ def log_button_action( user, exercise, module, book, name, description, action_t
                         ip_address = ip_address)
 
     return button_log.save(),True
+

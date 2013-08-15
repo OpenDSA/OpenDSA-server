@@ -28,6 +28,8 @@ import jsonpickle, json
 from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, \
                       attempt_problem_pe, update_module_proficiency, student_grade_all, date_from_timestamp
 
+from openpop.LinkedListKAEx import assesskaex
+
 
 # Key generation and verification
 import hmac
@@ -308,9 +310,49 @@ class UserexerciseResource(ModelResource):
             url(r"^(?P<resource_name>%s)/attempt%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logexercise'), name="api_logexe"),
             url(r"^(?P<resource_name>%s)/hint%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logexercisehint'), name="api_logexeh"),
             url(r"^(?P<resource_name>%s)/attemptpe%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logpeexercise'), name="api_logpeexe"), #return success and isproficient??
+            url(r"^(?P<resource_name>%s)/attemptpop%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logprogexercise'), name="api_assesskaex"),
             url(r"^(?P<resource_name>%s)/avbutton%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('logavbutton'), name="api_logavbutt"),
              url(r"^(?P<resource_name>%s)/getprogress%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('getprogress'), name="api_getprogress"),
         ]
+
+
+
+    def logprogexercise(self, request, **kwargs):
+        if request.POST['key']:
+            kusername = get_username(request.POST['key'])
+            kexercise = get_exercise(request.POST['sha1'])
+
+            if kusername and kexercise:
+                user_exercise = get_user_exercise(kusername, kexercise)
+
+                if user_exercise is None:
+                    with transaction.commit_on_success():
+                        user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
+            else:
+                return self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized)
+
+            dsa_book = get_book(request.POST['book'])
+            ubook = get_user_book(kusername, dsa_book)
+
+            with transaction.commit_on_success():
+                user_data, created = UserData.objects.get_or_create(user=kusername, book=dsa_book)
+
+            module = get_module(request.POST['module_name'])
+
+            if user_exercise and ubook:
+                ex_question = request.POST['sha1']
+                if 'non_summative' in request.POST:
+                    ex_question = request.POST['non_summative']
+                #self.method_check(request, allowed=['post'])
+                if request.POST.get('code'):
+                    returnedString= assesskaex(request.POST.get('code') , request.POST.get('genlist'))
+                    print returnedString
+                    return self.create_response(request, jsonpickle.encode({'streak':4 , 'progress': 2 , 'correct':returnedString[0]  ,'message':returnedString[1] , 'openPop': True  }))
+                else :
+                    print "This is not an ajax call"
+                    return self.create_response(request, {'details': "Empty"})
+        return  self.create_response(request, {}, HttpUnauthorized)
+
 
     def listlogs():
         return UserExercise.objects.all()
@@ -328,12 +370,6 @@ class UserexerciseResource(ModelResource):
     def logavbutton(self, request, **kwargs):
         print request.POST
         for key,value in request.POST.iteritems():
-        #if request.POST['key']:
-        #    kusername = get_username(request.POST['key'])
-
-        #if kusername:
-        #    actions = simplejson.loads(request.POST['actions'])
-        #actions = simplejson.loads(request.POST)
             actions = json.loads(key) 
             number_logs = 0
             for act in actions:
