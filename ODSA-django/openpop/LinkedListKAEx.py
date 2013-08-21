@@ -1,5 +1,6 @@
 # Create your views here.
 from opendsa.models import  UserExercise, UserExerciseLog, UserData
+from opendsa.exercises import update_module_proficiency
 from opendsa import models 
 from decimal import Decimal                         
 from django.http import HttpResponse
