@@ -1,6 +1,7 @@
 # Create your views here.
 from opendsa.models import  UserExercise, UserExerciseLog, UserData
-from opendsa import models                          
+from opendsa import models 
+from decimal import Decimal                         
 from django.http import HttpResponse
 import xml.etree.ElementTree as xml # for xml parsing
 import shlex # for strings splitting
