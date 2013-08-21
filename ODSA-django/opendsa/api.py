@@ -363,8 +363,8 @@ class UserexerciseResource(ModelResource):
                                        
                    
                     returnedVar= uexercise.__dict__
-                    returnedVar['correct']= message[0]
-                    returnedVar['message']= message[1]
+                    returnedVar['correct']= messages[0]
+                    returnedVar['message']= messages[1]
                     
                     return self.create_response(request,jsonpickle.encode(returnedVar))
                 else :
