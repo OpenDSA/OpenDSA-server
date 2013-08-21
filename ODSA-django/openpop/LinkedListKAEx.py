@@ -90,7 +90,7 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
             update_module_proficiency(user_data, module, user_exercise.exercise)
 
        
-        return user_exercise,feedback[1]     #, user_exercise_graph, goals_updated
+        return user_exercise,feedback     #, user_exercise_graph, goals_updated
 
 
 def assesskaex(data , generatedList):

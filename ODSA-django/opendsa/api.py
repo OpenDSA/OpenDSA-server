@@ -348,7 +348,7 @@ class UserexerciseResource(ModelResource):
                     ex_question = request.POST['sha1']
                     if 'non_summative' in request.POST:
                        ex_question = request.POST['non_summative']
-                    uexercise, message = attempt_problem_pop(user_data, 
+                    uexercise, messages = attempt_problem_pop(user_data, 
 							     user_exercise, 
 					                     request.POST['attempt_number'],
 					                     request.POST['complete'],
@@ -363,7 +363,8 @@ class UserexerciseResource(ModelResource):
                                        
                    
                     returnedVar= uexercise.__dict__
-                    returnedVar["message"]= message
+                    returnedVar['correct']= message[0]
+                    returnedVar['message']= message[1]
                     
                     return self.create_response(request,jsonpickle.encode(returnedVar))
                 else :
