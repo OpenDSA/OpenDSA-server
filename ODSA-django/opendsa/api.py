@@ -28,7 +28,7 @@ import jsonpickle, json
 from exercises import attempt_problem, make_wrong_attempt, get_pe_name_from_referer, log_button_action, \
                       attempt_problem_pe, update_module_proficiency, student_grade_all, date_from_timestamp
 
-from openpop.LinkedListKAEx import assesskaex
+from openpop.LinkedListKAEx import attempt_problem_pop
 
 
 # Key generation and verification
@@ -321,7 +321,6 @@ class UserexerciseResource(ModelResource):
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
             kexercise = get_exercise(request.POST['sha1'])
-
             if kusername and kexercise:
                 user_exercise = get_user_exercise(kusername, kexercise)
 
@@ -345,11 +344,30 @@ class UserexerciseResource(ModelResource):
                     ex_question = request.POST['non_summative']
                 #self.method_check(request, allowed=['post'])
                 if request.POST.get('code'):
-                    returnedString= assesskaex(request.POST.get('code') , request.POST.get('genlist'))
-                    print returnedString
-                    return self.create_response(request, jsonpickle.encode({'streak':4 , 'progress': 2 , 'correct':returnedString[0]  ,'message':returnedString[1] , 'openPop': True  }))
+                    #returnedString= assesskaex(request.POST.get('code') , request.POST.get('genlist'), )
+                    ex_question = request.POST['sha1']
+                    if 'non_summative' in request.POST:
+                       ex_question = request.POST['non_summative']
+                    uexercise, message = attempt_problem_pop(user_data, 
+							     user_exercise, 
+					                     request.POST['attempt_number'],
+					                     request.POST['complete'],
+					                     request.POST['count_hints'],
+					                     int(request.POST['time_taken']),
+					                     request.POST['attempt_content'],
+					                     request.POST['module_name'],
+					                     ex_question, 
+					                     request.META['REMOTE_ADDR'],
+                                                             request.POST)
+
+                                       
+                   
+                    returnedVar= uexercise.__dict__
+                    returnedVar["message"]= message
+                    
+                    return self.create_response(request,jsonpickle.encode(returnedVar))
                 else :
-                    print "This is not an ajax call"
+                    
                     return self.create_response(request, {'details': "Empty"})
         return  self.create_response(request, {}, HttpUnauthorized)
 
@@ -698,6 +716,7 @@ class ModuleResource(ModelResource):
                             kexercise.save()
                     #add exercise in list of module exercises
                     exers_.append(kexercise)
+                    u_prof = False
                     if UserData.objects.filter(user=kusername, book=kbook).count() > 0:
                         user_data = UserData.objects.get(user=kusername, book=kbook)
                         u_prof = user_data.is_proficient_at(kexercise)
