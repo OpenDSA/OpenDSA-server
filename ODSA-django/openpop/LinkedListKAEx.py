@@ -101,7 +101,7 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
 def assesskaex(data , generatedList):
     
     print generatedList
-    feedback=[False, 'null']
+    feedback=[False, 'null', 333 , 'studentlisttest.java' , 'class studentlisttest']
     #print feedback
     #filesPath = '/home/OpenPOP/Backend/visualize/build/ListTest/javaSource/'
     filesPath = '/home/aalto-beta/ODSA-django/openpop/build/ListTest/javaSource/'
@@ -172,12 +172,12 @@ def assesskaex(data , generatedList):
               feedback[0] = False
 
         
-      
+     
     return  feedback
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Assessing binary tree exercise
 def assesskaexbintree (data):
-    feedback=[False, 'null']
+    feedback=[False, 'null', 179 , 'studentpreordertest.java' , 'class studentpreordertest']
     filesPath = '/home/aalto-beta/ODSA-django/openpop/build/TreeTest/javaSource/'
     
     #cleaning: deleting already created files
@@ -217,12 +217,14 @@ def assesskaexbintree (data):
           syntaxErrorFile.close()
           if os.stat(filesPath+'compilationerrors.out')[6]!=0:
              feedback[1]= feedback[1]#.rsplit(':',1)[1]
+             print feedback[1]
              return feedback;
     if os.path.isfile(filesPath+'runerrors.out'):
        #Check what is returned from the test : what is inside the success file
           runErrorFile = open(filesPath+'runerrors.out' , 'r')
           feedback[0] = False
           feedback[1]= runErrorFile.readlines()
+          print feedback[1]
           runErrorFile.close()
           if os.stat(filesPath+'runerrors.out')[6]!=0:
              return feedback;
