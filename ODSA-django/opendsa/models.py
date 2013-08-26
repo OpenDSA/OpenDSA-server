@@ -328,6 +328,11 @@ class UserExerciseLog(models.Model):
 
 
 
+class UserProgLog(models.Model):
+    problem_log =  models.ForeignKey(UserExerciseLog)
+    student_code = models.TextField()
+    feedback = models.TextField() 
+
 
 class UserProfExerciseLog(models.Model):
     problem_log =  models.ForeignKey(UserExerciseLog)
