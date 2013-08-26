@@ -14,6 +14,7 @@ from  exercise.exercise_models import CourseModule
 # OpenDSA 
 from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserData, UserExerciseLog, UserButton, Assignments   #UserSummary
 from opendsa.statistics import is_authorized, get_active_exercises,convert,is_file_old_enough, get_widget_data, exercises_logs 
+from opendsa.exercises import get_due_date, get_assignment
 from opendsa.forms import AssignmentForm
 
 # Django
@@ -74,6 +75,7 @@ def add_or_edit_assignment(request, module_id):
     """
     course_module = CourseModule.objects.get(id=module_id)
     course_books = []
+    assignment = None
     #retrieve books
     for cb in  Books.objects.filter(courses=course_module.course_instance):
         if cb not in course_books:
@@ -94,14 +96,16 @@ def add_or_edit_assignment(request, module_id):
         except IOError as e:
               print "error ({0}) writing file : {1}".format(e.errno, e.strerror)
 
-
-    assignment = get_object_or_404(Assignments, course_module=course_module)
+    if Assignments.objects.filter(course_module=course_module).count()>0:
+        assignment = get_object_or_404(Assignments, course_module=course_module)
     if request.method == "POST":
         form = AssignmentForm(request.POST, instance=assignment)
         if form.is_valid():
             assignment = form.save()
             messages.success(request, _('The assignment module was saved successfully.'))
     else:
+        if not assignment:
+            assignment = Assignments(course_module = course_module)
         form = AssignmentForm(instance=assignment)
     return render_to_response("course/edit_module.html",
                               CourseContext(request, course_instance=course_module.course_instance,
@@ -160,33 +164,36 @@ def exercise_summary(request, book, course):
         udata_list = []
         columns_list = []
         columns_list.append({"sTitle":"Username"})
-        columns_list.append({"sTitle":"Points"})      
-        columns_list.append({"sTitle":"Sorting"})   
-        columns_list.append({"sTitle":"Hashing"})    
         columns_list.append({"sTitle":"Points"})
-
-        sorting = [2,3,5,6,7,8,12,13,14,15,16,17,18,20,37]
-        hashing = [21,22,23,24,25,26,28,29,30,31,32]
-        for bookmodex in BookModExercises:
-            exercises.append(bookmodex.exercise)
-            exercises_points_list.append(bookmodex.points)
-            if bookmodex.module.id in sorting:
-                total_sorting += Decimal(bookmodex.points)
-                sorting_exe.append(bookmodex.exercise.id)
-            if bookmodex.module.id in hashing:
-                total_hashing += Decimal(bookmodex.points)
-                hashing_exe.append(bookmodex.exercise.id)
-            columns_list.append({"sTitle":str(bookmodex.exercise.name)+'<span class="details" style="display:inline;" data-type="'+str(bookmodex.exercise.description)+'"></span>',"sClass": "center" }) 
-            columns_list.append({"sTitle":str(bookmodex.exercise.name)+'<span class="details" style="display:inline;" data-type="'+str(bookmodex.exercise.description)+'"></span>',"sClass": "center" })
+        #get list of book assignments
+        assignments_list = list(Assignments.objects.select_related().filter(assignment_book=obj_book))
+        assignments_points_list = []
+        students_assignment_points = []
+        for assignment in assignments_list:
+            assignment.course_module.name
+            columns_list.append({"sTitle":str(assignment.course_module.name)})
+            #get points of exercises
+            assignment_points = 0
+            for exercise in assignment.get_exercises():
+                for bexe in BookModuleExercise.components.select_related().filter(book=obj_book, exercise = exercise):
+                    if exercise not in exercises:
+                        exercises.append(exercise)
+                    exercises_points_list.append(bexe.points)
+                    assignment_points += Decimal(bexe.points)
+                    columns_list.append({"sTitle":str(bexe.exercise.name)+'<span class="details" style="display:inline;" data-type="'+str(bexe.exercise.description)+'"></span>',"sClass": "center" })
+            assignments_points_list.append(assignment_points)
+            students_assignment_points.append(0)
         #remove duplicates
-        exercises = list(OrderedDict.fromkeys(exercises))
+        #exercises = list(OrderedDict.fromkeys(exercises))
         userData = UserData.objects.select_related().filter(book=obj_book, user__is_staff=0).order_by('user')
         users = []
         for userdata in userData:
             if not userdata.user.is_staff:
+                for p in range(len(students_assignment_points)):
+                    students_assignment_points[p] = 0
                 u_points = 0
-                s_points = 0
-                h_points = 0
+                #s_points = 0
+                #h_points = 0
                 sh_data = []
                 u_data = [] 
                 u_data.append(str(userdata.user.username))
@@ -198,24 +205,25 @@ def exercise_summary(request, book, course):
                     if exercise_t in exercises:
                         #get detailed information
                         u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
-                        values[exercises.index(exercise_t)]= 'Done<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
-                        u_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
-                        if exercise_t.id in sorting_exe:
-                            s_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
-                        if exercise_t.id in hashing_exe:
-                            h_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
-
+                        #check late submission
+                        assignment_ = get_assignment(obj_book, exercise_t)
+                        if assignment_:
+                            if u_ex.proficient_date <= assignment_.course_module.closing_time:
+                                values[exercises.index(exercise_t)]= 'Done<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+                                u_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
+                                students_assignment_points[assignments_list.index(assignment_)] += Decimal(exercises_points_list[exercises.index(exercise_t)])
+                            else:
+                                values[exercises.index(exercise_t)]= 'Late<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
                 for s_ex in started_ex:
                     if Exercise.objects.get(id=s_ex) in exercises and s_ex not in  prof_ex:   
                         exercise_t = Exercise.objects.get(id=s_ex)
                         #get detailed information
                         u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
                         values[exercises.index(exercise_t)]= 'Started<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
-                sh_score = '%s/%s' %(s_points,total_sorting)
                 u_data.append(float(u_points))
-                u_data.append(sh_score)
-                sh_score = '%s/%s' %(h_points,total_hashing)
-                u_data.append(sh_score)
+                for assign in assignments_list:
+                    sh_score = '%s/%s' %(students_assignment_points[assignments_list.index(assign)],assignments_points_list[assignments_list.index(assign)])
+                    u_data.append(sh_score)
                 u_data = u_data + values
                 udata_list.append(u_data)
         context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list}) 

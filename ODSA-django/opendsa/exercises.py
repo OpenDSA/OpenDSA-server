@@ -15,7 +15,7 @@ import jsonpickle
 import math
 
 from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, \
-                           Books, BookModuleExercise
+                           Books, BookModuleExercise, Assignments
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -48,6 +48,21 @@ def make_wrong_attempt(user_data, user_exercise):
 
         return user_exercise
 
+
+def get_due_date(book, exercise):
+    assignments_list = Assignments.objects.select_related().filter(assignment_book=book)
+    for assignment in assignments_list:
+     if int(exercise.id) in assignment.get_exercises_id():
+         return assignment.course_module.closing_time
+    return None 
+    
+
+def get_assignment(book, exercise):
+    assignments_list = Assignments.objects.select_related().filter(assignment_book=book)
+    for assignment in assignments_list:
+        if int(exercise.id) in assignment.get_exercises_id():
+            return assignment
+    return None
 
 def student_grade_all(user, book):
 

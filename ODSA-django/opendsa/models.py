@@ -68,11 +68,18 @@ class Assignments(models.Model):
             self.assignment_exercises += '%s' %exid
         else:
             self.assignment_exercises += ',%s' %exid
-    def get_exercises(self):
+    def get_exercises_id(self):
         _ex =[]
         for ex in self.assignment_exercises.split(','):
             if ex.isdigit():
               _ex.append(int(ex))
+        return _ex
+    def get_exercises(self):
+        _ex =[]
+        for ex in self.assignment_exercises.split(','):
+            if ex.isdigit():
+              exer = Exercise.objects.get(id=ex)
+              _ex.append(exer)
         return _ex
 
 
