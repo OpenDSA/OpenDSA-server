@@ -1,0 +1,54 @@
+{% extends "odsa_base.html" %}
+{% load i18n %}
+
+{% block maintitle %}
+<h1>Welcome to OpenDSA Data Server<small><br />{% trans "The backend of the <a href='http://algoviz.org/OpenDSA/'>OpenDSA</a> Active-eBook Project" %}</small></h1>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    {% blocktrans %}
+    <p><a href="/developer_view/stats/">Daily use summary table</a>
+    </p>
+    <p><a href="/developer_view/daily_stat/">Daily use summary graphs</a>
+    </p>
+    <p><a href="/developer_view/widget/">Usage summary widget page</a>
+    </p>
+    {% endblocktrans %}
+</div>
+
+{% for instance in open_instances %}
+    {# Output a beginning row on every third instance #}
+    {% if forloop.counter0|divisibleby:3 %}
+    <div class="row">
+    
+    {% endif %}
+    <div class="span4">
+        <h3><a href="{{ instance.get_absolute_url }}">{{ instance.course.name }}</a></h3>
+        <p>
+            Vestibulum id ligula porta felis euismod semper. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
+        </p>
+        <p>
+            <a href="{{ instance.get_absolute_url }}" class="btn">{{ instance.instance_name }} &raquo;</a>
+        </p>
+    </div>
+    
+    {# Output an ending row element after every three instances, and at the end of the loop #}
+    {% if forloop.counter|divisibleby:3 or forloop.last %}
+    </div><!-- .row -->
+    {% endif %}
+{% endfor %}
+<hr />
+<div class="row">
+    <div class="span12">
+        <p>
+            {% trans "Old courses can be found at the" %}
+            <a href="{% url course.views.course_archive %}">{% trans "course archive" %}</a>.
+        </p>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block "footer" %}
+{% endblock %}
