@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>OpenDSA Book Activity</title>
+{% extends "odsa_base.html" %}
+    {% block head %}
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}datatables/media/js/jquery.dataTables.min.js"></script>
@@ -70,8 +69,8 @@
             } ); 
 	} );
   </script>
-  </head>
-  <body>
+  {% endblock %}
+{% block content %}
     <h1>Activity Summary</h1>
     <h4>Course: {{course}}</h4>
     <h4>Book: {{book}}</h4>
@@ -80,7 +79,5 @@
     
 
     </div>
-  </body>
-</html>
-
+{% endblock %}
 

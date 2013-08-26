@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from userprofile.models import UserProfile
 
 # OpenDSA
-from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserSummary, ExerciseModule, UserExerciseLog, UserButton, UserData, UserBook
+from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserExerciseLog, UserButton, UserData, UserBook
 
 # Django
 from django.contrib.auth.decorators import login_required

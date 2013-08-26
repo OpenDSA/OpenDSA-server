@@ -15,7 +15,7 @@ import jsonpickle
 import math
 
 from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, \
-                           Books, UserSummary, BookModuleExercise
+                           Books, BookModuleExercise
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
