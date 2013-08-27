@@ -1,5 +1,5 @@
 # Create your views here.
-from opendsa.models import  UserExercise, UserExerciseLog, UserData
+from opendsa.models import  UserExercise, UserExerciseLog, UserData , UserProgLog
 from opendsa.exercises import update_module_proficiency
 from opendsa import models 
 from decimal import Decimal                         
@@ -88,13 +88,20 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
             #if first_response:
             #       user_exercise.update_proficiency_model(correct=False)
 
+        # Saving student's code and the feedback received
+       
         problem_log.save()
         user_exercise.save()
         user_data.save()
         if proficient or problem_log.earned_proficiency:
             update_module_proficiency(user_data, module, user_exercise.exercise)
-
-       
+        userprog_log = models.UserProgLog(
+               problem_log= problem_log ,
+               student_code= data,
+               feedback=feedback[1],
+              )
+ 
+        userprog_log.save()
         return user_exercise,feedback     #, user_exercise_graph, goals_updated
 
 
