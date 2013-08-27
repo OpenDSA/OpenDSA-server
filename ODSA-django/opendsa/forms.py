@@ -24,27 +24,43 @@ class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
             value = value.split(',')
         js = """
              <script type="text/javascript">
+             function fillChapters(course,book){
+               $.getJSON('%(path)s' + course + '.json', function(data) {
+                 $('#id_assignment_chapter').empty();
+                 $.each(data, function(key0, val0) {
+                     $.each(val0, function(key1, val1) {
+                       $.each(val1, function(key2, val2) {
+                         chap = key2.split("-")[0];
+                         chap_id = key2.split("-")[1];
+                             $('#id_assignment_chapter').append('<option selected="selected" value="'+chap_id+'">'+chap+'</option>');
+                       });
+                     });
+                 });                          
+               });
+             }
              var selected = [];
-             function fillExercises(course,book){
+             function fillExercises(course,book,chapter){
                $.getJSON('%(path)s' + course + '.json', function(data) {
                      $('#exercises-checkbox').empty();
                      $.each(data, function(key0, val0) {
                        $.each(val0, function(key1, val1) {
-                         var j = 0;
-                         $.each(val1, function(key, val) {
-                           var checked ="";
-                           if(jQuery.inArray(key,selected) != -1){
-                             //checkbox checked
-                             checked ="checked";
-                           };
-                           $('#exercises-checkbox').append('<li><label for="id_assignment_exercises_'+j+'"><input id="id_assignment_exercises_'+j+'" type="checkbox" value="'+key+'" name="assignment_exercises"'+checked+'>'+val+'</label></li>');
-                           j++;
-                         });
+                         $.each(val1, function(key2, val2) {
+                           var j = 0;
+                           if(key2.split("-")[1]==chapter){   
+                             $.each(val2, function(key, val) {
+                               var checked ="";
+                               if(jQuery.inArray(key,selected) != -1){
+                                 //checkbox checked
+                                 checked ="checked";
+                               };
+                               $('#exercises-checkbox').append('<li><label for="id_assignment_exercises_'+j+'"><input id="id_assignment_exercises_'+j+'" type="checkbox" value="'+key+'" name="assignment_exercises"'+checked+'>'+val+'</label></li>');
+                               j++;
+                             });
+                           }
                        });
                      });
                  });
-
-          
+               });
              }   
              (function($) {
                 $(document).ready(function(){
@@ -53,21 +69,32 @@ class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
                      selected[i] = $(this).val();
                    });
                    var course = $("h1").text().split(" ")[1];
+                   //add chapter select box
+                   $('#id_assignment_book').after('<p><label for="id_assignment_chapter">Assignment chapter:</label><select id="id_assignment_chapter" name="assignment_chapter"></select></p>');
                    //we only display book associated with the course
                    $.getJSON('%(path)s' + course + '.json', function(data) {
                      $('#id_assignment_book').empty();
                      $.each(data, function(key0, val0) {
                        $.each(val0, function(key, val) {
                          text = key.split("-")[0];
-                         val = key.split("-")[1];
-                         $('#id_assignment_book').append('<option selected="selected" value="'+val+'">'+text+'</option>');
+                         value = key.split("-")[1];
+                         $('#id_assignment_book').append('<option selected="selected" value="'+value+'">'+text+'</option>');
+                           $.each(val, function(key1, val1) {
+                             chap = key1.split("-")[0];
+                             chap_id = key1.split("-")[1];
+                             $('#id_assignment_chapter').append('<option selected="selected" value="'+chap_id+'">'+chap+'</option>'); 
+                           });
                        });
                      });
                    });
-                   fillExercises( course, $('#id_assignment_book').val());
+                   fillExercises( course, $('#id_assignment_book').val(), $('#id_assignment_chapter').val());
                    $('#id_assignment_book').change(function(){
-                     fillExercises( course, $('#id_assignment_book').val());
+                     fillChapters( course, $('#id_assignment_book').val());
                    });
+                   $('#id_assignment_chapter').change(function(){
+                     fillExercises( course, $('#id_assignment_book').val(), $('#id_assignment_chapter').val());
+                   });
+
                 })
              })(jQuery);
              </script>

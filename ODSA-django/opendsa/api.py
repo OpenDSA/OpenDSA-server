@@ -14,7 +14,7 @@ from tastypie.exceptions import NotRegistered, BadRequest
 
 # ODSA
 from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module, UserModule, \
-                           BookModuleExercise, Books, UserBook
+                           BookModuleExercise, Books, UserBook, BookChapter
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -83,6 +83,16 @@ def get_module(name):
         module = None
 
     return module
+
+def get_chapter(book, chapter_name):
+    if BookChapter.objects.filter(book=book,name=chapter_name).count() == 1:
+        chapter = BookChapter.objects.get(book=book,name=chapter_name)
+    elif  BookChapter.objects.filter(book=book,name=chapter_name).count() > 1:
+        chapter =  BookChapter.objects.filter(book=book,name=chapter_name)[0]
+    else:
+        chapter = None
+
+    return chapter
 
 def get_exercise(exercise):
     if Exercise.objects.filter(name=exercise).count() == 1:
@@ -699,7 +709,14 @@ class ModuleResource(ModelResource):
                         kmodule, added = Module.objects.get_or_create(name=request.POST['module'])
                 
                 response[kmodule.name] = False
-
+               
+                #get or create chapter
+                kchapter = get_chapter(kbook, request.POST['chapter'])
+                if kchapter is None:
+                    with transaction.commit_on_success():
+                        kchapter, added = BookChapter.objects.get_or_create(book=kbook,name=request.POST['chapter'])
+                kchapter.add_module(kmodule.id)
+                kchapter.save()
                 #get or create exercises
                 mod_exes = simplejson.loads(request.POST['exercises'])
                 print mod_exes

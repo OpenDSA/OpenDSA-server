@@ -200,6 +200,37 @@ class BookModuleExercise (models.Model):
        return self.book.book_url
 
 
+class BookChapter (models.Model):
+    book = models.ForeignKey(Books)
+    name = models.CharField(max_length=100)
+    module_list = models.TextField()
+    class Meta:
+        unique_together = (("book","name"),)
+    def __unicode__(self):
+       '''
+       Returns a short representation of the book as an unicode string.
+       '''
+       return self.name
+
+
+    def add_module(self, exid):
+       if len(self.module_list)==0:
+           self.module_list += '%s' %exid
+       else:
+           self.module_list += ',%s' %exid
+    def get_modules_id(self):
+       _mod =[]
+       for mod in self.module_list.split(','):
+           if mod.isdigit():
+             _mod.append(int(mod))
+       return _mod
+    def get_modules(self):
+       _mod =[]
+       for mod in self.module_list.split(','):
+           if mod.isdigit():
+             cmod = Module.objects.get(id=mod)
+             _mod.append(cmod)
+       return _mod
 
 class UserBook (models.Model):
     user = models.ForeignKey(User)

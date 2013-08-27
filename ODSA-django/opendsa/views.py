@@ -12,7 +12,7 @@ from course.models import Course, CourseInstance
 from course.views import _get_course_instance
 from  exercise.exercise_models import CourseModule
 # OpenDSA 
-from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserData, UserExerciseLog, UserButton, Assignments   #UserSummary
+from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserData, UserExerciseLog, UserButton, Assignments, BookChapter   #UserSummary
 from opendsa.statistics import is_authorized, get_active_exercises,convert,is_file_old_enough, get_widget_data, exercises_logs 
 from opendsa.exercises import get_due_date, get_assignment
 from opendsa.forms import AssignmentForm
@@ -80,15 +80,22 @@ def add_or_edit_assignment(request, module_id):
     for cb in  Books.objects.filter(courses=course_module.course_instance):
         if cb not in course_books:
             course_books.append(cb)
-
     #retrieve exercises
     book_list = []
     for book in course_books:
-        exe_dict = {} 
-        for b_exe in BookModuleExercise.components.get_exercise_list(book):
-           exe_dict[str(int(b_exe.id))]=str(b_exe.name)
+        #get chapters
+        chapter_dict = {}
+        for chapter in BookChapter.objects.filter(book=book):
+            #get exercises
+            exe_dict = {} 
+            for c_mod in chapter.get_modules():
+                for b_exe in BookModuleExercise.components.get_mod_exercise_list(book, c_mod):
+                   exe_dict[str(int(b_exe.id))]=str(b_exe.name)
+            chap_ = '%s-%s' %(str(chapter.name),chapter.id)
+            chapter_dict[chap_] = exe_dict  
         book_ = '%s-%s' %(book.book_url,book.id)
-        book_list.append({str(book_):exe_dict})
+        book_list.append({str(book_).replace("'",'"'):chapter_dict})
+
         try:
               f_handle = open(settings.MEDIA_ROOT + course_module.course_instance.instance_name + '.json', 'w+')
               f_handle.writelines(str(book_list).replace("'",'"'))
