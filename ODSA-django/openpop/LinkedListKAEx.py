@@ -19,12 +19,12 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     ex_question, ip_address, request_post):
     
     data = request_post.get('code') 
-    generatedList =request_post.get('genlist')
+    generatedList =request_post.get('genlist') 
     # Will have here a check from which programming exercise we got this request
     # Temp: will use generated list --- if it has binarytree not a list then call the binary tree
-    if generatedList == "Binarytree" : # should change that to the class of the exercise
+    if request_post.get('sha1') == "BinaryTreePROG" : # should change that to the class of the exercise
        feedback= assesskaexbintree (data)
-    else : # should have many "else and if" here by time ..when adding more programming exercises
+    elif request_post.get('sha1') == "ListADTPROG": # should have many "else and if" here by time ..when adding more programming exercises
        feedback= assesskaex(data , generatedList)
 
     if user_exercise:   # and user_exercise.belongs_to(user_data):
