@@ -13,7 +13,7 @@ class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
     def value_from_datadict(self, data, files, name):
         # Return a string of comma separated integers since the database, and
         # field expect a string (not a list).
-        print data 
+        name = 'id_assignment_exercises' 
         return ','.join(data.getlist(name)).encode('ascii','ignore')
 
     def render(self, name, value, attrs=None, choices=()):
@@ -39,21 +39,27 @@ class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
                });
              }
              var selected = [];
+             var selected_id = [];
+             var val_displayed = [];
+             var j = 0;
              function fillExercises(course,book,chapter){
+               j = 0;
+               var displayed =[];
                $.getJSON('%(path)s' + course + '.json', function(data) {
-                     $('#exercises-checkbox').empty();
+                     $('#chapter-exercises').empty();
                      $.each(data, function(key0, val0) {
                        $.each(val0, function(key1, val1) {
                          $.each(val1, function(key2, val2) {
-                           var j = 0;
                            if(key2.split("-")[1]==chapter){   
                              $.each(val2, function(key, val) {
                                var checked ="";
                                if(jQuery.inArray(key,selected) != -1){
                                  //checkbox checked
+                                 displayed.push(jQuery.inArray(key,selected));
                                  checked ="checked";
                                };
-                               $('#exercises-checkbox').append('<li><label for="id_assignment_exercises_'+j+'"><input id="id_assignment_exercises_'+j+'" type="checkbox" value="'+key+'" name="assignment_exercises"'+checked+'>'+val+'</label></li>');
+                               $('#chapter-exercises').append('<li><label class="id_chapter_exercises" for="id_chapter_exercises_'+j+'"><input id="id_chapter_exercises_'+j+'" class="chapter_exercises" type="checkbox" value="'+key+'" name="chapter_exercises"'+checked+'>'+val+'</label></li>');
+                               val_displayed.push(val);
                                j++;
                              });
                            }
@@ -61,16 +67,46 @@ class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
                      });
                  });
                });
-             }   
+               //display checked exercises of the assignement
+               $('#exercises-checkbox').empty();
+               $.each(selected, function(i,l){
+                 if(jQuery.inArray(i,displayed) == -1){
+                   $('#exercises-checkbox').append('<li><label for="id_assignment_exercises_'+j+'"><input id="id_assignment_exercises_'+j+'" class="exercises-checkbox" type="checkbox" value="'+l+'" name="id_assignment_exercises" checked="" >'+selected_id[i]+'</label></li>');
+                   j++;  
+                 };
+               });
+             } 
+             function updateExercises(chapter_exercises){
+               $.each(chapter_exercises, function(k, v) {
+                 var x = -1;
+                 $('.exercises-checkbox').each(function(){
+                   if($(this).val()==k.split("-")[0]){
+                     x = 1;
+                     if(!v){
+                       $(this).remove();
+                     }
+                   }
+                 });
+                 if (v && (x==-1)){
+                   $('#exercises-checkbox').append('<li><label for="id_assignment_exercises_'+j+'"><input id="id_assignment_exercises_'+j+'" class="exercises-checkbox" type="checkbox" value="'+k.split("-")[0]+'" name="id_assignment_exercises" checked="" >'+k.split("-")[1]+'</label></li>');
+                   selected.push(k.split("-")[0]);
+                   selected_id.push(k.split("-")[1]);
+                 }
+               });
+             } 
              (function($) {
                 $(document).ready(function(){
                    //get selected exercises (if any)
                    $(':checkbox:checked').each(function(i){
                      selected[i] = $(this).val();
+                     selected_id[i] = $(this).parent().text();
                    });
+                   $('#exercises-checkbox').empty();
                    var course = $("h1").text().split(" ")[1];
                    //add chapter select box
                    $('#id_assignment_book').after('<p><label for="id_assignment_chapter">Assignment chapter:</label><select id="id_assignment_chapter" name="assignment_chapter"></select></p>');
+                   //add book chapter checkboxes
+                   $('#id_assignment_chapter').after('<p id="chapter-exe-label"><label for="chapter-exercises">Exercises in chapter:</label></p><ul id="chapter-exercises"></ul>');
                    //we only display book associated with the course
                    $.getJSON('%(path)s' + course + '.json', function(data) {
                      $('#id_assignment_book').empty();
@@ -88,13 +124,26 @@ class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
                      });
                    });
                    fillExercises( course, $('#id_assignment_book').val(), $('#id_assignment_chapter').val());
+                   $('#exercises-checkbox').empty();
                    $('#id_assignment_book').change(function(){
                      fillChapters( course, $('#id_assignment_book').val());
                    });
                    $('#id_assignment_chapter').change(function(){
                      fillExercises( course, $('#id_assignment_book').val(), $('#id_assignment_chapter').val());
                    });
-
+                   //we add selected chapter exercises to assignment exercises
+                   $('.chapter_exercises').live('change',function(){
+                     var checked_dict = {};
+                     $(':checkbox:checked.chapter_exercises').each(function(){
+                       var id_text = $(this).val() + '-' +$(this).parent().text();
+                       checked_dict[id_text]= true;//$(this).parent().text();
+                     });
+                     $(':checkbox:not(:checked).chapter_exercises').each(function(){
+                       var id_text = $(this).val() + '-' +$(this).parent().text();
+                       checked_dict[id_text]= false;//$(this).parent().text();
+                     });
+                     updateExercises(checked_dict);
+                   });
                 })
              })(jQuery);
              </script>
