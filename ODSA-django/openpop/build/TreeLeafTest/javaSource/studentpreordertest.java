@@ -184,8 +184,12 @@ public class studentpreordertest
 public static int exercise3(BinNode root) { 
   // Your code goes between these lines
 
+if(root == null)  return 0;
+  if(root.isLeaf())      
+    return 1;            
+  else 
+    return countLeaf(root.right()); 
 
-return 1;
 
 
 

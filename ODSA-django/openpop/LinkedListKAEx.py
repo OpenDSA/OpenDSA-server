@@ -260,7 +260,7 @@ def assesskaexbintree (data):
 
 # Assessing bt **Leaf**  exercise
 def assesskaexbtleaf (data):
-    feedback=[False, 'null', 179 , 'studentpreordertest.java' , 'class studentpreordertest']
+    feedback=[False, 'null', 183 , 'studentpreordertest.java' , 'class studentpreordertest']
     filesPath = '/home/aalto-beta/ODSA-django/openpop/build/TreeLeafTest/javaSource/'
     
     #cleaning: deleting already created files
