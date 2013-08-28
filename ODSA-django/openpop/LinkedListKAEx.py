@@ -20,11 +20,13 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     
     data = request_post.get('code') 
     generatedList =request_post.get('genlist') 
-    # Will have here a check from which programming exercise we got this request
-    # Temp: will use generated list --- if it has binarytree not a list then call the binary tree
-    if request_post.get('sha1') == "BinaryTreePROG" : # should change that to the class of the exercise
+
+    #  Check from which programming exercise we got this request
+    if request_post.get('sha1') == "BinaryTreePROG" : # count number of nodes
        feedback= assesskaexbintree (data)
-    elif request_post.get('sha1') == "ListADTPROG": # should have many "else and if" here by time ..when adding more programming exercises
+    elif request_post.get('sha1') == "BTLeafPROG" :  # count number of leaf nodes
+       feedback= assesskaexbtleaf (data)
+    elif request_post.get('sha1') == "ListADTPROG":  # generate a list
        feedback= assesskaex(data , generatedList)
 
     if user_exercise:   # and user_exercise.belongs_to(user_data):
@@ -181,6 +183,7 @@ def assesskaex(data , generatedList):
         
      
     return  feedback
+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Assessing binary tree exercise
 def assesskaexbintree (data):
@@ -250,4 +253,77 @@ def assesskaexbintree (data):
               feedback[0] = False
 
     return feedback
-        
+
+
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# Assessing bt **Leaf**  exercise
+def assesskaexbtleaf (data):
+    feedback=[False, 'null', 179 , 'studentpreordertest.java' , 'class studentpreordertest']
+    filesPath = '/home/aalto-beta/ODSA-django/openpop/build/TreeLeafTest/javaSource/'
+    
+    #cleaning: deleting already created files
+    if os.path.isfile(filesPath +'studentpreordertest.java'):
+       os.remove(filesPath+'studentpreordertest.java')
+ 
+    if os.path.isfile(filesPath +'output'):
+       os.remove(filesPath+'output')
+
+    if os.path.isfile(filesPath +'compilationerrors.out'):
+       os.remove(filesPath + 'compilationerrors.out')
+   
+    if os.path.isfile(filesPath +'runerrors.out'):
+       os.remove(filesPath + 'runerrors.out')
+
+   
+    # Saving the submitted/received code in the studentpreordertest.java file by copying the preorder + studentcode +}
+    BTTestFile = open(filesPath+'PreorderLeafTest.java' , 'r')
+    BTtest = BTTestFile.read()
+    answer = open(filesPath+'studentpreordertest.java', 'w')
+    answer.write(BTtest)
+    answer.write("public static")
+    answer.write(data.decode('utf-8'))
+    answer.write("}")
+    answer.close()
+    
+    # Setting the DISPLAY then run the processing command to test the submitted code
+    proc1 = subprocess.Popen(" cd /home/aalto-beta/ODSA-django/openpop/build/TreeLeafTest/javaSource/; javac studentpreordertest.java 2> /home/aalto-beta/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/aalto-beta/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    (out1, err1) = proc1.communicate() 
+    
+    print data
+    # Read the success file if has Success inside then "Well Done!" Otherwise "Try Again!"
+    if  os.path.isfile(filesPath+'compilationerrors.out'):
+          syntaxErrorFile = open(filesPath+'compilationerrors.out' , 'r')
+          feedback[0] = False
+          feedback[1]= syntaxErrorFile.readlines()
+          syntaxErrorFile.close()
+          if os.stat(filesPath+'compilationerrors.out')[6]!=0:
+             feedback[1]= feedback[1]#.rsplit(':',1)[1]
+             print feedback[1]
+             return feedback;
+    if os.path.isfile(filesPath+'runerrors.out'):
+       #Check what is returned from the test : what is inside the success file
+          runErrorFile = open(filesPath+'runerrors.out' , 'r')
+          feedback[0] = False
+          feedback[1]= runErrorFile.readlines()
+          print feedback[1]
+          runErrorFile.close()
+          if os.stat(filesPath+'runerrors.out')[6]!=0:
+             return feedback;
+    
+    
+    if os.path.isfile(filesPath+'output'):
+       #Check what is returned from the test : what is inside the success file
+       successFile = open(filesPath+'output' , 'r')
+       feedback[1] = successFile.readlines()
+       print feedback[1]
+       for line in feedback[1]:
+           if "Well Done" in line:
+              feedback[0] = True
+              break 
+           else :
+              feedback[0] = False
+
+    return feedback
+                
