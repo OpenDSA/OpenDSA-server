@@ -15,8 +15,6 @@
     <link href="{{ STATIC_URL }}opendsa/css/activity.css" rel="stylesheet" media="screen" />
     <script type="text/javascript" charset="utf-8">
 	$(document).ready(function() {
-            console.log({{ udata_list|safe  }}); 
-            console.log({{ columns_list|safe  }});
             $('#demo').html( '<table cellpadding="0" cellspacing="1" border="1" class="display" id="example"></table>' );
             var oTable = $('#example').dataTable( {
                 "sDom": 'T<"clear">lfrtip',
@@ -24,6 +22,19 @@
 			"sSwfPath": "{{ STATIC_URL }}datatables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf"
 		},
                 "bPaginate": false,
+                "fnDrawCallback": function ( oSettings ) {
+			/* Need to redo the counters if filtered or sorted */
+			if ( oSettings.bSorted || oSettings.bFiltered )
+			{
+				for ( var i=0, iLen=oSettings.aiDisplay.length ; i<iLen ; i++ )
+				{
+					$('td:eq(0)', oSettings.aoData[ oSettings.aiDisplay[i] ].nTr ).html( i+1 );
+				}
+			}
+		},
+                "aoColumnDefs": [
+			{ "bSortable": false, "aTargets": [ 0 ] }
+		],
                 "aaData": {{ udata_list|safe  }},
                 "aoColumns": {{ columns_list|safe  }},
             } );

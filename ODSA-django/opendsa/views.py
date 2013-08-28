@@ -168,6 +168,7 @@ def exercise_summary(request, book, course):
         #List containing users data: [["username","points","exercise1 score", "exercise1 score",...]]
         udata_list = []
         columns_list = []
+        columns_list.append({"sTitle":"Id"})
         columns_list.append({"sTitle":"Username"})
         columns_list.append({"sTitle":"Points"})
         #get list of book assignments
@@ -201,6 +202,7 @@ def exercise_summary(request, book, course):
                 #h_points = 0
                 sh_data = []
                 u_data = [] 
+                u_data.append(0)
                 u_data.append(str(userdata.user.username))
                 values = ['--<span class="details" style="display:inline;" data-type="Not Started"></span>' for j in range(len(exercises))]
                 prof_ex = userdata.get_prof_list()
