@@ -63,9 +63,6 @@ def widget_data(request):
     context = RequestContext(request, {'exercises':logs['exercises'], 'users':logs['users']})
     return render_to_response("opendsa/widget.html", context)
 
-
-
-
 @login_required  
 def add_or_edit_assignment(request, module_id):
     """
@@ -153,6 +150,7 @@ def all_statistics(request):
         context = RequestContext(request, {'daily_stats': data})
     return render_to_response("opendsa/all-stats.html", context) 
 
+
 @login_required
 def exercise_summary(request, book, course):
     if is_authorized(request.user,book,course):
@@ -170,6 +168,7 @@ def exercise_summary(request, book, course):
         #List containing users data: [["username","points","exercise1 score", "exercise1 score",...]]
         udata_list = []
         columns_list = []
+        columns_list.append({"sTitle":"Id"})
         columns_list.append({"sTitle":"Username"})
         columns_list.append({"sTitle":"Points"})
         #get list of book assignments
@@ -203,6 +202,7 @@ def exercise_summary(request, book, course):
                 #h_points = 0
                 sh_data = []
                 u_data = [] 
+                u_data.append(0)
                 u_data.append(str(userdata.user.username))
                 values = ['--<span class="details" style="display:inline;" data-type="Not Started"></span>' for j in range(len(exercises))]
                 prof_ex = userdata.get_prof_list()
@@ -237,6 +237,15 @@ def exercise_summary(request, book, course):
         return render_to_response("opendsa/class_summary.html", context)
     else:
         return  HttpResponseForbidden('<h1>Page Forbidden</h1>')
+
+
+
+def get_class_activity(request, module_id):
+    course_module = CourseModule.objects.get(id=module_id)
+    for cb in  Books.objects.filter(courses=course_module.course_instance):
+        return exercise_summary(request, cb.book_name, course_module.course_instance.instance_name)
+    return HttpResponseForbidden('<h1>No class activity</h1>') 
+
 
 class exerciseProgress:
         def __init__(self, name):

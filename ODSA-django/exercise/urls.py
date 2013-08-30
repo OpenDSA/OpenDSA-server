@@ -5,7 +5,7 @@ from exercise.staff_views import list_exercise_submissions, inspect_exercise_sub
 from exercise.async_views import new_async_submission, grade_async_submission
 
 #OpenDSA
-from opendsa.views import add_or_edit_assignment
+from opendsa.views import add_or_edit_assignment, get_class_activity
 
 urlpatterns = patterns('',
     (r'^(?P<exercise_id>\d+)/$', view_exercise),
@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     (r'^submissions/assess/(?P<submission_id>\d+)/$', submission_assessment),
     (r'^submitted_file/(?P<submitted_file_id>\d+)/', view_submitted_file),
     (r'^manage/(?P<module_id>\d+)/$', add_or_edit_assignment), #add_or_edit_exercise),
+    (r'^class/(?P<module_id>\d+)/$', get_class_activity), 
     (r'^fetch_metadata/$', fetch_exercise_metadata),
     (r'^manage/(?P<module_id>\d+)/(?P<exercise_id>\d+)/$', add_or_edit_exercise),
     (r'^rest/exercise/(?P<exercise_id>\d+)/students/(?P<student_ids>[\d\-]+)/(?P<hash>\w+)/$', new_async_submission),

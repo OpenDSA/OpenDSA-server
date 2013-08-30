@@ -745,12 +745,12 @@ class ModuleResource(ModelResource):
                     #check student progress -- KA exercises
                     user_exercise = get_user_exercise(user=kusername, exercise=kexercise)
 
-                    if user_exercise is not None:
+                    if u_prof and user_exercise is not None:
                         u_prog = user_exercise.progress
-                        if user_exercise.is_proficient() and not user_data.is_proficient_at(kexercise):
-                            user_data.earned_proficiency(kexercise.id)
-                            user_data.save()
-                            u_prof = True
+                        #if user_exercise.is_proficient() and not user_data.is_proficient_at(kexercise):
+                        #    user_data.earned_proficiency(kexercise.id)
+                        #    user_data.save()
+                        #    u_prof = True
                     else:
                         u_prog = 0
 
