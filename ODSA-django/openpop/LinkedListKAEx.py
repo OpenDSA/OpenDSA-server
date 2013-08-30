@@ -261,7 +261,7 @@ def assesskaexbintree (data):
 # Assessing bt **Leaf**  exercise
 def assesskaexbtleaf (data):
     feedback=[False, 'null', 183 , 'studentpreordertest.java' , 'class studentpreordertest']
-    filesPath = '/home/aalto-beta/ODSA-django/openpop/build/ListTest/javaSource/'
+    filesPath = '/home/aalto-beta/ODSA-django/openpop/build/TreeLeafTest/javaSource/'
     
     #cleaning: deleting already created files
     if os.path.isfile(filesPath +'studentpreordertest.java'):
@@ -288,7 +288,7 @@ def assesskaexbtleaf (data):
     answer.close()
     
     # Setting the DISPLAY then run the processing command to test the submitted code
-    proc1 = subprocess.Popen(" cd /home/aalto-beta/ODSA-django/openpop/build/ListTest/javaSource/; javac studentpreordertest.java 2> /home/aalto-beta/ODSA-django/openpop/build/ListTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/aalto-beta/ODSA-django/openpop/build/ListTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    proc1 = subprocess.Popen(" cd /home/aalto-beta/ODSA-django/openpop/build/TreeLeafTest/javaSource/; javac studentpreordertest.java 2> /home/aalto-beta/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/aalto-beta/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
     (out1, err1) = proc1.communicate() 
     
     print data
