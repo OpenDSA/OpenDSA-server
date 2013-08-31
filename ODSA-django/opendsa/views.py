@@ -168,6 +168,7 @@ def exercise_summary(request, book, course):
         #List containing users data: [["username","points","exercise1 score", "exercise1 score",...]]
         udata_list = []
         columns_list = []
+        columns_list_exe = []  #for exercises
         columns_list.append({"sTitle":"Id"})
         columns_list.append({"sTitle":"Username"})
         columns_list.append({"sTitle":"Points"})
@@ -176,7 +177,6 @@ def exercise_summary(request, book, course):
         assignments_points_list = []
         students_assignment_points = []
         for assignment in assignments_list:
-            assignment.course_module.name
             columns_list.append({"sTitle":str(assignment.course_module.name)})
             #get points of exercises
             assignment_points = 0
@@ -186,11 +186,12 @@ def exercise_summary(request, book, course):
                         exercises.append(exercise)
                     exercises_points_list.append(bexe.points)
                     assignment_points += Decimal(bexe.points)
-                    columns_list.append({"sTitle":str(bexe.exercise.name)+'<span class="details" style="display:inline;" data-type="'+str(bexe.exercise.description)+'"></span>',"sClass": "center" })
+                    columns_list_exe.append({"sTitle":str(bexe.exercise.name)+'<span class="details" style="display:inline;" data-type="'+str(bexe.exercise.description)+'"></span>',"sClass": "center" })
             assignments_points_list.append(assignment_points)
             students_assignment_points.append(0)
         #remove duplicates
         #exercises = list(OrderedDict.fromkeys(exercises))
+        columns_list = columns_list + columns_list_exe
         userData = UserData.objects.select_related().filter(book=obj_book, user__is_staff=0).order_by('user')
         users = []
         for userdata in userData:
