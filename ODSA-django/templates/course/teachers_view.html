@@ -11,7 +11,12 @@
         </tr>
     </thead>
     <tbody>
-
+    <hr/>
+        <a href="{% url opendsa.views.get_class_activity instance.course_modules.all.0.id %}" 
+           class="btn btn-success btn-mini">
+           <i></i> {% trans "Class activity" %}
+        </a>
+        <hr/>
     {% for module in instance.course_modules.all %}
         <tr>
             <th>
@@ -44,12 +49,6 @@
                 </td>
             </tr>
         {% endfor %}
-        <hr/>
-        <a href="{% url opendsa.views.get_class_activity module.id %}" 
-           class="btn btn-success btn-mini">
-           <i></i> {% trans "Class activity" %}
-        </a>
-        <hr/>
     {% endfor %}
     </tbody>
 </table>
