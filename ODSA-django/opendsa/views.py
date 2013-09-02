@@ -215,11 +215,11 @@ def exercise_summary(request, book, course):
                         u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
                         #check late submission
                         assignment_ = get_assignment(obj_book, exercise_t)
+                        u_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
+                        students_assignment_points[assignments_list.index(assignment_)] += Decimal(exercises_points_list[exercises.index(exercise_t)])
                         if assignment_:
                             if u_ex.proficient_date <= assignment_.course_module.closing_time:
                                 values[exercises.index(exercise_t)]= 'Done<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
-                                u_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
-                                students_assignment_points[assignments_list.index(assignment_)] += Decimal(exercises_points_list[exercises.index(exercise_t)])
                             else:
                                 values[exercises.index(exercise_t)]= 'Late<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
                 for s_ex in started_ex:

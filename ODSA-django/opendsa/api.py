@@ -738,8 +738,10 @@ class ModuleResource(ModelResource):
                     #add exercise in list of module exercises
                     exers_.append(kexercise)
                     u_prof = False
-                    if UserData.objects.filter(user=kusername, book=kbook).count() > 0:
-                        user_data = UserData.objects.get(user=kusername, book=kbook)
+                    #if UserData.objects.filter(user=kusername, book=kbook).count() > 0:
+                    with transaction.commit_on_success():
+                        user_data, created = UserData.objects.get_or_create(user=kusername,book = kbook)
+                        #user_data = UserData.objects.get(user=kusername, book=kbook)
                         u_prof = user_data.is_proficient_at(kexercise)
 
                     #check student progress -- KA exercises
