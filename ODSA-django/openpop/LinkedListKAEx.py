@@ -217,7 +217,7 @@ def assesskaexbintree (data):
     answer = open(filesPath+'studentpreordertest.java', 'w')
     answer.write(BTtest)
     answer.write("public static")
-    answer.write(data.decode('utf-8'))
+    answer.write(data)
     answer.write("}")
     answer.close()
     
