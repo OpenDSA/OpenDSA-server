@@ -110,6 +110,8 @@ def get_user_book(user, book):
     elif UserBook.objects.filter(user=user, book=book).count() > 1:
         ubook = UserBook.objects.filter(user=user, book=book)[0]
     else:
+        if user.username == 'phantom':
+            ubook,created = UserBook.objects.get_or_create(user=user, book=book)
         ubook = None
 
     return ubook
@@ -339,10 +341,8 @@ class UserexerciseResource(ModelResource):
                         user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
             else:
                 return self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized)
-
             dsa_book = get_book(request.POST['book'])
             ubook = get_user_book(kusername, dsa_book)
-
             with transaction.commit_on_success():
                 user_data, created = UserData.objects.get_or_create(user=kusername, book=dsa_book)
 
@@ -355,9 +355,9 @@ class UserexerciseResource(ModelResource):
                 #self.method_check(request, allowed=['post'])
                 if request.POST.get('code'):
                     #returnedString= assesskaex(request.POST.get('code') , request.POST.get('genlist'), )
-                    ex_question = request.POST['sha1']
-                    if 'non_summative' in request.POST:
-                       ex_question = request.POST['non_summative']
+                    #ex_question = request.POST['sha1']
+                    #if 'non_summative' in request.POST:
+                    #   ex_question = request.POST['non_summative']
                     uexercise, messages = attempt_problem_pop(user_data, 
 							     user_exercise, 
 					                     request.POST['attempt_number'],
@@ -371,7 +371,6 @@ class UserexerciseResource(ModelResource):
                                                              request.POST)
 
                                        
-                   
                     returnedVar= uexercise.__dict__
                     returnedVar['correct']= messages[0]
                     returnedVar['message']= messages[1]

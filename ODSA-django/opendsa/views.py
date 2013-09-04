@@ -202,7 +202,8 @@ def exercise_summary(request, book, course):
                 #s_points = 0
                 #h_points = 0
                 sh_data = []
-                u_data = [] 
+                u_data = []
+                assign_late = [] 
                 u_data.append(0)
                 u_data.append(str(userdata.user.username))
                 values = ['--<span class="details" style="display:inline;" data-type="Not Started"></span>' for j in range(len(exercises))]
@@ -216,12 +217,13 @@ def exercise_summary(request, book, course):
                         #check late submission
                         assignment_ = get_assignment(obj_book, exercise_t)
                         u_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
-                        students_assignment_points[assignments_list.index(assignment_)] += Decimal(exercises_points_list[exercises.index(exercise_t)])
                         if assignment_:
+                            students_assignment_points[assignments_list.index(assignment_)] += Decimal(exercises_points_list[exercises.index(exercise_t)])
                             if u_ex.proficient_date <= assignment_.course_module.closing_time:
                                 values[exercises.index(exercise_t)]= 'Done<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
                             else:
-                                values[exercises.index(exercise_t)]= 'Late<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+                                values[exercises.index(exercise_t)]= 'Late<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date)) 
+                                assign_late.append(assignment_.course_module.name)
                 for s_ex in started_ex:
                     if Exercise.objects.get(id=s_ex) in exercises and s_ex not in  prof_ex:   
                         exercise_t = Exercise.objects.get(id=s_ex)
@@ -230,7 +232,10 @@ def exercise_summary(request, book, course):
                         values[exercises.index(exercise_t)]= 'Started<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
                 u_data.append(float(u_points))
                 for assign in assignments_list:
-                    sh_score = '%s/%s' %(students_assignment_points[assignments_list.index(assign)],assignments_points_list[assignments_list.index(assign)])
+                    if assign.course_module.name in assign_late:
+                        sh_score = '<span class="late">%s/%s</span>' %(students_assignment_points[assignments_list.index(assign)],assignments_points_list[assignments_list.index(assign)]) 
+                    else:
+                        sh_score = '%s/%s' %(students_assignment_points[assignments_list.index(assign)],assignments_points_list[assignments_list.index(assign)])  
                     u_data.append(sh_score)
                 u_data = u_data + values
                 udata_list.append(u_data)
