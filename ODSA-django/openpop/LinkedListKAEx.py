@@ -11,6 +11,9 @@ import os
 import subprocess
 import datetime
 import codecs
+import unicodedata
+import sys
+import string
 #from subprocess import call
 #import pdb; pdb.set_trace()
 
@@ -18,9 +21,13 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     completed, count_hints, time_taken, attempt_content, module,   
     ex_question, ip_address, request_post):
     
+    #reload(sys)
+    #sys.setdefaultencoding("utf8")
+    
     data = request_post.get('code') 
     generatedList =request_post.get('genlist') 
-
+    data = ''.join([x for x in data if ord(x) < 128]) 
+    
     #  Check from which programming exercise we got this request
     if request_post.get('sha1') == "BinaryTreePROG" : # count number of nodes
        feedback= assesskaexbintree (data)
@@ -210,7 +217,7 @@ def assesskaexbintree (data):
     answer = open(filesPath+'studentpreordertest.java', 'w')
     answer.write(BTtest)
     answer.write("public static")
-    answer.write(data.decode('utf-8'))
+    answer.write(data)
     answer.write("}")
     answer.close()
     
