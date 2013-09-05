@@ -120,7 +120,7 @@ def assesskaex(data , generatedList):
     feedback=[False, 'null', 333 , 'studentlisttest.java' , 'class studentlisttest']
     #print feedback
     #filesPath = '/home/OpenPOP/Backend/visualize/build/ListTest/javaSource/'
-    filesPath = '/home/aalto-beta/ODSA-django/openpop/build/ListTest/javaSource/'
+    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/'
     print "In the begining of assessing the code using java compiler"
     #cleaning: deleting already created files
     if os.path.isfile(filesPath +'generatedlist'):
@@ -153,7 +153,7 @@ def assesskaex(data , generatedList):
     
     # Setting the DISPLAY then run the processing command to test the submitted code
     #proc1 = subprocess.Popen(" cd /home/OpenPOP/Backend/visualize/build/ListTest/javaSource/; javac studentlisttest.java 2> /home/OpenPOP/Backend/visualize/build/ListTest/javaSource/compilationerrors.out ; java studentlisttest 2> /home/OpenPOP/Backend/visualize/build/ListTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
-    proc1 = subprocess.Popen(" cd /home/aalto-beta/ODSA-django/openpop/build/ListTest/javaSource/; javac studentlisttest.java 2> /home/aalto-beta/ODSA-django/openpop/build/ListTest/javaSource/compilationerrors.out ; java studentlisttest 2> /home/aalto-beta/ODSA-django/openpop/build/ListTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/; javac studentlisttest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/compilationerrors.out ; java studentlisttest 2> /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
     (out1, err1) = proc1.communicate() 
     
     # Read the success file if has Success inside then "Well Done!" Otherwise "Try Again!"
@@ -195,7 +195,7 @@ def assesskaex(data , generatedList):
 # Assessing binary tree exercise
 def assesskaexbintree (data):
     feedback=[False, 'null', 179 , 'studentpreordertest.java' , 'class studentpreordertest']
-    filesPath = '/home/aalto-beta/ODSA-django/openpop/build/TreeTest/javaSource/'
+    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/TreeTest/javaSource/'
     
     #cleaning: deleting already created files
     if os.path.isfile(filesPath +'studentpreordertest.java'):
@@ -222,7 +222,7 @@ def assesskaexbintree (data):
     answer.close()
     
     # Setting the DISPLAY then run the processing command to test the submitted code
-    proc1 = subprocess.Popen(" cd /home/aalto-beta/ODSA-django/openpop/build/TreeTest/javaSource/; javac studentpreordertest.java 2> /home/aalto-beta/ODSA-django/openpop/build/TreeTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/aalto-beta/ODSA-django/openpop/build/TreeTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/TreeTest/javaSource/; javac studentpreordertest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
     (out1, err1) = proc1.communicate() 
     
     print data
@@ -268,7 +268,7 @@ def assesskaexbintree (data):
 # Assessing bt **Leaf**  exercise
 def assesskaexbtleaf (data):
     feedback=[False, 'null', 183 , 'studentpreordertest.java' , 'class studentpreordertest']
-    filesPath = '/home/aalto-beta/ODSA-django/openpop/build/TreeLeafTest/javaSource/'
+    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/'
     
     #cleaning: deleting already created files
     if os.path.isfile(filesPath +'studentpreordertest.java'):
@@ -295,7 +295,7 @@ def assesskaexbtleaf (data):
     answer.close()
     
     # Setting the DISPLAY then run the processing command to test the submitted code
-    proc1 = subprocess.Popen(" cd /home/aalto-beta/ODSA-django/openpop/build/TreeLeafTest/javaSource/; javac studentpreordertest.java 2> /home/aalto-beta/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/aalto-beta/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/; javac studentpreordertest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
     (out1, err1) = proc1.communicate() 
     
     print data
