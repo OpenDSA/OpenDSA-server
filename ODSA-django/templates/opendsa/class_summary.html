@@ -40,7 +40,7 @@
             } );
             var i = 0;
             var j = 0;
-
+            $(".late").css('backgroundColor', '#FF0000');
             $('#example tbody td').live('click', function (e) {
                 if ( $(e.target).children(".details").length > 0) {
 		    var kids = $(e.target).children(".details");
