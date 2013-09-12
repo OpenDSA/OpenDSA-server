@@ -17,6 +17,12 @@
            <i></i> {% trans "Class activity" %}
         </a>
         <hr/>
+        <a href="{% url opendsa.views.student_management instance.course_modules.all.0.id %}" 
+           class="btn btn-success btn-mini">
+           <i></i> {% trans "Manage students" %}
+        </a>
+
+        <hr/>
     {% for module in instance.course_modules.all %}
         <tr>
             <th>

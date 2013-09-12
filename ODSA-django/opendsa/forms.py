@@ -4,6 +4,7 @@ from django.forms.widgets import Select, CheckboxSelectMultiple
 from opendsa.models import Assignments, Books, Exercise, BookModuleExercise
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from django.contrib.auth.models import User
 
 from exercise.exercise_models import  CourseModule
 import settings
@@ -195,6 +196,13 @@ class AssignmentForm(forms.ModelForm):
 
 class AssignmentAdmin(admin.ModelAdmin):
     form = AssignmentForm
+
+
+class StudentsForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        exclude = ['first_name','last_name','email','password','is_staff','is_active','is_superuser','last_login','date_joined','user_permissions']
 
 
 admin.site.register(Assignments, AssignmentAdmin)

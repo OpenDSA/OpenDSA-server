@@ -12,10 +12,10 @@ from course.models import Course, CourseInstance
 from course.views import _get_course_instance
 from  exercise.exercise_models import CourseModule
 # OpenDSA 
-from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserData, UserExerciseLog, UserButton, Assignments, BookChapter   #UserSummary
+from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserData, UserExerciseLog, UserButton, Assignments, BookChapter, UserBook   #UserSummary
 from opendsa.statistics import is_authorized, get_active_exercises,convert,is_file_old_enough, get_widget_data, exercises_logs 
 from opendsa.exercises import get_due_date, get_assignment
-from opendsa.forms import AssignmentForm
+from opendsa.forms import AssignmentForm, StudentsForm
 
 # Django
 from django.contrib.auth.decorators import login_required
@@ -33,6 +33,9 @@ from django.views.generic import TemplateView, ListView
 from django.template import add_to_builtins
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
+from django.forms.formsets import formset_factory
+from django.forms.models import model_to_dict
+from django import forms
 import jsonpickle
 import datetime
 from django.conf import settings
@@ -62,6 +65,52 @@ def widget_data(request):
 
     context = RequestContext(request, {'exercises':logs['exercises'], 'users':logs['users']})
     return render_to_response("opendsa/widget.html", context)
+
+
+
+def student_management(request, module_id):
+    course_module = CourseModule.objects.get(id=module_id)
+    book = None
+    for bk in  Books.objects.filter(courses=course_module.course_instance):
+        book = bk
+    if is_authorized(request.user,book.book_name,course_module.course_instance.instance_name): 
+        return class_students(request, module_id)
+    return HttpResponseForbidden('<h1>No class activity</h1>')
+
+
+
+@login_required
+def class_students(request, module_id):
+    course_module = CourseModule.objects.get(id=module_id)
+    course_books = []
+    course_students = []
+    #retrieve books
+    for cb in  Books.objects.filter(courses=course_module.course_instance):
+        if cb not in course_books:
+            course_books.append(cb)
+    #get students
+    for book in course_books:
+        for ub in UserBook.objects.filter(book=book):
+            course_students.append(model_to_dict(ub.user))
+    
+    StudentsFormSet = formset_factory(StudentsForm)
+    #formset = StudentsFormSet(initial=course_students)
+    if request.method == "POST":
+        formset = StudentsFormSet(request.POST, initial=course_students)
+        if formset.is_valid():
+            stud = form.save()
+            messages.success(request, _('Students information were saved successfully.'))
+    else:
+        formset = StudentsFormSet(initial=course_students)
+        #formset.fields['first_name'].widget = forms.HiddenInput() 
+    return render_to_response("course/edit_students.html",
+                              CourseContext(request, course_instance=course_module.course_instance,
+                                                     module=course_module,
+                                                     form=formset
+                                             ))
+
+
+
 
 @login_required  
 def add_or_edit_assignment(request, module_id):
