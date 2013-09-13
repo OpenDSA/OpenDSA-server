@@ -199,7 +199,11 @@ class AssignmentAdmin(admin.ModelAdmin):
 
 
 class StudentsForm(forms.ModelForm):
-
+    def __init__(self, *args, **kwargs):
+        super(StudentsForm, self).__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        if instance:
+            self.fields['username'].widget.attrs['readonly'] = True
     class Meta:
         model = User
         exclude = ['first_name','last_name','email','password','is_staff','is_active','is_superuser','last_login','date_joined','user_permissions']

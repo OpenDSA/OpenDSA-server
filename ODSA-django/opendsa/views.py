@@ -34,7 +34,7 @@ from django.template import add_to_builtins
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.forms.formsets import formset_factory
-from django.forms.models import model_to_dict
+from django.forms.models import model_to_dict, modelformset_factory
 from django import forms
 import jsonpickle
 import datetime
@@ -84,25 +84,22 @@ def class_students(request, module_id):
     course_module = CourseModule.objects.get(id=module_id)
     course_books = []
     course_students = []
-    #retrieve books
-    for cb in  Books.objects.filter(courses=course_module.course_instance):
-        if cb not in course_books:
-            course_books.append(cb)
-    #get students
-    for book in course_books:
-        for ub in UserBook.objects.filter(book=book):
-            course_students.append(model_to_dict(ub.user))
-    
-    StudentsFormSet = formset_factory(StudentsForm)
-    #formset = StudentsFormSet(initial=course_students)
+    course_books =  list(Books.objects.filter(courses=course_module.course_instance))
+    book = course_books[0]
+    qs0 =  UserBook.objects.prefetch_related('user').filter(book=book).values('user')
+    usr_bk =[]
+    for u in qs0:
+        usr_bk.append(u['user'])
+    qs = User.objects.filter(id__in = usr_bk).order_by('username')
+
+    StudentsFormSet = modelformset_factory(User,form=StudentsForm, extra=0)
     if request.method == "POST":
-        formset = StudentsFormSet(request.POST, initial=course_students)
+        formset = StudentsFormSet(request.POST, queryset = qs)
         if formset.is_valid():
-            stud = form.save()
+            stud = formset.save()
             messages.success(request, _('Students information were saved successfully.'))
     else:
-        formset = StudentsFormSet(initial=course_students)
-        #formset.fields['first_name'].widget = forms.HiddenInput() 
+        formset = StudentsFormSet(queryset = qs)
     return render_to_response("course/edit_students.html",
                               CourseContext(request, course_instance=course_module.course_instance,
                                                      module=course_module,
@@ -239,17 +236,14 @@ def exercise_summary(request, book, course):
             assignments_points_list.append(assignment_points)
             students_assignment_points.append(0)
         #remove duplicates
-        #exercises = list(OrderedDict.fromkeys(exercises))
         columns_list = columns_list + columns_list_exe
         userData = UserData.objects.select_related().filter(book=obj_book, user__is_staff=0).order_by('user')
         users = []
         for userdata in userData:
-            if not userdata.user.is_staff:
+            if not userdata.user.is_staff and userdata.user.groups.filter(name='No grade').count()==0:
                 for p in range(len(students_assignment_points)):
                     students_assignment_points[p] = 0
                 u_points = 0
-                #s_points = 0
-                #h_points = 0
                 sh_data = []
                 u_data = []
                 assign_late = [] 
