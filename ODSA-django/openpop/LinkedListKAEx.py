@@ -14,6 +14,9 @@ import codecs
 import unicodedata
 import sys
 import string
+
+
+
 #from subprocess import call
 #import pdb; pdb.set_trace()
 
@@ -28,14 +31,21 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     generatedList =request_post.get('genlist') 
     data = ''.join([x for x in data if ord(x) < 128]) 
     
+    #Handling secrity issues
+    # 1- Infinite loops
+    
+
+
+   
+
     #  Check from which programming exercise we got this request
     if request_post.get('sha1') == "BinaryTreePROG" : # count number of nodes
        feedback= assesskaexbintree (data)
     elif request_post.get('sha1') == "BTLeafPROG" :  # count number of leaf nodes
-       feedback= assesskaexbtleaf (data)
+       feedback=assesskaexbtleaf (data)      
     elif request_post.get('sha1') == "ListADTPROG":  # generate a list
        feedback= assesskaex(data , generatedList)
-
+       
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         dt_now = datetime.datetime.now()
         #exercise = user_exercise.exercise
@@ -295,9 +305,9 @@ def assesskaexbtleaf (data):
     answer.close()
     
     # Setting the DISPLAY then run the processing command to test the submitted code
-    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/; javac studentpreordertest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
-    (out1, err1) = proc1.communicate() 
-    
+   # proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/; javac studentpreordertest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    #(out1, err1) = proc1.communicate() 
+    subprocess.call("cd /home/OpenDSA-server/ODSA-django/openpop; ./try.sh", shell=True)
     print data
     # Read the success file if has Success inside then "Well Done!" Otherwise "Try Again!"
     if  os.path.isfile(filesPath+'compilationerrors.out'):
@@ -328,9 +338,12 @@ def assesskaexbtleaf (data):
        for line in feedback[1]:
            if "Well Done" in line:
               feedback[0] = True
-              break 
+              return feedback
+               
            else :
               feedback[0] = False
+              return feedback
 
+    feedback[1]=['Try Again! Your code is taking too long to run! Revise your code!']
     return feedback
                 
