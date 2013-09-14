@@ -307,7 +307,7 @@ def assesskaexbtleaf (data):
     # Setting the DISPLAY then run the processing command to test the submitted code
    # proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/; javac studentpreordertest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
     #(out1, err1) = proc1.communicate() 
-    subprocess.call("cd /home/aalto-beta/ODSA-django/openpop; ./try.sh", shell=True)
+    subprocess.call("cd /home/OpenDSA-server/ODSA-django/openpop; ./try.sh", shell=True)
     print data
     # Read the success file if has Success inside then "Well Done!" Otherwise "Try Again!"
     if  os.path.isfile(filesPath+'compilationerrors.out'):
