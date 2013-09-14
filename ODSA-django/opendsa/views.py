@@ -263,16 +263,16 @@ def exercise_summary(request, book, course):
                         if assignment_:
                             students_assignment_points[assignments_list.index(assignment_)] += Decimal(exercises_points_list[exercises.index(exercise_t)])
                             if u_ex.proficient_date <= assignment_.course_module.closing_time:
-                                values[exercises.index(exercise_t)]= 'Done<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+                                values[exercises.index(exercise_t)]= '<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Done</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
                             else:
-                                values[exercises.index(exercise_t)]= 'Late<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date)) 
+                                values[exercises.index(exercise_t)]= '<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Late</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date)) 
                                 assign_late.append(assignment_.course_module.name)
                 for s_ex in started_ex:
                     if Exercise.objects.get(id=s_ex) in exercises and s_ex not in  prof_ex:   
                         exercise_t = Exercise.objects.get(id=s_ex)
                         #get detailed information
                         u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
-                        values[exercises.index(exercise_t)]= 'Started<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s"></span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+                        values[exercises.index(exercise_t)]= '<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Started</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
                 u_data.append(float(u_points))
                 for assign in assignments_list:
                     if assign.course_module.name in assign_late:

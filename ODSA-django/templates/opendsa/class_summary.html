@@ -7,6 +7,7 @@
     <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/TableTools.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/ZeroClipboard.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.js"></script> 
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/FixedHeader/js/FixedHeader.min.js"></script>
     <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
     <link href="{{ STATIC_URL }}datatables/media/css/demo_page.css" rel="stylesheet" media="screen" />
     <link href="{{ STATIC_URL }}datatables/media/css/demo_table.css" rel="stylesheet" media="screen" />
@@ -14,8 +15,10 @@
     <link href="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.css" rel="stylesheet" media="screen" />
     <link href="{{ STATIC_URL }}opendsa/css/activity.css" rel="stylesheet" media="screen" />
     <script type="text/javascript" charset="utf-8">
+        var giRedraw = false;
 	$(document).ready(function() {
             $('#demo').html( '<table cellpadding="0" cellspacing="1" border="1" class="display" id="example"></table>' );
+
             var oTable = $('#example').dataTable( {
                 "sDom": 'T<"clear">lfrtip',
                 "oTableTools": {
@@ -38,6 +41,26 @@
                 "aaData": {{ udata_list|safe  }},
                 "aoColumns": {{ columns_list|safe  }},
             } );
+            $("tr").css("background-color","rgba(255,255,255,1)");
+            new FixedHeader( oTable );
+   
+            /* Add a click handler to the rows - this could be used as a callback */
+            $("#example tr").live('click', function(event) {
+                var sdata = oTable.fnGetData( this );
+                if ($(this).hasClass('row_selected')) {
+                    $(this).removeClass('row_selected');
+                }
+                else {
+                    $(this).addClass('row_selected');
+                } 
+            });
+
+            /* Add a click handler for the delete row */
+            $('#delete').click( function() {
+                var anSelected = fnGetSelected( oTable );
+                    oTable.fnDeleteRow( anSelected[0] );
+            } );
+
             var i = 0;
             var j = 0;
             $(".late").css('backgroundColor', '#FF0000');
@@ -49,16 +72,16 @@
 		} );
             $('#example tbody td ').each( function(e) {
                 if ($(this).text()=="Done" ){ 
-                    $(this).css('backgroundColor', '#CCFFCC');
+                    $(this).children("span").css('backgroundColor', '#CCFFCC');
                 }
                 else if ($(this).text()=="Late"){
-                    $(this).css('backgroundColor', '#FF0000');
+                    $(this).children("span").css('backgroundColor', '#FF0000');
                 } 
                 else if ($(this).text()=="Started"){
-                    $(this).css('backgroundColor', '#FFFF00');
+                    $(this).children("span").css('backgroundColor', '#FFFF00');
                 }
                 else {
-                    $(this).css('backgroundColor', '#CCFFFF');
+                    $(this).css('opacity', 0.8);
                 }
                 if ( $(this).children(".details").length > 0) {
                     var kids = $(this).children(".details");
@@ -84,6 +107,21 @@
                 "fade": 200
             } ); 
 	} );
+        /* Get the rows which are currently selected */
+	function fnGetSelected( oTableLocal )
+	{
+		var aReturn = new Array();
+		var aTrs = oTableLocal.fnGetNodes();
+				
+		for ( var i=0 ; i<aTrs.length ; i++ )
+		{
+			if ( $(aTrs[i]).hasClass('row_selected') )
+			{
+				aReturn.push( aTrs[i] );
+			}
+		}
+		return aReturn;
+	}
   </script>
   {% endblock %}
 {% block content %}
