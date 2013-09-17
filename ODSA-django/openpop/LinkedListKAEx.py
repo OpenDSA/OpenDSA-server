@@ -163,9 +163,10 @@ def assesskaex(data , generatedList):
     
     # Setting the DISPLAY then run the processing command to test the submitted code
     #proc1 = subprocess.Popen(" cd /home/OpenPOP/Backend/visualize/build/ListTest/javaSource/; javac studentlisttest.java 2> /home/OpenPOP/Backend/visualize/build/ListTest/javaSource/compilationerrors.out ; java studentlisttest 2> /home/OpenPOP/Backend/visualize/build/ListTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
-    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/; javac studentlisttest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/compilationerrors.out ; java studentlisttest 2> /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
-    (out1, err1) = proc1.communicate() 
-    
+    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/; javac studentlisttest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/compilationerrors.out ; java java -Djava.security.manager -Djava.security.policy==newpolicy.policy studentlisttest 2> /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    #(out1, err1) = proc1.communicate() 
+    time.sleep(3)
+    os.system("kill -9 "+ str(proc1.pid) )
     # Read the success file if has Success inside then "Well Done!" Otherwise "Try Again!"
     if  os.path.isfile(filesPath+'compilationerrors.out'):
           syntaxErrorFile = open(filesPath+'compilationerrors.out' , 'r')
@@ -180,6 +181,12 @@ def assesskaex(data , generatedList):
           runErrorFile = open(filesPath+'runerrors.out' , 'r')
           feedback[0] = False
           feedback[1]= runErrorFile.readlines()
+          print feedback[1]
+          for line in feedback[1]:
+              print "line" + line
+              if "at java.security.AccessControlContext.checkPermission" in line:
+                 feedback[1]= ["Try Again! Your solution shouldn't write files to the disk!"]
+                 return feedback    
           runErrorFile.close()
           if os.stat(filesPath+'runerrors.out')[6]!=0:
              return feedback;
