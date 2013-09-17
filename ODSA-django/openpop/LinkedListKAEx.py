@@ -163,7 +163,7 @@ def assesskaex(data , generatedList):
     
     # Setting the DISPLAY then run the processing command to test the submitted code
     #proc1 = subprocess.Popen(" cd /home/OpenPOP/Backend/visualize/build/ListTest/javaSource/; javac studentlisttest.java 2> /home/OpenPOP/Backend/visualize/build/ListTest/javaSource/compilationerrors.out ; java studentlisttest 2> /home/OpenPOP/Backend/visualize/build/ListTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
-    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/; javac studentlisttest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/compilationerrors.out ; java java -Djava.security.manager -Djava.security.policy==newpolicy.policy studentlisttest 2> /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/; javac studentlisttest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy studentlisttest 2> /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
     #(out1, err1) = proc1.communicate() 
     time.sleep(3)
     os.system("kill -9 "+ str(proc1.pid) )
