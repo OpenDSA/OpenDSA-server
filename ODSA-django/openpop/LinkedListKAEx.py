@@ -14,7 +14,7 @@ import codecs
 import unicodedata
 import sys
 import string
-
+import time
 
 
 #from subprocess import call
@@ -305,9 +305,12 @@ def assesskaexbtleaf (data):
     answer.close()
     
     # Setting the DISPLAY then run the processing command to test the submitted code
-   # proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/; javac studentpreordertest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/; javac studentpreordertest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy studentpreordertest 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
     #(out1, err1) = proc1.communicate() 
-    subprocess.call("cd /home/OpenDSA-server/ODSA-django/openpop; ./try.sh", shell=True)
+    #subprocess.call("cd /home/OpenDSA-server/ODSA-django/openpop; ./try.sh", shell=True)
+    time.sleep(3)
+    os.system("kill -9 "+ str(proc1.pid) )
+
     print data
     # Read the success file if has Success inside then "Well Done!" Otherwise "Try Again!"
     if  os.path.isfile(filesPath+'compilationerrors.out'):
@@ -318,13 +321,18 @@ def assesskaexbtleaf (data):
           if os.stat(filesPath+'compilationerrors.out')[6]!=0:
              feedback[1]= feedback[1]#.rsplit(':',1)[1]
              print feedback[1]
-             return feedback;
+             return feedback
     if os.path.isfile(filesPath+'runerrors.out'):
        #Check what is returned from the test : what is inside the success file
           runErrorFile = open(filesPath+'runerrors.out' , 'r')
           feedback[0] = False
           feedback[1]= runErrorFile.readlines()
           print feedback[1]
+          for line in feedback[1]:
+              print "line" + line
+              if "at java.security.AccessControlContext.checkPermission" in line:
+                 feedback[1]= ["Try Again! Your solution shouldn't write files to the disk!"]
+                 return feedback    
           runErrorFile.close()
           if os.stat(filesPath+'runerrors.out')[6]!=0:
              return feedback;
