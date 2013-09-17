@@ -305,11 +305,7 @@ def assesskaexbtleaf (data):
     answer.close()
     
     # Setting the DISPLAY then run the processing command to test the submitted code
-<<<<<<< HEAD
     proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/; javac studentpreordertest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy studentpreordertest 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
-=======
-    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/; javac studentpreordertest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
->>>>>>> 73edb934bb2c3393fa7c0817bbf05cc8713a763f
     #(out1, err1) = proc1.communicate() 
     #subprocess.call("cd /home/OpenDSA-server/ODSA-django/openpop; ./try.sh", shell=True)
     time.sleep(3)
