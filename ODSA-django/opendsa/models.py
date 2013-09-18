@@ -1,5 +1,6 @@
 # Python
 import datetime
+from decimal import Decimal
 
 # Django
 from django.db import models
@@ -178,7 +179,8 @@ class ModuleExerciseManager(models.Manager):
     def get_mod_exercise_list(self, book, mod):
         exercise_list =[]
         for bme in super(ModuleExerciseManager,self).get_query_set().filter(book=book,module=mod):
-            exercise_list.append(bme.exercise)
+            if bme.points > Decimal(0):
+                exercise_list.append(bme.exercise)
         return exercise_list
 
 
