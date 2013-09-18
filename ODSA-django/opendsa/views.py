@@ -103,7 +103,7 @@ def class_students(request, module_id):
     return render_to_response("course/edit_students.html",
                               CourseContext(request, course_instance=course_module.course_instance,
                                                      module=course_module,
-                                                     form=formset
+                                                     formset=formset
                                              ))
 
 
