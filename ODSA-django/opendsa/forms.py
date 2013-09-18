@@ -204,9 +204,12 @@ class StudentsForm(forms.ModelForm):
         instance = getattr(self, 'instance', None)
         if instance:
             self.fields['username'].widget.attrs['readonly'] = True
+
     class Meta:
         model = User
         exclude = ['first_name','last_name','email','password','is_staff','is_active','is_superuser','last_login','date_joined','user_permissions']
-
+        widgets = {
+                     'groups': forms.CheckboxSelectMultiple(),
+                  } 
 
 admin.site.register(Assignments, AssignmentAdmin)
