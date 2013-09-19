@@ -4,7 +4,7 @@ from django.forms.widgets import Select, CheckboxSelectMultiple
 from opendsa.models import Assignments, Books, Exercise, BookModuleExercise
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from django.contrib.auth.models import User
+from opendsa.models import UserBook
 
 from exercise.exercise_models import  CourseModule
 import settings
@@ -203,13 +203,15 @@ class StudentsForm(forms.ModelForm):
         super(StudentsForm, self).__init__(*args, **kwargs)
         instance = getattr(self, 'instance', None)
         if instance:
-            self.fields['username'].widget.attrs['readonly'] = True
+            self.fields['user'].widget.attrs['readonly'] = True
+            #self.fields['user'].widget.attrs['disabled'] = True
 
     class Meta:
-        model = User
-        exclude = ['first_name','last_name','email','password','is_staff','is_active','is_superuser','last_login','date_joined','user_permissions']
-        widgets = {
-                     'groups': forms.CheckboxSelectMultiple(),
-                  } 
+        model = UserBook
+        exclude = ['book']
+
+#        widgets = {
+#                     'user': forms.TextInput(),
+#                  } 
 
 admin.site.register(Assignments, AssignmentAdmin)

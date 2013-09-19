@@ -237,6 +237,7 @@ class BookChapter (models.Model):
 class UserBook (models.Model):
     user = models.ForeignKey(User)
     book = models.ForeignKey(Books)
+    grade = models.BooleanField(default = True) 
     class Meta:
         unique_together = (("user","book"),)
 

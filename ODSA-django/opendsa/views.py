@@ -13,7 +13,7 @@ from course.views import _get_course_instance
 from  exercise.exercise_models import CourseModule
 # OpenDSA 
 from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserData, UserExerciseLog, UserButton, Assignments, BookChapter, UserBook   #UserSummary
-from opendsa.statistics import is_authorized, get_active_exercises,convert,is_file_old_enough, get_widget_data, exercises_logs 
+from opendsa.statistics import is_authorized, get_active_exercises,convert,is_file_old_enough, get_widget_data, exercises_logs, display_grade 
 from opendsa.exercises import get_due_date, get_assignment
 from opendsa.forms import AssignmentForm, StudentsForm
 
@@ -86,20 +86,17 @@ def class_students(request, module_id):
     course_students = []
     course_books =  list(Books.objects.filter(courses=course_module.course_instance))
     book = course_books[0]
-    qs0 =  UserBook.objects.prefetch_related('user').filter(book=book).values('user')
+    qs0 =  UserBook.objects.prefetch_related('user').filter(book=book).order_by('user__username') 
     usr_bk =[]
-    for u in qs0:
-        usr_bk.append(u['user'])
-    qs = User.objects.filter(id__in = usr_bk).order_by('username')
 
-    StudentsFormSet = modelformset_factory(User,form=StudentsForm, extra=0)
+    StudentsFormSet = modelformset_factory(UserBook,form=StudentsForm, extra=0)
     if request.method == "POST":
-        formset = StudentsFormSet(request.POST, queryset = qs)
+        formset = StudentsFormSet(request.POST, queryset = qs0)
         if formset.is_valid():
             stud = formset.save()
             messages.success(request, _('Students information were saved successfully.'))
     else:
-        formset = StudentsFormSet(queryset = qs)
+        formset = StudentsFormSet(queryset = qs0)
     return render_to_response("course/edit_students.html",
                               CourseContext(request, course_instance=course_module.course_instance,
                                                      module=course_module,
@@ -240,7 +237,7 @@ def exercise_summary(request, book, course):
         userData = UserData.objects.select_related().filter(book=obj_book, user__is_staff=0).order_by('user')
         users = []
         for userdata in userData:
-            if not userdata.user.is_staff and userdata.user.groups.filter(name='No grade').count()==0:
+            if not userdata.user.is_staff and display_grade(userdata.user,obj_book):
                 for p in range(len(students_assignment_points)):
                     students_assignment_points[p] = 0
                 u_points = 0

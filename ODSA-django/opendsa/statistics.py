@@ -11,7 +11,7 @@ from userprofile.models import UserProfile
 from course.models import Course, CourseInstance
 
 # OpenDSA 
-from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserData, UserExerciseLog, UserButton
+from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserData, UserExerciseLog, UserButton, UserBook
 # Django
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response
@@ -48,6 +48,12 @@ def get_active_exercises():
         if bme.exercise not in active_exe:
             active_exe.append(bme.exercise)
     return active_exe
+
+def display_grade(user, book):
+    if UserBook.objects.filter(user=user, book=book).count()==1:
+        return UserBook.objects.filter(user=user, book=book)[0].grade
+    return False
+
 
 def convert(input):
     if isinstance(input, dict):
