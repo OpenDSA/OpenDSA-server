@@ -11,7 +11,7 @@ from userprofile.models import UserProfile
 from course.models import Course, CourseInstance
 
 # OpenDSA 
-from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserData, UserExerciseLog, UserButton, UserBook
+from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserData, UserExerciseLog, UserButton, UserBook, BookChapter
 # Django
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response
@@ -64,6 +64,30 @@ def convert(input):
         return input.encode('utf-8')
     else:
         return input
+
+
+#f
+def create_book_file(book):
+    #get chapters
+    chapter_dict = {}
+    book_list = []
+    for chapter in BookChapter.objects.filter(book=book):
+        #get exercises
+        exe_dict = {}
+        for c_mod in chapter.get_modules():
+            for b_exe in BookModuleExercise.components.get_mod_exercise_list(book, c_mod):
+               exe_dict[str(int(b_exe.id))]=str(b_exe.name)
+        chap_ = '%s-%s' %(str(chapter.name),chapter.id)
+        chapter_dict[chap_] = exe_dict
+    book_ = '%s-%s' %(book.book_url,book.id)
+    book_list.append({str(book_).replace("'",'"'):chapter_dict})
+
+    try:
+          f_handle = open(settings.MEDIA_ROOT + book.book_name + '.json', 'w+')
+          f_handle.writelines(str(book_list).replace("'",'"'))
+          f_handle.close()
+    except IOError as e:
+          print "error ({0}) writing file : {1}".format(e.errno, e.strerror)
 
 
 #function that checks if a file is older than the limit

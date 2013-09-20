@@ -15,6 +15,7 @@ from tastypie.exceptions import NotRegistered, BadRequest
 # ODSA
 from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module, UserModule, \
                            BookModuleExercise, Books, UserBook, BookChapter
+from opendsa.statistics import create_book_file
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -778,6 +779,16 @@ class ModuleResource(ModelResource):
 
                     #Module proficiency response
                     response[kmodule.name] = user_module.is_proficient_at()
+
+                #create book json file
+                if request.POST['build_date']:
+                    if request.POST['module']!='index':
+                        build_date = datetime.datetime.strptime(request.POST['build_date'],'%Y-%m-%d %H:%M:%S')
+                        if kbook.creation_date != build_date:
+                            create_book_file(kbook)
+                            kbook.creation_date = build_date
+                            kbook.save()
+   
                 return self.create_response(request, response)
         return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
 

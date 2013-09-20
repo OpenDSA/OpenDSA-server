@@ -103,7 +103,8 @@ class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
                      selected_id[i] = $(this).parent().text();
                    });
                    $('#exercises-checkbox').empty();
-                   var course = $("h1").text().split(" ")[1];
+                   //var course = $("h1").text().split(" ")[1];
+                   var course = $('#book-name').attr('data-name');
                    //add chapter select box
                    $('#id_assignment_book').after('<p><label for="id_assignment_chapter">Assignment chapter:</label><select id="id_assignment_chapter" name="assignment_chapter"></select></p>');
                    //add book chapter checkboxes

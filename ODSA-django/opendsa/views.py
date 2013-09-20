@@ -114,34 +114,34 @@ def add_or_edit_assignment(request, module_id):
     @param request: the Django HttpRequest object
     """
     course_module = CourseModule.objects.get(id=module_id)
-    course_books = []
+    #course_books = []
     assignment = None
     #retrieve books
-    for cb in  Books.objects.filter(courses=course_module.course_instance):
-        if cb not in course_books:
-            course_books.append(cb)
+    book =  Books.objects.filter(courses=course_module.course_instance)[0]
+    #    if cb not in course_books:
+    #        course_books.append(cb)
     #retrieve exercises
-    book_list = []
-    for book in course_books:
-        #get chapters
-        chapter_dict = {}
-        for chapter in BookChapter.objects.filter(book=book):
+    #book_list = []
+    #for book in course_books:
+    #    #get chapters
+    #    chapter_dict = {}
+    #    for chapter in BookChapter.objects.filter(book=book):
             #get exercises
-            exe_dict = {} 
-            for c_mod in chapter.get_modules():
-                for b_exe in BookModuleExercise.components.get_mod_exercise_list(book, c_mod):
-                   exe_dict[str(int(b_exe.id))]=str(b_exe.name)
-            chap_ = '%s-%s' %(str(chapter.name),chapter.id)
-            chapter_dict[chap_] = exe_dict  
-        book_ = '%s-%s' %(book.book_url,book.id)
-        book_list.append({str(book_).replace("'",'"'):chapter_dict})
+    #        exe_dict = {} 
+    #        for c_mod in chapter.get_modules():
+    #            for b_exe in BookModuleExercise.components.get_mod_exercise_list(book, c_mod):
+    #               exe_dict[str(int(b_exe.id))]=str(b_exe.name)
+    #        chap_ = '%s-%s' %(str(chapter.name),chapter.id)
+    #        chapter_dict[chap_] = exe_dict  
+    #    book_ = '%s-%s' %(book.book_url,book.id)
+    #    book_list.append({str(book_).replace("'",'"'):chapter_dict})
 
-        try:
-              f_handle = open(settings.MEDIA_ROOT + course_module.course_instance.instance_name + '.json', 'w+')
-              f_handle.writelines(str(book_list).replace("'",'"'))
-              f_handle.close()
-        except IOError as e:
-              print "error ({0}) writing file : {1}".format(e.errno, e.strerror)
+    #    try:
+    #          f_handle = open(settings.MEDIA_ROOT + course_module.course_instance.instance_name + '.json', 'w+')
+    #          f_handle.writelines(str(book_list).replace("'",'"'))
+    #          f_handle.close()
+    #    except IOError as e:
+    #         print "error ({0}) writing file : {1}".format(e.errno, e.strerror)
 
     if Assignments.objects.filter(course_module=course_module).count()>0:
         assignment = get_object_or_404(Assignments, course_module=course_module)
@@ -157,7 +157,8 @@ def add_or_edit_assignment(request, module_id):
     return render_to_response("course/edit_module.html",
                               CourseContext(request, course_instance=course_module.course_instance,
                                                      module=course_module,
-                                                     form=form
+                                                     form=form,
+                                                     book_name = book.book_name
                                              ))
 
 @login_required

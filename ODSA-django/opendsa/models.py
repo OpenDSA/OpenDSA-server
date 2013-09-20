@@ -46,6 +46,7 @@ class Books(models.Model):
                                                validators=[RegexValidator(regex="^[\w\-\.]*$")],
                                                help_text="Input an URL identifier for this book.")
     courses = models.ManyToManyField(CourseInstance)
+    creation_date = models.DateTimeField()
 
     def __unicode__(self):
        '''
