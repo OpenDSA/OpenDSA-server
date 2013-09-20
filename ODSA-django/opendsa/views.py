@@ -274,9 +274,9 @@ def exercise_summary(request, book, course):
                 u_data.append(float(u_points))
                 for assign in assignments_list:
                     if assign.course_module.name in assign_late:
-                        sh_score = '<span class="late">%s/%s</span>' %(students_assignment_points[assignments_list.index(assign)],assignments_points_list[assignments_list.index(assign)]) 
+                        sh_score = '<span class="late">%s</span>' %(students_assignment_points[assignments_list.index(assign)])#,assignments_points_list[assignments_list.index(assign)]) 
                     else:
-                        sh_score = '%s/%s' %(students_assignment_points[assignments_list.index(assign)],assignments_points_list[assignments_list.index(assign)])  
+                        sh_score = '%s' %(students_assignment_points[assignments_list.index(assign)]) #,assignments_points_list[assignments_list.index(assign)])  
                     u_data.append(sh_score)
                 u_data = u_data + values
                 udata_list.append(u_data)
