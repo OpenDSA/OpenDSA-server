@@ -199,17 +199,6 @@ def all_statistics(request):
 def exercise_summary(request, book, course):
     if is_authorized(request.user,book,course):
         obj_book = Books.objects.get(book_name=book)
-        #we create 2 lists the same size: one for all the exercises in the book and one containing exercise points
-        exercises = []
-        exercises_points_list =[]
-        BookModExercises = BookModuleExercise.components.select_related().filter(book=obj_book)
-        exercise_table = {}
-        total_sorting = 0
-        total_hashing = 0
-        sorting_exe = []
-        hashing_exe = []
-        #we preparing the data for datatables jquery plugin
-        #List containing users data: [["username","points","exercise1 score", "exercise1 score",...]]
         udata_list = []
         columns_list = []
         columns_list_exe = []  #for exercises
@@ -222,64 +211,48 @@ def exercise_summary(request, book, course):
         students_assignment_points = []
         for assignment in assignments_list:
             columns_list.append({"sTitle":str(assignment.course_module.name)})
-            #get points of exercises
-            assignment_points = 0
             for exercise in assignment.get_exercises():
                 for bexe in BookModuleExercise.components.select_related().filter(book=obj_book, exercise = exercise):
-                    if exercise not in exercises:
-                        exercises.append(exercise)
-                    exercises_points_list.append(bexe.points)
-                    assignment_points += Decimal(bexe.points)
-                    columns_list_exe.append({"sTitle":str(bexe.exercise.name)+'<span class="details" style="display:inline;" data-type="'+str(bexe.exercise.description)+'"></span>',"sClass": "center" })
-            assignments_points_list.append(assignment_points)
-            students_assignment_points.append(0)
-        #remove duplicates
-        columns_list = columns_list + columns_list_exe
+                    columns_list.append({"sTitle":str(bexe.exercise.name)+'('+str(bexe.points)+')'+'<span class="details" style="display:inline;" data-type="'+str(bexe.exercise.description)+'"></span>',"sClass": "center" })
         userData = UserData.objects.select_related().filter(book=obj_book, user__is_staff=0).order_by('user')
         users = []
         for userdata in userData:
             if not userdata.user.is_staff and display_grade(userdata.user,obj_book):
-                for p in range(len(students_assignment_points)):
-                    students_assignment_points[p] = 0
                 u_points = 0
-                sh_data = []
                 u_data = []
-                assign_late = [] 
                 u_data.append(0)
                 u_data.append(str(userdata.user.username))
-                values = ['--<span class="details" style="display:inline;" data-type="Not Started"></span>' for j in range(len(exercises))]
-                prof_ex = userdata.get_prof_list()
-                started_ex = userdata.get_started_list()
-                for p_ex in prof_ex:
-                    exercise_t = Exercise.objects.get(id=p_ex)
-                    if exercise_t in exercises:
-                        #get detailed information
-                        u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
-                        #check late submission
-                        assignment_ = get_assignment(obj_book, exercise_t)
-                        u_points += Decimal(exercises_points_list[exercises.index(exercise_t)])
-                        if assignment_:
-                            students_assignment_points[assignments_list.index(assignment_)] += Decimal(exercises_points_list[exercises.index(exercise_t)])
-                            if u_ex.proficient_date <= assignment_.course_module.closing_time:
-                                values[exercises.index(exercise_t)]= '<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Done</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+                u_data.append(0)
+
+                for assignment in assignments_list:
+                    #get points of exercises
+                    assignment_points = 0
+                    students_assignment_points = 0
+                    u_assign = []
+                    u_assign.append(0)
+                    for exercise in assignment.get_exercises():
+                        bexe = BookModuleExercise.components.select_related().filter(book=obj_book, exercise = exercise)[0]
+                        u_ex = None
+                        if UserExercise.objects.filter(user=userdata.user,exercise=exercise).count() > 0: 
+                            u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise)
+                        assignment_points += Decimal(bexe.points)
+                        exe_str = ''
+                        if exercise.id in userdata.get_prof_list():
+                            u_points += Decimal(bexe.points) 
+                            students_assignment_points += Decimal(bexe.points)                         
+                            if u_ex.proficient_date <= assignment.course_module.closing_time:
+                                exe_str = '<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Done</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
                             else:
-                                values[exercises.index(exercise_t)]= '<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Late</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date)) 
-                                assign_late.append(assignment_.course_module.name)
-                for s_ex in started_ex:
-                    if Exercise.objects.get(id=s_ex) in exercises and s_ex not in  prof_ex:   
-                        exercise_t = Exercise.objects.get(id=s_ex)
-                        #get detailed information
-                        u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise_t)
-                        values[exercises.index(exercise_t)]= '<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Started</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
-                u_data.append(float(u_points))
-                for assign in assignments_list:
-                    if assign.course_module.name in assign_late:
-                        sh_score = '<span class="late">%s</span>' %(students_assignment_points[assignments_list.index(assign)])#,assignments_points_list[assignments_list.index(assign)]) 
-                    else:
-                        sh_score = '%s' %(students_assignment_points[assignments_list.index(assign)]) #,assignments_points_list[assignments_list.index(assign)])  
-                    u_data.append(sh_score)
-                u_data = u_data + values
+                                exe_str = '<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Late</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+                        if exercise.id in userdata.get_started_list() and exercise.id not in userdata.get_prof_list():    
+                            exe_str = '<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Started</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))  
+
+                        u_assign.append(exe_str)
+                    u_assign[0] =  str(students_assignment_points)
+                    u_data = u_data + u_assign
+                u_data[2] = str(u_points )
                 udata_list.append(u_data)
+
         context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list}) 
         return render_to_response("opendsa/class_summary.html", context)
     else:
