@@ -757,10 +757,17 @@ class ModuleResource(ModelResource):
                         u_prog = 0
 
                     #Link exercise to module and books only if the exercise is required
+                    if BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=kexercise).count()>0 and mod_exe['required']:
+                       with transaction.commit_on_success():
+                            bme = BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=kexercise)[0]
+                            bme.points = mod_exe['points']
+                            bme.save()
                     if BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=kexercise).count() == 0 and mod_exe['required']:
                         with transaction.commit_on_success():
                             bme = models.BookModuleExercise(book=kbook, module=kmodule, exercise=kexercise, points=mod_exe['points'])
                             bme.save()
+                    bme = BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=kexercise)[0]
+                    
                     response[kexercise.name] = {'proficient': u_prof, 'progress': u_prog}
 
                 # Remove exercises that are no longer part of this book / module
