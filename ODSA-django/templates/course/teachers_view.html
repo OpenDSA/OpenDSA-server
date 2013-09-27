@@ -23,6 +23,11 @@
         </a>
 
         <hr/>
+       <a href="{% url opendsa.views.rebuild_book_assignments instance.course_modules.all.0.id %}"
+           class="btn btn-success btn-mini">
+           <i></i> {% trans "Update book exercises" %}
+        </a>
+       <hr/>
     {% for module in instance.course_modules.all %}
         <tr>
             <th>

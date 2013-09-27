@@ -2,9 +2,8 @@
 from views import login,  verify_credentials #home
 from oauth_provider.views import protected_resource_example
 
-from opendsa.views import exercise_summary, module_list, daily_summary, all_statistics, widget_data, home, add_or_edit_assignment, class_students, student_management 
+from opendsa.views import exercise_summary, module_list, daily_summary, all_statistics, widget_data, home, add_or_edit_assignment, class_students, student_management, rebuild_book_assignments 
 from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail, non_required_exercise_use, total_module_time, slideshow_cheating, work_order, skipping_text, slideshow_stats, time_required, cheating_exercises, work_distribution #,timeline_sum , timeline_detail
-
 # Django
 from django.conf.urls.defaults import *
 from django.contrib import admin
@@ -23,6 +22,7 @@ urlpatterns = patterns('',
 
     # OpenDSA
     url(r'^assignments/(?P<course_module_id>[\w]+)/$',add_or_edit_assignment),
+    url(r'^teacher_view/rebuild/(?P<module_id>[\w]+)/$',rebuild_book_assignments),
     url(r'^students/(\d+)$',student_management),
     url(r'^teacher_view/(?P<course_module_id>[\w]+)/$',class_students),
     url(r'^teacher_view/(?P<book>[\w]+)/(?P<course>[\w]+)/$', exercise_summary),

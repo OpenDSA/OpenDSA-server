@@ -13,7 +13,7 @@ from course.views import _get_course_instance
 from  exercise.exercise_models import CourseModule
 # OpenDSA 
 from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserData, UserExerciseLog, UserButton, Assignments, BookChapter, UserBook   #UserSummary
-from opendsa.statistics import is_authorized, get_active_exercises,convert,is_file_old_enough, get_widget_data, exercises_logs, display_grade 
+from opendsa.statistics import is_authorized, get_active_exercises,convert,is_file_old_enough, get_widget_data, exercises_logs, display_grade,create_book_file 
 from opendsa.exercises import get_due_date, get_assignment
 from opendsa.forms import AssignmentForm, StudentsForm
 
@@ -78,6 +78,16 @@ def student_management(request, module_id):
     return HttpResponseForbidden('<h1>No class activity</h1>')
 
 
+@login_required
+def rebuild_book_assignments(request, module_id):
+    course_module = CourseModule.objects.get(id=module_id)
+    #retrieve books
+    book =  Books.objects.filter(courses=course_module.course_instance)[0]
+    create_book_file(book)
+    messages.success(request, _('Book was updated successfully.'))
+#    return HttpResponse()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
 @login_required
 def class_students(request, module_id):
@@ -102,6 +112,7 @@ def class_students(request, module_id):
                                                      module=course_module,
                                                      formset=formset
                                              ))
+
 
 
 
