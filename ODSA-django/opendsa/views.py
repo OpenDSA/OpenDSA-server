@@ -224,7 +224,7 @@ def exercise_summary(request, book, course):
             columns_list.append({"sTitle":str(assignment.course_module.name)})
             for exercise in assignment.get_exercises():
                 for bexe in BookModuleExercise.components.select_related().filter(book=obj_book, exercise = exercise):
-                    columns_list.append({"sTitle":str(bexe.exercise.name)+'<br />('+str(bexe.points)+')'+'<span class="details" style="display:inline;" data-type="'+str(bexe.exercise.description)+'"></span>',"sClass": "center" })
+                    columns_list.append({"sTitle":str(bexe.exercise.name)+'('+str(bexe.points)+')'+'<span class="details" style="display:inline;" data-type="'+str(bexe.exercise.description)+'"></span>',"sClass": "center" })
         userData = UserData.objects.select_related().filter(book=obj_book, user__is_staff=0).order_by('user')
         users = []
         for userdata in userData:
