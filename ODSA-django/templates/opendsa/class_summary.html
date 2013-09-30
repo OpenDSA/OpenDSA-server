@@ -42,7 +42,7 @@
                 "aoColumns": {{ columns_list|safe  }},
             } );
             $("tr").css("background-color","rgba(255,255,255,1)");
-            new FixedHeader( oTable,{ "left": true} );
+            new FixedHeader( oTable);//,{ "left": true} );
    
             /* Add a click handler to the rows - this could be used as a callback */
             $("#example tr").live('click', function(event) {
