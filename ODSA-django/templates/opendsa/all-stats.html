@@ -6,6 +6,7 @@
     <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/TableTools.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/ZeroClipboard.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/FixedHeader/js/FixedHeader.min.js"></script>
     <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
     <link href="{{ STATIC_URL }}datatables/media/css/demo_page.css" rel="stylesheet" media="screen" />
     <link href="{{ STATIC_URL }}datatables/media/css/demo_table.css" rel="stylesheet" media="screen" />
@@ -30,6 +31,8 @@
                 "aoColumns": [{"sTitle":"Exercises Performed (ka)"},{"sTitle":"Correct Answers (all)"},{"sTitle":"Exercises Performed (All)"},{"sTitle":"User Interactions"},{"sTitle":"Exercises Performed (ss)"},{"sTitle":"New Registration"},{"sTitle":"Exercises Performed (pe)"},{"sTitle":"Date"},{"sTitle":"Active Users"}],
                 "aaSorting": [[7,"desc"]]
             } );
+            $("th").css("background-color","rgba(255,255,255,1)");
+            new FixedHeader( oTable);
         } );
   </script>
     <div id="demo">
