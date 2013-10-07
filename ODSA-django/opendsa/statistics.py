@@ -116,7 +116,7 @@ def get_widget_data():
         print "error ({0}) written file : {1}".format(e.errno, e.strerror)
 
     w_table = {}
-    w_table['exercises'] = int(exe) + int(old_logs['exercises'])
+    w_table['exercises'] = int(exe)  # + int(old_logs['exercises'])
     w_table['users'] = int(user) + int(old_logs['users'])
 
     #write data into a file
@@ -243,10 +243,11 @@ def exercises_logs():
         
     #write data into a file
     try:
-        ffile = open(settings.MEDIA_ROOT + 'daily_stats1.json')
-        fall12_data = ffile.readlines()
-        ffile.close()
-        all_daily_logs = fall12_data[0][1:-1] + ',' + str(all_daily_logs).replace("'",'"')[1:-1]
+        #ffile = open(settings.MEDIA_ROOT + 'daily_stats1.json')
+        #fall12_data = ffile.readlines()
+        #ffile.close()
+        #all_daily_logs = fall12_data[0][1:-1] + ',' + str(all_daily_logs).replace("'",'"')[1:-1]
+        all_daily_logs = str(all_daily_logs).replace("'",'"')#[1:-1]
         all_daily_logs = all_daily_logs.replace("[","").replace("]","")
         all_daily_logs = '[' + all_daily_logs + ']' 
         
