@@ -16,34 +16,57 @@
     <link href="{{ STATIC_URL }}opendsa/css/activity.css" rel="stylesheet" media="screen" />
     <script type="text/javascript" charset="utf-8">
         var giRedraw = false;
+        var columns = "";
+        var u_data = "";
 	$(document).ready(function() {
             $('#demo').html( '<table cellpadding="0" cellspacing="1" border="1" class="display" id="example"></table>' );
+            $('#demo1').html( '<table cellpadding="0" cellspacing="1" border="1" class="display" id="example1"></table>' );
 
-            var oTable = $('#example').dataTable( {
-                "sDom": 'T<"clear">lfrtip',
-                "oTableTools": {
-			"sSwfPath": "{{ STATIC_URL }}datatables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf"
-		},
-                "bPaginate": false,
-                "fnDrawCallback": function ( oSettings ) {
-			/* Need to redo the counters if filtered or sorted */
-			if ( oSettings.bSorted || oSettings.bFiltered )
-			{
-				for ( var i=0, iLen=oSettings.aiDisplay.length ; i<iLen ; i++ )
-				{
-					$('td:eq(0)', oSettings.aoData[ oSettings.aiDisplay[i] ].nTr ).html( i+1 );
-				}
-			}
-		},
-                "aoColumnDefs": [
-			{ "bSortable": false, "aTargets": [ 0 ] }
-		],
-                "aaData": {{ udata_list|safe  }},
-                "aoColumns": {{ columns_list|safe  }},
-            } );
-            $("tr").css("background-color","rgba(255,255,255,1)");
-            new FixedHeader( oTable);//,{ "left": true} );
-   
+            u_data = {{ udata_list|safe  }};
+            columns = {{ columns_list|safe  }};
+            
+            var oTable = fnCreaateTable($('#example'));
+            $("div.fixedHeader").attr("id","table-0");
+
+            u_data = {{ udata_list1|safe  }};
+            columns = {{ columns_list1|safe  }};
+
+            var oTable1 = fnCreaateTable($('#example1'));
+            $('div.fixedHeader').each( function(e) {
+              if($(this).attr("id")!="table-0") {
+                  $(this).attr("id","table-1");
+              }
+            });
+            $("#demo1").hide();
+            $("#table-1").css("display", "none");
+
+            /*click handler for he check box       */
+            $("#hide_exe").live('click', function(event) {
+                 if ($("#demo").is(":visible")) {
+                    $("#demo").hide();
+                    $("#example").hide();
+                    $("#table-0").css("display", "none");
+                    $("#table-1").css("display", "block");
+                 }
+                 else {
+                    $("#demo").show();
+                    $("#example").show();
+                    $("#table-0").css("display", "block");
+                    $("#table-1").css("display", "none");
+                 }
+                 if ($("#demo1").is(":visible")) {
+                    $("#demo1").hide();
+                    $("#example1").hide();
+                    $("#table-1").css("display", "none");
+                    $("#table-0").css("display", "block");
+                 }
+                 else {
+                    $("#demo1").show();
+                    $("#example1").show();
+                    $("#table-1").css("display", "block");
+                    $("#table-0").css("display", "none");
+                 }
+            });  
             /* Add a click handler to the rows - this could be used as a callback */
             $("#example tr").live('click', function(event) {
                 var sdata = oTable.fnGetData( this );
@@ -107,6 +130,37 @@
                 "fade": 200
             } ); 
 	} );
+
+        /* Create the data table  */
+        function fnCreaateTable( divID )
+        {
+            var oTable = divID.dataTable( {
+                "sDom": 'T<"clear">lfrtip',
+                "oTableTools": {
+                        "sSwfPath": "{{ STATIC_URL }}datatables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf"
+                },
+                "bPaginate": false,
+                "fnDrawCallback": function ( oSettings ) {
+                        /* Need to redo the counters if filtered or sorted */
+                        if ( oSettings.bSorted || oSettings.bFiltered )
+                        {
+                                for ( var i=0, iLen=oSettings.aiDisplay.length ; i<iLen ; i++ )
+                                {
+                                        $('td:eq(0)', oSettings.aoData[ oSettings.aiDisplay[i] ].nTr ).html( i+1 );
+                                }
+                        }
+                },
+                "aoColumnDefs": [
+                        { "bSortable": false, "aTargets": [ 0 ] }
+                ],
+                "aaData": u_data, //{{ udata_list|safe  }},
+                "aoColumns": columns,  //{{ columns_list|safe  }},
+            } );
+            $("tr").css("background-color","rgba(255,255,255,1)");
+            new FixedHeader( oTable);//,{ "left": true} );
+            return oTable;
+        
+        }
         /* Get the rows which are currently selected */
 	function fnGetSelected( oTableLocal )
 	{
@@ -129,9 +183,12 @@
     <h4>Course: {{course}}</h4>
     <h4>Book: {{book}}</h4>
     <hr>
+    <input type="checkbox" id="hide_exe" name="toggle" value="hide">Toggle exercises columns<br>
     <div id="demo">
     
 
+    </div>
+    <div id="demo1">
     </div>
 {% endblock %}
 

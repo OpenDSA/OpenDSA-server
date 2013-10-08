@@ -211,17 +211,23 @@ def exercise_summary(request, book, course):
     if is_authorized(request.user,book,course):
         obj_book = Books.objects.get(book_name=book)
         udata_list = []
+        udata_list1 = []
         columns_list = []
+        columns_list1 = []
         columns_list_exe = []  #for exercises
         columns_list.append({"sTitle":"Id"})
         columns_list.append({"sTitle":"Username"})
         columns_list.append({"sTitle":"Points"})
+        columns_list1.append({"sTitle":"Id"})
+        columns_list1.append({"sTitle":"Username"})
+        columns_list1.append({"sTitle":"Points"})
         #get list of book assignments
-        assignments_list = list(Assignments.objects.select_related().filter(assignment_book=obj_book))
+        assignments_list = list(Assignments.objects.select_related().filter(assignment_book=obj_book).order_by('course_module__closing_time'))
         assignments_points_list = []
         students_assignment_points = []
         for assignment in assignments_list:
             columns_list.append({"sTitle":str(assignment.course_module.name)})
+            columns_list1.append({"sTitle":str(assignment.course_module.name)})
             for exercise in assignment.get_exercises():
                 for bexe in BookModuleExercise.components.select_related().filter(book=obj_book, exercise = exercise):
                     columns_list.append({"sTitle":str(bexe.exercise.name)+'('+str(bexe.points)+')'+'<span class="details" style="display:inline;" data-type="'+str(bexe.exercise.description)+'"></span>',"sClass": "center" })
@@ -234,12 +240,18 @@ def exercise_summary(request, book, course):
                 u_data.append(0)
                 u_data.append(str(userdata.user.username))
                 u_data.append(0)
+                u_data1 = []
+                u_data1.append(0)
+                u_data1.append(str(userdata.user.username))
+                u_data1.append(0)
+
 
                 for assignment in assignments_list:
                     #get points of exercises
                     assignment_points = 0
                     students_assignment_points = 0
                     u_assign = []
+                    u_assign1 = []
                     u_assign.append(0)
                     for exercise in assignment.get_exercises():
                         bexe = BookModuleExercise.components.select_related().filter(book=obj_book, exercise = exercise)[0]
@@ -261,10 +273,13 @@ def exercise_summary(request, book, course):
                         u_assign.append(exe_str)
                     u_assign[0] =  str(students_assignment_points)
                     u_data = u_data + u_assign
+                    u_data1.append(str(students_assignment_points))
                 u_data[2] = str(u_points )
                 udata_list.append(u_data)
+                u_data1[2] = str(u_points )
+                udata_list1.append(u_data1) 
 
-        context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list}) 
+        context = RequestContext(request, {'book':book,'course':course,'udata_list': udata_list, 'columns_list':columns_list, 'udata_list1': udata_list1, 'columns_list1':columns_list1}) 
         return render_to_response("opendsa/class_summary.html", context)
     else:
         return  HttpResponseForbidden('<h1>Page Forbidden</h1>')
