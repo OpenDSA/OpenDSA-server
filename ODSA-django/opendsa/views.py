@@ -222,17 +222,20 @@ def exercise_summary(request, book, course):
         columns_list1.append({"sTitle":"Username"})
         columns_list1.append({"sTitle":"Points"})
         #get list of book assignments
-        assignments_list = list(Assignments.objects.select_related().filter(assignment_book=obj_book).order_by('course_module__closing_time'))
+        assignments_list = Assignments.objects.select_related().filter(assignment_book=obj_book).order_by('course_module__closing_time')
         assignments_points_list = []
         students_assignment_points = []
         for assignment in assignments_list:
             columns_list.append({"sTitle":str(assignment.course_module.name)})
             columns_list1.append({"sTitle":str(assignment.course_module.name)})
             for exercise in assignment.get_exercises():
-                for bexe in BookModuleExercise.components.select_related().filter(book=obj_book, exercise = exercise):
-                    columns_list.append({"sTitle":str(bexe.exercise.name)+'('+str(bexe.points)+')'+'<span class="details" style="display:inline;" data-type="'+str(bexe.exercise.description)+'"></span>',"sClass": "center" })
+                #for bexe in BookModuleExercise.components.select_related().filter(book=obj_book, exercise = exercise):
+                for bexe in BookModuleExercise.components.filter(book=obj_book, exercise = exercise):
+                    columns_list.append({"sTitle":str(exercise.name)+'('+str(bexe.points)+')'+'<span class="details" style="display:inline;" data-type="'+str(exercise.description)+'"></span>',"sClass": "center" })
         userData = UserData.objects.select_related().filter(book=obj_book, user__is_staff=0).order_by('user')
         users = []
+        exe_bme = {}
+        exercises_ = {}
         for userdata in userData:
             if not userdata.user.is_staff and display_grade(userdata.user,obj_book):
                 u_points = 0
@@ -253,11 +256,17 @@ def exercise_summary(request, book, course):
                     u_assign = []
                     u_assign1 = []
                     u_assign.append(0)
-                    for exercise in assignment.get_exercises():
-                        bexe = BookModuleExercise.components.select_related().filter(book=obj_book, exercise = exercise)[0]
+                    for exercise_id in assignment.get_exercises_id():
+                        if exercise_id not in exercises_:
+                            exercises_[exercise_id] = Exercise.objects.get(id=exercise_id)
+                        exercise = exercises_[exercise_id] 
+                        if exercise.name not in exe_bme:
+                            exe_bme[exercise.name] = BookModuleExercise.components.filter(book=obj_book, exercise = exercise)[0] 
+                        bexe = exe_bme[exercise.name]
                         u_ex = None
-                        if UserExercise.objects.filter(user=userdata.user,exercise=exercise).count() > 0: 
-                            u_ex = UserExercise.objects.get(user=userdata.user,exercise=exercise)
+                        user_exe = UserExercise.objects.filter(user=userdata.user,exercise=exercise)
+                        if user_exe: 
+                            u_ex = user_exe[0]
                         assignment_points += Decimal(bexe.points)
                         exe_str = ''
                         if exercise.id in userdata.get_prof_list():
@@ -274,6 +283,7 @@ def exercise_summary(request, book, course):
                     u_assign[0] =  str(students_assignment_points)
                     u_data = u_data + u_assign
                     u_data1.append(str(students_assignment_points))
+
                 u_data[2] = str(u_points )
                 udata_list.append(u_data)
                 u_data1[2] = str(u_points )
