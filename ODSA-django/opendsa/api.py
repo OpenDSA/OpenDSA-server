@@ -50,10 +50,11 @@ def create_key(username):
     return hash_key.digest().encode('hex')
 
 def get_user_by_key(key):
-    if  len(ApiKey.objects.filter(key=key)) != 1:
+    user_by_key = ApiKey.objects.filter(key=key)
+    if  not user_by_key:
         return None
     else:
-        return ApiKey.objects.get(key=key).user
+        return user_by_key[0].user
 
 # Safe accessor methods - these functions are designed to prevent the problem of duplicate entries being created
 def get_username(key):
@@ -66,50 +67,45 @@ def get_username(key):
     return kusername
 
 def get_book(name):
-    if Books.objects.filter(book_name=name).count() == 1:
-        book = Books.objects.get(book_name=name)
-    elif Books.objects.filter(book_name=name).count() > 1:
-        book = Books.objects.filter(book_name=name)[0]
+    _books =  Books.objects.filter(book_name=name)
+    if _books:
+        book = _books[0]
     else:
         book = None
 
     return book
 
 def get_module(name):
-    if Module.objects.filter(name=name).count() == 1:
-        module = Module.objects.get(name=name)
-    elif Module.objects.filter(name=name).count() > 1:
-        module = Module.objects.filter(name=name)[0]
+    _modules = Module.objects.filter(name=name) 
+    if _modules:
+        module = _modules[0]
     else:
         module = None
 
     return module
 
 def get_chapter(book, chapter_name):
-    if BookChapter.objects.filter(book=book,name=chapter_name).count() == 1:
-        chapter = BookChapter.objects.get(book=book,name=chapter_name)
-    elif  BookChapter.objects.filter(book=book,name=chapter_name).count() > 1:
-        chapter =  BookChapter.objects.filter(book=book,name=chapter_name)[0]
+    _chapters = BookChapter.objects.filter(book=book,name=chapter_name)
+    if _chapters:
+        chapter = _chapters[0]
     else:
         chapter = None
 
     return chapter
 
 def get_exercise(exercise):
-    if Exercise.objects.filter(name=exercise).count() == 1:
-        exercise = Exercise.objects.get(name=exercise)
-    elif Exercise.objects.filter(name=exercise).count() > 1:
-        exercise = Exercise.objects.filter(name=exercise)[0]
+    _exercises = Exercise.objects.filter(name=exercise)
+    if _exercises:
+        exercise = _exercises[0]
     else:
         exercise = None
 
     return exercise
 
 def get_user_book(user, book):
-    if UserBook.objects.filter(user=user, book=book).count() == 1:
-        ubook = UserBook.objects.get(user=user, book=book)
-    elif UserBook.objects.filter(user=user, book=book).count() > 1:
-        ubook = UserBook.objects.filter(user=user, book=book)[0]
+    _user_book = UserBook.objects.filter(user=user, book=book)
+    if _user_book:
+        ubook = _user_book[0]
     else:
         if user.username == 'phantom':
             ubook,created = UserBook.objects.get_or_create(user=user, book=book)
@@ -118,20 +114,18 @@ def get_user_book(user, book):
     return ubook
 
 def get_user_module(user, book, module):
-    if UserModule.objects.filter(user=user, book=book, module=module).count() == 1:
-        umod = UserModule.objects.get(user=user, book=book, module=module)
-    elif UserModule.objects.filter(user=user, book=book, module=module).count() > 1:
-        umod = UserModule.objects.filter(user=user, book=book, module=module)[0]
+    _user_module = UserModule.objects.filter(user=user, book=book, module=module)
+    if _user_module:
+        umod = _user_module[0]
     else:
         umod = None
 
     return umod
 
 def get_user_exercise(user, exercise):
-    if UserExercise.objects.filter(user=user, exercise=exercise).count() == 1:
-        user_exercise = UserExercise.objects.get(user=user, exercise=exercise)
-    elif UserExercise.objects.filter(user=user, exercise=exercise).count() > 1:
-        user_exercise = UserExercise.objects.filter(user=user, exercise=exercise)[0]
+    _user_exercise = UserExercise.objects.filter(user=user, exercise=exercise)
+    if _user_exercise:
+        user_exercise = _user_exercise[0]
     else:
         user_exercise = None
 

@@ -145,11 +145,12 @@ class Module(models.Model):
      #function that returns list of id of exercises we get it from BookModuleExercise table
      #will be compared to student list of proficiency exercises
      def get_proficiency_model(self, book):
-         if BookModuleExercise.components.filter(book=book,module=self).count()==0:
+         mod_exe_data = BookModuleExercise.components.filter(book=book,module=self)
+         if not mod_exe_data:
              return None
          else:
              ex_id_list = []
-             for bme in  BookModuleExercise.components.filter(book=book,module=self):
+             for bme in  mod_exe_data:
                  ex_id_list.append(int(bme.exercise.id))
              return ex_id_list
 
