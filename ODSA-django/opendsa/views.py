@@ -183,6 +183,31 @@ def all_statistics(request):
     return render_to_response("opendsa/all-stats.html", context) 
 
 
+def get_all_student_data(udata, udatas):
+    occurrences = []
+    for ud in udatas:
+        if udata.user.username == ud.user.username:
+           occurrences.append(ud)
+    return occurrences
+
+def get_all_prof(udata):
+   profs =[]
+   for ud in udata:
+       for ex_id in ud.get_prof_list():
+          if ex_id not in profs:
+              profs.append(ex_id)
+   return profs
+
+def get_all_started(udata):
+   started =[]
+   for ud in udata:
+       for ex_id in ud.get_started_list():
+          if ex_id not in started:
+              started.append(ex_id)
+   return started
+
+
+
 @login_required
 def merged_book(request, book,book1):
    obj_book = Books.objects.get(id=book)
@@ -215,8 +240,14 @@ def merged_book(request, book,book1):
    users = []
    exe_bme = {}
    exercises_ = {}
+   marked_student = []
+   print '****************'
+   print len(userData)
+   print '~~~~~~~~~~~~~~~~'
    for userdata in userData:
-       if not userdata.user.is_staff and (display_grade(userdata.user,obj_book) or display_grade(userdata.user,obj_book1)):
+       if not userdata.user.is_staff and (userdata.user not in marked_student) and (display_grade(userdata.user,obj_book) or display_grade(userdata.user,obj_book1)):
+          marked_student.append(userdata.user)
+          student_activity = get_all_student_data(userdata, userData)
           u_points = 0
           u_data = []
           u_data.append(0)
@@ -247,14 +278,14 @@ def merged_book(request, book,book1):
                       u_ex = user_exe[0]
                   assignment_points += Decimal(bexe.points)
                   exe_str = ''
-                  if exercise.id in userdata.get_prof_list():
+                  if exercise.id in get_all_prof(student_activity):  #userdata.get_prof_list():
                       u_points += Decimal(bexe.points)
                       students_assignment_points += Decimal(bexe.points)
                       if u_ex.proficient_date <= assignment.course_module.closing_time:
                           exe_str = '<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Done</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
                       else:
                           exe_str = '<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Late</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
-                  if exercise.id in userdata.get_started_list() and exercise.id not in userdata.get_prof_list():
+                  if exercise.id in  get_all_started(student_activity) and exercise.id not in get_all_prof(student_activity):            #userdata.get_started_list() and exercise.id not in userdata.get_prof_list():
                       exe_str = '<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Started</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
                   u_assign.append(exe_str)
               u_assign[0] = str(students_assignment_points)
@@ -266,7 +297,7 @@ def merged_book(request, book,book1):
           u_data1[2] = str(u_points )
           udata_list1.append(u_data1)
 
-   context = RequestContext(request, {'book':book,'course':'','udata_list': udata_list, 'columns_list':columns_list, 'udata_list1': udata_list1, 'columns_list1':columns_list1})
+   context = RequestContext(request, {'book':book,'course':'CS3114','udata_list': udata_list, 'columns_list':columns_list, 'udata_list1': udata_list1, 'columns_list1':columns_list1})
    return render_to_response("opendsa/class_summary.html", context)
 
 @login_required
