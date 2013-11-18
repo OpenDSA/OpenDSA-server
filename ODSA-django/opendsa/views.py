@@ -35,6 +35,7 @@ from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.forms.formsets import formset_factory
 from django.forms.models import model_to_dict, modelformset_factory
+from django.db.models import Q
 from django import forms
 import jsonpickle
 import datetime
@@ -129,30 +130,6 @@ def add_or_edit_assignment(request, module_id):
     assignment = None
     #retrieve books
     book =  Books.objects.filter(courses=course_module.course_instance)[0]
-    #    if cb not in course_books:
-    #        course_books.append(cb)
-    #retrieve exercises
-    #book_list = []
-    #for book in course_books:
-    #    #get chapters
-    #    chapter_dict = {}
-    #    for chapter in BookChapter.objects.filter(book=book):
-            #get exercises
-    #        exe_dict = {} 
-    #        for c_mod in chapter.get_modules():
-    #            for b_exe in BookModuleExercise.components.get_mod_exercise_list(book, c_mod):
-    #               exe_dict[str(int(b_exe.id))]=str(b_exe.name)
-    #        chap_ = '%s-%s' %(str(chapter.name),chapter.id)
-    #        chapter_dict[chap_] = exe_dict  
-    #    book_ = '%s-%s' %(book.book_url,book.id)
-    #    book_list.append({str(book_).replace("'",'"'):chapter_dict})
-
-    #    try:
-    #          f_handle = open(settings.MEDIA_ROOT + course_module.course_instance.instance_name + '.json', 'w+')
-    #          f_handle.writelines(str(book_list).replace("'",'"'))
-    #          f_handle.close()
-    #    except IOError as e:
-    #         print "error ({0}) writing file : {1}".format(e.errno, e.strerror)
 
     if Assignments.objects.filter(course_module=course_module).count()>0:
         assignment = get_object_or_404(Assignments, course_module=course_module)
@@ -205,6 +182,92 @@ def all_statistics(request):
         context = RequestContext(request, {'daily_stats': data})
     return render_to_response("opendsa/all-stats.html", context) 
 
+
+@login_required
+def merged_book(request, book,book1):
+   obj_book = Books.objects.get(id=book)
+   obj_book1 = Books.objects.get(id=book1)
+   udata_list = []
+   udata_list1 = []
+   columns_list = []
+   columns_list1 = []
+   columns_list_exe = []  #for exercises
+   columns_list.append({"sTitle":"Id"})
+   columns_list.append({"sTitle":"Username"})
+   columns_list.append({"sTitle":"Points"})
+   columns_list1.append({"sTitle":"Id"})
+   columns_list1.append({"sTitle":"Username"})
+   columns_list1.append({"sTitle":"Points"})
+
+   #get list of book assignments
+   assignments_list = Assignments.objects.select_related().filter(assignment_book=obj_book).order_by('course_module__closing_time')
+   assignments_points_list = []
+   students_assignment_points = []
+   for assignment in assignments_list:
+       columns_list.append({"sTitle":str(assignment.course_module.name)})
+       columns_list1.append({"sTitle":str(assignment.course_module.name)})
+       for exercise in assignment.get_exercises():
+           #for bexe in BookModuleExercise.components.select_related().filter(book=obj_book, exercise = exercise):
+           for bexe in BookModuleExercise.components.filter(book=obj_book, exercise = exercise):
+               columns_list.append({"sTitle":str(exercise.name)+'('+str(bexe.points)+')'+'<span class="details" style="display:inline;" data-type="'+str(exercise.description)+'"></span>',"sClass": "center" })
+
+   userData = UserData.objects.select_related().filter(Q(book=obj_book) | Q(book=obj_book1)).order_by('user')
+   users = []
+   exe_bme = {}
+   exercises_ = {}
+   for userdata in userData:
+       if not userdata.user.is_staff and (display_grade(userdata.user,obj_book) or display_grade(userdata.user,obj_book1)):
+          u_points = 0
+          u_data = []
+          u_data.append(0)
+          u_data.append(str(userdata.user.username))
+          u_data.append(0)
+          u_data1 = []
+          u_data1.append(0)
+          u_data1.append(str(userdata.user.username))
+          u_data1.append(0)
+
+          for assignment in assignments_list:
+              #get points of exercises
+              assignment_points = 0
+              students_assignment_points = 0
+              u_assign = []
+              u_assign1 = []
+              u_assign.append(0)
+              for exercise_id in assignment.get_exercises_id():
+                  if exercise_id not in exercises_:
+                      exercises_[exercise_id] = Exercise.objects.get(id=exercise_id)
+                  exercise = exercises_[exercise_id]
+                  if exercise.name not in exe_bme:
+                     exe_bme[exercise.name] = BookModuleExercise.components.filter(book=obj_book, exercise = exercise)[0]
+                  bexe = exe_bme[exercise.name]
+                  u_ex = None
+                  user_exe = UserExercise.objects.filter(user=userdata.user,exercise=exercise)
+                  if user_exe:
+                      u_ex = user_exe[0]
+                  assignment_points += Decimal(bexe.points)
+                  exe_str = ''
+                  if exercise.id in userdata.get_prof_list():
+                      u_points += Decimal(bexe.points)
+                      students_assignment_points += Decimal(bexe.points)
+                      if u_ex.proficient_date <= assignment.course_module.closing_time:
+                          exe_str = '<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Done</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+                      else:
+                          exe_str = '<span class="details" style="display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Late</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+                  if exercise.id in userdata.get_started_list() and exercise.id not in userdata.get_prof_list():
+                      exe_str = '<span class="details" style="visibility: hidden; display:inline;" data-type="First done:%s, Last done:%s, Total done:%i, Total correct:%i, Proficiency date:%s">Started</span>' %(str(u_ex.first_done),str(u_ex.last_done),int(u_ex.total_done),int(u_ex.total_correct),str(u_ex.proficient_date))
+                  u_assign.append(exe_str)
+              u_assign[0] = str(students_assignment_points)
+              u_data = u_data + u_assign
+              u_data1.append(str(students_assignment_points))
+
+          u_data[2] = str(u_points )
+          udata_list.append(u_data)
+          u_data1[2] = str(u_points )
+          udata_list1.append(u_data1)
+
+   context = RequestContext(request, {'book':book,'course':'','udata_list': udata_list, 'columns_list':columns_list, 'udata_list1': udata_list1, 'columns_list1':columns_list1})
+   return render_to_response("opendsa/class_summary.html", context)
 
 @login_required
 def exercise_summary(request, book, course):
