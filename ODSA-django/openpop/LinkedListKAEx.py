@@ -201,11 +201,9 @@ def assesskaex(data , generatedList):
            if "Well Done" in line:
               feedback[0] = True
               return feedback
-              break 
            else :
               feedback[0] = False
               return feedback
-              break 
            else :
               feedback[0] = False
 
