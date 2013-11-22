@@ -1,14 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css">
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+{% extends "odsa_base.html" %}
+    {% block head %}
+
+
     <script src="{{ STATIC_URL }}opendsa/js/third_party/highcharts.js" type="text/javascript"></script>
-</head>
+    {% endblock %}
 
-<body>
-
-
+{% block content %}
 <!-- TODO(jace): Avoid the repeated use of inline style -->
 <div id="page-header" style="width:1600px; margin: 40px auto;">
 	<h1 id="page-title">Daily Statistics</h1>
@@ -193,6 +190,4 @@ $(document).ready(function() {
 
 </script>
 <script src="{{ STATIC_URL }}opendsa/js/third_party/bootstrap-dropdown.js"></script>
-</body>
-</html>
-
+{% endblock %}

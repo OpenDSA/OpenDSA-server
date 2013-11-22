@@ -14,7 +14,8 @@ from tastypie.exceptions import NotRegistered, BadRequest
 
 # ODSA
 from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, Module, UserModule, \
-                           BookModuleExercise, Books, UserBook
+                           BookModuleExercise, Books, UserBook, BookChapter
+from opendsa.statistics import create_book_file
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -49,10 +50,11 @@ def create_key(username):
     return hash_key.digest().encode('hex')
 
 def get_user_by_key(key):
-    if  len(ApiKey.objects.filter(key=key)) != 1:
+    user_by_key = ApiKey.objects.filter(key=key)
+    if  not user_by_key:
         return None
     else:
-        return ApiKey.objects.get(key=key).user
+        return user_by_key[0].user
 
 # Safe accessor methods - these functions are designed to prevent the problem of duplicate entries being created
 def get_username(key):
@@ -65,60 +67,65 @@ def get_username(key):
     return kusername
 
 def get_book(name):
-    if Books.objects.filter(book_name=name).count() == 1:
-        book = Books.objects.get(book_name=name)
-    elif Books.objects.filter(book_name=name).count() > 1:
-        book = Books.objects.filter(book_name=name)[0]
+    _books =  Books.objects.filter(book_name=name)
+    if _books:
+        book = _books[0]
     else:
         book = None
 
     return book
 
 def get_module(name):
-    if Module.objects.filter(name=name).count() == 1:
-        module = Module.objects.get(name=name)
-    elif Module.objects.filter(name=name).count() > 1:
-        module = Module.objects.filter(name=name)[0]
+    _modules = Module.objects.filter(name=name) 
+    if _modules:
+        module = _modules[0]
     else:
         module = None
 
     return module
 
+def get_chapter(book, chapter_name):
+    _chapters = BookChapter.objects.filter(book=book,name=chapter_name)
+    if _chapters:
+        chapter = _chapters[0]
+    else:
+        chapter = None
+
+    return chapter
+
 def get_exercise(exercise):
-    if Exercise.objects.filter(name=exercise).count() == 1:
-        exercise = Exercise.objects.get(name=exercise)
-    elif Exercise.objects.filter(name=exercise).count() > 1:
-        exercise = Exercise.objects.filter(name=exercise)[0]
+    _exercises = Exercise.objects.filter(name=exercise)
+    if _exercises:
+        exercise = _exercises[0]
     else:
         exercise = None
 
     return exercise
 
 def get_user_book(user, book):
-    if UserBook.objects.filter(user=user, book=book).count() == 1:
-        ubook = UserBook.objects.get(user=user, book=book)
-    elif UserBook.objects.filter(user=user, book=book).count() > 1:
-        ubook = UserBook.objects.filter(user=user, book=book)[0]
+    _user_book = UserBook.objects.filter(user=user, book=book)
+    if _user_book:
+        ubook = _user_book[0]
     else:
+        if user.username == 'phantom':
+            ubook,created = UserBook.objects.get_or_create(user=user, book=book)
         ubook = None
 
     return ubook
 
 def get_user_module(user, book, module):
-    if UserModule.objects.filter(user=user, book=book, module=module).count() == 1:
-        umod = UserModule.objects.get(user=user, book=book, module=module)
-    elif UserModule.objects.filter(user=user, book=book, module=module).count() > 1:
-        umod = UserModule.objects.filter(user=user, book=book, module=module)[0]
+    _user_module = UserModule.objects.filter(user=user, book=book, module=module)
+    if _user_module:
+        umod = _user_module[0]
     else:
         umod = None
 
     return umod
 
 def get_user_exercise(user, exercise):
-    if UserExercise.objects.filter(user=user, exercise=exercise).count() == 1:
-        user_exercise = UserExercise.objects.get(user=user, exercise=exercise)
-    elif UserExercise.objects.filter(user=user, exercise=exercise).count() > 1:
-        user_exercise = UserExercise.objects.filter(user=user, exercise=exercise)[0]
+    _user_exercise = UserExercise.objects.filter(user=user, exercise=exercise)
+    if _user_exercise:
+        user_exercise = _user_exercise[0]
     else:
         user_exercise = None
 
@@ -329,10 +336,8 @@ class UserexerciseResource(ModelResource):
                         user_exercise, exe_created = UserExercise.objects.get_or_create(user=kusername, exercise=kexercise, streak=0)
             else:
                 return self.create_response(request, {'error': 'attempt not logged'}, HttpUnauthorized)
-
             dsa_book = get_book(request.POST['book'])
             ubook = get_user_book(kusername, dsa_book)
-
             with transaction.commit_on_success():
                 user_data, created = UserData.objects.get_or_create(user=kusername, book=dsa_book)
 
@@ -345,9 +350,9 @@ class UserexerciseResource(ModelResource):
                 #self.method_check(request, allowed=['post'])
                 if request.POST.get('code'):
                     #returnedString= assesskaex(request.POST.get('code') , request.POST.get('genlist'), )
-                    ex_question = request.POST['sha1']
-                    if 'non_summative' in request.POST:
-                       ex_question = request.POST['non_summative']
+                    #ex_question = request.POST['sha1']
+                    #if 'non_summative' in request.POST:
+                    #   ex_question = request.POST['non_summative']
                     uexercise, messages = attempt_problem_pop(user_data, 
 							     user_exercise, 
 					                     request.POST['attempt_number'],
@@ -361,10 +366,12 @@ class UserexerciseResource(ModelResource):
                                                              request.POST)
 
                                        
-                   
                     returnedVar= uexercise.__dict__
                     returnedVar['correct']= messages[0]
                     returnedVar['message']= messages[1]
+                    returnedVar['lineNum']= messages[2]
+                    returnedVar['fileName']= messages[3]
+                    returnedVar['className']= messages[4]
                     
                     return self.create_response(request,jsonpickle.encode(returnedVar))
                 else :
@@ -696,7 +703,14 @@ class ModuleResource(ModelResource):
                         kmodule, added = Module.objects.get_or_create(name=request.POST['module'])
                 
                 response[kmodule.name] = False
-
+               
+                #get or create chapter
+                kchapter = get_chapter(kbook, request.POST['chapter'])
+                if kchapter is None:
+                    with transaction.commit_on_success():
+                        kchapter, added = BookChapter.objects.get_or_create(book=kbook,name=request.POST['chapter'])
+                kchapter.add_module(kmodule.id)
+                kchapter.save()
                 #get or create exercises
                 mod_exes = simplejson.loads(request.POST['exercises'])
                 print mod_exes
@@ -718,27 +732,37 @@ class ModuleResource(ModelResource):
                     #add exercise in list of module exercises
                     exers_.append(kexercise)
                     u_prof = False
-                    if UserData.objects.filter(user=kusername, book=kbook).count() > 0:
-                        user_data = UserData.objects.get(user=kusername, book=kbook)
+                    #if UserData.objects.filter(user=kusername, book=kbook).count() > 0:
+                    with transaction.commit_on_success():
+                        user_data, created = UserData.objects.get_or_create(user=kusername,book = kbook)
+                        #user_data = UserData.objects.get(user=kusername, book=kbook)
                         u_prof = user_data.is_proficient_at(kexercise)
 
                     #check student progress -- KA exercises
                     user_exercise = get_user_exercise(user=kusername, exercise=kexercise)
 
-                    if user_exercise is not None:
+                    if u_prof and user_exercise is not None:
                         u_prog = user_exercise.progress
-                        if user_exercise.is_proficient() and not user_data.is_proficient_at(kexercise):
-                            user_data.earned_proficiency(kexercise.id)
-                            user_data.save()
-                            u_prof = True
+                        #if user_exercise.is_proficient() and not user_data.is_proficient_at(kexercise):
+                        #    user_data.earned_proficiency(kexercise.id)
+                        #    user_data.save()
+                        #    u_prof = True
                     else:
                         u_prog = 0
 
                     #Link exercise to module and books only if the exercise is required
+                    bme =  None
+                    if BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=kexercise).count()>0 and mod_exe['required']:
+                       with transaction.commit_on_success():
+                            bme = BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=kexercise)[0]
+                            bme.points = mod_exe['points']
+                            bme.save()
                     if BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=kexercise).count() == 0 and mod_exe['required']:
                         with transaction.commit_on_success():
                             bme = models.BookModuleExercise(book=kbook, module=kmodule, exercise=kexercise, points=mod_exe['points'])
                             bme.save()
+                    #bme = BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=kexercise)[0]
+                    
                     response[kexercise.name] = {'proficient': u_prof, 'progress': u_prog}
 
                 # Remove exercises that are no longer part of this book / module
@@ -757,6 +781,16 @@ class ModuleResource(ModelResource):
 
                     #Module proficiency response
                     response[kmodule.name] = user_module.is_proficient_at()
+
+                #create book json file
+                if request.POST['build_date']:
+                    if request.POST['module']!='index':
+                        build_date = datetime.datetime.strptime(request.POST['build_date'],'%Y-%m-%d %H:%M:%S')
+                        if kbook.creation_date != build_date:
+                            create_book_file(kbook)
+                            kbook.creation_date = build_date
+                            kbook.save()
+   
                 return self.create_response(request, response)
         return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
 

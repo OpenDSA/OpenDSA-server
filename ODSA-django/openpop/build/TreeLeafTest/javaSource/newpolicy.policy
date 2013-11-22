@@ -1,0 +1,10 @@
+grant codeBase "file:/home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/*" {
+permission java.io.FilePermission "/home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/output","read , write";
+
+permission java.io.FilePermission "/home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors","read , write";
+
+permission java.io.FilePermission "/home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors","read , write";
+
+permission java.io.FilePermission "/home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/studentpreordertest.java","read , write , execute";
+};
+

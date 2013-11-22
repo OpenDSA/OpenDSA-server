@@ -1,0 +1,32 @@
+{% extends "course/course_base.html" %}
+{% load i18n %}
+
+{% block coursecontent %}
+
+<h2>{% trans "Edit Students Visibility" %}</h2>
+<hr>
+<div class="well">
+    <form method="post" action="">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        <table>
+        {% for form in formset.forms %}
+          <tr>
+          {% for field in form.hidden_fields %}
+             {{ field }}
+          {% endfor %}
+          {% for field in form.visible_fields %}
+            <td>
+              {{ field.errors }}
+             {{ field.label_tag }}  {{ field }}
+            </td>
+          {% endfor %}
+          </tr>
+        {% endfor %}
+        </table>
+        <p>
+            <input type="submit" class="btn btn-primary" value="{% trans "Submit" %}" />
+        </p>
+    </form>
+</div>
+{% endblock %}

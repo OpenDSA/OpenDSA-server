@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>OpenDSA Widget</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
-    <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
-    <link href="{{ STATIC_URL }}opendsa/css/activity.css" rel="stylesheet" media="screen" />
-  </head>
-  <body>
-    <h1>OpenDSA Statistics Widget</h1>
-    <hr>
+{% extends "odsa_base.html" %}
+
+  {% block maintitle %}
+   <h1>OpenDSA Statistics Widget</h1>
+  {% endblock %}
+   {% block content %}
     <div id="data">
        <h3>{{ exercises }} Exercises performed.</h3>
        <h3>{{ users }} Registered users.</h3>  
@@ -24,7 +18,5 @@
      <script type="text/javascript" src="https://opensa.cc.vt.edu/media/widget.js"></script>
     </textarea>
     </div>
-  </body>
-</html>
-
+  {% endblock %}
 

@@ -1,5 +1,6 @@
 # Python
 import datetime
+from decimal import Decimal
 
 # Django
 from django.db import models
@@ -14,6 +15,7 @@ from django.contrib.auth.models import User
 
 #A+
 from course.models import Course, CourseInstance
+from exercise.exercise_models import  CourseModule
 import consts
 #from decorator import clamp
 
@@ -32,6 +34,11 @@ class Exercise(models.Model):
     description = models.TextField()
     streak = models.DecimalField(default = 0, max_digits=5, decimal_places=2)
 
+    def __unicode__(self):
+       '''
+       Returns a short representation of the book as an unicode string.
+       '''
+       return '%s:%s' %(self.id,self.name)
 
 class Books(models.Model):
     book_name = models.CharField(max_length=50)
@@ -39,49 +46,87 @@ class Books(models.Model):
                                                validators=[RegexValidator(regex="^[\w\-\.]*$")],
                                                help_text="Input an URL identifier for this book.")
     courses = models.ManyToManyField(CourseInstance)
+    creation_date = models.DateTimeField()
+
+    def __unicode__(self):
+       '''
+       Returns a short representation of the book as an unicode string.
+       '''
+       return self.book_url
+
+
+class Assignments(models.Model):
+
+    course_module = models.ForeignKey(CourseModule, unique=True)
+    assignment_book = models.ForeignKey(Books)
+    #list of exercises in the assignment
+    assignment_exercises = models.CommaSeparatedIntegerField(
+        'comma separated ints', max_length=255, blank=True,
+        default=''
+    )
+
+    def add_exercise(self, exid):
+        if len(self.assignment_exercises)==0:
+            self.assignment_exercises += '%s' %exid
+        else:
+            self.assignment_exercises += ',%s' %exid
+    def get_exercises_id(self):
+        _ex =[]
+        for ex in self.assignment_exercises.split(','):
+            if ex.isdigit():
+              _ex.append(int(ex))
+        return _ex
+    def get_exercises(self):
+        _ex =[]
+        for ex in self.assignment_exercises.split(','):
+            if ex.isdigit():
+              exer = Exercise.objects.get(id=ex)
+              _ex.append(exer)
+        return _ex
+
 
 
 #A table to hold user status (proficient, started, not started) for each exercise.
-class UserSummary(models.Model):
+#class UserSummary(models.Model):
 
-   grouping =  models.IntegerField()
-   key = models.CharField(max_length=50)
-   value = models.CharField(max_length=50)
+#   grouping =  models.IntegerField()
+#   key = models.CharField(max_length=50)
+#   value = models.CharField(max_length=50)
 
-   @staticmethod
-   def GetUserSummaryByIds(userId, exerciseId):
-        cur = connection.cursor();
-        cur.callproc('GetUserSummaryByIds',[userId,exerciseId, ])
-        results = cur.fetchall()
-        cur.close()
-        return [UserSummary (*row) for row in results]
+#   @staticmethod
+#   def GetUserSummaryByIds(userId, exerciseId):
+#        cur = connection.cursor();
+#        cur.callproc('GetUserSummaryByIds',[userId,exerciseId, ])
+#        results = cur.fetchall()
+#        cur.close()
+#        return [UserSummary (*row) for row in results]
 
-   @staticmethod
-   def GetUserSummaryByExerciseId(exerciseId):
-       cur = connection.cursor()
-       cur.callproc('GetUserSummaryByExerciseId', [exerciseId, ])
-       results = cur.fetchall()
-       cur.close()
-       return [UserSummary (*row) for row in results]
+#   @staticmethod
+#   def GetUserSummaryByExerciseId(exerciseId):
+#       cur = connection.cursor()
+#       cur.callproc('GetUserSummaryByExerciseId', [exerciseId, ])
+#       results = cur.fetchall()
+#       cur.close()
+#       return [UserSummary (*row) for row in results]
 
 
 #A map table between exercise and modules
-class ExerciseModule(models.Model):
-   exercise = models.CharField(max_length=50)
-   module = models.CharField(max_length=50)
-
+#class ExerciseModule(models.Model):
+#   exercise = models.CharField(max_length=50)
+#   module = models.CharField(max_length=50)
+#
 
 #Table summarizing all students module activities
-class UserModuleSummary(models.Model):
-    user =  models.CharField(max_length=50)
-    module = models.CharField(max_length=60)
-    module_status =  models.CharField(max_length=3)
-    first_done = models.DateTimeField(default="1800-01-01 00:00:00")
-    last_done = models.DateTimeField(default="1800-01-01 00:00:00")
-    proficient_date = models.DateTimeField(default="1800-01-01 00:00:00")
-    proficient_exe =  models.TextField()
-    started_exe =  models.TextField()
-    notstarted_exe =  models.TextField()
+#class UserModuleSummary(models.Model):
+#    user =  models.CharField(max_length=50)
+#    module = models.CharField(max_length=60)
+#    module_status =  models.CharField(max_length=3)
+#    first_done = models.DateTimeField(default="1800-01-01 00:00:00")
+#    last_done = models.DateTimeField(default="1800-01-01 00:00:00")
+#    proficient_date = models.DateTimeField(default="1800-01-01 00:00:00")
+#    proficient_exe =  models.TextField()
+#    started_exe =  models.TextField()
+#    notstarted_exe =  models.TextField()
 
 
 class Module(models.Model):
@@ -100,11 +145,12 @@ class Module(models.Model):
      #function that returns list of id of exercises we get it from BookModuleExercise table
      #will be compared to student list of proficiency exercises
      def get_proficiency_model(self, book):
-         if BookModuleExercise.components.filter(book=book,module=self).count()==0:
+         mod_exe_data = BookModuleExercise.components.filter(book=book,module=self)
+         if not mod_exe_data:
              return None
          else:
              ex_id_list = []
-             for bme in  BookModuleExercise.components.filter(book=book,module=self):
+             for bme in  mod_exe_data:
                  ex_id_list.append(int(bme.exercise.id))
              return ex_id_list
 
@@ -112,6 +158,13 @@ class Module(models.Model):
 class ModuleExerciseManager(models.Manager):
     def get_query_set(self):
         return super(ModuleExerciseManager,self).get_query_set()
+
+    def get_book_list(self):
+        book_list =[]
+        for bme in super(ModuleExerciseManager,self).get_query_set():
+            if bme not in book_list:
+                book_list.append(bme.book)
+        return book_list
 
     def get_module_list(self, book):
         module_list =[]
@@ -128,7 +181,8 @@ class ModuleExerciseManager(models.Manager):
     def get_mod_exercise_list(self, book, mod):
         exercise_list =[]
         for bme in super(ModuleExerciseManager,self).get_query_set().filter(book=book,module=mod):
-            exercise_list.append(bme.exercise)
+            if bme.points > Decimal(0):
+                exercise_list.append(bme.exercise)
         return exercise_list
 
 
@@ -143,12 +197,49 @@ class BookModuleExercise (models.Model):
     components = ModuleExerciseManager()
     class Meta:
         unique_together = (("book","module", "exercise"),)
+    def __unicode__(self):
+       '''
+       Returns a short representation of the book as an unicode string.
+       '''
+       return self.book.book_url
 
 
+class BookChapter (models.Model):
+    book = models.ForeignKey(Books)
+    name = models.CharField(max_length=100)
+    module_list = models.TextField()
+    class Meta:
+        unique_together = (("book","name"),)
+    def __unicode__(self):
+       '''
+       Returns a short representation of the book as an unicode string.
+       '''
+       return self.name
+
+
+    def add_module(self, exid):
+       if len(self.module_list)==0:
+           self.module_list += '%s' %exid
+       else:
+           self.module_list += ',%s' %exid
+    def get_modules_id(self):
+       _mod =[]
+       for mod in self.module_list.split(','):
+           if mod.isdigit():
+             _mod.append(int(mod))
+       return _mod
+    def get_modules(self):
+       _mod =[]
+       for mod in self.module_list.split(','):
+           if mod.isdigit():
+             cmod = Module.objects.get(id=mod)
+             _mod.append(cmod)
+       return _mod
 
 class UserBook (models.Model):
     user = models.ForeignKey(User)
     book = models.ForeignKey(Books)
+    grade = models.BooleanField(default = True) 
     class Meta:
         unique_together = (("user","book"),)
 
@@ -279,6 +370,11 @@ class UserExerciseLog(models.Model):
         models.Model.put(self)
 
 
+
+class UserProgLog(models.Model):
+    problem_log =  models.ForeignKey(UserExerciseLog)
+    student_code = models.TextField()
+    feedback = models.TextField() 
 
 
 class UserProfExerciseLog(models.Model):
