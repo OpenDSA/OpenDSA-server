@@ -1,5 +1,5 @@
 # Create your views here.
-from opendsa.models import  UserExercise, UserExerciseLog, UserData
+from opendsa.models import  UserExercise, UserExerciseLog, UserData , UserProgLog
 from opendsa.exercises import update_module_proficiency
 from opendsa import models 
 from decimal import Decimal                         
@@ -11,6 +11,12 @@ import os
 import subprocess
 import datetime
 import codecs
+import unicodedata
+import sys
+import string
+import time
+
+
 #from subprocess import call
 #import pdb; pdb.set_trace()
 
@@ -18,15 +24,28 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     completed, count_hints, time_taken, attempt_content, module,   
     ex_question, ip_address, request_post):
     
+    #reload(sys)
+    #sys.setdefaultencoding("utf8")
+    
     data = request_post.get('code') 
-    generatedList =request_post.get('genlist')
-    # Will have here a check from which programming exercise we got this request
-    # Temp: will use generated list --- if it has binarytree not a list then call the binary tree
-    if generatedList == "Binarytree" :
-       feedback= assesskaexbintree (data)
-    else : # should have many else and if here by time 
-       feedback= assesskaex(data , generatedList)
+    generatedList =request_post.get('genlist') 
+    data = ''.join([x for x in data if ord(x) < 128]) 
+    
+    #Handling secrity issues
+    # 1- Infinite loops
+    
 
+
+   
+
+    #  Check from which programming exercise we got this request
+    if request_post.get('sha1') == "BinaryTreePROG" : # count number of nodes
+       feedback= assesskaexbintree (data)
+    elif request_post.get('sha1') == "BTLeafPROG" :  # count number of leaf nodes
+       feedback=assesskaexbtleaf (data)      
+    elif request_post.get('sha1') == "ListADTPROG":  # generate a list
+       feedback= assesskaex(data , generatedList)
+       
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         dt_now = datetime.datetime.now()
         #exercise = user_exercise.exercise
@@ -88,23 +107,30 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
             #if first_response:
             #       user_exercise.update_proficiency_model(correct=False)
 
+        # Saving student's code and the feedback received
+       
         problem_log.save()
         user_exercise.save()
         user_data.save()
         if proficient or problem_log.earned_proficiency:
             update_module_proficiency(user_data, module, user_exercise.exercise)
-
-       
+        userprog_log = models.UserProgLog(
+               problem_log= problem_log ,
+               student_code= data,
+               feedback=feedback[1],
+              )
+ 
+        userprog_log.save()
         return user_exercise,feedback     #, user_exercise_graph, goals_updated
 
 
 def assesskaex(data , generatedList):
     
     print generatedList
-    feedback=[False, 'null']
+    feedback=[False, 'null', 333 , 'studentlisttest.java' , 'class studentlisttest']
     #print feedback
     #filesPath = '/home/OpenPOP/Backend/visualize/build/ListTest/javaSource/'
-    filesPath = '/home/aalto-beta/ODSA-django/openpop/build/ListTest/javaSource/'
+    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/'
     print "In the begining of assessing the code using java compiler"
     #cleaning: deleting already created files
     if os.path.isfile(filesPath +'generatedlist'):
@@ -137,9 +163,10 @@ def assesskaex(data , generatedList):
     
     # Setting the DISPLAY then run the processing command to test the submitted code
     #proc1 = subprocess.Popen(" cd /home/OpenPOP/Backend/visualize/build/ListTest/javaSource/; javac studentlisttest.java 2> /home/OpenPOP/Backend/visualize/build/ListTest/javaSource/compilationerrors.out ; java studentlisttest 2> /home/OpenPOP/Backend/visualize/build/ListTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
-    proc1 = subprocess.Popen(" cd /home/aalto-beta/ODSA-django/openpop/build/ListTest/javaSource/; javac studentlisttest.java 2> /home/aalto-beta/ODSA-django/openpop/build/ListTest/javaSource/compilationerrors.out ; java studentlisttest 2> /home/aalto-beta/ODSA-django/openpop/build/ListTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
-    (out1, err1) = proc1.communicate() 
-    
+    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/; javac studentlisttest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy studentlisttest 2> /home/OpenDSA-server/ODSA-django/openpop/build/ListTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    #(out1, err1) = proc1.communicate() 
+    time.sleep(3)
+    os.system("kill -9 "+ str(proc1.pid) )
     # Read the success file if has Success inside then "Well Done!" Otherwise "Try Again!"
     if  os.path.isfile(filesPath+'compilationerrors.out'):
           syntaxErrorFile = open(filesPath+'compilationerrors.out' , 'r')
@@ -154,6 +181,12 @@ def assesskaex(data , generatedList):
           runErrorFile = open(filesPath+'runerrors.out' , 'r')
           feedback[0] = False
           feedback[1]= runErrorFile.readlines()
+          print feedback[1]
+          for line in feedback[1]:
+              print "line" + line
+              if "at java.security.AccessControlContext.checkPermission" in line:
+                 feedback[1]= ["Try Again! Your solution shouldn't write files to the disk!"]
+                 return feedback    
           runErrorFile.close()
           if os.stat(filesPath+'runerrors.out')[6]!=0:
              return feedback;
@@ -167,18 +200,21 @@ def assesskaex(data , generatedList):
        for line in feedback[1]:
            if "Well Done" in line:
               feedback[0] = True
+              return feedback
               break 
            else :
               feedback[0] = False
+              return feedback
 
         
-      
-    return  feedback
+    feedback[1]=['Try Again! Your code is taking too long to run! Revise your code!']
+    return feedback
+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Assessing binary tree exercise
 def assesskaexbintree (data):
-    feedback=[False, 'null']
-    filesPath = '/home/aalto-beta/ODSA-django/openpop/build/TreeTest/javaSource/'
+    feedback=[False, 'null', 179 , 'studentpreordertest.java' , 'class studentpreordertest']
+    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/TreeTest/javaSource/'
     
     #cleaning: deleting already created files
     if os.path.isfile(filesPath +'studentpreordertest.java'):
@@ -200,12 +236,12 @@ def assesskaexbintree (data):
     answer = open(filesPath+'studentpreordertest.java', 'w')
     answer.write(BTtest)
     answer.write("public static")
-    answer.write(data.decode('utf-8'))
+    answer.write(data)
     answer.write("}")
     answer.close()
     
     # Setting the DISPLAY then run the processing command to test the submitted code
-    proc1 = subprocess.Popen(" cd /home/aalto-beta/ODSA-django/openpop/build/TreeTest/javaSource/; javac studentpreordertest.java 2> /home/aalto-beta/ODSA-django/openpop/build/TreeTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/aalto-beta/ODSA-django/openpop/build/TreeTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/TreeTest/javaSource/; javac studentpreordertest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeTest/javaSource/compilationerrors.out ; java studentpreordertest 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
     (out1, err1) = proc1.communicate() 
     
     print data
@@ -217,12 +253,14 @@ def assesskaexbintree (data):
           syntaxErrorFile.close()
           if os.stat(filesPath+'compilationerrors.out')[6]!=0:
              feedback[1]= feedback[1]#.rsplit(':',1)[1]
+             print feedback[1]
              return feedback;
     if os.path.isfile(filesPath+'runerrors.out'):
        #Check what is returned from the test : what is inside the success file
           runErrorFile = open(filesPath+'runerrors.out' , 'r')
           feedback[0] = False
           feedback[1]= runErrorFile.readlines()
+          print feedback[1]
           runErrorFile.close()
           if os.stat(filesPath+'runerrors.out')[6]!=0:
              return feedback;
@@ -241,4 +279,88 @@ def assesskaexbintree (data):
               feedback[0] = False
 
     return feedback
-        
+
+
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# Assessing bt **Leaf**  exercise
+def assesskaexbtleaf (data):
+    feedback=[False, 'null', 183 , 'studentpreordertest.java' , 'class studentpreordertest']
+    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/'
+    
+    #cleaning: deleting already created files
+    if os.path.isfile(filesPath +'studentpreordertest.java'):
+       os.remove(filesPath+'studentpreordertest.java')
+ 
+    if os.path.isfile(filesPath +'output'):
+       os.remove(filesPath+'output')
+
+    if os.path.isfile(filesPath +'compilationerrors.out'):
+       os.remove(filesPath + 'compilationerrors.out')
+   
+    if os.path.isfile(filesPath +'runerrors.out'):
+       os.remove(filesPath + 'runerrors.out')
+
+   
+    # Saving the submitted/received code in the studentpreordertest.java file by copying the preorder + studentcode +}
+    BTTestFile = open(filesPath+'PreorderLeafTest.java' , 'r')
+    BTtest = BTTestFile.read()
+    answer = open(filesPath+'studentpreordertest.java', 'w')
+    answer.write(BTtest)
+    answer.write("public static")
+    answer.write(data)
+    answer.write("}")
+    answer.close()
+    
+    # Setting the DISPLAY then run the processing command to test the submitted code
+    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/; javac studentpreordertest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy studentpreordertest 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    #(out1, err1) = proc1.communicate() 
+    #subprocess.call("cd /home/OpenDSA-server/ODSA-django/openpop; ./try.sh", shell=True)
+    time.sleep(3)
+    os.system("kill -9 "+ str(proc1.pid) )
+
+    print data
+    # Read the success file if has Success inside then "Well Done!" Otherwise "Try Again!"
+    if  os.path.isfile(filesPath+'compilationerrors.out'):
+          syntaxErrorFile = open(filesPath+'compilationerrors.out' , 'r')
+          feedback[0] = False
+          feedback[1]= syntaxErrorFile.readlines()
+          syntaxErrorFile.close()
+          if os.stat(filesPath+'compilationerrors.out')[6]!=0:
+             feedback[1]= feedback[1]#.rsplit(':',1)[1]
+             print feedback[1]
+             return feedback
+    if os.path.isfile(filesPath+'runerrors.out'):
+       #Check what is returned from the test : what is inside the success file
+          runErrorFile = open(filesPath+'runerrors.out' , 'r')
+          feedback[0] = False
+          feedback[1]= runErrorFile.readlines()
+          print feedback[1]
+          for line in feedback[1]:
+              print "line" + line
+              if "at java.security.AccessControlContext.checkPermission" in line:
+                 feedback[1]= ["Try Again! Your solution shouldn't write files to the disk!"]
+                 return feedback    
+          runErrorFile.close()
+          if os.stat(filesPath+'runerrors.out')[6]!=0:
+             return feedback;
+    
+    
+    if os.path.isfile(filesPath+'output'):
+       #Check what is returned from the test : what is inside the success file
+       successFile = open(filesPath+'output' , 'r')
+       feedback[1] = successFile.readlines()
+       print feedback[1]
+       for line in feedback[1]:
+           if "Well Done" in line:
+              feedback[0] = True
+              return feedback
+               
+           else :
+              feedback[0] = False
+              return feedback
+
+    feedback[1]=['Try Again! Your code is taking too long to run! Revise your code!']
+    return feedback
+                
