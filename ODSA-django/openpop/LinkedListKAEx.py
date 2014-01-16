@@ -201,11 +201,13 @@ def assesskaex(data , generatedList):
            if "Well Done" in line:
               feedback[0] = True
               return feedback
+              break 
            else :
               feedback[0] = False
               return feedback
-           else :
-              feedback[0] = False
+              break 
+           #else :
+           #   feedback[0] = False
 
         
     feedback[1]=['Try Again! Your code is taking too long to run! Revise your code!']
