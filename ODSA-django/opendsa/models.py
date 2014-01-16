@@ -42,9 +42,9 @@ class Exercise(models.Model):
 
 class Books(models.Model):
     book_name = models.CharField(max_length=50)
-    book_url =  models.CharField(unique=False, max_length=80, blank=False,
-                                               validators=[RegexValidator(regex="^[\w\-\.]*$")],
-                                               help_text="Input an URL identifier for this book.")
+    book_url =  models.CharField(max_length=80) #(unique=False, max_length=80, blank=False,
+                                                #validators=[RegexValidator(regex="^[\w\-\.]*$")],
+                                                #help_text="Input an URL identifier for this book.")
     courses = models.ManyToManyField(CourseInstance)
     creation_date = models.DateTimeField()
 

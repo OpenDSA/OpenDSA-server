@@ -206,8 +206,8 @@ def assesskaex(data , generatedList):
               feedback[0] = False
               return feedback
               break 
-           else :
-              feedback[0] = False
+           #else :
+           #   feedback[0] = False
 
         
     feedback[1]=['Try Again! Your code is taking too long to run! Revise your code!']
