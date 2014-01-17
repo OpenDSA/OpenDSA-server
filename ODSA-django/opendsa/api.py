@@ -664,15 +664,102 @@ class ModuleResource(ModelResource):
         resource_name   = 'module'
         excludes        = []
 
-        # TODO: In this version, only GET requests are accepted and no
-        # permissions are checked.
         allowed_methods = ['get','post']
         authentication  = Authentication()
         authorization   = ReadOnlyAuthorization()
     def override_urls(self):
         return [
             url(r"^(?P<resource_name>%s)/loadmodule%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('loadmodule'), name="api_modproficient"),
+            url(r"^(?P<resource_name>%s)/loadbook%s$" %(self._meta.resource_name, trailing_slash()),self.wrap_view('loadbook'), name="api_modbook"),
         ]
+
+
+
+    def loadbook(self, request, **kwargs):
+        if request.POST['key']:
+            kusername = get_username(request.POST['key'])
+
+            if kusername:
+                response = {}
+                response['saved'] = False
+                #get or create Book & link a book to user
+                kbook = get_book(request.POST['book'])
+
+                if kbook is None:
+                    with transaction.commit_on_success():
+                        kbook, added = Books.objects.get_or_create(book_name= request.POST['book'], book_url = request.POST['url'])
+                #get and save book elements
+                book_json = simplejson.loads(request.POST['b_json'])
+ 
+                chap_ = []
+                for chapter in book_json['chapters']:
+                  #get or create chapter
+                  kchapter = get_chapter(kbook, chapter)
+                  if kchapter is None:
+                    with transaction.commit_on_success():
+                      kchapter, added = BookChapter.objects.get_or_create(book=kbook,name=chapter)
+
+                  for lesson in book_json['chapters'][chapter]:
+                    #get or create module
+                    kmodule = get_module(lesson)
+
+                    if kmodule is None:
+                      with transaction.commit_on_success():
+                        kmodule, added = Module.objects.get_or_create(name=lesson)
+                    #link module/lesson to chapter 
+                    kchapter.add_module(kmodule.id)
+                    kchapter.save()
+                    for exercise in book_json['chapters'][chapter][lesson]['exercises']:
+                      #get or create exercises
+                      exers_ = []
+                      description = ''
+                      streak = 0
+                      required = False
+                      #module has exercises
+                      if len(book_json['chapters'][chapter][lesson]['exercises'][exercise]) > 0:
+                          description = book_json['chapters'][chapter][lesson]['exercises'][exercise]['long_name']
+                          streak = book_json['chapters'][chapter][lesson]['exercises'][exercise]['threshold']
+                          required = book_json['chapters'][chapter][lesson]['exercises'][exercise]['required']
+
+                      if Exercise.objects.filter(name=exercise).count() == 0 :
+                        # Add new exercise
+                        with transaction.commit_on_success():
+                          kexercise, added = Exercise.objects.get_or_create(name=exercise, covers="dsa", description=description, streak=streak)
+                      else:
+                        # Update existing exercise
+                        with transaction.commit_on_success():
+                          kexercise = get_exercise(exercise)
+                          kexercise.covers="dsa"
+                          kexercise.description=description
+                          kexercise.streak=Decimal(streak)
+                          kexercise.save()
+                      
+                        #Link exercise to module and books only if the exercise is required
+                      bme =  None
+                      if BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=kexercise).count()>0 and required:
+                         with transaction.commit_on_success():
+                            bme = BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=kexercise)[0]
+                            bme.points = book_json['chapters'][chapter][lesson]['exercises'][exercise]['points']
+                            bme.save()
+                      if BookModuleExercise.components.filter(book=kbook, module=kmodule, exercise=kexercise).count() == 0 and required:
+                         with transaction.commit_on_success():
+                            bme = models.BookModuleExercise(book=kbook, module=kmodule, exercise=kexercise, points=book_json['chapters'][chapter][lesson]['exercises'][exercise]['points'])
+                            bme.save()
+
+                response['saved'] = True
+                #create book json file
+                if request.POST['build_date']:
+                  build_date = datetime.datetime.strptime(request.POST['build_date'],'%Y-%m-%d %H:%M:%S')
+                  if kbook.creation_date != build_date:
+                    create_book_file(kbook)
+                    kbook.creation_date = build_date
+                    kbook.save()
+
+                return self.create_response(request, response)
+        return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
+
+
+
 
     def loadmodule(self, request, **kwargs):
         if request.POST['key']:
@@ -781,15 +868,6 @@ class ModuleResource(ModelResource):
 
                     #Module proficiency response
                     response[kmodule.name] = user_module.is_proficient_at()
-
-                #create book json file
-                if request.POST['build_date']:
-                    if request.POST['module']!='index':
-                        build_date = datetime.datetime.strptime(request.POST['build_date'],'%Y-%m-%d %H:%M:%S')
-                        if kbook.creation_date != build_date:
-                            create_book_file(kbook)
-                            kbook.creation_date = build_date
-                            kbook.save()
    
                 return self.create_response(request, response)
         return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
