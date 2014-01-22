@@ -45,7 +45,7 @@ import os
 
 
 def home(request):
-    open_instances = CourseInstance.objects.all() #filter(ending_time__gte=datetime.now())
+    open_instances = CourseInstance.objects.filter(ending_time__gte=datetime.datetime.now())
     context = RequestContext(request, {"open_instances": open_instances})
     return render_to_response("opendsa/home.html", context)
 
@@ -324,7 +324,9 @@ def exercise_summary(request, book, course):
             columns_list1.append({"sTitle":str(assignment.course_module.name)})
             for exercise in assignment.get_exercises():
                 #for bexe in BookModuleExercise.components.select_related().filter(book=obj_book, exercise = exercise):
-                for bexe in BookModuleExercise.components.filter(book=obj_book, exercise = exercise):
+                bexe = BookModuleExercise.components.filter(book=obj_book, exercise = exercise)[0] #get exercise name only once
+                if bexe:
+                #for bexe in BookModuleExercise.components.filter(book=obj_book, exercise = exercise):
                     columns_list.append({"sTitle":str(exercise.name)+'('+str(bexe.points)+')'+'<span class="details" style="display:inline;" data-type="'+str(exercise.description)+'"></span>',"sClass": "center" })
         userData = UserData.objects.select_related().filter(book=obj_book, user__is_staff=0).order_by('user')
         users = []
