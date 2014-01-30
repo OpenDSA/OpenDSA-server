@@ -69,13 +69,6 @@ def student_grade_all(user, book):
     #prof_list = user_data.get_prof_list()
     student_data_id = UserData.objects.select_related().get(user = user,book=book)
     proficient_exercises = student_data_id.get_prof_list()
-    all_exercises = Exercise.objects.all()
-    all_exercises_id = []
-    for aexer in all_exercises:
-        all_exercises_id.append(aexer.id)
-    #list of non proficient exercises
-    not_proficient_exercises = diff (set(all_exercises_id),set(proficient_exercises))
-    #modules =  Module.objects.all()
     user_grade = {}
     grade = []
     modules = []
