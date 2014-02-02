@@ -16,6 +16,7 @@ import math
 
 from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, UserButton, UserModule, Module, \
                            Books, BookModuleExercise, Assignments
+from exercise.models import CourseModule
 from django.conf.urls.defaults import patterns, url
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -23,6 +24,8 @@ from django.contrib.auth.models import User
 from django.utils import simplejson
 from django.contrib.sessions.models import Session
 from django.db import connection, transaction
+import jsonpickle
+
 
 def diff(a, b):
     b = set(b)
@@ -34,7 +37,6 @@ def str2bool(v):
 
 def get_pe_name_from_referer(referer):
     tab = referer.split('/')
-    print tab[len(tab)-1].split('.')[0]
     return tab[len(tab)-1].split('.')[0]
 
 def date_from_timestamp(tstamp):
@@ -75,13 +77,25 @@ def student_grade_all(user, book):
         all_exercises_id.append(aexer.id)
     #list of non proficient exercises
     not_proficient_exercises = diff (set(all_exercises_id),set(proficient_exercises))
-    #modules =  Module.objects.all()
     user_grade = {}
     grade = []
     modules = []
     checked_modules = []
+    assignments = []
+    exe_assign = []
+    #get open assignments for the book
+    #first we get open exercises_course_modules
+    course_mods = CourseModule.objects.filter(opening_time__lte=datetime.datetime.now())
+    assignments_list = Assignments.objects.select_related().all().filter(assignment_book=book).filter(course_module__in=course_mods)
+    for assignment in assignments_list:
+        ass_l = []
+        exe_assign.append(assignment.get_exercises())
+        for exercise in assignment.get_exercises():
+            ass_l.append({'name':exercise.name,'exercise':exercise.description, 'points':0})
+        assignments.append({'assignment':assignment.course_module.name, 'due_date':str(assignment.course_module.closing_time.date().strftime('%b %d,%Y')),'exercises':ass_l})
 
     bme_list = BookModuleExercise.components.select_related().filter(book=book)
+
     for bme in bme_list:
         if bme.exercise.id in proficient_exercises:
             grade.append({'exercise':bme.exercise.name, 'description':bme.exercise.description,'type':bme.exercise.ex_type,'points':bme.points,'module':bme.module.name})
@@ -97,6 +111,7 @@ def student_grade_all(user, book):
 
     user_grade['modules'] = modules
     user_grade['grades'] = grade
+    user_grade['assignments'] = assignments 
     return user_grade
 
 
