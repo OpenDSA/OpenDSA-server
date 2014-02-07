@@ -1,16 +1,23 @@
+"""
+File containing the forms used in the application
+"""
+
 from django import forms
 from django.forms import MultipleChoiceField
-from django.forms.widgets import Select, CheckboxSelectMultiple
-from opendsa.models import Assignments, Books, Exercise, BookModuleExercise
+from django.forms.widgets import CheckboxSelectMultiple
+from opendsa.models import Assignments, Exercise
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 from opendsa.models import UserBook
 
-from exercise.exercise_models import  CourseModule
 import settings
 
 # Widget
 class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
+    """
+    Class implementing the list of exercises to add to an assignment
+    The exercises are displayed as a list of checkboxes
+    """
     def value_from_datadict(self, data, files, name):
         # Return a string of comma separated integers since the database, and
         # field expect a string (not a list).
@@ -160,6 +167,10 @@ class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
 
 # Form field
 class CSIMultipleChoiceField(MultipleChoiceField):
+    """
+    base class representing the form element for multiple choice
+    the widget is a list of checkbox
+    """
     widget = CSICheckboxSelectMultiple
 
     # Value is stored and retrieved as a string of comma separated
@@ -178,28 +189,47 @@ class CSIMultipleChoiceField(MultipleChoiceField):
         super(CSIMultipleChoiceField, self).validate(value)
 
 
-def exercises_in_book(book=None):
-    a_exe = Exercise.objects.all()
+def exercises_in_object(obj = None):
+    """
+    returns a list of exercises in the input object
+    if the input is not an assignment, we return 
+    all the exercises.
+    """
+    if obj is not None and obj.isType() == "assignments":
+        a_exe = obj.get_exercises()
+    else:
+        a_exe = Exercise.objects.all()
+    
     result = ()
     for exe in a_exe:
-       if not exe.name.isspace():
-          result += ((exe.id,exe.name),)
+        if not exe.name.isspace():
+            result += ((exe.id, exe.name),)
     return result
 
 
 class AssignmentForm(forms.ModelForm):
-    assignment_exercises = CSIMultipleChoiceField( choices =exercises_in_book(), # settings.exercises_in_book, #all_exercises(),
-        required=False,
-    )
+    """
+    Form for adding exercises to an assignment
+    """
+    assignment_exercises = CSIMultipleChoiceField( \
+                                 choices = exercises_in_object(), 
+                                 required = False,
+                                 )
 
     class Meta:
         model = Assignments 
 
 class AssignmentAdmin(admin.ModelAdmin):
+    """
+    We add assignemnt form to the admin console
+    """
     form = AssignmentForm
 
 
 class StudentsForm(forms.ModelForm):
+    """
+    Form for managing the students enrolled in the course
+    """
     def __init__(self, *args, **kwargs):
         super(StudentsForm, self).__init__(*args, **kwargs)
         instance = getattr(self, 'instance', None)
@@ -211,8 +241,25 @@ class StudentsForm(forms.ModelForm):
         model = UserBook
         exclude = ['book']
 
-#        widgets = {
-#                     'user': forms.TextInput(),
-#                  } 
 
+class DelAssignmentForm(forms.ModelForm):
+    """
+    Form to delete a specific assignment
+    """
+    assignment_exercises = forms.MultipleChoiceField( \
+                                 widget = CheckboxSelectMultiple, \
+                                 required = False, \
+                                 label = "Exercises in assignment")
+    def __init__(self, *args, **kwargs):
+        super(DelAssignmentForm, self).__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        self.fields['assignment_exercises'].choices = \
+                                            exercises_in_object(instance)
+        if instance:
+            self.fields['assignment_exercises'].widget.attrs['disabled'] = True
+            self.fields['assignment_exercises'].widget.attrs['checked'] = \
+                                                                      "checked"
+    class Meta:
+        model = Assignments
+        
 admin.site.register(Assignments, AssignmentAdmin)
