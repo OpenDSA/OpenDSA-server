@@ -180,16 +180,25 @@ def delete_assignment(request, module_id):
     
     course_module = CourseModule.objects.get(id=module_id)
     assignment = Assignments.objects.get(course_module=course_module)
+    #retrieve books
+    book =  Books.objects.filter(courses=course_module.course_instance)[0]
 
-    if Assignments.objects.filter(course_module=course_module).count()>0:
+    #create redirection url that is the teachers' view
+    next_url = "/course/%s/%s/teachers/" % ( \
+                       course_module.course_instance.course.url, \
+                       course_module.course_instance.url)
+
+    if Assignments.objects.filter(course_module = course_module).count()>0:
         assignment = get_object_or_404(Assignments, course_module = \
                                                     course_module)
+
+    if Assignments.objects.filter(assignment_book = book).count() == 1:
+        messages.warning(request, \
+                 _('There should be at least one assignment in the course.'))
+        return HttpResponseRedirect(next_url)
     if request.method == "POST":
         form = DelAssignmentForm(request.POST, instance=assignment)
         if form.is_valid():
-            next_url = "/course/%s/%s/teachers/" % ( \
-                       course_module.course_instance.course.url, \
-                       course_module.course_instance.url)
             assignment.delete()
             course_module.delete()
             messages.success(request, \
