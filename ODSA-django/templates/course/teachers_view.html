@@ -31,7 +31,7 @@
     {% for module in instance.course_modules.all %}
         <tr>
             <th>
-                <strong>{{ module.name }}</strong>
+                <strong>{{ module.name }} -- {{ module.closing_time }}</strong>
             </th>
             <td>
                 <a href="{% url course.views.add_or_edit_module instance.course.url instance.url module.id %}" class="btn btn-mini">
