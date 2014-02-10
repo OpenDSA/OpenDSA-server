@@ -31,8 +31,11 @@
     {% for module in instance.course_modules.all %}
         <tr>
             <th>
-                <strong>{{ module.name }} -- {{ module.closing_time }}</strong>
+                <strong>{{ module.name }}</strong>
             </th>
+            <td>
+               <font color="red">{{ module.closing_time }}</font>
+            </td>
             <td>
                 <a href="{% url course.views.add_or_edit_module instance.course.url instance.url module.id %}" class="btn btn-mini">
                     <i class="icon-edit"></i> {% trans "Edit assignment" %}
