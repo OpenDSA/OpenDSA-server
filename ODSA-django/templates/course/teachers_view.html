@@ -34,7 +34,7 @@
                 <strong>{{ module.name }}</strong>
             </th>
             <td>
-               <font color="red">{{ module.closing_time }}</font>
+               {{ module.closing_time }}
             </td>
             <td>
                 <a href="{% url course.views.add_or_edit_module instance.course.url instance.url module.id %}" class="btn btn-mini">
