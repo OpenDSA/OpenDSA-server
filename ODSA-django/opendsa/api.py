@@ -580,7 +580,7 @@ class UserexerciseResource(ModelResource):
                     request.POST['uiid'],  #attempt_number
                     int(request.POST['tstamp']), #submit_time
                     request.POST['total_time'],   #time_taken
-                    request.POST['threshold'], #threshold
+                    Decimal(request.POST['threshold']), #threshold
                     Decimal(request.POST['score']), #score
                     request.POST['module'],
                     request.META['REMOTE_ADDR'],
