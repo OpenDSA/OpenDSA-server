@@ -38,7 +38,7 @@ from opendsa.exercises import attempt_problem, \
                       student_grade_all, date_from_timestamp
 
 from openpop.LinkedListKAEx import attempt_problem_pop
-
+from django.conf import settings
 
 # Key generation and verification
 import hmac
@@ -833,6 +833,8 @@ class ModuleResource(ModelResource):
                 book_json = simplejson.loads(request.POST['b_json'])
  
                 chap_ = []
+                exers_ = []
+
                 for chapter in book_json['chapters']:
                   #get or create chapter
                     kchapter = get_chapter(kbook, chapter)
@@ -842,86 +844,99 @@ class ModuleResource(ModelResource):
                                       BookChapter.objects.get_or_create(\
                                                  book=kbook,name=chapter)
 
-                for lesson in book_json['chapters'][chapter]:
-                    #get or create module
-                    kmodule = get_module(lesson)
+                    for lesson in book_json['chapters'][chapter]:
+                        #get or create module
+                        kmodule = get_module(lesson)
 
-                    if kmodule is None:
-                        with transaction.commit_on_success():
-                            kmodule, added = Module.objects.get_or_create(\
-                                         name=lesson)
-                    #link module/lesson to chapter 
-                    kchapter.add_module(kmodule.id)
-                    kchapter.save()
-                    exercises_l = \
+                        if kmodule is None:
+                            with transaction.commit_on_success():
+                                kmodule, added = Module.objects.get_or_create(\
+                                             name=lesson)
+                        #link module/lesson to chapter 
+                        kchapter.add_module(kmodule.id)
+                        kchapter.save()
+                        exercises_l = \
                             book_json['chapters'][chapter][lesson]['exercises']
-                    for exercise in exercises_l:
-                        #get or create exercises
-                        exers_ = []
-                        description = ''
-                        streak = 0
-                        required = False
-                        #module has exercises
-                        if len(exercises_l[exercise]) > 0:
-                            description = exercises_l[exercise]['long_name']
-                            streak = exercises_l[exercise]['threshold']
-                            required = exercises_l[exercise]['required']
+                        for exercise in exercises_l:
+                            #get or create exercises
+                            #exers_ = []
+                            description = ''
+                            streak = 0
+                            required = False
+                            #module has exercises
+                            if len(exercises_l[exercise]) > 0:
+                                description = exercises_l[exercise]['long_name']
+                                streak = exercises_l[exercise]['threshold']
+                                required = exercises_l[exercise]['required']
 
-                        if Exercise.objects.filter(name=exercise).count() == 0 :
-                          # Add new exercise
-                            with transaction.commit_on_success():
-                                kexercise, added = \
-                                              Exercise.objects.get_or_create(\
-                                                   name = exercise, 
-                                                   covers = "dsa", 
-                                                   description = description, 
-                                                   streak = streak)
-                        else:
-                            # Update existing exercise
-                            with transaction.commit_on_success():
-                                kexercise = get_exercise(exercise)
-                                kexercise.covers = "dsa"
-                                kexercise.description = description
-                                kexercise.streak = Decimal(streak)
-                                kexercise.save()
+                            if Exercise.objects.filter(name=exercise).count() == 0 :
+                              # Add new exercise
+                                with transaction.commit_on_success():
+                                    kexercise, added = \
+                                               Exercise.objects.get_or_create(\
+                                               name = exercise, 
+                                               covers = "dsa", 
+                                               description = description, 
+                                               streak = streak)
+                            else:
+                                # Update existing exercise
+                                with transaction.commit_on_success():
+                                    kexercise = get_exercise(exercise)
+                                    kexercise.covers = "dsa"
+                                    kexercise.description = description
+                                    kexercise.streak = Decimal(streak)
+                                    kexercise.save()
                       
-                        #Link exercise to module and books only 
-                        #if the exercise is required
-                        bme =  None
-                        if BookModuleExercise.components.filter(\
+                            #Link exercise to module and books only 
+                            #if the exercise is required
+                            if kexercise not in exers_:
+                                    exers_.append(kexercise)
+                            bme =  None
+                            if BookModuleExercise.components.filter(\
                                                book = kbook, \
                                                module = kmodule, \
                                                exercise = kexercise).count()>0 \
                                                and required:
-                            with transaction.commit_on_success():
-                                bme = BookModuleExercise.components.filter(\
+                                with transaction.commit_on_success():
+                                    bme = BookModuleExercise.components.filter(\
                                                 book = kbook, 
                                                 module = kmodule, 
                                                 exercise = kexercise)[0]
-                                bme.points = exercises_l[exercise]['points']
-                                bme.save()
-                        if BookModuleExercise.components.filter(\
+                                    bme.points = exercises_l[exercise]['points']
+                                    bme.save()
+                                if kexercise not in exers_:
+                                    exers_.append(kexercise)
+                            if BookModuleExercise.components.filter(\
                                            book = kbook, \
                                            module = kmodule, \
                                            exercise = kexercise).count() == 0\
                                            and required:
-                            with transaction.commit_on_success():
-                                bme = BookModuleExercise(\
-                                      book = kbook, \
-                                      module = kmodule, 
-                                      exercise = kexercise, 
-                                      points = exercises_l[exercise]['points'])
-                                bme.save()
+                                with transaction.commit_on_success():
+                                    bme = BookModuleExercise(\
+                                          book = kbook, \
+                                          module = kmodule, 
+                                          exercise = kexercise, 
+                                          points = exercises_l[exercise]['points'])
+                                    bme.save()
 
-                response['saved'] = True
+                    # Remove exercises that are no longer
+                    #part of this book / module
+                    for exer in \
+                             BookModuleExercise.components.get_mod_exercise_list(\
+                                                                   kbook,kmodule):
+                        if exer not in exers_:
+                            BookModuleExercise.components.filter(book = kbook,
+                                                           module = kmodule,
+                                                           exercise = exer).delete()
+                    response['saved'] = True
                 #create book json file
                 if request.POST['build_date']:
                     build_date = datetime.datetime.strptime(\
                             request.POST['build_date'],'%Y-%m-%d %H:%M:%S')
-                    if kbook.creation_date != build_date:
-                        create_book_file(kbook)
-                        kbook.creation_date = build_date
-                        kbook.save()
+                    #if kbook.creation_date != build_date:
+                    create_book_file(kbook)
+                    kbook.creation_date = build_date
+                    kbook.save()
 
                 return self.create_response(request, response)
         return self.create_response(request, \
