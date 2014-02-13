@@ -917,6 +917,8 @@ class ModuleResource(ModelResource):
                                           exercise = kexercise, 
                                           points = exercises_l[exercise]['points'])
                                     bme.save()
+                                    if kexercise not in exers_:
+                                        exers_.append(kexercise)
 
                     # Remove exercises that are no longer
                     #part of this book / module
