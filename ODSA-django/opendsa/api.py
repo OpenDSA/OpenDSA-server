@@ -859,7 +859,6 @@ class ModuleResource(ModelResource):
                             book_json['chapters'][chapter][lesson]['exercises']
                         for exercise in exercises_l:
                             #get or create exercises
-                            #exers_ = []
                             description = ''
                             streak = 0
                             required = False
@@ -889,8 +888,6 @@ class ModuleResource(ModelResource):
                       
                             #Link exercise to module and books only 
                             #if the exercise is required
-                            if kexercise not in exers_:
-                                    exers_.append(kexercise)
                             bme =  None
                             if BookModuleExercise.components.filter(\
                                                book = kbook, \
@@ -904,6 +901,8 @@ class ModuleResource(ModelResource):
                                                 exercise = kexercise)[0]
                                     bme.points = exercises_l[exercise]['points']
                                     bme.save()
+                                    if kexercise not in exers_:
+                                        exers_.append(kexercise)
                                 if kexercise not in exers_:
                                     exers_.append(kexercise)
                             if BookModuleExercise.components.filter(\
@@ -918,6 +917,8 @@ class ModuleResource(ModelResource):
                                           exercise = kexercise, 
                                           points = exercises_l[exercise]['points'])
                                     bme.save()
+                                    if kexercise not in exers_:
+                                        exers_.append(kexercise)
 
                     # Remove exercises that are no longer
                     #part of this book / module
