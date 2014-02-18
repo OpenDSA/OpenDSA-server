@@ -465,10 +465,10 @@ def exercise_summary(request, book, course):
             columns_list.append({"sTitle":str(assignment.course_module.name)})
             columns_list1.append({"sTitle":str(assignment.course_module.name)})
             for exercise in assignment.get_exercises():
-                for bexe in BookModuleExercise.components.filter( \
+                bexe = BookModuleExercise.components.filter( \
                                                book = obj_book, \
-                                               exercise = exercise):
-                    columns_list.append({"sTitle":str(exercise.name)+ \
+                                               exercise = exercise)[0]
+                columns_list.append({"sTitle":str(exercise.name)+ \
                                          '('+str(bexe.points)+')'+ \
                                          '<span class="details" \
                                          style="display:inline;" \
