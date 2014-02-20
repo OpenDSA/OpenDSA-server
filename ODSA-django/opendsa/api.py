@@ -4,6 +4,7 @@ It exposes endpoint to collect data from the content server.
 
 
 from decimal import Decimal
+from collections import Iterable
 # Tastypie
 from tastypie.resources import ModelResource #, ALL, ALL_WITH_RELATIONS
 from tastypie.authentication import Authentication, ApiKeyAuthentication
@@ -845,6 +846,9 @@ class ModuleResource(ModelResource):
                                                  book=kbook,name=chapter)
 
                     for lesson in book_json['chapters'][chapter]:
+                        #if we encounter "hidden" we do nothing
+                        if not isinstance(book_json['chapters'][chapter][lesson], Iterable):
+                            continue
                         #get or create module
                         kmodule = get_module(lesson)
 
@@ -920,24 +924,23 @@ class ModuleResource(ModelResource):
                                     if kexercise not in exers_:
                                         exers_.append(kexercise)
 
-                    # Remove exercises that are no longer
-                    #part of this book / module
-                    for exer in \
-                             BookModuleExercise.components.get_mod_exercise_list(\
-                                                                   kbook,kmodule):
-                        if exer not in exers_:
-                            BookModuleExercise.components.filter(book = kbook,
-                                                           module = kmodule,
-                                                           exercise = exer).delete()
-                    response['saved'] = True
+                # Remove exercises that are no longer
+                #part of this book / module
+                for exer in \
+                         BookModuleExercise.components.get_exercise_list(\
+                                                               kbook):
+                    if exer not in exers_:
+                        BookModuleExercise.components.filter(book = kbook,
+                                                       exercise = exer).delete()
+                response['saved'] = True
                 #create book json file
                 if request.POST['build_date']:
                     build_date = datetime.datetime.strptime(\
                             request.POST['build_date'],'%Y-%m-%d %H:%M:%S')
-                    #if kbook.creation_date != build_date:
-                    create_book_file(kbook)
-                    kbook.creation_date = build_date
-                    kbook.save()
+                    if kbook.creation_date != build_date:
+                        create_book_file(kbook)
+                        kbook.creation_date = build_date
+                        kbook.save()
 
                 return self.create_response(request, response)
         return self.create_response(request, \
