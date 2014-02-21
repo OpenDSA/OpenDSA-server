@@ -880,8 +880,7 @@ class ModuleResource(ModelResource):
                         if kmodule not in kchapter.get_modules(): 
                             kchapter.add_module(kmodule.id)
                             kchapter.save()
-                        #exercises_l = \
-                        #    book_json['chapters'][chapter][lesson]['exercises']
+
                         for exercise in exercises_l:
                             #get or create exercises
                             description = ''
@@ -951,11 +950,10 @@ class ModuleResource(ModelResource):
                     build_date = datetime.datetime.strptime(\
                             request.POST['build_date'],'%Y-%m-%d %H:%M:%S')
                     if kbook.creation_date != build_date:
-                        print "+++++++++++++++++++"
                         create_book_file(kbook)
                         kbook.creation_date = build_date
                         kbook.save()
-                        print "*******************"
+
                 return self.create_response(request, response)
         return self.create_response(request, \
                           {'error': 'unauthorized action'}, HttpUnauthorized)
