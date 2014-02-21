@@ -832,35 +832,56 @@ class ModuleResource(ModelResource):
                                        book_url = request.POST['url'])
                 #get and save book elements
                 book_json = simplejson.loads(request.POST['b_json'])
- 
-                chap_ = []
+
+                # We first delete all entries of the book 
+                # in BookModuleExercise table 
+                #for exer in \
+                BookModuleExercise.components.filter(book = kbook).delete()
+                    #if exer not in exers_:
+                    #    BookModuleExercise.components.filter(book = kbook,
+                    #                                   exercise = exer).delete()
+
+
+
                 exers_ = []
+              
 
                 for chapter in book_json['chapters']:
                   #get or create chapter
                     kchapter = get_chapter(kbook, chapter)
-                    if kchapter is None:
+                    # First we delete chaper entry already in DB
+                    if kchapter is not None:
                         with transaction.commit_on_success():
-                            kchapter, added = \
-                                      BookChapter.objects.get_or_create(\
-                                                 book=kbook,name=chapter)
-
+                            kchapter.delete()
+                    with transaction.commit_on_success():
+                        kchapter, added = \
+                                  BookChapter.objects.get_or_create(\
+                                             book=kbook,name=chapter)
+                    
                     for lesson in book_json['chapters'][chapter]:
                         #if we encounter "hidden" we do nothing
                         if not isinstance(book_json['chapters'][chapter][lesson], Iterable):
                             continue
+                   
+                        # Get list of exercises
+                        exercises_l = \
+                            book_json['chapters'][chapter][lesson]['exercises']
                         #get or create module
+                        # We first extract module name 
+                        if '/' in lesson:
+                            lesson = lesson.split('/')[1]
                         kmodule = get_module(lesson)
 
                         if kmodule is None:
                             with transaction.commit_on_success():
                                 kmodule, added = Module.objects.get_or_create(\
                                              name=lesson)
-                        #link module/lesson to chapter 
-                        kchapter.add_module(kmodule.id)
-                        kchapter.save()
-                        exercises_l = \
-                            book_json['chapters'][chapter][lesson]['exercises']
+                        #link module/lesson to chapter
+                        if kmodule not in kchapter.get_modules(): 
+                            kchapter.add_module(kmodule.id)
+                            kchapter.save()
+                        #exercises_l = \
+                        #    book_json['chapters'][chapter][lesson]['exercises']
                         for exercise in exercises_l:
                             #get or create exercises
                             description = ''
@@ -924,24 +945,17 @@ class ModuleResource(ModelResource):
                                     if kexercise not in exers_:
                                         exers_.append(kexercise)
 
-                # Remove exercises that are no longer
-                #part of this book / module
-                for exer in \
-                         BookModuleExercise.components.get_exercise_list(\
-                                                               kbook):
-                    if exer not in exers_:
-                        BookModuleExercise.components.filter(book = kbook,
-                                                       exercise = exer).delete()
                 response['saved'] = True
                 #create book json file
                 if request.POST['build_date']:
                     build_date = datetime.datetime.strptime(\
                             request.POST['build_date'],'%Y-%m-%d %H:%M:%S')
                     if kbook.creation_date != build_date:
+                        print "+++++++++++++++++++"
                         create_book_file(kbook)
                         kbook.creation_date = build_date
                         kbook.save()
-
+                        print "*******************"
                 return self.create_response(request, response)
         return self.create_response(request, \
                           {'error': 'unauthorized action'}, HttpUnauthorized)
@@ -997,7 +1011,6 @@ class ModuleResource(ModelResource):
                 kchapter.save()
                 #get or create exercises
                 mod_exes = simplejson.loads(request.POST['exercises'])
-                print mod_exes
                 exers_ = []
                 for mod_exe in mod_exes:
                     if Exercise.objects.filter(\
