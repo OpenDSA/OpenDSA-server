@@ -133,7 +133,7 @@ class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
                      });
                    });
                    fillExercises( course, $('#id_assignment_book').val(), $('#id_assignment_chapter').val());
-                   $('#exercises-checkbox').empty();
+                   //$('#exercises-checkbox').empty();
                    $('#id_assignment_book').change(function(){
                      fillChapters( course, $('#id_assignment_book').val());
                    });
@@ -212,9 +212,16 @@ class AssignmentForm(forms.ModelForm):
     Form for adding exercises to an assignment
     """
     assignment_exercises = CSIMultipleChoiceField( \
-                                 choices = exercises_in_object(), 
+                                 #choices = exercises_in_object(instance), 
                                  required = False,
                                  )
+    def __init__(self, *args, **kwargs):
+        super(AssignmentForm, self).__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        self.fields['assignment_exercises'].choices = \
+                                            exercises_in_object(instance)
+        if instance:
+            self.fields['assignment_exercises'].initial = instance.get_exercises_id()
 
     class Meta:
         model = Assignments 
