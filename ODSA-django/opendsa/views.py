@@ -465,6 +465,10 @@ def exercise_summary(request, book, course):
             columns_list.append({"sTitle":str(assignment.course_module.name)})
             columns_list1.append({"sTitle":str(assignment.course_module.name)})
             for exercise in assignment.get_exercises():
+                if BookModuleExercise.components.filter( \
+                                         book = obj_book, \
+                                         exercise = exercise).count() == 0:
+                    continue
                 bexe = BookModuleExercise.components.filter( \
                                                book = obj_book, \
                                                exercise = exercise)[0]
@@ -507,7 +511,11 @@ def exercise_summary(request, book, course):
                         if exercise_id not in exercises_:
                             exercises_[exercise_id] = Exercise.objects.get( \
                                                            id = exercise_id )
-                        exercise = exercises_[exercise_id] 
+                        exercise = exercises_[exercise_id]
+                        if BookModuleExercise.components.filter( \
+                                         book = obj_book, \
+                                         exercise = exercise).count() == 0:
+                            continue  
                         if exercise.name not in exe_bme:
                             exe_bme[exercise.name] = \
                                    BookModuleExercise.components.filter( \
