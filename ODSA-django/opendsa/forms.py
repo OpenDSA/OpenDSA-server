@@ -212,16 +212,18 @@ class AssignmentForm(forms.ModelForm):
     Form for adding exercises to an assignment
     """
     assignment_exercises = CSIMultipleChoiceField( \
-                                 #choices = exercises_in_object(instance), 
+                                 choices = exercises_in_object(), 
                                  required = False,
                                  )
     def __init__(self, *args, **kwargs):
         super(AssignmentForm, self).__init__(*args, **kwargs)
         instance = getattr(self, 'instance', None)
-        self.fields['assignment_exercises'].choices = \
-                                            exercises_in_object(instance)
+        #self.fields['assignment_exercises'].choices = \
+        #                                    exercises_in_object(instance)
         if instance:
-            self.fields['assignment_exercises'].initial = instance.get_exercises_id()
+            if len(instance.get_exercises_id())>0:
+                self.fields['assignment_exercises'].initial = \
+                                                    instance.get_exercises_id()
 
     class Meta:
         model = Assignments 
