@@ -10,7 +10,7 @@ from tastypie.resources import ModelResource #, ALL, ALL_WITH_RELATIONS
 from tastypie.authentication import Authentication, ApiKeyAuthentication
 #from tastypie.authorization import DjangoAuthorization, \
 from tastypie.authorization  import ReadOnlyAuthorization, Authorization
-#from tastypie import fields
+from tastypie import fields
 from tastypie.utils import trailing_slash
 from tastypie.serializers import Serializer
 from tastypie.http import HttpUnauthorized, HttpForbidden, HttpBadRequest
@@ -21,7 +21,7 @@ from tastypie.exceptions import BadRequest
 # ODSA
 from opendsa.models import Exercise, UserExercise, UserExerciseLog, UserData, \
                            Module, UserModule, BookModuleExercise, Books, \
-                           UserBook, BookChapter
+                           UserBook, BookChapter, Bugs
 from opendsa.statistics import create_book_file
 from django.conf.urls.defaults import url
 from django.contrib.auth import authenticate, login
@@ -1158,6 +1158,53 @@ class UserModuleResource(ModelResource):
         return self.create_response(request, {'error': 'unauthorized action'}, \
                                               HttpUnauthorized)
 
+
+
+class BugsResource(ModelResource):
+    """
+    Endpoint handling bugs request
+    """
+    #img = fields.FileField(attribute="screenshot", null=True, blank=True)
+    class Meta:
+        queryset        = Bugs.objects.all()
+        resource_name   = 'bugs'
+        excludes        = []
+        allowed_methods = ['get','post']
+        authentication  = Authentication()
+        authorization   = ReadOnlyAuthorization()
+
+    def override_urls(self):
+        return [
+            url(r"^(?P<resource_name>%s)/submitbug%s$" %(\
+                    self._meta.resource_name, trailing_slash()),\
+                    self.wrap_view('submitbug'), \
+                    name="api_submitbug"),
+        ]
+
+    def submitbug(self, request, **kwargs):
+        if(request.method == 'POST'):
+            if "multipart/form-data" not in str(request.META['CONTENT_TYPE']):
+                return self.create_response(request, \
+                                            {'error': 'Bad requested'},\
+                                            HttpBadRequest)
+            if request.POST['key']:
+                kusername = get_username(request.POST['key'])
+            if kusername:
+                img = None
+                if('img' in request.FILES):
+                    img = request.FILES['img']
+                new_bug = Bugs(user = kusername,
+                           os_family = request.POST['os'],
+                           browser_family = request.POST['browser'],
+                           title = request.POST['title'],
+                           description = request.POST['description'],
+                           screenshot = img)
+                new_bug.save()
+                return self.create_response(request, {'response':'Bug stored'})     
+            return self.create_response(request, {'error': 'unauthorized action'}, \
+                                              HttpUnauthorized)
+        return self.create_response(request, {'error': 'Bad requested'}, \
+                                               HttpBadRequest)      
 
 
 class UserExerciseSummaryResource(ModelResource):

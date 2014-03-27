@@ -530,3 +530,14 @@ class UserExercise(models.Model):
         return (self.proficient_date != datetime.datetime.strptime( \
                                    '2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))
 
+class Bugs(models.Model):
+    """
+    Table to store bugs reported by users.
+    Bugs have user information, user computer and bugs information.
+    """
+    user = models.ForeignKey(User)
+    os_family = models.CharField(max_length=50)
+    browser_family = models.CharField(max_length=20)
+    title = models.CharField(max_length=50)
+    description = models.TextField() 
+    screenshot = models.ImageField(upload_to='bugs/%Y_%m_%d/', null=True, blank=True)
