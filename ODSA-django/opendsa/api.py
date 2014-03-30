@@ -1193,6 +1193,10 @@ class BugsResource(ModelResource):
                 img = None
                 if('img' in request.FILES):
                     img = request.FILES['img']
+                    if  len(img) > 1536000: #1.5MB
+                         print "big file"
+                         return self.create_response(request, {'error': 'Image file too big'}, \
+                                               HttpBadRequest)
                 new_bug = Bugs(user = kusername,
                            os_family = request.POST['os'],
                            browser_family = request.POST['browser'],
