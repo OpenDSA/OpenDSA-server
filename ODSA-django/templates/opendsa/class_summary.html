@@ -18,7 +18,6 @@
         var giRedraw = false;
         var columns = "";
         var u_data = "";
-        var check = 0;
 	$(document).ready(function() {
             $('#demo').html( '<table cellpadding="0" cellspacing="1" border="1" class="display" id="example"></table>' );
             $('#demo1').html( '<table cellpadding="0" cellspacing="1" border="1" class="display" id="example1"></table>' );
@@ -42,34 +41,23 @@
 
             /*click handler for he check box       */
             $("#hide_exe").live('click', function(event) {
-                 if (check==0) {
-                    $("#demo").css("display", "none"); //.hide();
-                    $("#table-0").css("display", "none");
-                    check = 1;
-                 }
                  if ($("#demo").is(":visible")) {
                     $("#demo").hide();
                     $("#example").hide();
                     $("#table-0").css("display", "none");
+                    $("#demo1").show();
+                    $("#example1").show();
                     $("#table-1").css("display", "block");
-                 }
-                 else {
-                    $("#demo").show();
-                    $("#example").show();
-                    $("#table-0").css("display", "block");
-                    $("#table-1").css("display", "none");
+                    return;
                  }
                  if ($("#demo1").is(":visible")) {
                     $("#demo1").hide();
                     $("#example1").hide();
                     $("#table-1").css("display", "none");
+                    $("#demo").show();
+                    $("#example").show();
                     $("#table-0").css("display", "block");
-                 }
-                 else {
-                    $("#demo1").show();
-                    $("#example1").show();
-                    $("#table-1").css("display", "block");
-                    $("#table-0").css("display", "none");
+                    return;
                  }
             });  
             /* Add a click handler to the rows - this could be used as a callback */
