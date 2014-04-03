@@ -20,6 +20,7 @@ from opendsa.statistics import is_authorized, convert, \
 from opendsa.forms import AssignmentForm, StudentsForm, \
                           DelAssignmentForm
 
+from opendsa.exercises import getUserExercise
 # Django
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response
@@ -461,17 +462,30 @@ def exercise_summary(request, book, course):
                                 'course_module__closing_time')
         assignments_points_list = []
         students_assignment_points = []
+        u_book = UserBook.objects.filter(book = obj_book)
+        #exercises_ = {}
+        exe_bme = {}
+        assign_exe = {}
+        user_exe_tab = {}
         for assignment in assignments_list:
             columns_list.append({"sTitle":str(assignment.course_module.name)})
             columns_list1.append({"sTitle":str(assignment.course_module.name)})
-            for exercise in assignment.get_exercises():
+            assign_exe[assignment.course_module.name] = assignment.get_exercises()
+            #for exercise in assignment.get_exercises():
+            for exercise in assign_exe[assignment.course_module.name]:
                 if BookModuleExercise.components.filter( \
                                          book = obj_book, \
                                          exercise = exercise).count() == 0:
                     continue
+                #exercises_[exercise.id] = exercise
                 bexe = BookModuleExercise.components.filter( \
                                                book = obj_book, \
                                                exercise = exercise)[0]
+                exe_bme[exercise.name] = bexe
+  
+                user_exe_tab[exercise.name] = UserExercise.objects.filter( \
+                                                user__in = u_book, \
+                                                exercise = exercise)
                 columns_list.append({"sTitle":str(exercise.name)+ \
                                          '('+str(bexe.points)+')'+ \
                                          '<span class="details" \
@@ -483,9 +497,10 @@ def exercise_summary(request, book, course):
                                                      book = obj_book, \
                                                      user__is_staff = 0 \
                                                      ).order_by('user')
+        
         users = []
-        exe_bme = {}
-        exercises_ = {}
+        #exe_bme = {}
+        #exercises_ = {}
         for userdata in userData:
             if not userdata.user.is_staff and display_grade( \
                                               userdata.user, obj_book):
@@ -507,27 +522,13 @@ def exercise_summary(request, book, course):
                     u_assign = []
                     u_assign1 = []
                     u_assign.append(0)
-                    for exercise_id in assignment.get_exercises_id():
-                        if exercise_id not in exercises_:
-                            exercises_[exercise_id] = Exercise.objects.get( \
-                                                           id = exercise_id )
-                        exercise = exercises_[exercise_id]
-                        if BookModuleExercise.components.filter( \
-                                         book = obj_book, \
-                                         exercise = exercise).count() == 0:
-                            continue  
-                        if exercise.name not in exe_bme:
-                            exe_bme[exercise.name] = \
-                                   BookModuleExercise.components.filter( \
-                                   book = obj_book, \
-                                   exercise = exercise)[0] 
+                    for exercise in assign_exe[assignment.course_module.name]:
                         bexe = exe_bme[exercise.name]
                         u_ex = None
-                        user_exe = UserExercise.objects.filter( \
-                                                user = userdata.user, \
-                                                exercise = exercise)
-                        if user_exe: 
-                            u_ex = user_exe[0]
+                        user_exe = getUserExercise(userdata.user, user_exe_tab[exercise.name])
+                        if not user_exe:
+                            continue 
+                        u_ex = user_exe
                         assignment_points += Decimal(bexe.points)
                         exe_str = ''
                         if exercise.id in userdata.get_prof_list():
@@ -583,6 +584,7 @@ def exercise_summary(request, book, course):
                 udata_list.append(u_data)
                 u_data1[2] = str(u_points )
                 udata_list1.append(u_data1) 
+
 
         context = RequestContext(request, {'book':book, \
                                            'course':course, \

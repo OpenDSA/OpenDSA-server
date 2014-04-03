@@ -53,6 +53,17 @@ def make_wrong_attempt(user_data, user_exercise):
         return user_exercise
 
 
+def getUserExercise(user, user_exe_list):
+    """
+    Finds a userexercise instance based of user
+    """
+    for ue in user_exe_list:
+        if user == ue.user:
+            return ue
+    return None
+
+
+
 def get_due_date(book, exercise):
     """
     Returns assignment due date
