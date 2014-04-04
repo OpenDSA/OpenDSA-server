@@ -101,8 +101,9 @@ class Assignments(models.Model):
         _ex = []
         for ex in self.assignment_exercises.split(','):
             if ex.isdigit():
-                exer = Exercise.objects.get(id=ex)
-                _ex.append(exer)
+                if Exercise.objects.filter(id=ex).count() > 0: 
+                    exer = Exercise.objects.get(id=ex)
+                    _ex.append(exer)
         return _ex
     def isType(self):
         """
