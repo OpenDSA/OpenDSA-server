@@ -466,7 +466,7 @@ def exercise_summary(request, book, course):
         #exercises_ = {}
         exe_bme = {}
         assign_exe = {}
-        user_exe_tab = {}
+        #user_exe_tab = {}
         for assignment in assignments_list:
             columns_list.append({"sTitle":str(assignment.course_module.name)})
             columns_list1.append({"sTitle":str(assignment.course_module.name)})
@@ -483,9 +483,9 @@ def exercise_summary(request, book, course):
                                                exercise = exercise)[0]
                 exe_bme[exercise.name] = bexe
   
-                user_exe_tab[exercise.name] = UserExercise.objects.filter( \
-                                                user__in = u_book, \
-                                                exercise = exercise)
+                #user_exe_tab[exercise.name] = UserExercise.objects.filter( \
+                #                                user__in = u_book, \
+                #                                exercise = exercise)
                 columns_list.append({"sTitle":str(exercise.name)+ \
                                          '('+str(bexe.points)+')'+ \
                                          '<span class="details" \
@@ -514,7 +514,6 @@ def exercise_summary(request, book, course):
                 u_data1.append(str(userdata.user.username))
                 u_data1.append(0)
 
-
                 for assignment in assignments_list:
                     #get points of exercises
                     assignment_points = 0
@@ -522,12 +521,18 @@ def exercise_summary(request, book, course):
                     u_assign = []
                     u_assign1 = []
                     u_assign.append(0)
+
                     for exercise in assign_exe[assignment.course_module.name]:
                         bexe = exe_bme[exercise.name]
                         u_ex = None
-                        user_exe = getUserExercise(userdata.user, user_exe_tab[exercise.name])
+                        #user_exe = getUserExercise(userdata.user, user_exe_tab[exercise.name])
+                        user_exe = UserExercise.objects.filter( \
+                                                user = userdata.user, \
+                                                exercise = exercise)
                         if not user_exe:
                             continue 
+                        else:
+                            user_exe = user_exe[0]
                         u_ex = user_exe
                         assignment_points += Decimal(bexe.points)
                         exe_str = ''
@@ -574,7 +579,7 @@ def exercise_summary(request, book, course):
                                       int(u_ex.total_done), \
                                       int(u_ex.total_correct), \
                                       str(u_ex.proficient_date))  
-
+                    
                         u_assign.append(exe_str)
                     u_assign[0] =  str(students_assignment_points)
                     u_data = u_data + u_assign
