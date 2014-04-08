@@ -1208,7 +1208,7 @@ class BugsResource(ModelResource):
                 new_bug.save()
 
                 #send notification email
-                subject = 'New Bug Reported: %s' %request.POST['title']
+                subject = '[OpenDSA] New Bug Reported: %s' %request.POST['title']
                 bug_url = "http://opendsa.cc.vt.edu/api/v1/bugs/%s/?format=json" %(\
                                                                             new_bug.id)
                 message = '%s reported the following bug:\n%s\n%s' %(kusername.email, \
