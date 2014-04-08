@@ -40,6 +40,8 @@ from opendsa.exercises import attempt_problem, \
 
 from openpop.LinkedListKAEx import attempt_problem_pop
 from django.conf import settings
+from django.core.mail import send_mail
+
 
 # Key generation and verification
 import hmac
@@ -1204,6 +1206,16 @@ class BugsResource(ModelResource):
                            description = request.POST['description'],
                            screenshot = img)
                 new_bug.save()
+
+                #send notification email
+                subject = 'New Bug Reported: %s' %request.POST['title']
+                bug_url = "http://opendsa.cc.vt.edu/api/v1/bugs/%s/?format=json" %(\
+                                                                            new_bug.id)
+                message = '%s reported the following bug:\n%s\n%s' %(kusername.email, \
+                                                                     request.POST['description'], \
+                                                                     bug_url)
+                send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', ['opendsa@cs.vt.edu'], fail_silently=False)
+
                 return self.create_response(request, {'response':'Bug stored'})     
             return self.create_response(request, {'error': 'unauthorized action'}, \
                                               HttpUnauthorized)
