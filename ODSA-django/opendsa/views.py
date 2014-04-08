@@ -525,23 +525,24 @@ def exercise_summary(request, book, course):
                     for exercise in assign_exe[assignment.course_module.name]:
                         bexe = exe_bme[exercise.name]
                         u_ex = None
-                        #user_exe = getUserExercise(userdata.user, user_exe_tab[exercise.name])
+                        #u_ex = getUserExercise(userdata.user, user_exe_tab[exercise.name])
                         user_exe = UserExercise.objects.filter( \
                                                 user = userdata.user, \
                                                 exercise = exercise)
                         if not user_exe:
-                            continue 
+                            exe_str = ''
+                            #continue 
                         else:
                             user_exe = user_exe[0]
-                        u_ex = user_exe
-                        assignment_points += Decimal(bexe.points)
-                        exe_str = ''
-                        if exercise.id in userdata.get_prof_list():
-                            u_points += Decimal(bexe.points) 
-                            students_assignment_points += Decimal(bexe.points) 
-                            if u_ex.proficient_date <= \
-                               assignment.course_module.closing_time:
-                                exe_str = '<span class="details" \
+                            u_ex = user_exe
+                            assignment_points += Decimal(bexe.points)
+                            exe_str = ''
+                            if exercise.id in userdata.get_prof_list():
+                                u_points += Decimal(bexe.points) 
+                                students_assignment_points += Decimal(bexe.points) 
+                                if u_ex.proficient_date <= \
+                                    assignment.course_module.closing_time:
+                                    exe_str = '<span class="details" \
                                           style="display:inline;" \
                                           data-type="First done:%s, \
                                           Last done:%s, Total done:%i, \
@@ -552,8 +553,8 @@ def exercise_summary(request, book, course):
                                           int(u_ex.total_done), \
                                           int(u_ex.total_correct), \
                                           str(u_ex.proficient_date))
-                            else:
-                                exe_str = '<span class="details" \
+                                else:
+                                    exe_str = '<span class="details" \
                                           style="display:inline;" \
                                           data-type="First done:%s, \
                                           Last done:%s, Total done:%i, \
@@ -564,10 +565,10 @@ def exercise_summary(request, book, course):
                                           int(u_ex.total_done), \
                                           int(u_ex.total_correct), \
                                           str(u_ex.proficient_date))
-                        if exercise.id in userdata.get_started_list() and \
+                            if exercise.id in userdata.get_started_list() and \
                                           exercise.id not in \
                                           userdata.get_prof_list():    
-                            exe_str = '<span class="details" \
+                                exe_str = '<span class="details" \
                                       style="visibility: hidden; \
                                       display:inline;" \
                                       data-type="First done:%s, \
