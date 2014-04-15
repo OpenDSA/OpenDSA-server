@@ -2,7 +2,7 @@
 from views import login,  verify_credentials #home
 from oauth_provider.views import protected_resource_example
 
-from opendsa.views import exercise_summary, daily_summary, all_statistics, widget_data, home, add_or_edit_assignment, class_students, student_management, rebuild_book_assignments, merged_book, delete_assignment 
+from opendsa.views import exercise_summary, daily_summary, all_statistics, widget_data, home, add_or_edit_assignment, class_students, student_management, rebuild_book_assignments, merged_book, delete_assignment, mobile_devices 
 from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail, non_required_exercise_use, total_module_time, slideshow_cheating, work_order, skipping_text, slideshow_stats, time_required, cheating_exercises, work_distribution
 # Django
 from django.conf.urls.defaults import *
@@ -33,6 +33,7 @@ urlpatterns = patterns('',
     url(r'^developer_view/daily_stat/$', daily_summary),
     url(r'^developer_view/stats/$', all_statistics),
     url(r'^developer_view/widget/$', widget_data),
+    url(r'^developer_view/mobility/$', mobile_devices),
     url(r'^developer_view/non_required_exercise_use/$', non_required_exercise_use),
     url(r'^developer_view/slideshow_cheating/(?P<student>[\w]+)/$', slideshow_cheating),
     url(r'^developer_view/work_distribution/(?P<book>[\w]+)/(?P<bin_size>[\w]+)$', work_distribution),
@@ -49,6 +50,10 @@ urlpatterns = patterns('',
     url(r'^developer_view/exercise_list/(?P<student>[\w]+)/$', exercise_list),
     url(r'^developer_view/exercise_detail/(?P<student>[\w]+)/(?P<exercise>[\w]+)/$', exercise_detail),
     (r'^activity/', include('actstream.urls')),
+
+    #Haystack
+    (r'^search/', include('haystack.urls')),
+
     #url(r'^developer_view/timeline_sum/(?P<student>[\w]+)/$', timeline_sum),
     #url(r'^developer_view/timeline_detail/(?P<student>[\w]+)/(?P<module>[\w]+)/(?P<year>[\w]+)/(?P<month>[\w]+)/(?P<day>[\w]+)/$', timeline_detail),
 

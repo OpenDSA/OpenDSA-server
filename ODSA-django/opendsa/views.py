@@ -16,7 +16,8 @@ from opendsa.models import Exercise, UserExercise, Books, \
                            Assignments, UserBook   
 from opendsa.statistics import is_authorized, convert, \
                                is_file_old_enough, get_widget_data, \
-                               exercises_logs, display_grade,create_book_file 
+                               exercises_logs, display_grade,create_book_file, \
+                               devices_analysis 
 from opendsa.forms import AssignmentForm, StudentsForm, \
                           DelAssignmentForm
 
@@ -70,6 +71,25 @@ def widget_data(request):
     return render_to_response("opendsa/widget.html", context)
 
 
+
+def mobile_devices(request):
+
+    mobile_data = devices_analysis()
+
+    context = RequestContext(request, \
+              {'categories':mobile_data['days'], \
+               'pc_users':mobile_data['pc_only_users'], \
+               'pc_mob_users':mobile_data['pc_mob_users'], \
+               'pc_actions':mobile_data['pc_actions'], \
+               'mobile_actions':mobile_data['mobile_actions'], \
+               'users':mobile_data['users'], \
+               'mobile_users':mobile_data['mobile_users'], \
+               'interactions':mobile_data['interactions'], \
+               'mobile_interactions':mobile_data['mobile_interactions'], \
+               'mobile_jsav':mobile_data['mobile_jsav'], \
+               'mobile_jsav_distinct_users':mobile_data['mobile_jsav_distinct_users']})
+
+    return render_to_response("opendsa/mobilesdata.html", context)
 
 def student_management(request, module_id):
     """
@@ -529,7 +549,7 @@ def exercise_summary(request, book, course):
                         user_exe = UserExercise.objects.filter( \
                                                 user = userdata.user, \
                                                 exercise = exercise)
-                        if not user_exe:
+                        if not user_exe and (not exercise.id in userdata.get_prof_list()):
                             exe_str = ''
                             #continue 
                         else:

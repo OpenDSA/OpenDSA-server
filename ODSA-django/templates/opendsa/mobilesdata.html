@@ -1,0 +1,266 @@
+{% extends "odsa_base.html" %}
+  {% block head %}
+     <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+     <script type="text/javascript" src="http://code.highcharts.com/highcharts.js"></script>
+     <script type="text/javascript" src="http://code.highcharts.com/modules/exporting.js"></script>
+     <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+
+     <script type="text/javascript" charset="utf-8">
+       $(function () {
+          $('#data0').highcharts({
+           chart: {
+              plotBackgroundColor: null,
+              plotBorderWidth: null,
+              plotShadow: false
+           },
+           title: {
+              text: 'PC only and PC-mobile users shares'
+        },
+        tooltip: {
+    	    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    color: '#000000',
+                    connectorColor: '#000000',
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                }
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: 'device type share',
+            data: [
+                {
+                    name: 'PC only users',
+                    y: {{ pc_users }},
+                    //sliced: true,
+                    //selected: true
+                },
+                {
+                    name: 'Mobile-PC users',
+                    y: {{ pc_mob_users }},
+                    sliced: true,
+                    selected: true
+                } 
+             ]
+          }]
+       });
+
+       $('#data0-1').highcharts({
+           chart: {
+              plotBackgroundColor: null,
+              plotBorderWidth: null,
+              plotShadow: false
+           },
+           title: {
+              text: 'PC and mobile interactions shares'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    color: '#000000',
+                    connectorColor: '#000000',
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                }
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: 'interaction device type share',
+            data: [
+                {
+                    name: 'PC interactions',
+                    y: {{ pc_actions }},
+                    //sliced: true,
+                    //selected: true
+                },
+                {
+                    name: 'Mobile interactions',
+                    y: {{ mobile_actions }},
+                    sliced: true,
+                    selected: true
+                } 
+             ]
+          }]
+       });
+
+          $('#data1').highcharts({
+             title: {
+                text: 'PC users and mobile users',
+                x: -20 
+             },
+             subtitle: {
+                text: '',
+                x: -20
+             }, 
+             xAxis: {
+                categories: {{ categories|safe }},
+                labels: {
+                   rotation: -45,
+                   step: 30
+                }
+             },
+             yAxis: {
+               title: {
+                  text: 'Number of users'
+               },
+               plotLines: [{
+                  value: 0,
+                  width: 1,
+                  color: '#808080'
+               }]
+             },
+             tooltip: {
+                valueSuffix: ' users',
+                shared: true
+             },
+             legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+             },
+             series: [{
+                name: 'All users',
+                data: {{ users }}
+                }, {
+                name: 'Mobile users',
+                data: {{ mobile_users }}
+                }]
+          }); 
+
+         $('#data2').highcharts({
+             title: {
+                text: 'PC and mobiles interactions',
+                x: -20 
+             },
+             subtitle: {
+                text: '',
+                x: -20
+             }, 
+             xAxis: {
+                categories: {{ categories|safe }},
+                labels: {
+                   rotation: -45,
+                   step: 30
+                }
+             },
+             yAxis: {
+               title: {
+                  text: 'Number of interactions'
+               },
+               plotLines: [{
+                  value: 0,
+                  width: 1,
+                  color: '#808080'
+               }]
+             },
+             tooltip: {
+                valueSuffix: ' actions',
+                shared: true
+             },
+             legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+             },
+             series: [{
+                name: 'PC',
+                data: {{ interactions }}
+                }, {
+                name: 'Mobile',
+                data: {{ mobile_interactions }}
+                }]
+          });
+
+         $('#data3').highcharts({
+             chart: {
+                zoomType: 'xy',
+                alignTicks: false
+             },
+             title: {
+                text: 'Mobile JSAV Data'
+             },
+             subtitle: {
+                text: 'OpenDSA'
+             }, 
+             xAxis: {
+                categories: {{ categories|safe }},
+                labels: {
+                   rotation: -45,
+                   step: 30
+                }
+             },
+             yAxis: [{
+               title: {
+                  text: 'Number of mobile interactions'
+               }},
+               {
+               title: {
+                  min: 0,
+                  max: 10,
+                  text: 'Number of mobile users'
+               },
+               gridLineWidth: 0,
+               opposite: true
+              }
+             ],
+             tooltip: {
+                   shared: true
+             },
+             legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+             },
+             series: [ {
+                name: 'Users',
+                type: 'spline',
+                yaxis: 1,
+                data: {{ mobile_jsav_distinct_users }},
+                tooltip: {
+                   valueSuffix: ' users'
+                  }
+                },
+                {
+                name: 'Interactions',
+                type: 'spline',
+                data: {{ mobile_jsav }},
+                tooltip: {
+                   valueSuffix: ' interactions'
+                 }
+                }
+                ]
+          }); 
+        });
+     </script>
+  {% endblock %}
+  {% block maintitle %}
+   <h1>OpenDSA Mobile Devices Statistics</h1>
+  {% endblock %}
+   {% block content %}
+    <div id="data0">
+    </div>
+    <div id="data0-1">
+    </div>
+    <div id="data1">
+    </div>
+    <div id="data2">
+    </div>
+    <div id="data3">
+    </div>
+  {% endblock %}
+

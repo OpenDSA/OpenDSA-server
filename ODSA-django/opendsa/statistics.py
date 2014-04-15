@@ -128,7 +128,143 @@ def get_widget_data():
         print "error ({0}) written file : {1}".format(e.errno, e.strerror)
 
 
+def devices_analysis():
+    #mobile devices analysis
+    pc_only_users = User.objects.raw('''SELECT  `id` , COUNT( * ) AS pc_only
+                                        FROM  `auth_user` 
+                                        WHERE  `id` NOT 
+                                        IN (
+                                             SELECT  `id` 
+                                             FROM  `opendsa_userbutton` 
+                                             WHERE  `device` !=  'PC'
+                                        )''')
 
+    pc_mob_users = UserButton.objects.raw('''SELECT id, COUNT(DISTINCT user_id) As mob_users
+                                                  FROM opendsa_userbutton
+                                                  WHERE device != 'PC'
+                                                  ''')
+
+    pc_actions_total = UserButton.objects.raw('''SELECT id, COUNT(*) As volume
+                                                   FROM opendsa_userbutton
+                                                   WHERE device = 'PC'
+                                                   ''')
+
+    mobile_actions_total  = UserButton.objects.raw('''SELECT id, COUNT(*) As volume
+                                                   FROM opendsa_userbutton
+                                                   WHERE device != 'PC'
+                                                   ''')
+
+    day_list = UserButton.objects.raw('''SELECT id, DATE(action_time) As date
+                                                  FROM opendsa_userbutton
+                                                  GROUP BY date
+                                                  ORDER BY date ASC''')
+
+    all_users_day =  UserButton.objects.raw('''SELECT id, COUNT(DISTINCT user_id) As users,
+                                                  DATE(action_time) As date
+                                                  FROM opendsa_userbutton
+                                                  WHERE device = 'PC'
+                                                  GROUP BY date
+                                                  ORDER BY date ASC''')
+
+    mobile_users_day =  UserButton.objects.raw('''SELECT id, COUNT(DISTINCT user_id) As users,
+                                                  DATE(action_time) As date
+                                                  FROM opendsa_userbutton
+                                                  WHERE device != 'PC'
+                                                  GROUP BY date
+                                                  ORDER BY date ASC''')
+
+    all_actions_day = UserButton.objects.raw('''SELECT id, COUNT(*) As volume,
+                                                   DATE(action_time) As date
+                                                   FROM opendsa_userbutton
+                                                   WHERE device = 'PC'
+                                                   GROUP BY date
+                                                   ORDER BY date ASC ''')
+
+    mobile_actions_day = UserButton.objects.raw('''SELECT id, COUNT(*) As volume,
+                                                   DATE(action_time) As date
+                                                   FROM opendsa_userbutton
+                                                   WHERE device != 'PC'
+                                                   GROUP BY date
+                                                   ORDER BY date ASC ''')
+
+
+    jsav_actions_day = UserButton.objects.raw('''SELECT id, COUNT(*) As volume,
+                                                   DATE(action_time) As date
+                                                   FROM opendsa_userbutton
+                                                   WHERE device != 'PC' AND
+                                                   name LIKE '%%jsav%%'
+                                                   GROUP BY date
+                                                   ORDER BY date ASC ''')
+
+    jsav_distinct_users_day = UserButton.objects.raw('''SELECT id, COUNT(DISTINCT user_id) As volume,
+                                                        DATE(action_time) As date
+                                                        FROM opendsa_userbutton
+                                                        WHERE device != 'PC' AND
+                                                        name LIKE '%%jsav%%'
+                                                        GROUP BY date
+                                                        ORDER BY date ASC ''')
+
+    dates = []
+    all_users = []
+    mobile_users = []
+    all_actions = []
+    mobile_actions = []
+    jsav_actions = []
+    jsav_distinct_users = []
+    interactions_dict = {}
+
+    for  pou in pc_only_users:
+        interactions_dict['pc_only_users'] = int(pou.pc_only)
+    for pmu in pc_mob_users:
+        interactions_dict['pc_mob_users'] = int(pmu.mob_users)
+    for pat in pc_actions_total:
+        interactions_dict['pc_actions'] = int(pat.volume)
+    for mat in mobile_actions_total:
+        interactions_dict['mobile_actions'] = int(mat.volume)
+
+    for day in day_list:
+        dates.append(str(day.date.strftime('%Y-%m-%d')))
+        all_users.append(0)
+        mobile_users.append(0)
+        all_actions.append(0)
+        mobile_actions.append(0)
+        jsav_actions.append(0)
+        jsav_distinct_users.append(0)
+        for aud in all_users_day:
+            if (day.date == aud.date):
+                all_users.pop()
+                all_users.append(int(aud.users)) 
+        for mud in mobile_users_day:
+            if (day.date == mud.date):
+                mobile_users.pop()
+                mobile_users.append(int(mud.users))       
+        for aad in all_actions_day:
+            if (day.date == aad.date):
+                all_actions.pop()
+                all_actions.append(int(aad.volume))
+        for mad in mobile_actions_day:
+            if (day.date == mad.date):
+                mobile_actions.pop()
+                mobile_actions.append(int(mad.volume))
+        for jad in jsav_actions_day:
+            if (day.date == jad.date):
+                jsav_actions.pop()
+                jsav_actions.append(int(jad.volume))
+        for jdu in jsav_distinct_users_day:
+            if (day.date == jdu.date):
+                jsav_distinct_users.pop()
+                jsav_distinct_users.append(int(jdu.volume))
+
+    interactions_dict['days'] = dates
+    interactions_dict['users'] = all_users
+    interactions_dict['mobile_users'] = mobile_users
+    interactions_dict['interactions'] = all_actions
+    interactions_dict['mobile_interactions'] = mobile_actions
+    interactions_dict['mobile_jsav'] = jsav_actions
+    interactions_dict['mobile_jsav_distinct_users'] = jsav_distinct_users
+    return interactions_dict
+
+ 
 def exercises_logs():
     #days rage, now all dayys the book was used
     day_list = UserExerciseLog.objects.raw('''SELECT id, DATE(time_done) As date
