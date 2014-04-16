@@ -74,7 +74,18 @@ def widget_data(request):
 
 def mobile_devices(request):
 
-    mobile_data = devices_analysis()
+    mobile_data = None
+    if is_file_old_enough('device_stats.json', 43200):
+        mobile_data = devices_analysis()
+
+    if mobile_data is None:
+        try:
+            f_handle = open(settings.MEDIA_ROOT + 'device_stats.json')
+            mobile_data = convert(json.load(f_handle))
+            f_handle.close()
+        except IOError as ferror:
+            print "error ({0}) reading file : {1}".format(ferror.errno, \
+                                                     ferror.strerror)
 
     context = RequestContext(request, \
               {'categories':mobile_data['days'], \

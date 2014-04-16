@@ -262,6 +262,19 @@ def devices_analysis():
     interactions_dict['mobile_interactions'] = mobile_actions
     interactions_dict['mobile_jsav'] = jsav_actions
     interactions_dict['mobile_jsav_distinct_users'] = jsav_distinct_users
+
+    #write data into a file
+    try:
+        #all_daily_logs = str(all_daily_logs).replace("'",'"')#[1:-1]
+        #all_daily_logs = all_daily_logs.replace("[","").replace("]","")
+        #all_daily_logs = '[' + all_daily_logs + ']'
+
+        ofile = open(settings.MEDIA_ROOT + 'device_stats.json','w') #'ab+')
+        ofile.writelines(str(interactions_dict).replace("'",'"'))
+        ofile.close
+    except IOError as e:
+        print "error ({0}) written file : {1}".format(e.errno, e.strerror)
+
     return interactions_dict
 
  
