@@ -73,7 +73,6 @@
 
 			- python manage.py syncdb
 				- Create an administrator (superuser) account when prompted 
-			- python manage.py loaddata opendsa/fixtures/modules.json
 			
 			- python manage.py runserver 0.0.0.0:8000
 			- In your web browser, go to: http://127.0.0.1:8000/admin/
