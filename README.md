@@ -77,6 +77,8 @@ cd ODSAserver/ODSA-django
   - Update 'BASE_URL' to have the IP and port of the Django server (optional?)
 
     Ex: BASE_URL = "127.0.0.1:8000"
+    
+  - Edit 'TEMPLATE_LOADERS', if necessary
 
   - Update 'DATABASES'
 ```
@@ -87,9 +89,6 @@ cd ODSAserver/ODSA-django
 'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
 'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
 ```
-
-  - Edit 'TEMPLATE_LOADERS', if necessary
-
 
 - python manage.py syncdb
   - Create an administrator (superuser) account when prompted
