@@ -421,6 +421,7 @@ class UserexerciseResource(ModelResource):
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
             kexercise = get_exercise(request.POST['sha1'])
+            print "The exercise question is " + ex_question
             if kusername and kexercise:
                 user_exercise = get_user_exercise(kusername, kexercise)
 
@@ -432,7 +433,7 @@ class UserexerciseResource(ModelResource):
                                        streak=0)
             else:
                 return self.create_response(request, \
-                            {'error': 'attempt not logged'}, HttpUnauthorized)
+                            {'error': 'new error!!'}, HttpUnauthorized)
             dsa_book = get_book(request.POST['book'])
             ubook = get_user_book(kusername, dsa_book)
             with transaction.commit_on_success():

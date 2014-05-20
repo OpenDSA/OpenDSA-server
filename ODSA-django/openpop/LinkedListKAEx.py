@@ -45,6 +45,9 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
        feedback=assesskaexbtleaf (data)      
     elif request_post.get('sha1') == "ListADTPROG":  # generate a list
        feedback= assesskaex(data , generatedList)
+    elif request_post.get('sha1') == "RecWBCProg":  # generate a list
+       feedback= assesskaex(data , generatedList)
+    
        
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         dt_now = datetime.datetime.now()
@@ -201,13 +204,11 @@ def assesskaex(data , generatedList):
            if "Well Done" in line:
               feedback[0] = True
               return feedback
-              break 
            else :
               feedback[0] = False
               return feedback
-              break 
-           #else :
-           #   feedback[0] = False
+           else :
+              feedback[0] = False
 
         
     feedback[1]=['Try Again! Your code is taking too long to run! Revise your code!']
