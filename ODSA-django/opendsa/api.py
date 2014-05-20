@@ -471,7 +471,7 @@ class UserexerciseResource(ModelResource):
                 else :
                     
                     return self.create_response(request, {'details': "Empty"})
-        return  self.create_response(request, {}, HttpUnauthorized)
+         return  self.create_response(request, {}, HttpUnauthorized)
 
 
     def listlogs():
