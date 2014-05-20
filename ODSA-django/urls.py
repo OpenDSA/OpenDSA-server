@@ -52,7 +52,7 @@ urlpatterns = patterns('',
     (r'^activity/', include('actstream.urls')),
 
     #Haystack
-    (r'^search/', include('haystack.urls')),
+    #(r'^search/', include('haystack.urls')),
 
     #url(r'^developer_view/timeline_sum/(?P<student>[\w]+)/$', timeline_sum),
     #url(r'^developer_view/timeline_detail/(?P<student>[\w]+)/(?P<module>[\w]+)/(?P<year>[\w]+)/(?P<month>[\w]+)/(?P<day>[\w]+)/$', timeline_detail),
