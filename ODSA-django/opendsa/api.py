@@ -418,11 +418,9 @@ class UserexerciseResource(ModelResource):
 
 
     def logprogexercise(self, request, **kwargs):
-        print "I am in the prog func"
-        if request.POST['key']:
+         if request.POST['key']:
             kusername = get_username(request.POST['key'])
             kexercise = get_exercise(request.POST['sha1'])
-            print "The exercise question is" + ex_question
             if kusername and kexercise:
                 user_exercise = get_user_exercise(kusername, kexercise)
 
@@ -551,7 +549,6 @@ class UserexerciseResource(ModelResource):
                              'error': 'unauthorized action'}, HttpUnauthorized)
 
     def logpeexercise(self, request, **kwargs):
-        print "I am NOTTTTTT in the prog func"
         print request
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
