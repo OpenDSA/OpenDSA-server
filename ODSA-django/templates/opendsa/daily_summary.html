@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>OpenDSA Book Activity</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/media/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/TableTools.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/ZeroClipboard.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.js"></script> 
+    <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/media/css/demo_page.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/media/css/demo_table.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/extras/TableTools/media/css/TableTools.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}opendsa/css/activity.css" rel="stylesheet" media="screen" />
+    <script type="text/javascript" charset="utf-8">
+	$(document).ready(function() {
+            $('#demo').html( '<table cellpadding="0" cellspacing="1" border="1" class="display" id="example"></table>' );
+            var oTable = $('#example').dataTable( {
+                "sDom": 'T<"clear">lfrtip',
+               "oTableTools": {
+			"sSwfPath": "{{ STATIC_URL }}datatables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf"
+		},
+                "sPaginationType": "full_numbers",
+                "aaData": {{ daily_data|safe  }},
+                "aoColumns": {{ columns_list|safe  }},
+            } ); 
+            var i = 0;
+            var j = 0;
+
+            $('#example tbody td').live('click', function (e) {
+                if ( $(e.target).children(".details").length > 0) {
+		    var kids = $(e.target).children(".details");
+                    alert(kids[0].getAttribute("data-type")); 
+                }
+		} );
+            $('#example tbody td ').each( function(e) {
+                if ($(this).text()=="Done" ){ 
+                    $(this).css('backgroundColor', '#FF99FF');
+                } 
+                else if ($(this).text()=="Started"){
+                    $(this).css('backgroundColor', '#CCFFCC');
+                }
+                else {
+                    $(this).css('backgroundColor', '#CCFFFF');
+                }
+                if ( $(this).children(".details").length > 0) {
+                    var kids = $(this).children(".details");
+                    var text = kids[0].getAttribute("data-type");
+                    this.setAttribute( 'title', text );
+                }
+            } );
+            $('#example thead th ').each( function(e) {
+                if ( $(this).children(".details").length > 0) {
+                    var kids = $(this).children(".details");
+                    var text = kids[0].getAttribute("data-type");
+                    this.setAttribute( 'title', text );
+                }
+            } );
+            oTable.$('td').tooltip( {
+                "delay": 0,
+                "track": true,
+                "fade": 200
+            } );
+            oTable.$('th').tooltip( {
+                "delay": 0,
+                "track": true,
+                "fade": 200
+            } ); 
+	} );
+  </script>
+  </head>
+  <body>
+    <h1>Daily Class Summary</h1>
+    <h4>Course: {{course}}</h4>
+    <h4>Book: {{book}}</h4>
+    <hr>
+    <h4>Date: {{date}}</h4>
+    <div id="demo">
+    
+
+    </div>
+  </body>
+</html>
+
+
