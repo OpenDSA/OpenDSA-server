@@ -31,21 +31,14 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     generatedList =request_post.get('genlist') 
     data = ''.join([x for x in data if ord(x) < 128]) 
     
-    #Handling secrity issues
-    # 1- Infinite loops
-    
-
-
-   
-
     #  Check from which programming exercise we got this request
-    if request_post.get('sha1') == "BinaryTreePROG" : # count number of nodes
+    if request_post.get('sha1') == "BinaryTreePROG" : #count number of nodes
        feedback= assesskaexbintree (data)
-    elif request_post.get('sha1') == "BTLeafPROG" :  # count number of leaf nodes
+    elif request_post.get('sha1') == "BTLeafPROG" :  #count number of leaf nodes
        feedback=assesskaexbtleaf (data)      
-    elif request_post.get('sha1') == "ListADTPROG":  # generate a list
+    elif request_post.get('sha1') == "ListADTPROG":  #generate a list
        feedback= assesskaex(data , generatedList)
-    elif request_post.get('sha1') == "RecWBCProg":  # generate a list
+    elif request_post.get('sha1') == "RecWBCProg":   #recursion programming exercise
        feedback= assesskaex(data , generatedList)
     
        
@@ -207,8 +200,7 @@ def assesskaex(data , generatedList):
            else :
               feedback[0] = False
               return feedback
-           else :
-              feedback[0] = False
+
 
         
     feedback[1]=['Try Again! Your code is taking too long to run! Revise your code!']
