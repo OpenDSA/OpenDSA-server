@@ -28,7 +28,7 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     #sys.setdefaultencoding("utf8")
     
     data = request_post.get('code') 
-    generatedList =request_post.get('genlist') 
+    generatedList =request_post.get('genlist')
     data = ''.join([x for x in data if ord(x) < 128]) 
     
     #  Check from which programming exercise we got this request
@@ -39,7 +39,7 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     elif request_post.get('sha1') == "ListADTPROG":  #generate a list
        feedback= assesskaex(data , generatedList)
     elif request_post.get('sha1') == "RecWBCProg":   #recursion programming exercise
-       feedback= assesskaex(data , generatedList)
+       feedback= assessreckaex(data)
     
        
     if user_exercise:   # and user_exercise.belongs_to(user_data):
@@ -311,6 +311,94 @@ def assesskaexbtleaf (data):
     
     # Setting the DISPLAY then run the processing command to test the submitted code
     proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/; javac studentpreordertest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy studentpreordertest 2> /home/OpenDSA-server/ODSA-django/openpop/build/TreeLeafTest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    #(out1, err1) = proc1.communicate() 
+    #subprocess.call("cd /home/OpenDSA-server/ODSA-django/openpop; ./try.sh", shell=True)
+    time.sleep(3)
+    os.system("kill -9 "+ str(proc1.pid) )
+
+    print data
+    # Read the success file if has Success inside then "Well Done!" Otherwise "Try Again!"
+    if  os.path.isfile(filesPath+'compilationerrors.out'):
+          syntaxErrorFile = open(filesPath+'compilationerrors.out' , 'r')
+          feedback[0] = False
+          feedback[1]= syntaxErrorFile.readlines()
+          syntaxErrorFile.close()
+          if os.stat(filesPath+'compilationerrors.out')[6]!=0:
+             feedback[1]= feedback[1]#.rsplit(':',1)[1]
+             print feedback[1]
+             return feedback
+    if os.path.isfile(filesPath+'runerrors.out'):
+       #Check what is returned from the test : what is inside the success file
+          runErrorFile = open(filesPath+'runerrors.out' , 'r')
+          feedback[0] = False
+          feedback[1]= runErrorFile.readlines()
+          print feedback[1]
+          for line in feedback[1]:
+              print "line" + line
+              if "at java.security.AccessControlContext.checkPermission" in line:
+                 feedback[1]= ["Try Again! Your solution shouldn't write files to the disk!"]
+                 return feedback    
+          runErrorFile.close()
+          if os.stat(filesPath+'runerrors.out')[6]!=0:
+             return feedback;
+    
+    
+    if os.path.isfile(filesPath+'output'):
+       #Check what is returned from the test : what is inside the success file
+       successFile = open(filesPath+'output' , 'r')
+       feedback[1] = successFile.readlines()
+       print feedback[1]
+       for line in feedback[1]:
+           if "Well Done" in line:
+              feedback[0] = True
+              return feedback
+               
+           else :
+              feedback[0] = False
+              return feedback
+
+    feedback[1]=['Try Again! Your code is taking too long to run! Revise your code!']
+    return feedback
+
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# Recursion Programming exercises
+def assessreckaex(data):
+    studentfilename = "studentrectest.java"
+    classname = "studentrectest"
+    testfilename= "rectest.java"
+    feedback=[False, 'null', 59 , studentfilename , 'class '+ classname]
+    
+    
+    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/rectest/javaSource/'
+    
+    #cleaning: deleting already created files
+    if os.path.isfile(filesPath +''):
+       os.remove(filesPath+studentfilename)
+ 
+    if os.path.isfile(filesPath +'output'):
+       os.remove(filesPath+'output')
+
+    if os.path.isfile(filesPath +'compilationerrors.out'):
+       os.remove(filesPath + 'compilationerrors.out')
+   
+    if os.path.isfile(filesPath +'runerrors.out'):
+       os.remove(filesPath + 'runerrors.out')
+
+   
+    # Saving the submitted/received code in the studentrectest.java file by copying the preorder + studentcode +}
+    TestFile = open(filesPath+testfilename , 'r')
+    test = TestFile.read()
+    answer = open(filesPath+studentfilename, 'w')
+    answer.write(test)
+    answer.write("public static ")
+    answer.write(data)
+    answer.write("}")
+    answer.close()
+    
+    # Setting the DISPLAY then run the processing command to test the submitted code
+    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/rectest/javaSource/; javac studentrectest.java 2> /home/OpenDSA-server/ODSA-django/openpop/build/rectest/javaSource/compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy studentrectest 2> /home/OpenDSA-server/ODSA-django/openpop/build/rectest/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
     #(out1, err1) = proc1.communicate() 
     #subprocess.call("cd /home/OpenDSA-server/ODSA-django/openpop; ./try.sh", shell=True)
     time.sleep(3)
