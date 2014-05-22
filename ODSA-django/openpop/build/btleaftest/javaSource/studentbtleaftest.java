@@ -68,7 +68,7 @@ class BSTNode<Key, E> implements BinNode<E> {
   { return (left == null) && (right == null); }
 }
 
-public class studentpreordertest
+public class studentbtleaftest
 {
 
  public static int countLeaf(BinNode root) {
@@ -181,3 +181,15 @@ public class studentpreordertest
   writeResult(root , true);
 
   } 
+public static  int exercise3(BinNode root) { 
+  // Your code goes between these lines
+
+
+
+
+
+
+  // Your code goes between these lines
+ 
+  } 
+}
