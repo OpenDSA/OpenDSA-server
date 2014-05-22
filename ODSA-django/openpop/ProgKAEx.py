@@ -101,28 +101,34 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-#  All Programming exercises are compiled and run through the following function
+#  Set the testing folder and passed parameters to the programming exercise
 def setparameters(exerciseName, data, generatedList ):
      #  Check from which programming exercise we got this request
     if exerciseName == "BinaryTreePROG" : #count number of nodes
-       feedback= assessprogkaex (data, "binarytreetest","")
+       feedback= assessprogkaex (data, "binarytreetest", "binarytreetest","")
+
     elif exerciseName == "BTLeafPROG" :  #count number of leaf nodes
-       feedback= assessprogkaex (data , "btleaftest","")      
+       feedback= assessprogkaex (data , "btleaftest", "btleaftest","")      
+
     elif exerciseName == "ListADTPROG":  #generate a list
-       feedback= assessprogkaex(data , "listadttest", generatedList)
+       feedback= assessprogkaex(data , "listadttest", "listadttest" ,generatedList)
+
     #recursion programming exercises
-    elif exerciseName == "RecWBCProg":   
-       feedback= assessprogkaex(data,"rectest","")
+    elif exerciseName == "recwbcprog":   
+       feedback= assessprogkaex(data,"rectest/"+exerciseName, exerciseName,"")
     return feedback   
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  All Programming exercises are compiled and run through the following function
-def assessprogkaex(data, testfoldername, generatedList ):
+def assessprogkaex(data, testfoldername, testfilenamep, generatedList ):
+    # live server
+    #filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername
+
+    # testing server
+    filesPath = '/home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
     
-    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/javaSource/'
-    
-    testfilename = testfoldername+".java"
+    testfilename = testfilenamep+".java"
     studentfilename = "student"+testfilename
     
     # count the number of lines in the original test file so that we can have the error shown to the student with respect to the student's code
@@ -164,11 +170,11 @@ def assessprogkaex(data, testfoldername, generatedList ):
     answer.write(data)
     answer.write("}")
     answer.close()
-    
+    print filesPath
+    print studentfilename
     # Setting the DISPLAY then run the processing command to test the submitted code
-    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/"+testfoldername+"/javaSource/; javac "+studentfilename+" 2> /home/OpenDSA-server/ODSA-django/openpop/build/"+testfoldername+"/javaSource/compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy student"+testfoldername+" 2> /home/OpenDSA-server/ODSA-django/openpop/build/"+testfoldername+"/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
-    #(out1, err1) = proc1.communicate() 
-    #subprocess.call("cd /home/OpenDSA-server/ODSA-django/openpop; ./try.sh", shell=True)
+    proc1 = subprocess.Popen(" cd "+ filesPath +"; javac "+studentfilename+" 2> "+filesPath + "compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy student"+testfilenamep+" 2> " + filesPath +"runerrors.out", stdout=subprocess.PIPE, shell=True)
+   
     time.sleep(3)
     os.system("kill -9 "+ str(proc1.pid) )
 

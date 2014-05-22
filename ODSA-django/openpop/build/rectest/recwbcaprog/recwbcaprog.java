@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.Random;
 
 
-public class studentrectest
+public class studentrecwbcaprog
 {
  // The model answer of the largest number: the student is asked to write the base case
  public static int modellargest(int[] numbers, int index) {

@@ -185,7 +185,7 @@ public static  int exercise3(BinNode root) {
   // Your code goes between these lines
 
 
-
+return 3;
 
 
 
