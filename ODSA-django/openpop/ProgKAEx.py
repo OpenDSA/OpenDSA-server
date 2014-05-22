@@ -24,25 +24,13 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     completed, count_hints, time_taken, attempt_content, module,   
     ex_question, ip_address, request_post):
     
-    #reload(sys)
-    #sys.setdefaultencoding("utf8")
-    #student code
     data = request_post.get('code') 
     generatedList =request_post.get('genlist')
     data = ''.join([x for x in data if ord(x) < 128]) 
+    exerciseName = request_post.get('sha1')
     
-    #  Check from which programming exercise we got this request
-    if request_post.get('sha1') == "BinaryTreePROG" : #count number of nodes
-       feedback= assessprogkaex (data, "binarytreetest","")
-    elif request_post.get('sha1') == "BTLeafPROG" :  #count number of leaf nodes
-       feedback= assessprogkaex (data , "btleaftest","")      
-    elif request_post.get('sha1') == "ListADTPROG":  #generate a list
-       feedback= assessprogkaex(data , "listadttest", generatedList)
-    #recursion programming exercises
-    elif request_post.get('sha1') == "RecWBCProg":   
-       feedback= assessprogkaex(data,"rectest","")
-    
-       
+    feedback= setparameters(exerciseName, data, generatedList)
+     
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         dt_now = datetime.datetime.now()
         #exercise = user_exercise.exercise
@@ -93,17 +81,7 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
            else:
              user_exercise.total_done += 1
              user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)
-        #else:
-            #if (int(count_hints) ==0) and (attempt_content!='hint') and (int(attempt_number) == 1):
-            # Only count wrong answer at most once per problem
-             #  if user_exercise.streak - 1 > 0:
-             #      user_exercise.streak = user_exercise.streak - 1
-             #  else:
-             #      user_exercise.streak = 0
-            #user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)
-            #if first_response:
-            #       user_exercise.update_proficiency_model(correct=False)
-
+    
         # Saving student's code and the feedback received
        
         problem_log.save()
@@ -118,17 +96,31 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
               )
  
         userprog_log.save()
-        return user_exercise,feedback     #, user_exercise_graph, goals_updated
-
-
+        return user_exercise,feedback
 
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-#  Programming exercises
+#  All Programming exercises are compiled and run through the following function
+def setparameters(exerciseName, data, generatedList ):
+     #  Check from which programming exercise we got this request
+    if exerciseName == "BinaryTreePROG" : #count number of nodes
+       feedback= assessprogkaex (data, "binarytreetest","")
+    elif exerciseName == "BTLeafPROG" :  #count number of leaf nodes
+       feedback= assessprogkaex (data , "btleaftest","")      
+    elif exerciseName == "ListADTPROG":  #generate a list
+       feedback= assessprogkaex(data , "listadttest", generatedList)
+    #recursion programming exercises
+    elif exerciseName == "RecWBCProg":   
+       feedback= assessprogkaex(data,"rectest","")
+    return feedback   
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+#  All Programming exercises are compiled and run through the following function
 def assessprogkaex(data, testfoldername, generatedList ):
     
-    filesPath = '/home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/javaSource/'
+    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/javaSource/'
     
     testfilename = testfoldername+".java"
     studentfilename = "student"+testfilename
@@ -174,7 +166,7 @@ def assessprogkaex(data, testfoldername, generatedList ):
     answer.close()
     
     # Setting the DISPLAY then run the processing command to test the submitted code
-    proc1 = subprocess.Popen(" cd /home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/"+testfoldername+"/javaSource/; javac "+studentfilename+" 2> /home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/"+testfoldername+"/javaSource/compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy student"+testfoldername+" 2> /home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/"+testfoldername+"/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
+    proc1 = subprocess.Popen(" cd /home/OpenDSA-server/ODSA-django/openpop/build/"+testfoldername+"/javaSource/; javac "+studentfilename+" 2> /home/OpenDSA-server/ODSA-django/openpop/build/"+testfoldername+"/javaSource/compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy student"+testfoldername+" 2> /home/OpenDSA-server/ODSA-django/openpop/build/"+testfoldername+"/javaSource/runerrors.out", stdout=subprocess.PIPE, shell=True)
     #(out1, err1) = proc1.communicate() 
     #subprocess.call("cd /home/OpenDSA-server/ODSA-django/openpop; ./try.sh", shell=True)
     time.sleep(3)

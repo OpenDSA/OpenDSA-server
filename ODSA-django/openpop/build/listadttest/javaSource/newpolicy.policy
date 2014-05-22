@@ -1,0 +1,10 @@
+grant codeBase "file:/home/OpenDSA-server/ODSA-django/openpop/build/listadttest/javaSource/*" {
+permission java.io.FilePermission "/home/OpenDSA-server/ODSA-django/openpop/build/listadttest/javaSource/output","read , write";
+
+permission java.io.FilePermission "/home/OpenDSA-server/ODSA-django/openpop/build/listadttest/javaSource/compilationerrors","read , write";
+
+permission java.io.FilePermission "/home/OpenDSA-server/ODSA-django/openpop/build/listadttest/javaSource/runerrors","read , write";
+
+permission java.io.FilePermission "/home/OpenDSA-server/ODSA-django/openpop/build/listadttest/javaSource/studentlistadttest.java","read , write , execute";
+};
+

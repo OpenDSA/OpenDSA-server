@@ -61,7 +61,7 @@ public class studentrectest
 public static int largest(int[] numbers, int index) {
  if(index==numbers.length-1)
    {
-    return numbers[index]
+    return numbers[index];
    }
  else if(numbers[index] > numbers[index+1]) {
     numbers[index+1] = numbers[index];
