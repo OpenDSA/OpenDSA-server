@@ -123,7 +123,7 @@ def setparameters(exerciseName, data, generatedList ):
 #  All Programming exercises are compiled and run through the following function
 def assessprogkaex(data, testfoldername, testfilenamep, generatedList ):
     # live server
-    #filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername
+    #filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
 
     # testing server
     filesPath = '/home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
@@ -159,6 +159,9 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList ):
    
     if os.path.isfile(filesPath +'runerrors.out'):
        os.remove(filesPath + 'runerrors.out')
+    
+    if os.path.isfile(filesPath +'newpolicy.policy'):
+       os.remove(filesPath + 'newpolicy.policy')
 
    
     # Saving the submitted/received code in the studentrectest.java file by copying the preorder + studentcode +}
@@ -170,8 +173,18 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList ):
     answer.write(data)
     answer.write("}")
     answer.close()
-    print filesPath
-    print studentfilename
+    
+
+    # create the policy file on the fly instead of having a static copy per exercise
+    policyfile = open(filesPath+"newpolicy.policy" , 'w')
+    policyfile.write('grant codeBase "file:'+ filesPath +'*" {')
+    policyfile.write('permission java.io.FilePermission "'+ filesPath +'output","read , write";')
+    policyfile.write('permission java.io.FilePermission "'+ filesPath +'compilationerrors","read , write";')
+    policyfile.write('permission java.io.FilePermission "'+ filesPath +'runerrors","read , write";')
+    policyfile.write('permission java.io.FilePermission "'+ filesPath + studentfilename +'","read , write , execute";')
+    policyfile.write('};')
+    policyfile.close()
+
     # Setting the DISPLAY then run the processing command to test the submitted code
     proc1 = subprocess.Popen(" cd "+ filesPath +"; javac "+studentfilename+" 2> "+filesPath + "compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy student"+testfilenamep+" 2> " + filesPath +"runerrors.out", stdout=subprocess.PIPE, shell=True)
    
