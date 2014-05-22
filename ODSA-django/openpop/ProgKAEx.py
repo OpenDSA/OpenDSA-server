@@ -123,10 +123,10 @@ def setparameters(exerciseName, data, generatedList ):
 #  All Programming exercises are compiled and run through the following function
 def assessprogkaex(data, testfoldername, testfilenamep, generatedList ):
     # live server
-    #filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
+    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
 
     # testing server
-    filesPath = '/home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
+    #filesPath = '/home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
     
     testfilename = testfilenamep+".java"
     studentfilename = "student"+testfilename
