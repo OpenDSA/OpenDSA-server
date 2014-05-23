@@ -1,0 +1,3 @@
+Exception in thread "main" java.lang.ArithmeticException: / by zero
+	at studentrecwbcrcprog.log(studentrecwbcrcprog.java:57)
+	at studentrecwbcrcprog.main(studentrecwbcrcprog.java:27)
