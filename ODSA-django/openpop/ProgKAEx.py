@@ -103,7 +103,7 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
 
 #  Set the testing folder and passed parameters to the programming exercise
 def setparameters(exerciseName, data, generatedList ):
-     #  Check from which programming exercise we got this request
+    # Check from which programming exercise we got this request
     if exerciseName == "BinaryTreePROG" : #count number of nodes
        feedback= assessprogkaex (data, "binarytreetest", "binarytreetest","")
 
@@ -113,8 +113,8 @@ def setparameters(exerciseName, data, generatedList ):
     elif exerciseName == "ListADTPROG":  #generate a list
        feedback= assessprogkaex(data , "listadttest", "listadttest" ,generatedList)
 
-    #recursion programming exercises
-    elif exerciseName == "recwbcprog":   
+    # Recursion programming exercises have the same folder with different subfolders. Where the subfolder is the exercise name
+    elif "rec" in exerciseName:   
        feedback= assessprogkaex(data,"rectest/"+exerciseName, exerciseName,"")
     return feedback   
 
@@ -123,10 +123,10 @@ def setparameters(exerciseName, data, generatedList ):
 #  All Programming exercises are compiled and run through the following function
 def assessprogkaex(data, testfoldername, testfilenamep, generatedList ):
     # live server
-    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
+    #filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
 
     # testing server
-    #filesPath = '/home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
+    filesPath = '/home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
     
     testfilename = testfilenamep+".java"
     studentfilename = "student"+testfilename
@@ -178,6 +178,7 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList ):
     # create the policy file on the fly instead of having a static copy per exercise
     policyfile = open(filesPath+"newpolicy.policy" , 'w')
     policyfile.write('grant codeBase "file:'+ filesPath +'*" {')
+    #policyfile.write('permission java.security.AllPermission;')
     policyfile.write('permission java.io.FilePermission "'+ filesPath +'output","read , write";')
     policyfile.write('permission java.io.FilePermission "'+ filesPath +'compilationerrors","read , write";')
     policyfile.write('permission java.io.FilePermission "'+ filesPath +'runerrors","read , write";')

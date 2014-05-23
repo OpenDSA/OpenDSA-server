@@ -8,32 +8,49 @@ import java.util.Random;
 
 public class studentrecwbcaprog
 {
- // The model answer of the largest number: the student is asked to write the base case
- public static int modellargest(int[] numbers, int index) {
-   if(index==numbers.length-1)
-   {
-     return numbers[index];
+
+   private static final String ALPHA_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+   
+  // The model answer of the print : the student is asked to write the base case action
+   public static String modelprint(String[] list, int index) { 
+       if (index < list.length) 
+         return list[index] + " "+ modelprint(list, index + 1) ;
+                        
+      return "";   
+ }
+  
+   /*public static String getAlphaNumeric(int len) {
+    StringBuffer sb = new StringBuffer(len);
+    for (int i = 0; i < len; i++) {
+     int ndx = (int) (Math.random() * ALPHA_NUM.length());
+     sb.append(ALPHA_NUM.charAt(ndx));
+    }
+    return sb.toString();
    }
-   else if(numbers[index] > numbers[index+1]) {
-     numbers[index+1] = numbers[index];
-   }
-    return modellargest(numbers,index+1);
- } 
- 
+  */
 
   public static void main(String [ ] args) {
     boolean SUCCESS = false;
     
-    // To test: generate a random array of length 10
-    Random randNumGenerator = new Random();
-    int[] numbers = new int[10];
-    for (int i=0; i< numbers.length; i++)
-    {
-       numbers[i] = (randNumGenerator.nextInt(100)+1);
-    }
-    int modelanswerlargest = largest(numbers, 0);    
-   
-    if (largest(numbers,0)  == modellargest(numbers,0)) SUCCESS = true;
+    // To test: generate a random array string of length 10
+    //String [] array = new String[10];
+    //for (int i=0 ; i<10 ; i++)
+   // {
+    // array[i]= getAlphaNumeric(5);
+   // }
+    // We need to redirect the  stream.out to a string
+    String [] array = {"Cheese", "Mushrooms", "Black Olives","Green Pepper"};
+
+    //OutputStream out = new ByteArrayOutputStream();
+    //System.setOut(new PrintStream(out));
+    //recursiveprint(array , 0);
+    //String sysout_content = out.toString();
+    //System.out.flush();
+    //modelprint(array, 0);
+    //String sysout_content2 = out.toString();
+    System.out.println(recursiveprint(array , 0));
+    System.out.println(modelprint(array, 0));
+    if (recursiveprint(array , 0).equals(modelprint(array, 0))) SUCCESS = true;
 
     try{
 
@@ -46,7 +63,7 @@ public class studentrecwbcaprog
      }
     else 
     {
-     output.println("Try Again! Incorrect Base case!");
+     output.println("Try Again! Incorrect Base case action!");
      output.close();
     }
   
