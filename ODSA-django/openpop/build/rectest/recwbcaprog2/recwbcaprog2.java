@@ -2,11 +2,13 @@
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
 
+//Exercise 2: Concatenate the values in an array named list and return it in one String. The values must be in the order of increasing subscript and seprated with a space.
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecwbcaprog
+
+public class studentrecwbcaprog2
 {
 
    private static final String ALPHA_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -48,8 +50,7 @@ public class studentrecwbcaprog
     //System.out.flush();
     //modelprint(array, 0);
     //String sysout_content2 = out.toString();
-    System.out.println(recursiveprint(array , 0));
-    System.out.println(modelprint(array, 0));
+   
     if (recursiveprint(array , 0).equals(modelprint(array, 0))) SUCCESS = true;
 
     try{
@@ -75,10 +76,3 @@ public class studentrecwbcaprog
   }
 
   
-public static String recursiveprint(String[] list, int index) { 
- if (index < list.length) 
-   return list[index] + " "+ recursiveprint(list, index + 1) ;
-
- return "";   
-}
-}

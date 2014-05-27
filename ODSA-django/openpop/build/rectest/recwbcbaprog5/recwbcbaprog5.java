@@ -1,29 +1,24 @@
 
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-
+//Exercise 5: multiply two  numbers x and y. (Assume both values given are positive.)
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecrcprog
+public class studentrecwbcbaprog5
 {
  // The model answer of the largest number: the student is asked to write the base case
- public static int modelOddRecursive(int n) {
-  if(n<=0)
-  {
-    return 0;    
-  }
-  if(n%2 != 0)
-  {
-    return (n+ modelOddRecursive(n-1));
-  }
-  else
-  {
-    return modelOddRecursive(n-1);
-  }
-      
-}
+ public static int modelmult(int x, int y) {
+
+    if ( x == 1 )
+    
+      return y;
+
+     else
+
+     return modelmult(x-1, y) + y;
+     }
  
 
   public static void main(String [ ] args) {
@@ -31,9 +26,10 @@ public class studentrecrcprog
     
     // To test: generate a random number
     Random randNumGenerator = new Random();
-    int n=  randNumGenerator.nextInt(100)+1;
-   
-    if ( addodd(n) == modelOddRecursive(n)) SUCCESS = true;
+    int x=  randNumGenerator.nextInt(100)+1;
+    int y=  randNumGenerator.nextInt(100)+1;
+
+    if ( mult(x,y) == modelmult(x,y)) SUCCESS = true;
 
     try{
 

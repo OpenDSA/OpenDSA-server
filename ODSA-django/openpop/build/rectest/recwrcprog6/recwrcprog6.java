@@ -1,39 +1,34 @@
 
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-
+//Exercise 5: multiply two  numbers x and y. (Assume both values given are positive.)
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecwbcprog
+public class studentrecwrcprog6
 {
  // The model answer of the largest number: the student is asked to write the base case
- public static int modellargest(int[] numbers, int index) {
-   if(index==numbers.length-1)
-   {
-     return numbers[index];
-   }
-   else if(numbers[index] > numbers[index+1]) {
-     numbers[index+1] = numbers[index];
-   }
-    return modellargest(numbers,index+1);
- } 
+ public static int modelpower(int x, int y) {
+  if ( x == 1 )
+
+   return y;
+
+  else
+
+   return power(x-1, y) * y;
+}
  
 
   public static void main(String [ ] args) {
     boolean SUCCESS = false;
     
-    // To test: generate a random array of length 10
+    // To test: generate a random number
     Random randNumGenerator = new Random();
-    int[] numbers = new int[10];
-    for (int i=0; i< numbers.length; i++)
-    {
-       numbers[i] = (randNumGenerator.nextInt(100)+1);
-    }
-    int modelanswerlargest = largest(numbers, 0);    
-   
-    if (largest(numbers,0)  == modellargest(numbers,0)) SUCCESS = true;
+    int x=  randNumGenerator.nextInt(100)+1;
+    int y=  randNumGenerator.nextInt(100)+1;
+
+    if ( power(x,y) == modelpower(x,y)) SUCCESS = true;
 
     try{
 

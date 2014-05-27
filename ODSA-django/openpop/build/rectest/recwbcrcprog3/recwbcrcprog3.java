@@ -1,16 +1,15 @@
 
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Finds the largest number in the array
-//computes logb n
+//Exercise 3: computes logb n
 
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecwbcrcprog
+public class studentrecwbcrcprog3
 { 
-  // The model answer of the print : the student is asked to write the base case action and the recursive call
+ 
    public static int modellog(int b, int n ) { 
 
    if ( b == n ) return 1;

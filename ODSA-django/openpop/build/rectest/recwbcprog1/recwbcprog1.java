@@ -1,14 +1,15 @@
 
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
+//Exercise 1: finds the largest number in the array named numbers.
 
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecwbcprog
+public class studentrecwbcprog1
 {
- // The model answer of the largest number: the student is asked to write the base case
+ 
  public static int modellargest(int[] numbers, int index) {
    if(index==numbers.length-1)
    {
@@ -58,14 +59,3 @@ public class studentrecwbcprog
   }
 
   
-public static int largest(int[] numbers, int index) {
-if(index==numbers.length-1)
-   {
-    return numbers[index];
-   }
- else if(numbers[index] > numbers[index+1]) {
-    numbers[index+1] = numbers[index];
-   }
- return largest(numbers,index+1);
-}
-}
