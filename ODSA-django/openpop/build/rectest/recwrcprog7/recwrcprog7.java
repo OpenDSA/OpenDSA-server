@@ -1,22 +1,23 @@
 
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Exercise 6: computes the value of y to the x power
+//Exercise 7: given 2 numbers, will find the sum of all the integers between them
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecwrcprog6
+public class studentrecwrcprog7
 {
  // The model answer of the largest number: the student is asked to write the base case
- public static int modelpower(int x, int y) {
-  if ( x == 1 )
+ public static int modelSum(int a, int b)
+{
+ if (a == b)
 
-   return y;
+  return a;
 
-  else
+else
 
-   return power(x-1, y) * y;
+  return modelSum(a,b-1) + b;
 }
  
 
@@ -28,7 +29,7 @@ public class studentrecwrcprog6
     int x=  randNumGenerator.nextInt(100)+1;
     int y=  randNumGenerator.nextInt(100)+1;
 
-    if ( power(x,y) == modelpower(x,y)) SUCCESS = true;
+    if ( Sum(x,y) == modelSum(x,y)) SUCCESS = true;
 
     try{
 

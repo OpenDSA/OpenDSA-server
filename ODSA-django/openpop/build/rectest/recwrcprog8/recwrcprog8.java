@@ -1,23 +1,26 @@
 
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Exercise 6: computes the value of y to the x power
+//Exercise 8: computes the factorial of n
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecwrcprog6
+public class studentrecwrcprog8
 {
- // The model answer of the largest number: the student is asked to write the base case
- public static int modelpower(int x, int y) {
-  if ( x == 1 )
-
-   return y;
-
-  else
-
-   return power(x-1, y) * y;
-}
+ 
+ public static int modelfact(int n)
+	  {
+	
+	   int result;
+	
+	   if(n==1)
+	
+	   return 1;
+	
+	  return modelfact(n-1) * n;
+	
+	 }
  
 
   public static void main(String [ ] args) {
@@ -25,10 +28,10 @@ public class studentrecwrcprog6
     
     // To test: generate a random number
     Random randNumGenerator = new Random();
-    int x=  randNumGenerator.nextInt(100)+1;
-    int y=  randNumGenerator.nextInt(100)+1;
+    int n=  randNumGenerator.nextInt(100)+1;
 
-    if ( power(x,y) == modelpower(x,y)) SUCCESS = true;
+
+    if ( fact(n) == modelfact(n)) SUCCESS = true;
 
     try{
 
