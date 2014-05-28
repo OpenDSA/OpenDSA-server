@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class studentrecwbcbaprog5
 {
- // The model answer of the largest number: the student is asked to write the base case
+ 
  public static int modelmult(int x, int y) {
 
     if ( x == 1 )
@@ -42,7 +42,7 @@ public class studentrecwbcbaprog5
      }
     else 
     {
-     output.println("Try Again! Incorrect Base case!");
+     output.println("Try Again! Incorrect Base case condition or base case action!");
      output.close();
     }
   

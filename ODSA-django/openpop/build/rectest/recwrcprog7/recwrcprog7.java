@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class studentrecwrcprog7
 {
- // The model answer of the largest number: the student is asked to write the base case
+
  public static int modelSum(int a, int b)
 {
  if (a == b)
@@ -42,7 +42,7 @@ else
      }
     else 
     {
-     output.println("Try Again! Incorrect Base case!");
+     output.println("Try Again! Incorrect recursive call!");
      output.close();
     }
   

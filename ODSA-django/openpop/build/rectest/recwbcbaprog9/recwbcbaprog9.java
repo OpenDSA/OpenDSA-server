@@ -1,37 +1,35 @@
 
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Exercise 8: computes the factorial of n
+//Exercise 9: computes the GCD of x and y
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecwrcprog8
+public class studentrecwbcbaprog9
 {
  
- public static int modelfact(int n)
-	  {
+ public static int modelGCD(int x, int y)
+ {
+ if ((x % y) == 0)
+  {
+   return y;
+  }   
+ else
+ {
+   return modelGCD (y, x % y);
+ }
+}
 	
-	   int result;
-	
-	   if(n==1)
-	
-	   return 1;
-	
-	  return modelfact(n-1) * n;
-	
-	 }
- 
-
   public static void main(String [ ] args) {
     boolean SUCCESS = false;
     
     // To test: generate a random number
     Random randNumGenerator = new Random();
-    int n=  randNumGenerator.nextInt(100)+1;
+    int x=  randNumGenerator.nextInt(100)+1;
+    int y=  randNumGenerator.nextInt(100)+1;
 
-
-    if ( fact(n) == modelfact(n)) SUCCESS = true;
+    if ( GCD(x,y) == modelGCD(x,y)) SUCCESS = true;
 
     try{
 
@@ -44,7 +42,7 @@ public class studentrecwrcprog8
      }
     else 
     {
-     output.println("Try Again! Incorrect recursive call!");
+     output.println("Try Again! Incorrect base case or base case action!");
      output.close();
     }
   

@@ -1,37 +1,39 @@
 
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Exercise 8: computes the factorial of n
+//Exercise 10: complete the mysrtrey function
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecwrcprog8
+public class studentrecwrcprog10
 {
  
- public static int modelfact(int n)
-	  {
-	
-	   int result;
-	
-	   if(n==1)
-	
-	   return 1;
-	
-	  return modelfact(n-1) * n;
-	
-	 }
- 
+ public static int modelmystery(int k) 
+ {
 
+  if (k <= 0) {
+
+   return 0;
+ }
+
+ else {
+ 
+  return k + mystery(k - 1);
+
+  }
+
+ }
+	
   public static void main(String [ ] args) {
     boolean SUCCESS = false;
     
     // To test: generate a random number
     Random randNumGenerator = new Random();
-    int n=  randNumGenerator.nextInt(100)+1;
+    int x=  randNumGenerator.nextInt(100)+1;
+   
 
-
-    if ( fact(n) == modelfact(n)) SUCCESS = true;
+    if ( mystery(x) == modelmystery(x)) SUCCESS = true;
 
     try{
 

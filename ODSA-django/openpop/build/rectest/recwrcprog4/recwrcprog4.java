@@ -46,7 +46,7 @@ public class studentrecwrcprog4
      }
     else 
     {
-     output.println("Try Again! Incorrect Base case!");
+     output.println("Try Again! Incorrect recursive call!");
      output.close();
     }
   

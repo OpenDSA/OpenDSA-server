@@ -36,7 +36,7 @@ public class studentrecwbcrcprog3
      }
     else 
     {
-     output.println("Try Again! Incorrect Base case action!");
+     output.println("Try Again! Incorrect Base case or recursive call!");
      output.close();
     }
   
