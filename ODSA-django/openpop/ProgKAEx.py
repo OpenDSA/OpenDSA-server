@@ -213,7 +213,10 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList ):
               print "line" + line
               if "at java.security.AccessControlContext.checkPermission" in line:
                  feedback[1]= ["Try Again! Your solution shouldn't write files to the disk!"]
-                 return feedback    
+                 return feedback
+              elif 'Exception in thread "main" java.lang.StackOverflowError' in line:
+                 feedback[1]= ["Try Again! Your solution leads to infinite recursion!"]
+                 return feedback     
           runErrorFile.close()
           if os.stat(filesPath+'runerrors.out')[6]!=0:
              return feedback;
