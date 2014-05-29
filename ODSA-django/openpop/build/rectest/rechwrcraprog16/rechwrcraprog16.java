@@ -24,7 +24,7 @@ public class studentrechwrcraprog16
     Random randNumGenerator = new Random();
     int number=  randNumGenerator.nextInt(32);
 	
-    if (decibinary(number) .equals(modeldecibinary(number))) SUCCESS = true;
+    if (decibinary(number).equals(modeldecibinary(number))) SUCCESS = true;
 
     try{
 

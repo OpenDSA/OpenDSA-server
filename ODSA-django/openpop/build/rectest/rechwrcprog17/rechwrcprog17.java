@@ -1,30 +1,24 @@
-
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Exercise 1: finds the largest number in the array named numbers.
-
+//Exercise 17:  determines the minimum element in an array of integers
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecwbcprog1
+public class studentrechwrcprog17
 {
  
- public static int modellargest(int[] numbers, int index) {
-   if(index==numbers.length-1)
-   {
-     return numbers[index];
-   }
-   else if(numbers[index] > numbers[index+1]) {
-     numbers[index+1] = numbers[index];
-   }
-    return modellargest(numbers,index+1);
- } 
- 
-
+ public static  int modelrecursiveMin(int numbers[] , int startIndex)
+{ 
+  if(startIndex+1 == numbers.length)
+    return numbers[startIndex];
+  else
+    return Math.min(numbers[startIndex], modelrecursiveMin(numbers , startIndex+1));	
+}
+	  
   public static void main(String [ ] args) {
     boolean SUCCESS = false;
-    
+   
     // To test: generate a random array of length 10
     Random randNumGenerator = new Random();
     int[] numbers = new int[10];
@@ -32,9 +26,8 @@ public class studentrecwbcprog1
     {
        numbers[i] = (randNumGenerator.nextInt(100)+1);
     }
-    
-   
-    if (largest(numbers,0)  == modellargest(numbers,0)) SUCCESS = true;
+
+    if (recursiveMin(numbers,0)==modelrecursiveMin(numbers,0)) SUCCESS = true;
 
     try{
 
@@ -47,7 +40,7 @@ public class studentrecwbcprog1
      }
     else 
     {
-     output.println("Try Again! Incorrect Base case!");
+     output.println("Try Again! Incorrect recursive call!");
      output.close();
     }
   
