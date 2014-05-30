@@ -202,7 +202,8 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList ):
           if os.stat(filesPath+'compilationerrors.out')[6]!=0:
              feedback[1]= feedback[1]#.rsplit(':',1)[1]
              print feedback[1]
-             return feedback
+             if  feedback[1][0].find("Note:") == -1: # Ignore the warnings
+                return feedback
     if os.path.isfile(filesPath+'runerrors.out'):
        #Check what is returned from the test : what is inside the success file
           runErrorFile = open(filesPath+'runerrors.out' , 'r')
