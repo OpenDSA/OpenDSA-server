@@ -483,9 +483,11 @@ def exercise_summary(request, book, course):
         columns_list_exe = []  #for exercises
         columns_list.append({"sTitle":"Id"})
         columns_list.append({"sTitle":"Username"})
+        columns_list.append({"sTitle":"Email"})
         columns_list.append({"sTitle":"Points"})
         columns_list1.append({"sTitle":"Id"})
         columns_list1.append({"sTitle":"Username"})
+        columns_list1.append({"sTitle":"Email"})
         columns_list1.append({"sTitle":"Points"})
         #get list of book assignments
         assignments_list = Assignments.objects.select_related().filter( \
@@ -494,29 +496,22 @@ def exercise_summary(request, book, course):
         assignments_points_list = []
         students_assignment_points = []
         u_book = UserBook.objects.filter(book = obj_book)
-        #exercises_ = {}
         exe_bme = {}
         assign_exe = {}
-        #user_exe_tab = {}
         for assignment in assignments_list:
             columns_list.append({"sTitle":str(assignment.course_module.name)})
             columns_list1.append({"sTitle":str(assignment.course_module.name)})
             assign_exe[assignment.course_module.name] = assignment.get_exercises()
-            #for exercise in assignment.get_exercises():
             for exercise in assign_exe[assignment.course_module.name]:
                 if BookModuleExercise.components.filter( \
                                          book = obj_book, \
                                          exercise = exercise).count() == 0:
                     continue
-                #exercises_[exercise.id] = exercise
                 bexe = BookModuleExercise.components.filter( \
                                                book = obj_book, \
                                                exercise = exercise)[0]
                 exe_bme[exercise.name] = bexe
   
-                #user_exe_tab[exercise.name] = UserExercise.objects.filter( \
-                #                                user__in = u_book, \
-                #                                exercise = exercise)
                 columns_list.append({"sTitle":str(exercise.name)+ \
                                          '('+str(bexe.points)+')'+ \
                                          '<span class="details" \
@@ -530,8 +525,6 @@ def exercise_summary(request, book, course):
                                                      ).order_by('user')
         
         users = []
-        #exe_bme = {}
-        #exercises_ = {}
         for userdata in userData:
             if not userdata.user.is_staff and display_grade( \
                                               userdata.user, obj_book):
@@ -539,10 +532,12 @@ def exercise_summary(request, book, course):
                 u_data = []
                 u_data.append(0)
                 u_data.append(str(userdata.user.username))
+                u_data.append(str(userdata.user.email))
                 u_data.append(0)
                 u_data1 = []
                 u_data1.append(0)
                 u_data1.append(str(userdata.user.username))
+                u_data1.append(str(userdata.user.email))
                 u_data1.append(0)
 
                 for assignment in assignments_list:
@@ -556,7 +551,6 @@ def exercise_summary(request, book, course):
                     for exercise in assign_exe[assignment.course_module.name]:
                         bexe = exe_bme[exercise.name]
                         u_ex = None
-                        #u_ex = getUserExercise(userdata.user, user_exe_tab[exercise.name])
                         user_exe = UserExercise.objects.filter( \
                                                 user = userdata.user, \
                                                 exercise = exercise)
@@ -617,9 +611,9 @@ def exercise_summary(request, book, course):
                     u_data = u_data + u_assign
                     u_data1.append(str(students_assignment_points))
 
-                u_data[2] = str(u_points )
+                u_data[3] = str(u_points )
                 udata_list.append(u_data)
-                u_data1[2] = str(u_points )
+                u_data1[3] = str(u_points )
                 udata_list1.append(u_data1) 
 
 
