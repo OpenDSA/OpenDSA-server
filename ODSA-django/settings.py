@@ -1,6 +1,6 @@
 # Django settings for aaltoplus project.
 import os
-
+import conf
 
 # Lines for Celery.
 import djcelery
@@ -37,9 +37,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',         #g3et_path('test.db'),            # Or path to database file if using sqlite3.
-        'USER': '',                  # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
+        'NAME': conf.name,         #g3et_path('test.db'),            # Or path to database file if using sqlite3.
+        'USER': conf.user,                  # Not used with sqlite3. dbadmin
+        'PASSWORD': conf.password,                  # Not used with sqlite3. vis4_dsa
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -84,7 +84,8 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    "/home/aalto/aaltoplus/assets"
+    "/home/efouh/OpenDSA-server/ODSA-django/assets/",
+    #"/home/aalto/aaltoplus/assets"
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -104,7 +105,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'hf7nbgeuz8(y+&9&(7fy62aiw-5djxhfm+n4#f38*)^_-*#6e%'
+SECRET_KEY = conf.secret_key 
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -156,9 +157,9 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
-STATICFILES_DIRS = (
-    get_path("assets"),
-)
+#STATICFILES_DIRS = (
+#    get_path("assets"),
+#)
 
 INSTALLED_APPS = (
     'oauth_provider',
