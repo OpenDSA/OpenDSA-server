@@ -116,8 +116,8 @@ def get_widget_data():
         print "error ({0}) written file : {1}".format(e.errno, e.strerror)
 
     w_table = {}
-    w_table['exercises'] = int(exe)  # + int(old_logs['exercises'])
-    w_table['users'] = int(user) + int(old_logs['users'])
+    w_table['exercises'] = int(exe)  + 573059# + int(old_logs['exercises'])
+    w_table['users'] = int(user) + int(old_logs['users']) + 1115
 
     #write data into a file
     try:

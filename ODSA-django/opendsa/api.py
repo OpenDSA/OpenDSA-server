@@ -358,7 +358,7 @@ class ExerciseResource(ModelResource):
                         'load-ka',
                         text,
                         time.time()*1000,
-                        None,
+                        00000,
                         request.user_agent.browser.family,
                         request.user_agent.browser.version_string,
                         request.user_agent.os.family,
@@ -976,7 +976,8 @@ class ModuleResource(ModelResource):
                     with transaction.commit_on_success():
                         kbook, added = Books.objects.get_or_create(\
                                        book_name= request.POST['book'], 
-                                       book_url = request.POST['url'])
+                                       book_url = request.POST['url'],
+                                       creation_date = datetime.datetime.now())
                         ubook, created = UserBook.objects.get_or_create(\
                                          user=kusername, 
                                          book=kbook)
