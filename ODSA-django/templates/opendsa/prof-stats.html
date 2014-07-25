@@ -1,0 +1,44 @@
+{% extends "odsa_base.html" %}
+    {% block head %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/media/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/TableTools.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/ZeroClipboard.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/FixedHeader/js/FixedHeader.min.js"></script>
+    <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/media/css/demo_page.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/media/css/demo_table.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/extras/TableTools/media/css/TableTools.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}opendsa/css/activity.css" rel="stylesheet" media="screen" />
+     {% endblock %}
+    {% block maintitle %}
+    <h1>OpenDSA Statistics</h1>
+    {% endblock %}
+  {% block content %}
+     <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            $('#demo').html( '<table cellpadding="0" cellspacing="1" border="1" class="display" id="example"></table>' );
+            var oTable = $('#example').dataTable( {
+                "sDom": 'T<"clear">lfrtip',
+                "oTableTools": {
+                        "sSwfPath": "{{ STATIC_URL }}datatables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf"
+                },
+                "bPaginate": false,
+                "aaData": {{ daily_stats|safe  }},
+                "aoColumns": [{"sTitle":"Number PostProf"},{"sTitle":"Proficiency Date"},{"sTitle":"Book"},{"sTitle":"Student ID"},{"sTitle":"Type"},{"sTitle":"Exercise"}],
+                "aaSorting": [[2,"asc"]]
+            } );
+            $("th").css("background-color","rgba(255,255,255,1)");
+            new FixedHeader( oTable);
+        } );
+  </script>
+    <div id="demo">
+    
+
+    </div>
+  {% endblock %}
+
+

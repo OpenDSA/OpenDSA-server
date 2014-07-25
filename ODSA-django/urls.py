@@ -2,7 +2,7 @@
 from views import login,  verify_credentials #home
 from oauth_provider.views import protected_resource_example
 
-from opendsa.views import exercise_summary, daily_summary, all_statistics, widget_data, home, add_or_edit_assignment, class_students, student_management, rebuild_book_assignments, merged_book, delete_assignment, mobile_devices 
+from opendsa.views import exercise_summary, daily_summary, all_statistics, widget_data, home, add_or_edit_assignment, class_students, student_management, rebuild_book_assignments, merged_book, delete_assignment, mobile_devices, prof_statistics 
 from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail, non_required_exercise_use, total_module_time, slideshow_cheating, work_order, skipping_text, slideshow_stats, time_required, cheating_exercises, work_distribution
 # Django
 from django.conf.urls.defaults import *
@@ -32,6 +32,7 @@ urlpatterns = patterns('',
     url(r'^developer_view/exercises_stat/$', exercises_stat),
     url(r'^developer_view/daily_stat/$', daily_summary),
     url(r'^developer_view/stats/$', all_statistics),
+    url(r'^developer_view/prof_data/$', prof_statistics),
     url(r'^developer_view/widget/$', widget_data),
     url(r'^developer_view/mobility/$', mobile_devices),
     url(r'^developer_view/non_required_exercise_use/$', non_required_exercise_use),

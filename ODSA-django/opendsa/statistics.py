@@ -128,6 +128,91 @@ def get_widget_data():
         print "error ({0}) written file : {1}".format(e.errno, e.strerror)
 
 
+def post_proficiency():
+    #detailed data on post proficiency
+
+    users_pp_logs=[]
+
+    #get books and courses
+    all_books_courses = Books.objects.raw('''SELECT `id`, `books_id`, `courseinstance_id` 
+                                             FROM `opendsa_books_courses` 
+                                         ''' ) 
+
+
+    for abc in all_books_courses:
+
+        #get course instance
+        book_course =  Books.objects.raw('''SELECT `id`, `instance_name`
+                                             FROM `course_courseinstance` 
+                                             WHERE `id`=%s
+                                         ''', [abc.courseinstance_id] )
+
+
+        #get exercises in the book
+        exercise_book = Books.objects.raw('''SELECT id, exercise_id
+                                                      FROM `opendsa_bookmoduleexercise`
+                                                      WHERE `book_id`=%s
+                                                   ''',[abc.books_id])
+
+        #get students id
+        user_book = UserBook.objects.raw('''SELECT `id`, `user_id` FROM `opendsa_userbook`
+                                            WHERE `book_id`=%s
+                                        ''',[abc.books_id])        
+        for ub in user_book:
+            for eb in exercise_book:
+                exercise_data = Exercise.objects.raw('''SELECT `id`, `name`, `ex_type` 
+                                                        FROM `opendsa_exercise`
+                                                        WHERE `id`=%s
+                                                     ''',[eb.exercise_id])
+
+                user_prof_date = UserExercise.objects.raw('''SELECT `id`, `proficient_date` FROM `opendsa_userexercise`
+                                                             WHERE `user_id`=%s AND `exercise_id`=%s
+                                                          ''',[ub.user_id,eb.exercise_id])
+                
+
+                for upd in user_prof_date:
+                    pp_logs={}
+                    pp_logs['book'] = ''
+                    pp_logs['student'] = 0
+                    pp_logs['exercise'] = ''
+                    pp_logs['type'] = ''
+                    pp_logs['prof_date']= ''
+                    pp_logs['number_pp'] = 0
+
+                    for bc in book_course:
+                        pp_logs['book'] = str(bc.instance_name)
+
+                    pp_logs['student'] = int(ub.user_id)
+                    for ed in exercise_data:
+                        pp_logs['exercise'] = str(ed.name)
+                        pp_logs['type'] = str(ed.ex_type)
+
+                    pp_logs['prof_date']= str(upd.proficient_date)
+       
+                    exe_prof_data = UserExerciseLog.objects.raw('''SELECT `id`, COUNT( * ) AS numb_pp
+                                                                FROM  `opendsa_userexerciselog`
+                                                                WHERE `user_id`=%s and `exercise_id`=%s
+                                                                       and `time_done`>%s 
+                                                                ''',[ub.user_id,eb.exercise_id,upd.proficient_date])
+                    for epd in exe_prof_data:
+                        pp_logs['number_pp'] = int(epd.numb_pp)
+
+
+                    users_pp_logs.append(pp_logs)
+
+        #write data into a file
+    try:
+        users_pp_logs = str(users_pp_logs).replace("'",'"')
+        users_pp_logs = users_pp_logs.replace("[","").replace("]","")
+        users_pp_logs = '[' + users_pp_logs + ']'
+        ofile = open(settings.MEDIA_ROOT + 'proficiency_stats.json','w') #'ab+')
+        ofile.writelines(str(users_pp_logs).replace("'",'"'))
+        ofile.close
+    except IOError as e:
+        print "error ({0}) written file : {1}".format(e.errno, e.strerror)
+    return users_pp_logs
+
+
 def devices_analysis():
     #mobile devices analysis
     pc_only_users = User.objects.raw('''SELECT  `id` , COUNT( * ) AS pc_only
@@ -400,7 +485,7 @@ def exercises_logs():
         all_daily_logs = all_daily_logs.replace("[","").replace("]","")
         all_daily_logs = '[' + all_daily_logs + ']' 
         
-        ofile = open(settings.MEDIA_ROOT + 'daily_stats.json','w') #'ab+')
+        ofile = open(settings.MEDIA_ROOT + 'daily_stats1.json','w') #'ab+')
         ofile.writelines(str(all_daily_logs).replace("'",'"'))
         ofile.close
     except IOError as e:
