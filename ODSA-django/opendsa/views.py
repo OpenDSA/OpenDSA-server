@@ -17,7 +17,7 @@ from opendsa.models import Exercise, UserExercise, Books, \
 from opendsa.statistics import is_authorized, convert, \
                                is_file_old_enough, get_widget_data, \
                                exercises_logs, display_grade,create_book_file, \
-                               devices_analysis 
+                               devices_analysis,  post_proficiency 
 from opendsa.forms import AssignmentForm, StudentsForm, \
                           DelAssignmentForm
 
@@ -260,6 +260,37 @@ def daily_summary(request):
     context = RequestContext(request, {'daily_stats': str(settings.MEDIA_URL \
                                                       + 'daily_stats.json')})
     return render_to_response("opendsa/daily-ex-stats.html", context)
+
+
+def prof_statistics(request):
+    """
+    we only run the whole stats computaion if the statistic
+    file is older than an hour
+    """
+    stat_file = str(settings.MEDIA_ROOT + 'proficiency_stats.json')
+    statbuf = os.stat(stat_file)
+    last_modif = datetime.datetime.fromtimestamp(statbuf.st_mtime)
+    diff = datetime.datetime.now() - last_modif
+    data = []
+    if  diff > datetime.timedelta(0, 86400, 0):
+        context = RequestContext(request, {'daily_stats': post_proficiency() })
+    else:
+        try:
+            f_handle = open(stat_file)
+            logs = convert(json.load(f_handle))
+            for t_log in logs:
+                data_0 = []
+                for key, value in t_log.iteritems():
+                    data_0.append(value)
+                data.append(data_0)
+            f_handle.close()
+        except IOError as f_error:
+            print "error ({0}) reading file : {1}".format(f_error.errno, \
+                                                          f_error.strerror)
+
+        context = RequestContext(request, {'daily_stats': data})
+    return render_to_response("opendsa/prof-stats.html", context)
+
 
 def all_statistics(request):
     """
