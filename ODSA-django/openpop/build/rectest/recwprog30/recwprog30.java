@@ -1,46 +1,55 @@
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Exercise 30: Old merchants problem. Find out if a certain target weight can be measured or not
+//Exercise 30: Stack Sorting
 
 import java.io.*;
-import java.util.Vector;
+import java.util.Stack;
 
 public class studentrecwprog30
 {
 
-public static boolean modelRecIsMeasurable(int target, Vector<Integer> weights, int index)
+public static void modelstacksort(Stack S1, Stack S2)
 {
-		
-if (target == 0)
-{
-return true;
-}
-if (index >= weights.size())
-{
-return false;
-}
-return modelRecIsMeasurable(target + weights.elementAt(index), weights, index +1)|| modelRecIsMeasurable(target, weights, index + 1)||modelRecIsMeasurable(target - weights.elementAt(index), weights,index+ 1);
-		
+  int temp;
+  while(! S1.empty())
+  { temp= (Integer) S1.pop();
+    while(! S2.empty() && (Integer) S2.peek() < temp) 
+    {
+      S1.push(S2.pop());
+    }
+   S2.push(temp);
+  		
+  }
 }
 
  public static void main(String [ ] args) 
 {
   
-    boolean SUCCESS1 = false;
-    boolean SUCCESS2 = false;
+    boolean SUCCESS = false;
 
-    Vector<Integer> vector = new Vector<Integer>(); 
-    vector.add(1);
-    vector.add(2);
-    vector.add(3);
+    Stack S1 = new Stack();
+    Stack S2 = new Stack();
+    Stack A = new Stack();
+    Stack B = new Stack();
+    
+    S1.push(new Integer(2));
+    S1.push(new Integer(4));
+    S1.push(new Integer(1));
 
-    if (RecIsMeasurable(5, vector, 0)== modelRecIsMeasurable(5, vector, 0)) SUCCESS1 = true;
-    if (RecIsMeasurable(10, vector, 0)== modelRecIsMeasurable(10, vector, 0)) SUCCESS2 = true;
+    A.push(new Integer(2));
+    A.push(new Integer(4));
+    A.push(new Integer(1));
+
+    modelstacksort(S1, S2);
+    stacksort(A, B);
+    
+    if (S2.equals(B)) SUCCESS = true;
+    
     try{
 
      PrintWriter output = new PrintWriter("output");
 
-     if (SUCCESS1 && SUCCESS2) { 
+     if (SUCCESS) { 
    
       output.println("Well Done!");
       output.close();

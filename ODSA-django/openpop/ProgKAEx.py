@@ -26,10 +26,13 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     
     data = request_post.get('code') 
     generatedList =request_post.get('genlist')
+
+    checkDefinedvar= request_post.get('checkdefvar')
+
     data = ''.join([x for x in data if ord(x) < 128]) 
     exerciseName = request_post.get('sha1')
     
-    feedback= setparameters(exerciseName, data, generatedList)
+    feedback= setparameters(exerciseName, data, generatedList, checkDefinedvar)
      
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         dt_now = datetime.datetime.now()
@@ -102,26 +105,26 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  Set the testing folder and passed parameters to the programming exercise
-def setparameters(exerciseName, data, generatedList ):
+def setparameters(exerciseName, data, generatedList, checkDefinedvar ):
     # Check from which programming exercise we got this request
     if exerciseName == "BinaryTreePROG" : #count number of nodes
-       feedback= assessprogkaex (data, "binarytreetest", "binarytreetest","")
+       feedback= assessprogkaex (data, "binarytreetest", "binarytreetest","",checkDefinedvar)
 
     elif exerciseName == "BTLeafPROG" :  #count number of leaf nodes
-       feedback= assessprogkaex (data , "btleaftest", "btleaftest","")      
+       feedback= assessprogkaex (data , "btleaftest", "btleaftest","", checkDefinedvar)      
 
     elif exerciseName == "ListADTPROG":  #generate a list
-       feedback= assessprogkaex(data , "listadttest", "listadttest" ,generatedList)
+       feedback= assessprogkaex(data , "listadttest", "listadttest" ,generatedList, checkDefinedvar)
 
     # Recursion programming exercises have the same folder with different subfolders. Where the subfolder is the exercise name
     elif "rec" in exerciseName:   
-       feedback= assessprogkaex(data,"rectest/"+exerciseName, exerciseName,"")
+       feedback= assessprogkaex(data,"rectest/"+exerciseName, exerciseName,"",checkDefinedvar)
     return feedback   
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  All Programming exercises are compiled and run through the following function
-def assessprogkaex(data, testfoldername, testfilenamep, generatedList ):
+def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefinedvar ):
     # live server
     filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
 
@@ -130,7 +133,9 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList ):
     
     testfilename = testfilenamep+".java"
     studentfilename = "student"+testfilename
-    
+
+ 
+    print testfilenamep
     # count the number of lines in the original test file so that we can have the error shown to the student with respect to the student's code
     TestFile = open(filesPath+testfilename , 'r')
     with TestFile:
@@ -139,7 +144,16 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList ):
     print i+1 
     
     feedback=[False, 'null', i+1 , studentfilename , 'class '+ studentfilename]
-            
+    datatypes= ["float ", "double ", "char "]
+
+    if testfilenamep == "recwprog30":
+       if data.count("int ") > 1 or (any( x in data for x in datatypes)):
+          feedback[1]= ["Try Again! You should not declare any variables!"]
+          return feedback
+
+    # Check if the student decalred extra variables
+    #if   checkDefinedvar[0] == "True":
+    #print "check=" checkDefinedvar
     #cleaning: deleting already created files
     if generatedList != 'null':
        if os.path.isfile(filesPath +'generatedlist'):
