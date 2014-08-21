@@ -146,10 +146,6 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
     feedback=[False, 'null', i+1 , studentfilename , 'class '+ studentfilename]
     datatypes= ["float ", "double ", "char "]
 
-    if testfilenamep == "recwprog30":
-       if data.count("int ") > 1 or (any( x in data for x in datatypes)):
-          feedback[1]= ["Try Again! You should not declare any variables!"]
-          return feedback
 
     # Check if the student decalred extra variables
     #if   checkDefinedvar[0] == "True":
@@ -218,6 +214,12 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
              print feedback[1]
              if  feedback[1][0].find("Note:") == -1: # Ignore the warnings
                 return feedback
+
+    if testfilenamep == "recwprog30":
+       if data.count("int ") > 1 or (any( x in data for x in datatypes)):
+          feedback[1]= ["Try Again! You should not declare any variables!"]
+          return feedback
+
     if os.path.isfile(filesPath+'runerrors.out'):
        #Check what is returned from the test : what is inside the success file
           runErrorFile = open(filesPath+'runerrors.out' , 'r')
