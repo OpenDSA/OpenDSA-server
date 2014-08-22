@@ -106,17 +106,20 @@ def get_widget_data():
 
     #number of registered attempted
     user = User.objects.filter(is_staff=0).count()
-
+    old_logs = {}
+    old_logs['users'] = 0 
+    old_logs['exe'] = 0
     #get data from old databse
     try:
         old_handle = open(settings.MEDIA_ROOT + 'widget_stats1.json')
         old_logs = convert(json.load(old_handle))
+        old_logs['exe'] = 573059
         old_handle.close
     except IOError as e:
         print "error ({0}) written file : {1}".format(e.errno, e.strerror)
 
     w_table = {}
-    w_table['exercises'] = int(exe)  + 573059# + int(old_logs['exercises'])
+    w_table['exercises'] = int(exe)  + int(old_logs['exe'])
     w_table['users'] = int(user) + int(old_logs['users']) + 1115
 
     #write data into a file
