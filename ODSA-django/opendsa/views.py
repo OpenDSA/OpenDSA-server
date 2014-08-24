@@ -515,16 +515,16 @@ def exercise_summary(request, book, course):
         columns_list.append({"sTitle":"Id"})
         columns_list.append({"sTitle":"Username"})
         columns_list.append({"sTitle":"Email"})
-        columns_list.append({"sTitle":"Points"})
+        columns_list.append({"sTitle":"Score(%)"})
         columns_list1.append({"sTitle":"Id"})
         columns_list1.append({"sTitle":"Username"})
         columns_list1.append({"sTitle":"Email"})
-        columns_list1.append({"sTitle":"Points"})
+        columns_list1.append({"sTitle":"Score(%)"})
         #get list of book assignments
         assignments_list = Assignments.objects.select_related().filter( \
                            assignment_book=obj_book).order_by( \
                                 'course_module__closing_time')
-        assignments_points_list = []
+        max_assignments_points = 0
         students_assignment_points = []
         u_book = UserBook.objects.filter(book = obj_book)
         exe_bme = {}
@@ -542,6 +542,8 @@ def exercise_summary(request, book, course):
                                                book = obj_book, \
                                                exercise = exercise)[0]
                 exe_bme[exercise.name] = bexe
+
+                max_assignments_points += Decimal(bexe.points)
   
                 columns_list.append({"sTitle":str(exercise.name)+ \
                                          '('+str(bexe.points)+')'+ \
@@ -641,14 +643,16 @@ def exercise_summary(request, book, course):
                     u_assign[0] =  str(students_assignment_points)
                     u_data = u_data + u_assign
                     u_data1.append(str(students_assignment_points))
-
-                u_data[3] = str(u_points )
+                
+                u_points = (u_points * 100) / max_assignments_points 
+                u_data[3] = str("%.2f" % round(u_points,2))
                 udata_list.append(u_data)
-                u_data1[3] = str(u_points )
+                u_data1[3] = str("%.2f" % round(u_points,2))
                 udata_list1.append(u_data1) 
 
 
         context = RequestContext(request, {'book':book, \
+                                           'max_points':max_assignments_points, \
                                            'course':course, \
                                            'udata_list': udata_list, \
                                            'columns_list':columns_list, \
