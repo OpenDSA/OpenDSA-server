@@ -114,13 +114,14 @@ def get_widget_data():
         old_handle = open(settings.MEDIA_ROOT + 'widget_stats1.json')
         old_logs = convert(json.load(old_handle))
         old_logs['exe'] = 573059
+        old_logs['users'] = 1115
         old_handle.close
     except IOError as e:
         print "error ({0}) written file : {1}".format(e.errno, e.strerror)
 
     w_table = {}
     w_table['exercises'] = int(exe)  + int(old_logs['exe'])
-    w_table['users'] = int(user) + int(old_logs['users']) + 1115
+    w_table['users'] = int(user) + int(old_logs['users']) 
 
     #write data into a file
     try:
