@@ -494,50 +494,53 @@ class UserexerciseResource(ModelResource):
             actions = json.loads(key) 
             number_logs = 0
             for act in actions:
-                if 'score[total]' in request.POST:
-                    streak = request.POST['score[total]']
-                else:
-                    streak = 0
+              kusername = User.objects.get(username=act['user'])
+              if kusername:  
+                 if 'score[total]' in request.POST:
+                     streak = request.POST['score[total]']
+                 else:
+                     streak = 0
                  
-                with transaction.commit_on_success():
-                    kusername, created = User.objects.get_or_create(\
-                                                      username=act['user'])
+                 with transaction.commit_on_success():
+                    #kusername, created = User.objects.get_or_create(\
+                    #                                  username=act['user'])
+                     kusername = User.objects.get(username=act['user'])
 
-                if  Exercise.objects.filter(name=act['av']).count()==1:
-                    kexercise = Exercise.objects.get(name=act['av'])
-                else:
-                    with transaction.commit_on_success():
-                        kexercise = Exercise(name=act['av'], streak=streak)
-                        kexercise.save()
+                 if  Exercise.objects.filter(name=act['av']).count()==1:
+                     kexercise = Exercise.objects.get(name=act['av'])
+                 else:
+                     with transaction.commit_on_success():
+                         kexercise = Exercise(name=act['av'], streak=streak)
+                         kexercise.save()
 
-                with transaction.commit_on_success():
-                    kbook = Books.objects.get(book_name= act['book']) 
-                    user_data, created = UserData.objects.get_or_create(\
-                                                  user=kusername,book=kbook)
-                module = get_module(act['module'])
+                 with transaction.commit_on_success():
+                     kbook = Books.objects.get(book_name= act['book']) 
+                     user_data, created = UserData.objects.get_or_create(\
+                                                   user=kusername,book=kbook)
+                 module = get_module(act['module'])
 
-                if kexercise and module:
-                    with transaction.commit_on_success():
-                        user_module, exist = UserModule.objects.get_or_create(\
-                                      user=kusername, book=kbook,module=module)
-                    user_button, correct = log_button_action(
-                        kusername,
-                        kexercise,
-                        module,
-                        kbook,
-                        act['type'],
-                        act['desc'],
-                        act['tstamp'],
-                        act['uiid'],
-                        request.user_agent.browser.family,
-                        request.user_agent.browser.version_string,
-                        request.user_agent.os.family,
-                        request.user_agent.os.version_string,
-                        request.user_agent.device.family,
-                        request.META['REMOTE_ADDR'],
-                        )
-                    if correct:
-                        number_logs += 1
+                 if kexercise and module:
+                     with transaction.commit_on_success():
+                         user_module, exist = UserModule.objects.get_or_create(\
+                                       user=kusername, book=kbook,module=module)
+                     user_button, correct = log_button_action(
+                         kusername,
+                         kexercise,
+                         module,
+                         kbook,
+                         act['type'],
+                         act['desc'],
+                         act['tstamp'],
+                         act['uiid'],
+                         request.user_agent.browser.family,
+                         request.user_agent.browser.version_string,
+                         request.user_agent.os.family,
+                         request.user_agent.os.version_string,
+                         request.user_agent.device.family,
+                         request.META['REMOTE_ADDR'],
+                         )
+                     if correct:
+                         number_logs += 1
 
         if number_logs == len(actions):
             return self.create_response(request, {'success': True, \
