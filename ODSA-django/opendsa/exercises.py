@@ -276,7 +276,6 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                             user_data.all_proficient_exercises += \
                                         ",%s" % user_exercise.exercise.id
             else:
-                user_exercise.total_done += 1
                 user_exercise.progress = Decimal(user_exercise.streak)/\
                                          Decimal(user_exercise.exercise.streak)
         else:

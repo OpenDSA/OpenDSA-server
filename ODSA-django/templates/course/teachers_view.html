@@ -1,6 +1,7 @@
 {% extends "course/course_base.html" %}
 {% load i18n %}
 
+
 {% block coursecontent %}
 
 <h2>{% trans "Teachers' view" %}</h2>
@@ -12,6 +13,12 @@
     </thead>
     <tbody>
     <hr/>
+        <a href="{% url opendsa.views.create_accounts instance.course_modules.all.0.id %}" 
+           class="btn btn-success btn-mini">
+           <i></i> {% trans "Create students accounts" %}
+        </a>
+        <hr/>
+
         <a href="{% url opendsa.views.get_class_activity instance.course_modules.all.0.id %}" 
            class="btn btn-success btn-mini">
            <i></i> {% trans "Class activity" %}

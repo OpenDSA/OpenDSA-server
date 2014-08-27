@@ -2,8 +2,8 @@
 from views import login,  verify_credentials #home
 from oauth_provider.views import protected_resource_example
 
-from opendsa.views import exercise_summary, daily_summary, all_statistics, widget_data, home, add_or_edit_assignment, class_students, student_management, rebuild_book_assignments, merged_book, delete_assignment, mobile_devices, prof_statistics 
-from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail, non_required_exercise_use, total_module_time, slideshow_cheating, work_order, skipping_text, slideshow_stats, time_required, cheating_exercises, work_distribution
+from opendsa.views import exercise_summary, daily_summary, all_statistics, widget_data, home, add_or_edit_assignment, class_students, student_management, rebuild_book_assignments, merged_book, delete_assignment, mobile_devices, prof_statistics, student_work, students_data_home, create_accounts 
+from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail, non_required_exercise_use, total_module_time, slideshow_cheating, work_order, skipping_text, slideshow_stats, time_required, cheating_exercises, work_distribution  
 # Django
 from django.conf.urls.defaults import *
 from django.contrib import admin
@@ -28,9 +28,11 @@ urlpatterns = patterns('',
     url(r'^teacher_view/(?P<course_module_id>[\w]+)/$',class_students),
     url(r'^teacher_view/(?P<book>[\w]+)/(?P<course>[\w]+)/$', exercise_summary),
     url(r'^teacher_view/mb/(?P<book>[\w]+)/(?P<book1>[\w]+)/$', merged_book),
+    url(r'^students/accounts/(?P<module_id>[\w]+)/$', create_accounts),
 #    url(r'^student_view/(?P<student>[\w]+)/(?P<book>[\w]+)/$', module_list),
     url(r'^developer_view/exercises_stat/$', exercises_stat),
     url(r'^developer_view/daily_stat/$', daily_summary),
+    url(r'^developer_view/daily_stat/(?P<course_instance>[\w]+)/$', daily_summary),
     url(r'^developer_view/stats/$', all_statistics),
     url(r'^developer_view/prof_data/$', prof_statistics),
     url(r'^developer_view/widget/$', widget_data),
@@ -47,6 +49,9 @@ urlpatterns = patterns('',
     url(r'^developer_view/exercises_bargraph/$', exercises_bargraph),
     url(r'^developer_view/exercises_time/$', exercises_time),
     url(r'^developer_view/$', student_list),
+    url(r'^developer_view/students_stat/(?P<course_instance>[\w]+)/$', student_work),    
+    url(r'^developer_view/students_stat/$', student_work),
+    url(r'^developer_view/studs_stat/$', students_data_home),
     url(r'^developer_view/student_exercise/(?P<student>[\w]+)/$', student_exercise),
     url(r'^developer_view/exercise_list/(?P<student>[\w]+)/$', exercise_list),
     url(r'^developer_view/exercise_detail/(?P<student>[\w]+)/(?P<exercise>[\w]+)/$', exercise_detail),

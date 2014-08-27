@@ -1,0 +1,18 @@
+{% extends "course/course_base.html" %}
+{% load i18n %}
+
+{% block coursecontent %}
+<h2>{% trans "Create Students Accounts" %}</h2>
+<div class="well">
+    <form method="post" action="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p>
+            <input type="submit" class="btn btn-primary" value="{% trans "Create" %}" />
+        </p>
+    </form>
+</div>
+{% endblock %}
+
+
+

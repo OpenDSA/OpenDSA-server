@@ -19,11 +19,8 @@
         <h5>Class</h5>
         <select title="Classes" id="classlist">
             <option value="all">All</option>
-            <option value="egypt">CS223</option>
-            <option value="cao">CS3114a</option>
-            <option value="barnette">CS3114b</option>
-            <option value="finland">T1061220</option>
         </select>
+        <input type="submit" id="refresh-graph" class="refresh-graph" value="Update">
 </div>
 
 <div id="ex_input_container" style="width:1600px; margin: 40px auto;">
@@ -71,27 +68,54 @@ $(document).ready(function() {
 
     var chart;
     var url = classFile;   //"{{ daily_stats|safe }}";
+    var instance = "{{ instance|safe }}"
+    var courses = {{ courses|safe }};
+    
+    for (i=0; i<courses.length; i++){
+      $('<option/>').val(courses[i]).html(courses[i]).appendTo('#classlist');
+    }
 
+    if (instance!=="None"){
+      $('#classlist').val(instance);
+    }
+    else {
+       $('#classlist').val("All");
+    }
+
+    $('.refresh-graph').click(function() {
+      if ($("#classlist").val() !== "all") {
+        window.location =  $("#classlist").val();
+      }
+    });
 
     var setClass = function() { 
         var className = $("#classlist").val();
         $("#page-title").text(function(i, oldText) {
             return  "Daily Statistics"+" - "+ className;
         }); 
-        if (className=="egypt") {
-            classFile = "/media/daily_stats_egypt.json";    
+
+        if (className.toLowerCase() === "all") {
+          classFile = "/media/daily_stats.json";
         }
-        else if (className=="barnette") {
+        else if (className.toLowerCase()==="cs223") {
+            classFile = "/media/daily_stats_egypt.json";
+        }
+        else if (className.toLowerCase()==="cs3114b") {
             classFile = "/media/daily_stats_cs3114b.json";
         }
-        else if (className=="cao") {
+        else if (className.toLowerCase()==="cs2114a") {
             classFile = "/media/daily_stats_cs3114a.json";
         }
-        else if (className=="finland") {
+        else if (className.toLowerCase()==="t1061220") {
             classFile = "/media/daily_stats_t1061220.json";
         }
         else {
+          if (instance.toLowerCase()==="none") {
             classFile = "/media/daily_stats.json";
+          }
+          else {
+            classFile = "/media/daily_stats_" + instance.toLowerCase()  +".json";  
+          }
         }
 
     };

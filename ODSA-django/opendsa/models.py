@@ -245,7 +245,8 @@ class BookChapter (models.Model):
         if len(self.module_list)==0:
             self.module_list += '%s' % exid
         else:
-            self.module_list += ',%s' % exid
+            if exid not in self.module_list.split(','):
+                self.module_list += ',%s' % exid
     def get_modules_id(self):
         """
         Returns a list of the ids of all the modules in a chapter

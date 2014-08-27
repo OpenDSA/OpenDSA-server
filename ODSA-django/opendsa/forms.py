@@ -251,6 +251,16 @@ class StudentsForm(forms.ModelForm):
         exclude = ['book']
 
 
+class AccountsCreationForm(forms.ModelForm):
+    """
+    For to automatically create a specific number of students accounts
+    """
+    account_prefix = forms.CharField(label='Usernane Prefix', max_length=50)
+    account_number = forms.IntegerField(label='Number of accounts', min_value=1, max_value=1000)
+    class Meta:
+        model = UserBook
+        exclude = ['user', 'book', 'grade']
+
 class DelAssignmentForm(forms.ModelForm):
     """
     Form to delete a specific assignment

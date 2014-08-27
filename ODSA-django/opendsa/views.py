@@ -17,9 +17,9 @@ from opendsa.models import Exercise, UserExercise, Books, \
 from opendsa.statistics import is_authorized, convert, \
                                is_file_old_enough, get_widget_data, \
                                exercises_logs, display_grade,create_book_file, \
-                               devices_analysis,  post_proficiency 
+                               devices_analysis,  post_proficiency, students_logs 
 from opendsa.forms import AssignmentForm, StudentsForm, \
-                          DelAssignmentForm
+                          DelAssignmentForm, AccountsCreationForm
 
 from opendsa.exercises import getUserExercise
 # Django
@@ -30,13 +30,14 @@ from django.http import HttpResponseForbidden, \
 from course.context import CourseContext
 from django.template.context import RequestContext
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.forms.models import modelformset_factory
 from django.db.models import Q
 import datetime
 from django.conf import settings
-import os
-
+import os, random, string
+from django.core.mail import send_mail
 
 
 def home(request):
@@ -252,12 +253,20 @@ def delete_assignment(request, module_id):
 
 
 @login_required
-def daily_summary(request):
+def daily_summary(request, course_instance=None):
     """
     Daily statictics view
     """
-    #exercises_logs()
-    context = RequestContext(request, {'daily_stats': str(settings.MEDIA_URL \
+    courses_intances = CourseInstance.objects.all()
+
+    ci_List = []
+    for ci in courses_intances:
+      ci_List.append(str(ci.instance_name))
+
+    exercises_logs(course_instance)
+   
+ 
+    context = RequestContext(request, {'courses': ci_List, 'instance': course_instance,'daily_stats': str(settings.MEDIA_URL \
                                                       + 'daily_stats.json')})
     return render_to_response("opendsa/daily-ex-stats.html", context)
 
@@ -272,6 +281,7 @@ def prof_statistics(request):
     last_modif = datetime.datetime.fromtimestamp(statbuf.st_mtime)
     diff = datetime.datetime.now() - last_modif
     data = []
+    post_proficiency()
     if  diff > datetime.timedelta(0, 86400, 0):
         context = RequestContext(request, {'daily_stats': post_proficiency() })
     else:
@@ -676,5 +686,88 @@ def get_class_activity(request, module_id):
         return HttpResponseForbidden('<h1>No class activity</h1>') 
     return HttpResponseForbidden('<h1>No class activity</h1>')
 
+
+def student_work(request, course_instance=None):
+
+  if course_instance:
+    columns_list = []
+    columns_list.append({"sTitle":"Id"})
+    #columns_list.append({"sTitle":"Interactions"})
+    columns_list.append({"sTitle":"Total KA"})
+    columns_list.append({"sTitle":"Correct KA"})
+    columns_list.append({"sTitle":"Total KAV"})
+    columns_list.append({"sTitle":"Correct KAV"})
+    columns_list.append({"sTitle":"Total PE"})
+    columns_list.append({"sTitle":"Correct PE"})
+    columns_list.append({"sTitle":"Total SS"})
+    columns_list.append({"sTitle":"Correct SS"})
+    open_instances = CourseInstance.objects.all()
+
+    students_activity = students_logs(course_instance)
+    context = RequestContext(request, {'courseinstance':course_instance, \
+                                           'data': students_activity, \
+                                           'headers':columns_list, \
+                                           'open_instances': open_instances})
+    return render_to_response("opendsa/studentsdata.html", context)
+  else:
+    return HttpResponseForbidden('<h1>No class activity</h1>')
+
+
+def students_data_home(request):
+    """
+    The students data home view
+    """
+    open_instances = CourseInstance.objects.all()
+    context = RequestContext(request, {"open_instances": open_instances, \
+                                         'data': "[]", \
+                                         'headers':"[]", \
+                                         'courseinstance':'None'})
+    return render_to_response("opendsa/studentsdata.html", context)
+
+
+
+#utility function to generate passwords
+#see http://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+   return ''.join(random.choice(chars) for _ in range(size))
+
+@login_required
+def create_accounts(request, module_id):
+    """
+     Views responsible of creating students accounts
+     An email is sent to the course teachers at 
+     the end of the process
+    """
+
+    course_module = CourseModule.objects.get(id=module_id)
+
+    form = None
+    if request.method == 'POST':
+        form = AccountsCreationForm(request.POST)
+        current_user = request.user
+        roster = 'username,password\n'
+        if form.is_valid():
+            for x in range(0, form.cleaned_data['account_number']):
+                username = form.cleaned_data['account_prefix'] + str(x)
+                password = id_generator()
+                User.objects.create_user( username, '', password)
+                roster = roster + username + ',' + password + '\n'
+            messages.success(request, \
+                           _('Accounts created successfully. The roster has been emailed to %s.' %current_user.email))
+            #send notification email
+            subject = '[OpenDSA] Students accounts created'
+            message = 'List of accounts created.\n\n\n\n' + roster
+            send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', [current_user.email], fail_silently=False)
+
+    else:
+        form = AccountsCreationForm()
+
+
+    return render_to_response("opendsa/studentsaccounts.html",
+                              CourseContext(request, course_instance = \
+                                            course_module.course_instance, \
+                                            module=course_module, \
+                                            form=form, \
+                                             ))
 
 
