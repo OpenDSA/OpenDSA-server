@@ -250,10 +250,19 @@ class StudentsForm(forms.ModelForm):
         model = UserBook
         exclude = ['book']
 
+class AccountsUploadForm(forms.ModelForm):
+    """
+    Form to upload class roster 
+    """
+    classfile = forms.FileField(label="Select your class roster file")
+    class Meta:
+        model = UserBook
+        exclude = ['user', 'book', 'grade']
+
 
 class AccountsCreationForm(forms.ModelForm):
     """
-    For to automatically create a specific number of students accounts
+    Form to automatically create a specific number of students accounts
     """
     account_prefix = forms.CharField(label='Usernane Prefix', max_length=50)
     account_number = forms.IntegerField(label='Number of accounts', min_value=1, max_value=1000)

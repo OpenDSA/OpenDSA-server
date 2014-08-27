@@ -16,7 +16,11 @@
         <a href="{% url opendsa.views.create_accounts instance.course_modules.all.0.id %}" 
            class="btn btn-success btn-mini">
            <i></i> {% trans "Create students accounts" %}
+        </a>   |  <a href="{% url opendsa.views.upload_accounts instance.course_modules.all.0.id %}" 
+           class="btn btn-success btn-mini">
+           <i></i> {% trans "Upload students list" %}
         </a>
+        
         <hr/>
 
         <a href="{% url opendsa.views.get_class_activity instance.course_modules.all.0.id %}" 
