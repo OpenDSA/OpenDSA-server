@@ -2,7 +2,7 @@
 from views import login,  verify_credentials #home
 from oauth_provider.views import protected_resource_example
 
-from opendsa.views import exercise_summary, daily_summary, all_statistics, widget_data, home, add_or_edit_assignment, class_students, student_management, rebuild_book_assignments, merged_book, delete_assignment, mobile_devices, prof_statistics, student_work, students_data_home, create_accounts 
+from opendsa.views import exercise_summary, daily_summary, all_statistics, widget_data, home, add_or_edit_assignment, class_students, student_management, rebuild_book_assignments, merged_book, delete_assignment, mobile_devices, prof_statistics, student_work, students_data_home, create_accounts, upload_accounts 
 from opendsa.developerview import exercises_stat, exercises_bargraph, exercises_time, student_list, student_exercise, exercise_list, exercise_detail, non_required_exercise_use, total_module_time, slideshow_cheating, work_order, skipping_text, slideshow_stats, time_required, cheating_exercises, work_distribution  
 # Django
 from django.conf.urls.defaults import *
@@ -29,6 +29,7 @@ urlpatterns = patterns('',
     url(r'^teacher_view/(?P<book>[\w]+)/(?P<course>[\w]+)/$', exercise_summary),
     url(r'^teacher_view/mb/(?P<book>[\w]+)/(?P<book1>[\w]+)/$', merged_book),
     url(r'^students/accounts/(?P<module_id>[\w]+)/$', create_accounts),
+    url(r'^students/upload/(?P<module_id>[\w]+)/$', upload_accounts),
 #    url(r'^student_view/(?P<student>[\w]+)/(?P<book>[\w]+)/$', module_list),
     url(r'^developer_view/exercises_stat/$', exercises_stat),
     url(r'^developer_view/daily_stat/$', daily_summary),

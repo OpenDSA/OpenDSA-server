@@ -19,7 +19,8 @@ from opendsa.statistics import is_authorized, convert, \
                                exercises_logs, display_grade,create_book_file, \
                                devices_analysis,  post_proficiency, students_logs 
 from opendsa.forms import AssignmentForm, StudentsForm, \
-                          DelAssignmentForm, AccountsCreationForm
+                          DelAssignmentForm, AccountsCreationForm, \
+                          AccountsUploadForm
 
 from opendsa.exercises import getUserExercise
 # Django
@@ -29,6 +30,7 @@ from django.http import HttpResponseForbidden, \
                         HttpResponseRedirect
 from course.context import CourseContext
 from django.template.context import RequestContext
+from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
@@ -36,7 +38,7 @@ from django.forms.models import modelformset_factory
 from django.db.models import Q
 import datetime
 from django.conf import settings
-import os, random, string
+import os, random, string, csv
 from django.core.mail import send_mail
 
 
@@ -771,3 +773,50 @@ def create_accounts(request, module_id):
                                              ))
 
 
+
+@login_required
+def upload_accounts(request, module_id):
+    """
+     Views responsible of creating students accounts
+     the instructor upload his course roaster
+     An email is sent to each student 
+    """
+
+    course_module = CourseModule.objects.get(id=module_id)
+    book =  Books.objects.filter(courses=course_module.course_instance)[0]
+
+    form = None
+    if request.method == 'POST':
+        form = AccountsUploadForm(request.POST, request.FILES)
+        #current_user = request.user
+        if form.is_valid():
+                account_created = 0
+            #with open(request.FILES['classfile'], 'rb') as csvfile:
+                csvfile = request.FILES['classfile']
+                listreader = csv.reader(csvfile.read().splitlines())  #, delimiter=',', quotechar='|')
+                for row in listreader:
+                    username = row[0]
+                    email = row[1]
+                    password = id_generator()
+                    if User.objects.filter(username=username).count()==0:
+                        User.objects.create_user( username, email, password)
+                        account_created = account_created + 1
+                        #send notification email
+                        subject = '[OpenDSA] account created'
+                        message = 'Your OpenDSA account has been  created for the Book instance at %s.\n\n\n username: %s\n password:%s' %(book.book_url,username, password)
+                        send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', [email], fail_silently=False)
+
+
+                messages.success(request, \
+                           _('%s account(s) created successfully.' %account_created))
+
+    else:
+        form = AccountsUploadForm()
+
+
+    return render_to_response("opendsa/studentsupload.html",
+                              CourseContext(request, course_instance = \
+                                            course_module.course_instance, \
+                                            module=course_module, \
+                                            form=form, \
+                                             ))
