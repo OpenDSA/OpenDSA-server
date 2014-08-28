@@ -747,15 +747,18 @@ def create_accounts(request, module_id):
     if request.method == 'POST':
         form = AccountsCreationForm(request.POST)
         current_user = request.user
+        account_created = 0
         roster = 'username,password\n'
         if form.is_valid():
             for x in range(0, form.cleaned_data['account_number']):
                 username = form.cleaned_data['account_prefix'] + str(x)
                 password = id_generator()
-                User.objects.create_user( username, '', password)
-                roster = roster + username + ',' + password + '\n'
+                if User.objects.filter(username=username).count()==0:
+                    User.objects.create_user( username, '', password)
+                    account_created = account_created + 1
+                    roster = roster + username + ',' + password + '\n'
             messages.success(request, \
-                           _('Accounts created successfully. The roster has been emailed to %s.' %current_user.email))
+                           _('%s account(s) created successfully. The roster has been emailed to %s.' %(account_created, current_user.email)))
             #send notification email
             subject = '[OpenDSA] Students accounts created'
             message = 'List of accounts created.\n\n\n\n' + roster
