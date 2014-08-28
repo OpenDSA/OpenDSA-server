@@ -546,15 +546,15 @@ def students_logs( course=None):
       total_done_pe = 0
       total_done_ss = 0  
       stud_data.append(int(ub.user.id))
-      uxe = UserExercise.objects.filter(user=ub.user, proficient_date__gt=datetime.date(2013, 10, 1), proficient_date__lt=datetime.date(2013, 11, 12))
+      uxe = UserExercise.objects.filter(user=ub.user) #, proficient_date__gt=datetime.date(2013, 10, 1), proficient_date__lt=datetime.date(2013, 11, 12))
       #uxel = UserExerciseLog.objects.filter(user=ub.user, time_done__lt=datetime.date(2014, 10, 1))
       for ux_row in uxe:
         if ux_row.exercise.ex_type=="ka" and ux_row.exercise.id not in ka_exe_av and ux_row.exercise.id not in other_exe:
           total_correct_ka = total_correct_ka + int(ux_row.progress)
-          total_done_ka = total_done_ka +  UserExerciseLog.objects.filter(user=ub.user, exercise=ux_row.exercise, time_done__gt=datetime.date(2013, 10, 1), time_done__lt=datetime.date(2013, 11, 12)).count()
+          total_done_ka = total_done_ka +  UserExerciseLog.objects.filter(user=ub.user, exercise=ux_row.exercise).count() #, time_done__gt=datetime.date(2013, 10, 1), time_done__lt=datetime.date(2013, 11, 12)).count()
         if ux_row.exercise.id in ka_exe_av:
           total_correct_kav = total_correct_kav + int(ux_row.progress)
-          total_done_kav = total_done_kav +  UserExerciseLog.objects.filter(user=ub.user, exercise=ux_row.exercise, time_done__gt=datetime.date(2013, 10, 1), time_done__lt=datetime.date(2013, 11, 12)).count()
+          total_done_kav = total_done_kav +  UserExerciseLog.objects.filter(user=ub.user, exercise=ux_row.exercise).count() #, time_done__gt=datetime.date(2013, 10, 1), time_done__lt=datetime.date(2013, 11, 12)).count()
         if ux_row.exercise.ex_type=="pe":
           total_correct_pe = total_correct_pe + int(ux_row.total_correct)
           total_done_pe = total_done_pe + int(ux_row.total_done) 
