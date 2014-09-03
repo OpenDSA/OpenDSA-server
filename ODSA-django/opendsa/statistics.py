@@ -547,6 +547,35 @@ def glossary_logs(course=None):
     return glo_logs
   return None
 
+def terms_logs(course=None):
+  if course is not None:
+    # get book_id from course
+    obj_course = CourseInstance.objects.get(instance_name=course)
+    obj_book = Books.objects.filter(courses=obj_course)
+
+    glo_logs = []
+    glo_data = {}
+    #number of book users
+    ubook = UserBook.objects.filter(book=obj_book).count()
+    #glossary click
+    #glo_mod = Module.objects.get(name='Glossary')
+    glossaries = UserButton.objects.filter(book=obj_book, name='glossary-term-clicked')
+    for glo in glossaries:
+      json_data = glo.description
+      term = json_data['msg']
+      if term not in glo_data:
+        glo_data[term] = 1
+      else:
+         glo_data[term] = glo_data[term] + 1
+
+    #convert glo_data to list 
+    for key, value in glo_data.iteritems():
+      temp = [key,value]
+      glo_logs.append(temp)
+    return glo_logs
+  return None
+
+
 
 def students_logs( course=None):
 

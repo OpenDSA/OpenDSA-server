@@ -18,7 +18,7 @@ from opendsa.statistics import is_authorized, convert, \
                                is_file_old_enough, get_widget_data, \
                                exercises_logs, display_grade,create_book_file, \
                                devices_analysis,  post_proficiency, students_logs, \
-                               glossary_logs   
+                               glossary_logs, terms_logs   
 from opendsa.forms import AssignmentForm, StudentsForm, \
                           DelAssignmentForm, AccountsCreationForm, \
                           AccountsUploadForm
@@ -712,10 +712,17 @@ def glossary_module_data(request, course_instance=None):
     columns_list.append({"sTitle":"Glossary Term Clicks (W)"})
     open_instances = CourseInstance.objects.all()
 
+    columns_list1 = []
+    columns_list1.append({"sTitle":"Terms"})
+    columns_list1.append({"sTitle":"# Clicks"})
+
     glossary_activity = glossary_logs(course_instance)
+    term_activity = terms_logs(course_instance)
     context = RequestContext(request, {'courseinstance':course_instance, \
                                            'data': glossary_activity, \
+                                           'data1': term_activity, \
                                            'headers':columns_list, \
+                                           'headers1':columns_list1, \
                                            'open_instances': open_instances})
     return render_to_response("opendsa/glossarydata.html", context)
   else:

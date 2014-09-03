@@ -24,6 +24,7 @@
             var str = String({{ data|safe }});
             if (  str.length > 4) {
                $('#demo').html( '<table cellpadding="0" cellspacing="1" border="1" class="display" id="example"></table>' );
+               $('#demo1').html( '<table cellpadding="0" cellspacing="1" border="1" class="display" id="example1"></table>' );
                var oTable = $('#example').dataTable( {
                    "sDom": 'T<"clear">lfrtip',
                    "oTableTools": {
@@ -34,8 +35,23 @@
                    "aoColumns": {{ headers|safe }},
                    "aaSorting": [[1,"desc"]]
                } );
+
+               //Terms table
+               var oTable1 = $('#example1').dataTable( {
+                   "sDom": 'T<"clear">lfrtip',
+                   "oTableTools": {
+                           "sSwfPath": "{{ STATIC_URL }}datatables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf"
+                   },
+                   "bPaginate": false,
+                   "aaData": {{ data1|safe }},
+                   "aoColumns": {{ headers1|safe }},
+                   "aaSorting": [[1,"desc"]]
+               } );
+
+                
                $("th").css("background-color","rgba(255,255,255,1)");
-               new FixedHeader( oTable);
+               new FixedHeader(oTable);
+               new FixedHeader(oTable1);
             }        
             $('#class-submit-btn').live('click', function () {
                var newurl = "{% url opendsa.views.glossary_module_data %}" + $("#classlist").val().trim();
@@ -61,6 +77,10 @@
     
 
     </div>
+
+    <div id="demo1">
+    </div>
+
   {% endblock %}
 
 
