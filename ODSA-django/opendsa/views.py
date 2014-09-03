@@ -697,7 +697,9 @@ def glossary_module_data_home(request):
     open_instances = CourseInstance.objects.all()
     context = RequestContext(request, {"open_instances": open_instances, \
                                          'data': "[]", \
+                                         'data1': "[]", \
                                          'headers':"[]", \
+                                         'headers1':"[]", \
                                          'courseinstance':'None'})
     return render_to_response("opendsa/glossarydata.html", context)
 

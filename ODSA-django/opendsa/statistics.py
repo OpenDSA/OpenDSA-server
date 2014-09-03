@@ -561,12 +561,12 @@ def terms_logs(course=None):
     #glo_mod = Module.objects.get(name='Glossary')
     glossaries = UserButton.objects.filter(book=obj_book, name='glossary-term-clicked')
     for glo in glossaries:
-      json_data = json.loads(glo.description)
+      json_data = json.loads(str(glo.description))
       term = json_data['msg']
       if term not in glo_data:
-        glo_data[term] = 1
+        glo_data[str(term)] = 1
       else:
-         glo_data[term] = glo_data[term] + 1
+         glo_data[str(term)] = glo_data[term] + 1
 
     #convert glo_data to list 
     for key, value in glo_data.iteritems():
