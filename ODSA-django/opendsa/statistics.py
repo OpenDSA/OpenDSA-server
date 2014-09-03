@@ -522,6 +522,30 @@ def exercises_logs( course=None):
     return all_daily_logs
 
 
+def glossary_logs(course=None):
+  if course is not None:
+    # get book_id from course
+    obj_course = CourseInstance.objects.get(instance_name=course)
+    obj_book = Books.objects.filter(courses=obj_course)
+
+    glo_data = []
+    #number of book users
+    ubook = UserBook.objects.filter(book=obj_book).count()
+    #module page views
+    moduless = UserButton.objects.filter(book=obj_book, name='document-ready').count()
+    #glossary click
+    glo_mod = Module.objects.get(name='Glossary')
+    glossaries = UserButton.objects.filter(book=obj_book, name='glossary-term-clicked').count()
+    #within glossary pages clicks
+    glossariesw = UserButton.objects.filter(book=obj_book, name='glossary-term-clicked', module=glo_mod).count() 
+    glo_data.append(ubook)
+    glo_data.append(moduless)
+    glo_data.append(glossaries)
+    glo_data.append(glossariesw)
+    glo_logs = []
+    glo_logs.append(glo_data)
+    return glo_logs
+  return None
 
 
 def students_logs( course=None):

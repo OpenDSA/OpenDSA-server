@@ -17,7 +17,8 @@ from opendsa.models import Exercise, UserExercise, Books, \
 from opendsa.statistics import is_authorized, convert, \
                                is_file_old_enough, get_widget_data, \
                                exercises_logs, display_grade,create_book_file, \
-                               devices_analysis,  post_proficiency, students_logs 
+                               devices_analysis,  post_proficiency, students_logs, \
+                               glossary_logs   
 from opendsa.forms import AssignmentForm, StudentsForm, \
                           DelAssignmentForm, AccountsCreationForm, \
                           AccountsUploadForm
@@ -687,6 +688,40 @@ def get_class_activity(request, module_id):
                    course_module.course_instance.instance_name)
         return HttpResponseForbidden('<h1>No class activity</h1>') 
     return HttpResponseForbidden('<h1>No class activity</h1>')
+
+
+def glossary_module_data_home(request):
+    """
+    The students data home view
+    """
+    open_instances = CourseInstance.objects.all()
+    context = RequestContext(request, {"open_instances": open_instances, \
+                                         'data': "[]", \
+                                         'headers':"[]", \
+                                         'courseinstance':'None'})
+    return render_to_response("opendsa/glossarydata.html", context)
+
+
+def glossary_module_data(request, course_instance=None):
+
+  if course_instance:
+    columns_list = []
+    columns_list.append({"sTitle":"Users"})
+    columns_list.append({"sTitle":"Module views"})
+    columns_list.append({"sTitle":"Glossary Terms Clicks"})
+    columns_list.append({"sTitle":"Glossary Term Clicks (W)"})
+    open_instances = CourseInstance.objects.all()
+
+    glossary_activity = glossary_logs(course_instance)
+    context = RequestContext(request, {'courseinstance':course_instance, \
+                                           'data': glossary_activity, \
+                                           'headers':columns_list, \
+                                           'open_instances': open_instances})
+    return render_to_response("opendsa/glossarydata.html", context)
+  else:
+    return HttpResponseForbidden('<h1>No class activity</h1>')
+
+
 
 
 def student_work(request, course_instance=None):
