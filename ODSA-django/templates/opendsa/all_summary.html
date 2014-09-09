@@ -1,0 +1,155 @@
+{% extends "odsa_base.html" %}
+    {% block head %}
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/media/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/TableTools.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/ZeroClipboard.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.js"></script> 
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/FixedHeader/js/FixedHeader.min.js"></script>
+    <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/media/css/demo_page.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/media/css/demo_table.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/extras/TableTools/media/css/TableTools.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}opendsa/css/activity.css" rel="stylesheet" media="screen" />
+    <script type="text/javascript" charset="utf-8">
+        var giRedraw = false;
+        var columns = "";
+        var u_data = "";
+	$(document).ready(function() {
+            $('#demo').html( '<table cellpadding="0" cellspacing="1" border="1" class="display" id="example"></table>' );
+
+            u_data = {{ udata_list|safe  }};
+            columns = {{ columns_list|safe  }};
+            
+            var oTable = fnCreaateTable($('#example'));
+            $("div.fixedHeader").attr("id","table-0");
+
+
+
+            /* Add a click handler to the rows - this could be used as a callback */
+            $("#example tr").live('click', function(event) {
+                var sdata = oTable.fnGetData( this );
+                if ($(this).hasClass('row_selected')) {
+                    $(this).removeClass('row_selected');
+                }
+                else {
+                    $(this).addClass('row_selected');
+                } 
+            });
+
+            /* Add a click handler for the delete row */
+            $('#delete').click( function() {
+                var anSelected = fnGetSelected( oTable );
+                    oTable.fnDeleteRow( anSelected[0] );
+            } );
+
+            var i = 0;
+            var j = 0;
+            $(".late").css('backgroundColor', '#FF0000');
+            $('#example tbody td').live('click', function (e) {
+                if ( $(e.target).children(".details").length > 0) {
+		    var kids = $(e.target).children(".details");
+                    alert(kids[0].getAttribute("data-type")); 
+                }
+		} );
+            $('#example tbody td ').each( function(e) {
+                if ($(this).text()=="Done" ){ 
+                    $(this).children("span").css('backgroundColor', '#CCFFCC');
+                }
+                else if ($(this).text()=="Late"){
+                    $(this).children("span").css('backgroundColor', '#FF0000');
+                } 
+                else if ($(this).text()=="Started"){
+                    $(this).children("span").css('backgroundColor', '#FFFF00');
+                }
+                else {
+                    $(this).css('opacity', 0.8);
+                }
+                if ( $(this).children(".details").length > 0) {
+                    var kids = $(this).children(".details");
+                    var text = kids[0].getAttribute("data-type");
+                    this.setAttribute( 'title', text );
+                }
+            } );
+            $('#example thead th ').each( function(e) {
+                if ( $(this).children(".details").length > 0) {
+                    var kids = $(this).children(".details");
+                    var text = kids[0].getAttribute("data-type");
+                    this.setAttribute( 'title', text );
+                }
+            } );
+            oTable.$('td').tooltip( {
+                "delay": 0,
+                "track": true,
+                "fade": 200
+            } );
+            oTable.$('th').tooltip( {
+                "delay": 0,
+                "track": true,
+                "fade": 200
+            } ); 
+	} );
+
+        /* Create the data table  */
+        function fnCreaateTable( divID )
+        {
+            var oTable = divID.dataTable( {
+                "sDom": 'T<"clear">lfrtip',
+                "oTableTools": {
+                        "sSwfPath": "{{ STATIC_URL }}datatables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf"
+                },
+                "bPaginate": false,
+                "fnDrawCallback": function ( oSettings ) {
+                        /* Need to redo the counters if filtered or sorted */
+                        if ( oSettings.bSorted || oSettings.bFiltered )
+                        {
+                                for ( var i=0, iLen=oSettings.aiDisplay.length ; i<iLen ; i++ )
+                                {
+                                        $('td:eq(0)', oSettings.aoData[ oSettings.aiDisplay[i] ].nTr ).html( i+1 );
+                                }
+                        }
+                },
+                "aoColumnDefs": [
+                        { "bSortable": false, "aTargets": [ 0 ] }
+                ],
+                "aaData": u_data, //{{ udata_list|safe  }},
+                "aoColumns": columns,  //{{ columns_list|safe  }},
+            } );
+            $("tr").css("background-color","rgba(255,255,255,1)");
+            new FixedHeader( oTable);//,{ "left": true} );
+            return oTable;
+        
+        }
+        /* Get the rows which are currently selected */
+	function fnGetSelected( oTableLocal )
+	{
+		var aReturn = new Array();
+		var aTrs = oTableLocal.fnGetNodes();
+				
+		for ( var i=0 ; i<aTrs.length ; i++ )
+		{
+			if ( $(aTrs[i]).hasClass('row_selected') )
+			{
+				aReturn.push( aTrs[i] );
+			}
+		}
+		return aReturn;
+	}
+  </script>
+  {% endblock %}
+{% block content %}
+    <h1>All Exercises Activity Summary</h1>
+    <h4>Course: {{course}}</h4>
+    <h4>Book: {{book}}</h4>
+    <h5>Max Points: {{max_points}}</h5>
+    <hr>
+    <a id="with-exe"></a>
+    <div id="demo">
+    
+
+    </div>
+{% endblock %}
+
