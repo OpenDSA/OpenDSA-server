@@ -814,9 +814,6 @@ def get_class_activity(request, module_id):
     if module_id:
         course_module = CourseModule.objects.get(id=module_id)
         for c_book in  Books.objects.filter(courses=course_module.course_instance):
-            print 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-            print c_book.book_name
-            print 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
             return exercise_summary(request, c_book.book_name, \
                    course_module.course_instance.instance_name)
         return HttpResponseForbidden('<h1>No class activity</h1>') 
