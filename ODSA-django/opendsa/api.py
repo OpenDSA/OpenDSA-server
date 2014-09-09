@@ -824,7 +824,7 @@ class ModuleResource(ModelResource):
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
 
-            if kusername:
+            if kusername and kusername.is_staff:
                 response = {}
                 response['saved'] = False
                 #get or create Book & link a book to user
