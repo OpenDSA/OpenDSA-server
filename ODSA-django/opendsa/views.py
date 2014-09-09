@@ -513,10 +513,140 @@ def merged_book(request, book, book1):
                                        'columns_list1':columns_list1})
     return render_to_response("opendsa/class_summary.html", context)
 
+
+
+
+@login_required
+def class_summary(request, book, course):
+    """
+    View creating the data displayed in the class activity spreadsheet
+    """
+    if is_authorized(request.user, book, course):
+        exe_bme = []
+        obj_book = Books.objects.get(book_name = book)
+        max_book_points = 0
+        udata_list = []
+        udata_list1 = []
+        columns_list = []
+        columns_list1 = []
+        columns_list_exe = []  #for exercises
+        columns_list.append({"sTitle":"Id"})
+        columns_list.append({"sTitle":"Username"})
+        columns_list.append({"sTitle":"Email"})
+        columns_list.append({"sTitle":"Score(%)"})
+        #get book instances required exercises
+        for bexe in BookModuleExercise.components.filter( \
+                                         book = obj_book):
+            if Decimal(bexe.points) > Decimal(0):
+                exe_bme.append(bexe)
+
+                max_book_points += Decimal(bexe.points)
+
+                columns_list.append({"sTitle":str(bexe.exercise.name)+ \
+                                         '('+str(bexe.points)+')'+ \
+                                         '<span class="details" \
+                                         style="display:inline;" \
+                                         data-type="' + \
+                                         str(bexe.exercise.description) + \
+                                         '"></span>',"sClass": "center" })
+        userData = UserData.objects.select_related().filter( \
+                                                     book = obj_book, \
+                                                     user__is_staff = 0 \
+                                                     ).order_by('user')
+
+
+        users = []
+        for userdata in userData:
+            if not userdata.user.is_staff and display_grade( \
+                                              userdata.user, obj_book):
+                u_points = 0
+                u_data = []
+                u_data.append(0)
+                u_data.append(str(userdata.user.username))
+                u_data.append(str(userdata.user.email))
+                u_data.append(0)
+                u_assign = []
+                for bexe in exe_bme:
+                        u_ex = None
+                        user_exe = UserExercise.objects.filter( \
+                                                user = userdata.user, \
+                                                exercise = bexe.exercise)
+                        if not user_exe and (not bexe.exercise.id in userdata.get_prof_list()):
+                            exe_str = ''
+                            #continue 
+                        else:
+                            user_exe = user_exe[0]
+                            u_ex = user_exe
+                            #assignment_points += Decimal(bexe.points)
+                            exe_str = ''
+                            if bexe.exercise.id in userdata.get_prof_list():
+                                u_points += Decimal(bexe.points)
+                                #students_assignment_points += Decimal(bexe.points)
+                                #if u_ex.proficient_date <= \
+                                #    assignment.course_module.closing_time:
+                                exe_str = '<span class="details" \
+                                      style="display:inline;" \
+                                      data-type="First done:%s, \
+                                      Last done:%s, Total done:%i, \
+                                      Total correct:%i, \
+                                      Proficiency date:%s">Done</span>' \
+                                      %(str(u_ex.first_done), \
+                                      str(u_ex.last_done), \
+                                      int(u_ex.total_done), \
+                                      int(u_ex.total_correct), \
+                                      str(u_ex.proficient_date))
+                                #else:
+                                #    exe_str = '<span class="details" \
+                                #          style="display:inline;" \
+                                #          data-type="First done:%s, \
+                                #          Last done:%s, Total done:%i, \
+                                #          Total correct:%i, \
+                                #          Proficiency date:%s">Late</span>' \
+                                #          %(str(u_ex.first_done), \
+                                #          str(u_ex.last_done), \
+                                #          int(u_ex.total_done), \
+                                #          int(u_ex.total_correct), \
+                                #          str(u_ex.proficient_date))
+                            if bexe.exercise.id in userdata.get_started_list() and \
+                                          bexe.exercise.id not in \
+                                          userdata.get_prof_list():
+                                exe_str = '<span class="details" \
+                                      style="visibility: hidden; \
+                                      display:inline;" \
+                                      data-type="First done:%s, \
+                                      Last done:%s, Total done:%i, \
+                                      Total correct:%i, \
+                                      Proficiency date:%s">Started</span>' \
+                                      %(str(u_ex.first_done), \
+                                      str(u_ex.last_done), \
+                                      int(u_ex.total_done), \
+                                      int(u_ex.total_correct), \
+                                      str(u_ex.proficient_date))
+
+                        u_assign.append(exe_str)
+                    #u_assign[0] =  str(students_assignment_points)
+                u_data = u_data + u_assign
+
+                u_points = (u_points * 100) / max_book_points
+                u_data[3] = str("%.2f" % round(u_points,2))
+                udata_list.append(u_data)
+
+
+        context = RequestContext(request, {'book':book, \
+                                           'max_points':max_book_points, \
+                                           'course':course, \
+                                           'udata_list': udata_list, \
+                                           'columns_list':columns_list})
+        return render_to_response("opendsa/all_summary.html", context)
+    else:
+        return  HttpResponseForbidden('<h1>Page Forbidden</h1>')
+
+
+
 @login_required
 def exercise_summary(request, book, course):
     """
-    View creating the data displayed in the class activity spreadsheet
+    View creating the data displayed in the class assignments activity spreadsheet
     """
     if is_authorized(request.user, book, course):
         obj_book = Books.objects.get(book_name = book)
@@ -684,9 +814,25 @@ def get_class_activity(request, module_id):
     if module_id:
         course_module = CourseModule.objects.get(id=module_id)
         for c_book in  Books.objects.filter(courses=course_module.course_instance):
+            print 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+            print c_book.book_name
+            print 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
             return exercise_summary(request, c_book.book_name, \
                    course_module.course_instance.instance_name)
         return HttpResponseForbidden('<h1>No class activity</h1>') 
+    return HttpResponseForbidden('<h1>No class activity</h1>')
+
+
+def get_all_activity(request, module_id):
+    """
+    efouh: Leaving this for now. 
+    """
+    if module_id:
+        course_module = CourseModule.objects.get(id=module_id)
+        for c_book in  Books.objects.filter(courses=course_module.course_instance):
+            return class_summary(request, c_book.book_name, \
+                   course_module.course_instance.instance_name)
+        return HttpResponseForbidden('<h1>No class activity</h1>')
     return HttpResponseForbidden('<h1>No class activity</h1>')
 
 

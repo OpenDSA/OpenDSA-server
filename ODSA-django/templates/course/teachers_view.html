@@ -23,9 +23,12 @@
         
         <hr/>
 
-        <a href="{% url opendsa.views.get_class_activity instance.course_modules.all.0.id %}" 
+        <a href="{% url opendsa.views.get_all_activity instance.course_modules.all.0.id %}" 
            class="btn btn-success btn-mini">
            <i></i> {% trans "Class activity" %}
+        </a>  | <a href="{% url opendsa.views.get_class_activity instance.course_modules.all.0.id %}" 
+           class="btn btn-success btn-mini">
+           <i></i> {% trans "Assignments activity" %}
         </a>
         <hr/>
         <a href="{% url opendsa.views.student_management instance.course_modules.all.0.id %}" 
@@ -61,7 +64,7 @@
             <td>
                 <a href="{% url opendsa.views.add_or_edit_assignment module.id %}" 
                         class="btn btn-success btn-mini">
-                    <i class="icon-plus-sign icon-white"></i> {% trans "Add new exercise" %}
+                    <i class="icon-plus-sign icon-white"></i> {% trans "Set Exercises" %}
                 </a>
             </td>
         </tr>
