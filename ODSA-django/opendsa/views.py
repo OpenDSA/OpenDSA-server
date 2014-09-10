@@ -672,29 +672,35 @@ def exercise_summary(request, book, course):
         u_book = UserBook.objects.filter(book = obj_book)
         exe_bme = {}
         assign_exe = {}
+        assignments_list_tmp = []
         for assignment in assignments_list:
-            columns_list.append({"sTitle":str(assignment.course_module.name)})
-            columns_list1.append({"sTitle":str(assignment.course_module.name)})
-            assign_exe[assignment.course_module.name] = assignment.get_exercises()
-            for exercise in assign_exe[assignment.course_module.name]:
-                if BookModuleExercise.components.filter( \
-                                         book = obj_book, \
-                                         exercise = exercise).count() == 0:
-                    continue
-                bexe = BookModuleExercise.components.filter( \
+            if assignment.course_module.course_instance.instance_name == course:
+                assignments_list_tmp.append(assignment)
+                columns_list.append({"sTitle":str(assignment.course_module.name)})
+                columns_list1.append({"sTitle":str(assignment.course_module.name)})
+                assign_exe[assignment.course_module.name] = assignment.get_exercises()
+                for exercise in assign_exe[assignment.course_module.name]:
+                    if BookModuleExercise.components.filter( \
+                                             book = obj_book, \
+                                             exercise = exercise).count() == 0:
+                        continue
+                    bexe = BookModuleExercise.components.filter( \
                                                book = obj_book, \
                                                exercise = exercise)[0]
-                exe_bme[exercise.name] = bexe
-
-                max_assignments_points += Decimal(bexe.points)
+                    exe_bme[exercise.name] = bexe
   
-                columns_list.append({"sTitle":str(exercise.name)+ \
+                    max_assignments_points += Decimal(bexe.points)
+  
+                    columns_list.append({"sTitle":str(exercise.name)+ \
                                          '('+str(bexe.points)+')'+ \
                                          '<span class="details" \
                                          style="display:inline;" \
                                          data-type="' + \
                                          str(exercise.description) + \
                                          '"></span>',"sClass": "center" })
+
+        #we only work assignments relevants to this course instance
+        assignments_list = assignments_list_tmp
         userData = UserData.objects.select_related().filter( \
                                                      book = obj_book, \
                                                      user__is_staff = 0 \
