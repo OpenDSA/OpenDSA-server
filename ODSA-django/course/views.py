@@ -3,7 +3,7 @@ from icalendar import Calendar, Event
 
 # Django
 from django.shortcuts import get_object_or_404, render_to_response
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.template.context import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -223,6 +223,8 @@ def add_or_edit_module(request, course_url, instance_url, module_id=None):
         if form.is_valid():
             module = form.save()
             messages.success(request, _('The course module was saved successfully.'))
+            next_url = "/course/%s/%s/teachers/" % (course_instance.course.url, course_instance.url)
+            return HttpResponseRedirect(next_url)
     else:
         form = CourseModuleForm(instance=module)
     

@@ -211,6 +211,9 @@ class AssignmentForm(forms.ModelForm):
     """
     Form for adding exercises to an assignment
     """
+
+    #course_module = forms.CharField(label='Assignment name', max_length=50)
+    #assignment_book = forms.CharField(label='Assignment book', max_length=80)
     assignment_exercises = CSIMultipleChoiceField( \
                                  choices = exercises_in_object(), 
                                  required = False,
@@ -221,6 +224,8 @@ class AssignmentForm(forms.ModelForm):
         #self.fields['assignment_exercises'].choices = \
         #                                    exercises_in_object(instance)
         if instance:
+            self.fields['course_module'].widget.attrs['disabled'] = True
+            self.fields['assignment_book'].widget.attrs['disabled'] = True
             if len(instance.get_exercises_id())>0:
                 self.fields['assignment_exercises'].initial = \
                                                     instance.get_exercises_id()
