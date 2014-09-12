@@ -198,7 +198,7 @@ def add_or_edit_assignment(request, module_id):
         if not assignment:
             assignment = Assignments(course_module = course_module)
         form = AssignmentForm(instance=assignment)
-    return render_to_response("course/edit_module.html",
+    return render_to_response("course/set_exercises.html",
                               CourseContext(request, course_instance = \
                                                 course_module.course_instance,
                                                 module=course_module,
@@ -215,7 +215,10 @@ def delete_assignment(request, module_id):
     """
     
     course_module = CourseModule.objects.get(id=module_id)
-    assignment = Assignments.objects.get(course_module=course_module)
+  
+    assignment = None
+    if Assignments.objects.filter(course_module = course_module).count()>0: 
+        assignment = Assignments.objects.filter(course_module=course_module)[0]
     #retrieve books
     book =  Books.objects.filter(courses=course_module.course_instance)[0]
 
@@ -240,6 +243,15 @@ def delete_assignment(request, module_id):
             messages.success(request, \
                          _('The assignment module was deleted successfully.'))
             return HttpResponseRedirect(next_url)
+        else:
+            if assignment is not None:
+                assignment.delete()
+            if course_module is not None:  
+                course_module.delete()
+
+            messages.success(request, \
+                         _('The assignment module was deleted successfully.'))
+            return HttpResponseRedirect(next_url)  
     else:
         if not assignment:
             assignment = Assignments(course_module = course_module)
