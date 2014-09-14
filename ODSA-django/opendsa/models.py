@@ -9,6 +9,7 @@ from decimal import Decimal
 # Django
 from django.db import models
 from django.db import connection
+from django.db.models.signals import post_save, m2m_changed
 #from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 
@@ -63,6 +64,27 @@ class Books(models.Model):
         Returns the type of the model object
         """
         return "books"
+
+
+def create_course_module(sender, instance, action, pk_set, **kwargs):
+    '''
+    This function automatically creates a course module when a book is associated to a course .
+
+    @param sender: the signal(?) that invoked the function
+    @param instance: the User object that was just created
+    '''
+    if action == "post_add":
+        name_ = "Assignment_%s" % datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        c_i = 0 
+        for ci in pk_set:
+            c_i = ci
+        course_i = CourseInstance.objects.get(id = c_i)
+        CourseModule.objects.create(name=name_, course_instance=course_i)
+
+m2m_changed.connect(create_course_module, sender=Books.courses.through)
+
+
+
 
 class Assignments(models.Model):
     """
