@@ -757,10 +757,12 @@ def exercise_summary(request, book, course):
                             assignment_points += Decimal(bexe.points)
                             exe_str = ''
                             if exercise.id in userdata.get_prof_list():
-                                u_points += Decimal(bexe.points) 
-                                students_assignment_points += Decimal(bexe.points) 
+                                #u_points += Decimal(bexe.points) 
+                                #students_assignment_points += Decimal(bexe.points) 
                                 if u_ex.proficient_date <= \
                                     assignment.course_module.closing_time:
+                                    u_points += Decimal(bexe.points)
+                                    students_assignment_points += Decimal(bexe.points)
                                     exe_str = '<span class="details" \
                                           style="display:inline;" \
                                           data-type="First done:%s, \
@@ -773,6 +775,9 @@ def exercise_summary(request, book, course):
                                           int(u_ex.total_correct), \
                                           str(u_ex.proficient_date))
                                 else:
+                                    penalty = Decimal(bexe.points) * (Decimal(1)-Decimal(assignment.course_module.late_submission_penalty))
+                                    u_points += Decimal(penalty)
+                                    students_assignment_points += Decimal(penalty)
                                     exe_str = '<span class="details" \
                                           style="display:inline;" \
                                           data-type="First done:%s, \
