@@ -196,7 +196,7 @@ def add_or_edit_assignment(request, module_id):
                            _('The assignment module was saved successfully.'))
     else:
         if not assignment:
-            assignment = Assignments(course_module = course_module)
+            assignment = Assignments(course_module = course_module, assignment_book = book)
         form = AssignmentForm(instance=assignment)
     return render_to_response("course/set_exercises.html",
                               CourseContext(request, course_instance = \

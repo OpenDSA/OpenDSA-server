@@ -121,9 +121,11 @@ class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
                      $('#id_assignment_book').empty();
                      $.each(data, function(key0, val0) {
                        $.each(val0, function(key, val) {
+                         var url = key.substring(0, key.lastIndexOf("-"));
+                         var url_id = key.substring(key.lastIndexOf("-")).split("-")[1];
                          text = key.split("-")[0];
                          value = key.split("-")[1];
-                         $('#id_assignment_book').append('<option selected="selected" value="'+value+'">'+text+'</option>');
+                         $('#id_assignment_book').append('<option selected="selected" value="'+url_id+'">'+url+'</option>');
                            $.each(val, function(key1, val1) {
                              chap = key1.split("-")[0];
                              chap_id = key1.split("-")[1];
@@ -224,8 +226,8 @@ class AssignmentForm(forms.ModelForm):
         #self.fields['assignment_exercises'].choices = \
         #                                    exercises_in_object(instance)
         if instance:
-            self.fields['course_module'].widget.attrs['readonly'] = True 
-            self.fields['assignment_book'].widget.attrs['readonly'] = True
+            #self.fields['course_module'].widget.attrs['readonly'] = True 
+            #self.fields['assignment_book'].widget.attrs['readonly'] = True
             if len(instance.get_exercises_id())>0:
                 self.fields['assignment_exercises'].initial = \
                                                     instance.get_exercises_id()
