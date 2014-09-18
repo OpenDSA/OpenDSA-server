@@ -226,8 +226,8 @@ class AssignmentForm(forms.ModelForm):
         #self.fields['assignment_exercises'].choices = \
         #                                    exercises_in_object(instance)
         if instance:
-            #self.fields['course_module'].widget.attrs['readonly'] = True 
-            #self.fields['assignment_book'].widget.attrs['readonly'] = True
+            self.fields['course_module'].widget.attrs['readonly'] = True 
+            self.fields['assignment_book'].widget.attrs['readonly'] = True
             if len(instance.get_exercises_id())>0:
                 self.fields['assignment_exercises'].initial = \
                                                     instance.get_exercises_id()
