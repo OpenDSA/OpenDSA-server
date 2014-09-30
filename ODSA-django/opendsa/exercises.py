@@ -11,7 +11,7 @@ from opendsa.models import Exercise, UserExerciseLog, \
                            BookModuleExercise, Assignments
 from exercise.models import CourseModule
 from django.db import transaction
-
+from course.models import CourseInstance
 
 def diff(list_a, list_b):
     """
@@ -110,10 +110,15 @@ def student_grade_all(user, book):
     checked_modules = []
     assignments = []
     exe_assign = []
+
+    #get book's open courses
+    currentCourses = CourseInstance.objects.filter(books=book, ending_time__gte = datetime.datetime.now())   
+    currentCourse = currentCourses[0]
     #get open assignments for the book
-    #first we get open exercises_course_modules
+    #we get open exercises_course_modules
     course_mods = CourseModule.objects.filter(\
-                                opening_time__lte = datetime.datetime.now())
+                                opening_time__lte = datetime.datetime.now(),\
+                                opening_time__gte = currentCourse.starting_time)
     assignments_list = Assignments.objects.select_related().all().filter(\
                                             assignment_book=book).filter(\
                                             course_module__in = course_mods)
