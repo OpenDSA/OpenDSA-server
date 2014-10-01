@@ -850,7 +850,8 @@ class ModuleResource(ModelResource):
 
                 exers_ = []
               
-
+                #delete book chapters
+                BookChapter.objects.filter(book = kbook).delete()
                 for chapter in book_json['chapters']:
                   #get or create chapter
                     kchapter = get_chapter(kbook, chapter)
