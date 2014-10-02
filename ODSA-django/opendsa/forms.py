@@ -38,8 +38,10 @@ class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
                  $.each(data, function(key0, val0) {
                      $.each(val0, function(key1, val1) {
                        $.each(val1, function(key2, val2) {
-                         chap = key2.split("-")[0];
-                         chap_id = key2.split("-")[1];
+                         chap = key2.substring(0, key.lastIndexOf("-"));
+                         chap_id = key2.substring(key.lastIndexOf("-")).split("-")[1];
+                         //chap = key2.split("-")[0];
+                         //chap_id = key2.split("-")[1];
                              $('#id_assignment_chapter').append('<option selected="selected" value="'+chap_id+'">'+chap+'</option>');
                        });
                      });
@@ -58,7 +60,7 @@ class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
                      $.each(data, function(key0, val0) {
                        $.each(val0, function(key1, val1) {
                          $.each(val1, function(key2, val2) {
-                           if(key2.split("-")[1]==chapter){   
+                           if(key2.substring(key2.lastIndexOf("-")).split("-")[1]==chapter){   
                              $.each(val2, function(key, val) {
                                var checked ="";
                                if(jQuery.inArray(key,selected) != -1){
@@ -127,8 +129,10 @@ class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
                          value = key.split("-")[1];
                          $('#id_assignment_book').append('<option selected="selected" value="'+url_id+'">'+url+'</option>');
                            $.each(val, function(key1, val1) {
-                             chap = key1.split("-")[0];
-                             chap_id = key1.split("-")[1];
+                             chap = key1.substring(0, key1.lastIndexOf("-"));
+                             chap_id = key1.substring(key1.lastIndexOf("-")).split("-")[1];
+                             //chap = key1.split("-")[0];
+                             //chap_id = key1.split("-")[1];
                              $('#id_assignment_chapter').append('<option selected="selected" value="'+chap_id+'">'+chap+'</option>'); 
                            });
                        });
