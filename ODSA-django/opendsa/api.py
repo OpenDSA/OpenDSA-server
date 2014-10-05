@@ -1198,12 +1198,15 @@ class BugsResource(ModelResource):
                 kusername = get_username(request.POST['key'])
             if kusername:
                 img = None
+                img_str = ''
+
                 if('img' in request.FILES):
                     img = request.FILES['img']
                     if  len(img) > 1536000: #1.5MB
                          print "big file"
                          return self.create_response(request, {'error': 'Image file too big'}, \
                                                HttpBadRequest)
+                    
                 new_bug = Bugs(user = kusername,
                            os_family = request.POST['os'],
                            browser_family = request.POST['browser'],
@@ -1211,14 +1214,16 @@ class BugsResource(ModelResource):
                            description = request.POST['description'],
                            screenshot = img)
                 new_bug.save()
+                if img is not None:
+                    img_str = 'Screenshot:\thttp://opendsa.cc.vt.edu/media/' + str(new_bug.screenshot)
 
                 #send notification email
                 subject = '[OpenDSA] New Bug Reported: %s' %request.POST['title']
                 bug_url = "http://opendsa.cc.vt.edu/api/v1/bugs/%s/?format=json" %(\
                                                                             new_bug.id)
-                message = '%s reported the following bug:\n%s\n%s\n\nScreenshot:\thttp://opendsa.cc.vt.edu/media/%s' %(kusername.email, \
+                message = '%s reported the following bug:\n%s\n%s\n\n%s' %(kusername.email, \
                                                                      request.POST['description'], \
-                                                                     bug_url, str(new_bug.screenshot))
+                                                                     bug_url, img_str)
                 send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', ['opendsa@cs.vt.edu'], fail_silently=False)
 
                 return self.create_response(request, {'response':'Bug stored'})     
