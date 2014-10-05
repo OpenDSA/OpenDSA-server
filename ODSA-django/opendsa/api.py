@@ -1216,9 +1216,9 @@ class BugsResource(ModelResource):
                 subject = '[OpenDSA] New Bug Reported: %s' %request.POST['title']
                 bug_url = "http://opendsa.cc.vt.edu/api/v1/bugs/%s/?format=json" %(\
                                                                             new_bug.id)
-                message = '%s reported the following bug:\n%s\n%s' %(kusername.email, \
+                message = '%s reported the following bug:\n%s\n%s\n\nScreenshot:\thttp://opendsa.cc.vt.edu/media/%s' %(kusername.email, \
                                                                      request.POST['description'], \
-                                                                     bug_url)
+                                                                     bug_url, str(new_bug.screenshot))
                 send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', ['opendsa@cs.vt.edu'], fail_silently=False)
 
                 return self.create_response(request, {'response':'Bug stored'})     
