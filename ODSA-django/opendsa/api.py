@@ -1224,7 +1224,7 @@ class BugsResource(ModelResource):
                 subject = '[OpenDSA] New Bug Reported: %s' %request.POST['title']
                 bug_url = "%s%s/?format=json" %(\
                                                full_url, new_bug.id)
-                message = '%s reported the following bug:\n\n%s\n\nOS:\t%s\nBrowser:\t%s\nURL:\t%s\n%s' %(kusername.email, \
+                message = '%s (%s) reported the following bug:\n\n%s\n\nOS:\t%s\nBrowser:\t%s\nURL:\t%s\n%s' %(kusername.username, kusername.email, \
                                                                      request.POST['description'], \
                                                                      new_bug.os_family, new_bug.browser_family, \
                                                                      bug_url, img_str)
