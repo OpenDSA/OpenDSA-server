@@ -221,7 +221,7 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
              if  feedback[1][0].find("Note:") == -1: # Ignore the warnings
                 return feedback
 
-    if testfilenamep == "recwprog30":
+    if checkDefinedvar == "True":
        if data.count("int ") > 1 or (any( x in data for x in datatypes)):
           feedback[1]= ["Try Again! You should not declare any variables!"]
           return feedback
