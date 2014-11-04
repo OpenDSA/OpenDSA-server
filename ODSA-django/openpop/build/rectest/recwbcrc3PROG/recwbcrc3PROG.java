@@ -20,8 +20,8 @@ public class studentrecwbcrc3PROG
 
   public static void main(String [ ] args) {
     boolean SUCCESS = false;
-    int b=0;
-    int n=0;
+    int b=10;
+    int n=100;
   
     if (modellog(b , n)== log(b, n)) SUCCESS = true;
 

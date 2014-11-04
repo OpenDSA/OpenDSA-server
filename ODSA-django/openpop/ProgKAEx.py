@@ -29,8 +29,14 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
 
     checkDefinedvar= request_post.get('checkdefvar')
 
-    data = ''.join([x for x in data if ord(x) < 128]) 
-    exerciseName = request_post.get('sha1')
+    data = ''.join([x for x in data if ord(x) < 128])
+
+    # Summary Programming Exercises so we need to get the current selected exercises
+    if request_post.get('summexname')  != 'null':
+       exerciseName = request_post.get('summexname')
+
+    else:
+        exerciseName = request_post.get('sha1')
     
     feedback= setparameters(exerciseName, data, generatedList, checkDefinedvar)
      
@@ -126,10 +132,10 @@ def setparameters(exerciseName, data, generatedList, checkDefinedvar ):
 #  All Programming exercises are compiled and run through the following function
 def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefinedvar ):
     # live server
-    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
+    #filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
 
     # testing server
-    #filesPath = '/home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
+    filesPath = '/home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
     
     testfilename = testfilenamep+".java"
     studentfilename = "student"+testfilename
