@@ -128,6 +128,10 @@ def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftype
     elif exerciseName == "ListADTPROG":  #generate a list
        feedback= assessprogkaex(data , "listadttest", "listadttest" ,generatedList, checkDefinedvar, listoftypes)
 
+    # Binary Trees programming exercises
+    elif "bt" in exerciseName:   
+       feedback= assessprogkaex(data,"bttest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes)
+
     # Recursion programming exercises have the same folder with different subfolders. Where the subfolder is the exercise name
     elif "rec" in exerciseName:   
        feedback= assessprogkaex(data,"rectest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes)
