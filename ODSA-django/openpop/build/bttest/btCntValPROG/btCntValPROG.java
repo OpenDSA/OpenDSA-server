@@ -71,18 +71,16 @@ class BSTNode implements BinNode {
 
 
 
-public class studentbtCheckValPROG
+public class studentbtCntValPROG
 {
 
- public static boolean modelbtCheckVal(BinNode rt , Comparable value) {
-    if (rt == null) return false; 
+ public static int modelbtCntVal(BinNode rt , Comparable value) {
+    if (rt == null) return 0; 
     else{
      if(((Integer)rt.element()).compareTo((Integer)value)==0)
-       return true;
+       return 1;
      else{ 
-      modelbtCheckVal(rt.left(), value);
-      modelbtCheckVal(rt.right() , value);
-      return false;
+      return modelbtCntVal(rt.left(), value)+ modelbtCntVal(rt.right() , value);
 
      }
     
@@ -118,7 +116,7 @@ public class studentbtCheckValPROG
  public static boolean runTestCase(BinNode rt , Comparable value)
  { 
    boolean SUCCESS = false;  
-   if (btCheckVal(rt, value)  == modelbtCheckVal(rt, value)) 
+   if (btCntVal(rt, value)  == modelbtCntVal(rt, value)) 
    { 
      SUCCESS = true;   
    }
