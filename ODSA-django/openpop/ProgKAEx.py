@@ -28,6 +28,12 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     generatedList =request_post.get('genlist')
 
     checkDefinedvar= request_post.get('checkdefvar')
+    
+    listoftypes= request_post.get('listoftypes')
+    
+    # Clean the strings from bad characters
+    
+    listoftypes = ''.join([x for x in listoftypes if ord(x) < 128])
 
     data = ''.join([x for x in data if ord(x) < 128])
 
@@ -38,7 +44,7 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     else:
         exerciseName = request_post.get('sha1')
     
-    feedback= setparameters(exerciseName, data, generatedList, checkDefinedvar)
+    feedback= setparameters(exerciseName, data, generatedList, checkDefinedvar , listoftypes)
      
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         dt_now = datetime.datetime.now()
@@ -111,26 +117,30 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  Set the testing folder and passed parameters to the programming exercise
-def setparameters(exerciseName, data, generatedList, checkDefinedvar ):
+def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftypes ):
     # Check from which programming exercise we got this request
     if exerciseName == "BinaryTreePROG" : #count number of nodes
-       feedback= assessprogkaex (data, "binarytreetest", "binarytreetest","",checkDefinedvar)
+       feedback= assessprogkaex (data, "binarytreetest", "binarytreetest","",checkDefinedvar , listoftypes)
 
     elif exerciseName == "BTLeafPROG" :  #count number of leaf nodes
-       feedback= assessprogkaex (data , "btleaftest", "btleaftest","", checkDefinedvar)      
+       feedback= assessprogkaex (data , "btleaftest", "btleaftest","", checkDefinedvar , listoftypes)      
 
     elif exerciseName == "ListADTPROG":  #generate a list
-       feedback= assessprogkaex(data , "listadttest", "listadttest" ,generatedList, checkDefinedvar)
+       feedback= assessprogkaex(data , "listadttest", "listadttest" ,generatedList, checkDefinedvar, listoftypes)
+
+    # Binary Trees programming exercises
+    elif "bt" in exerciseName:   
+       feedback= assessprogkaex(data,"bttest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes)
 
     # Recursion programming exercises have the same folder with different subfolders. Where the subfolder is the exercise name
     elif "rec" in exerciseName:   
-       feedback= assessprogkaex(data,"rectest/"+exerciseName, exerciseName,"",checkDefinedvar)
+       feedback= assessprogkaex(data,"rectest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes)
     return feedback   
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  All Programming exercises are compiled and run through the following function
-def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefinedvar ):
+def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefinedvar, listoftypes ):
     # live server
     #filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
 
@@ -150,12 +160,11 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
     print i+1 
     
     feedback=[False, 'null', i+1 , studentfilename , 'class '+ studentfilename]
-    datatypes= ["float ", "double ", "char "]
-
-
-    # Check if the student decalred extra variables
-    #if   checkDefinedvar[0] == "True":
-    #print "check=" checkDefinedvar
+    # Those are the datatypes that are not allowed to be defined in that exercise
+    # The first one is already defined in the given code to the student 
+    # so the student should not define more and the others should not be declared at all
+    datatypes= re.split(",", listoftypes )
+   
     #cleaning: deleting already created files
     if generatedList != 'null':
        if os.path.isfile(filesPath +'generatedlist'):
@@ -220,9 +229,10 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
              print feedback[1]
              if  feedback[1][0].find("Note:") == -1: # Ignore the warnings
                 return feedback
-
+    print datatypes[0]
+    print datatypes[1:len(datatypes)]
     if checkDefinedvar == "True":
-       if data.count("int ") > 1 or (any( x in data for x in datatypes)):
+       if data.count(datatypes[0]) > 1 or (any( x in data for x in datatypes[1:len(datatypes)])):
           feedback[1]= ["Try Again! You should not declare any variables!"]
           return feedback
 
