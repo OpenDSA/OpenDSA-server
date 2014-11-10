@@ -570,10 +570,12 @@ def terms_logs(course=None):
          glo_data[str(term)] = glo_data[term] + 1
 
     #convert glo_data to list 
+    word_array = []
     for key, value in glo_data.iteritems():
       temp = [key,value]
       glo_logs.append(temp)
-    return glo_logs
+      word_array.append({"text":key,"weight":value})
+    return glo_logs, word_array
   return None
 
 

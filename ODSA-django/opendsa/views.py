@@ -885,10 +885,11 @@ def glossary_module_data(request, course_instance=None):
     columns_list1.append({"sTitle":"# Clicks"})
 
     glossary_activity = glossary_logs(course_instance)
-    term_activity = terms_logs(course_instance)
+    term_activity, word_array = terms_logs(course_instance)
     context = RequestContext(request, {'courseinstance':course_instance, \
                                            'data': glossary_activity, \
                                            'data1': term_activity, \
+                                           'wordscount' : word_array, \
                                            'headers':columns_list, \
                                            'headers1':columns_list1, \
                                            'open_instances': open_instances})

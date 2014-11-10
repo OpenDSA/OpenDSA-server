@@ -7,12 +7,14 @@
     <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/ZeroClipboard.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/FixedHeader/js/FixedHeader.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}opendsa/js/third_party/jqcloud-1.0.4.min.js"></script>
     <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
     <link href="{{ STATIC_URL }}datatables/media/css/demo_page.css" rel="stylesheet" media="screen" />
     <link href="{{ STATIC_URL }}datatables/media/css/demo_table.css" rel="stylesheet" media="screen" />
     <link href="{{ STATIC_URL }}datatables/extras/TableTools/media/css/TableTools.css" rel="stylesheet" media="screen" />
     <link href="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.css" rel="stylesheet" media="screen" />
     <link href="{{ STATIC_URL }}opendsa/css/activity.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}opendsa/css/jqcloud.css" rel="stylesheet" media="screen" />
      {% endblock %}
     {% block maintitle %}
     <h1>OpenDSA Statistics</h1>
@@ -57,6 +59,7 @@
                var newurl = "{% url opendsa.views.glossary_module_data %}" + $("#classlist").val().trim();
                window.location.href = newurl; 
             });
+            $("#wordtag").jQCloud({{ wordscount|safe }});
         } );
   </script>
 
@@ -71,6 +74,9 @@
          <p>
             <input type="submit" id="class-submit-btn" class="btn" value="Submit"/>
         </p>
+    </div>
+
+    <div id="wordtag" style="width: 550px; height: 350px;">
     </div>
 
     <div id="demo">
