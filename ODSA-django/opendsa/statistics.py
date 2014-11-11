@@ -78,8 +78,9 @@ def create_book_file(book):
         for c_mod in chapter.get_modules():
             for b_exe in BookModuleExercise.components.get_mod_exercise_list(book, c_mod):
                exe_dict[str(int(b_exe.id))]=str(b_exe.name)
-        chap_ = '%s-%s' %(str(chapter.name),chapter.id)
-        chapter_dict[chap_] = exe_dict
+        if len(exe_dict) > 0:
+            chap_ = '%s-%s' %(str(chapter.name),chapter.id)
+            chapter_dict[chap_] = exe_dict
     book_ = '%s-%s' %(book.book_url,book.id)
     book_list.append({str(book_).replace("'",'"'):chapter_dict})
 
@@ -672,6 +673,7 @@ def terms_logs(course=None):
 
     word_array = [] 
     #convert glo_data to list 
+    word_array = []
     for key, value in glo_data.iteritems():
       temp = [key,value]
       glo_logs.append(temp)
