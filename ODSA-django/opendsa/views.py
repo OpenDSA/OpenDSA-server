@@ -18,7 +18,8 @@ from opendsa.statistics import is_authorized, convert, \
                                is_file_old_enough, get_widget_data, \
                                exercises_logs, display_grade,create_book_file, \
                                devices_analysis,  post_proficiency, students_logs, \
-                               glossary_logs, terms_logs   
+                               glossary_logs, terms_logs, interaction_logs, \
+                               interaction_timeseries   
 from opendsa.forms import AssignmentForm, StudentsForm, \
                           DelAssignmentForm, AccountsCreationForm, \
                           AccountsUploadForm
@@ -856,6 +857,71 @@ def get_all_activity(request, module_id):
     return HttpResponseForbidden('<h1>No class activity</h1>')
 
 
+def interactions_data_home(request):
+    """
+    The students interactions data home view
+    """
+    open_instances = CourseInstance.objects.all()
+    context = RequestContext(request, {"open_instances": open_instances, \
+                                         'data': "[]", \
+                                         'headers':"[]", \
+                                         'courseinstance':'None'})
+    return render_to_response("opendsa/interactionsdata.html", context)
+
+
+
+def interactionsts_data_home(request):
+    """
+    The students interactions data home view
+    """
+    open_instances = CourseInstance.objects.all()
+    context = RequestContext(request, {"open_instances": open_instances, \
+                                         'data': "[]", \
+                                         'headers':"[]", \
+                                         'courseinstance':'None'})
+    return render_to_response("opendsa/interactionstsdata.html", context)
+
+
+def interactionsts_data(request, course_instance=None):
+  
+  if course_instance:
+    headers, interactions_activity = interaction_timeseries(course_instance)
+    #print interactions_activity
+    columns_list = []
+    for title in headers:
+      columns_list.append({"sTitle":str(title)})
+    open_instances = CourseInstance.objects.all()
+
+    context = RequestContext(request, {'courseinstance':course_instance, \
+                                           'data': interactions_activity, \
+                                           'headers':columns_list, \
+                                           'open_instances': open_instances})
+    return render_to_response("opendsa/interactionstsdata.html", context)
+  else:
+    return HttpResponseForbidden('<h1>No class activity</h1>')
+
+
+
+
+def interactions_data(request, course_instance=None):
+
+  if course_instance:
+    headers, interactions_activity = interaction_logs(course_instance)
+    #print interactions_activity
+    columns_list = []
+    for title in headers:
+      columns_list.append({"sTitle":str(title)})
+    open_instances = CourseInstance.objects.all()
+
+    context = RequestContext(request, {'courseinstance':course_instance, \
+                                           'data': interactions_activity, \
+                                           'headers':columns_list, \
+                                           'open_instances': open_instances})
+    return render_to_response("opendsa/interactionsdata.html", context)
+  else:
+    return HttpResponseForbidden('<h1>No class activity</h1>')
+
+
 def glossary_module_data_home(request):
     """
     The students data home view
@@ -885,10 +951,11 @@ def glossary_module_data(request, course_instance=None):
     columns_list1.append({"sTitle":"# Clicks"})
 
     glossary_activity = glossary_logs(course_instance)
-    term_activity = terms_logs(course_instance)
+    term_activity, word_array = terms_logs(course_instance)
     context = RequestContext(request, {'courseinstance':course_instance, \
                                            'data': glossary_activity, \
                                            'data1': term_activity, \
+                                           'wordscount' : word_array, \
                                            'headers':columns_list, \
                                            'headers1':columns_list1, \
                                            'open_instances': open_instances})
@@ -904,15 +971,18 @@ def student_work(request, course_instance=None):
   if course_instance:
     columns_list = []
     columns_list.append({"sTitle":"Id"})
+    columns_list.append({"sTitle":"Exe M1"})
+    columns_list.append({"sTitle":"Exe M2"})
+    columns_list.append({"sTitle":"Exe F"})
     #columns_list.append({"sTitle":"Interactions"})
-    columns_list.append({"sTitle":"Total KA"})
-    columns_list.append({"sTitle":"Correct KA"})
-    columns_list.append({"sTitle":"Total KAV"})
-    columns_list.append({"sTitle":"Correct KAV"})
-    columns_list.append({"sTitle":"Total PE"})
-    columns_list.append({"sTitle":"Correct PE"})
-    columns_list.append({"sTitle":"Total SS"})
-    columns_list.append({"sTitle":"Correct SS"})
+#    columns_list.append({"sTitle":"Total KA"})
+#    columns_list.append({"sTitle":"Correct KA"})
+#    columns_list.append({"sTitle":"Total KAV"})
+#    columns_list.append({"sTitle":"Correct KAV"})
+#    columns_list.append({"sTitle":"Total PE"})
+#    columns_list.append({"sTitle":"Correct PE"})
+#    columns_list.append({"sTitle":"Total SS"})
+#    columns_list.append({"sTitle":"Correct SS"})
     open_instances = CourseInstance.objects.all()
 
     students_activity = students_logs(course_instance)
