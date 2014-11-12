@@ -6,11 +6,13 @@ from django.contrib.auth.models import User
 
 # A+
 from userprofile.models import UserProfile
+from course.models import CourseInstance
 
 # OpenDSA
 from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserExerciseLog, UserButton, UserData, UserBook
 
 # Django
+from django.template.context import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import get_object_or_404, render_to_response
@@ -18,6 +20,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from course.context import CourseContext
 from collections import OrderedDict
 from django.db.models import Q
+from settings import STATIC_URL
 import time
 import datetime
 import os
@@ -1165,13 +1168,42 @@ def exercises_time(request):
                 
     return render_to_response("developer_view/exercises_time.html", {'exercises': exercises })
 
+@staff_member_required
+def student_list_home(request, course_instance = None):
+
+
+    if course_instance:
+        students = []
+        course = CourseInstance.objects.get(instance_name = course_instance)
+        books = Books.objects.filter(courses = course)
+        for book in books:
+            bookstudents = UserBook.objects.filter(book = book)
+            for profile in bookstudents:
+                if not profile.user.is_staff and not profile.user.is_superuser and profile.grade:
+                    students.append(profile.user)
+        return render_to_response("developer_view/student_list.html", {'students': students, 'course': course_instance })
+    else:
+        courses_intances = CourseInstance.objects.all()
+        context = RequestContext(request,{'open_instances': courses_intances,'STATIC_URL':STATIC_URL})
+        return render_to_response("opendsa/student_list_home.html", context)
+
+
 #This function responds student list (not staff or super user)
 #The student information includes id(in the database), user name, and email, etc
 @staff_member_required
 def student_list(request):
-    userProfiles = UserProfile.objects.all();
-    
+
+    courses_intances = CourseInstance.objects.all()
+    #userProfiles = UserProfile.objects.all();
     students = []
+    for course in courses_intances:
+        course_students = []
+        books = Books.objects.filter(courses=course)
+        for book in books:
+            bookstudents = UserBook.objects.filter(book=book)
+            for profile in bookstudents:
+                if not profile.user.is_staff and not profile.user.is_superuser and profile.grade:
+                    course_students.append(profile.user) 
     
     for profile in userProfiles:
         if not profile.user.is_staff and not profile.user.is_superuser:
@@ -1209,7 +1241,7 @@ class proficient_exercises:
         return self.number*20
 
 @staff_member_required
-def student_exercise(request, student):
+def student_exercise(request, course, student):
     userButtons = UserButton.objects.filter(user=student, name='document-ready')
 
     activities = []
