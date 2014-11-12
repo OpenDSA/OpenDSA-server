@@ -29,11 +29,11 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
 
     checkDefinedvar= request_post.get('checkdefvar')
     
-    listoftypes= request_post.get('listoftypes')
+    #listoftypes= request_post.get('listoftypes')
     
     # Clean the strings from bad characters
     
-    listoftypes = ''.join([x for x in listoftypes if ord(x) < 128])
+    listoftypes =""# ''.join([x for x in listoftypes if ord(x) < 128])
 
     data = ''.join([x for x in data if ord(x) < 128])
 
@@ -142,10 +142,10 @@ def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftype
 #  All Programming exercises are compiled and run through the following function
 def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefinedvar, listoftypes ):
     # live server
-    #filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
+    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
 
     # testing server
-    filesPath = '/home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
+    #filesPath = '/home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
     
     testfilename = testfilenamep+".java"
     studentfilename = "student"+testfilename
@@ -229,12 +229,12 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
              print feedback[1]
              if  feedback[1][0].find("Note:") == -1: # Ignore the warnings
                 return feedback
-    print datatypes[0]
-    print datatypes[1:len(datatypes)]
-    if checkDefinedvar == "True":
-       if data.count(datatypes[0]) > 1 or (any( x in data for x in datatypes[1:len(datatypes)])):
-          feedback[1]= ["Try Again! You should not declare any variables!"]
-          return feedback
+    #print datatypes[0]
+    #print datatypes[1:len(datatypes)]
+    #if checkDefinedvar == "True":
+    #   if data.count(datatypes[0]) > 1 or (any( x in data for x in datatypes[1:len(datatypes)])):
+    #      feedback[1]= ["Try Again! You should not declare any variables!"]
+    #      return feedback
 
     if os.path.isfile(filesPath+'runerrors.out'):
        #Check what is returned from the test : what is inside the success file
