@@ -1,0 +1,71 @@
+{% extends "odsa_base.html" %}
+    {% block head %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/media/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/TableTools.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/TableTools/media/js/ZeroClipboard.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}datatables/extras/FixedHeader/js/FixedHeader.min.js"></script>
+    <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/media/css/demo_page.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/media/css/demo_table.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/extras/TableTools/media/css/TableTools.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.css" rel="stylesheet" media="screen" />
+    <link href="{{ STATIC_URL }}opendsa/css/activity.css" rel="stylesheet" media="screen" />
+     {% endblock %}
+    {% block maintitle %}
+    <h1>OpenDSA Statistics</h1>
+    {% endblock %}
+  {% block content %}
+     <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            $("#classlist").val("{{ courseinstance|safe }}");
+            var str = String({{ data|safe }});
+            if (  str.length > 4) {
+               $('#demo').html( '<table cellpadding="0" cellspacing="1" border="1" class="display" id="example"></table>' );
+               var oTable = $('#example').dataTable( {
+                   "sDom": 'T<"clear">lfrtip',
+                   "oTableTools": {
+                           "sSwfPath": "{{ STATIC_URL }}datatables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf"
+                   },
+                   "bPaginate": false,
+                   "aaData": {{ data|safe }},
+                   "aoColumns": {{ headers|safe }},
+                   "aaSorting": [[1,"desc"]]
+               } );
+
+
+                
+               $("th").css("background-color","rgba(255,255,255,1)");
+               new FixedHeader(oTable);
+            }        
+            $('#class-submit-btn').live('click', function () {
+               var newurl = "{% url opendsa.views.interactionsts_data %}" + $("#classlist").val().trim();
+               window.location.href = newurl; 
+            });
+        } );
+  </script>
+
+    <div id="class_container" style="width:1600px; margin: 40px auto;">
+        <h5>Class</h5>
+        <select title="Classes" id="classlist">
+            <option value="none"> ---- </option>
+            {% for instance in open_instances %}
+                <option value="{{ instance.instance_name }}"> {{ instance.instance_name }} </option>
+            {% endfor %} 
+        </select>
+         <p>
+            <input type="submit" id="class-submit-btn" class="btn" value="Submit"/>
+        </p>
+    </div>
+
+    <div id="demo">
+    
+
+    </div>
+
+
+  {% endblock %}
+
+

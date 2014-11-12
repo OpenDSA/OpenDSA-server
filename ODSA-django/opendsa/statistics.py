@@ -523,6 +523,108 @@ def exercises_logs( course=None):
     return all_daily_logs
 
 
+def interaction_timeseries(course = None):
+  if course is not None:
+    # get book_id from course
+    obj_course = CourseInstance.objects.get(instance_name=course)
+    obj_book = Books.objects.filter(courses=obj_course) 
+    #days rage, now all dayys the book was used
+    clause_1 = " WHERE action_time BETWEEN '%s' AND '%s' " %(obj_course.starting_time, obj_course.ending_time)
+    day_list = UserExerciseLog.objects.raw('''SELECT id, DATE(action_time) As date
+                                                  FROM opendsa_userbutton {0}
+                                                  GROUP BY date
+                                                  ORDER BY date ASC'''.format(clause_1))
+
+    print day_list
+    #get course students
+    ubook = UserBook.objects.filter(book=obj_book)
+    all_daily_logs=[]
+    class_data = {}
+    class_headers = ['id']
+    for day in day_list:
+      class_headers.append(day.date.strftime('%Y-%m-%d'))
+      for ub in ubook:
+         if int(ub.user.id) not in class_data:
+           class_data[int(ub.user.id)] = [int(ub.user.id)]
+         today_min = datetime.datetime.combine(day.date, datetime.time.min)
+         today_max = datetime.datetime.combine(day.date, datetime.time.max)
+         #act_count =  UserButton.objects.filter(user=ub.user,book=obj_book, action_time__range=(today_min, today_max)).count()  
+         act_count =  UserExerciseLog.objects.filter(user=ub.user,time_done__range=(today_min, today_max),earned_proficiency=True).count()
+         #interactions_d = UserButton.objects.filter(user=ub.user,book=obj_book, action_time__range=(today_min, today_max))
+         #actions = ''
+         #for inter_d in interactions_d:
+             #try: 
+             #tmp = json.loads(str(inter_d.description))
+             #print "==========================\n %s +++++++ \n  %s" %(tmp,tmp['msg'])
+             #actions = actions + str(tmp['msg'])
+             #except ValueError, e:
+             #print "XXXXXXXXXXXXXXXXXX \n %s " %str(inter_d.description)
+             #actions = actions + ',' + str(inter_d.name)
+         class_data[int(ub.user.id)].append(act_count)
+         #class_data[int(ub.user.id)].append(actions)
+     #put all data in the output list
+    output_list = []
+    for key, value in class_data.iteritems():
+      output_list.append(value)
+  
+    try:
+        the_file = 'interactionsTS_stats.json'
+        if course is not None:
+           the_file = 'interactionsTS_stats_%s.json' %course.lower()
+
+
+        ofile = open(settings.MEDIA_ROOT + the_file,'w')
+        ofile.writelines(str(output_list).replace("'",'"'))
+        ofile.close
+    except IOError as e:
+        print "error ({0}) written file : {1}".format(e.errno, e.strerror)
+    return class_headers, output_list
+
+  return None, None
+
+
+def interaction_logs(course = None):
+  if course is not None:
+    # get book_id from course
+    obj_course = CourseInstance.objects.get(instance_name=course)
+    obj_book = Books.objects.filter(courses=obj_course)
+    #get course students
+    ubook = UserBook.objects.filter(book=obj_book)
+    #get all interaction type\
+    actions = UserButton.objects.values('name').distinct()
+    class_data = {}
+    class_headers = ['id'] 
+    for act in actions:
+      class_headers.append(act['name']) 
+      for ub in ubook:
+         if int(ub.user.id) not in class_data:
+           class_data[int(ub.user.id)] = [int(ub.user.id)]
+         act_count =  UserButton.objects.filter(user=ub.user,book=obj_book, name=act['name']).count()
+         class_data[int(ub.user.id)].append(act_count)
+    #put all data in the output list
+    output_list = []
+    for key, value in class_data.iteritems(): 
+      output_list.append(value)
+    try:
+        the_file = 'interactions_stats.json'
+        if course is not None:
+           the_file = 'interactions_stats_%s.json' %course.lower()
+
+
+        ofile = open(settings.MEDIA_ROOT + the_file,'w')
+        ofile.writelines(str(output_list).replace("'",'"'))
+        ofile.close
+    except IOError as e:
+        print "error ({0}) written file : {1}".format(e.errno, e.strerror)
+    return class_headers, output_list
+
+  return None, None
+  
+
+
+
+
+
 def glossary_logs(course=None):
   if course is not None:
     # get book_id from course
@@ -569,6 +671,7 @@ def terms_logs(course=None):
       else:
          glo_data[str(term)] = glo_data[term] + 1
 
+    word_array = [] 
     #convert glo_data to list 
     word_array = []
     for key, value in glo_data.iteritems():
@@ -587,9 +690,16 @@ def students_logs( course=None):
     obj_course = CourseInstance.objects.get(instance_name=course)
     obj_book = Books.objects.filter(courses=obj_course)
 
+   ##### CS3114 F13
+   #Midterm 1: Tuesday, October 1
+   #Midterm 2: Tuesday, November 12
+   #Final: Tuesday, December 12
+
+
+
     ka_exe_av = [8,23,29,31,36,38,43,45,52,71,73,76,78,81,85,88,90,94,136,137,155,179,182,183,184,185,189,190,191,192]
     other_exe = [203, 214, 220]
-    students_logs = []
+    students_ilogs = []
     ubook = UserBook.objects.filter(book=obj_book)
     for ub in ubook:
       stud_data = [] 
@@ -602,30 +712,43 @@ def students_logs( course=None):
       total_done_pe = 0
       total_done_ss = 0  
       stud_data.append(int(ub.user.id))
-      uxe = UserExercise.objects.filter(user=ub.user) #, proficient_date__gt=datetime.date(2013, 10, 1), proficient_date__lt=datetime.date(2013, 11, 12))
-      #uxel = UserExerciseLog.objects.filter(user=ub.user, time_done__lt=datetime.date(2014, 10, 1))
-      for ux_row in uxe:
-        if ux_row.exercise.ex_type=="ka" and ux_row.exercise.id not in ka_exe_av and ux_row.exercise.id not in other_exe:
-          total_correct_ka = total_correct_ka + int(ux_row.progress)
-          total_done_ka = total_done_ka +  UserExerciseLog.objects.filter(user=ub.user, exercise=ux_row.exercise).count() #, time_done__gt=datetime.date(2013, 10, 1), time_done__lt=datetime.date(2013, 11, 12)).count()
-        if ux_row.exercise.id in ka_exe_av:
-          total_correct_kav = total_correct_kav + int(ux_row.progress)
-          total_done_kav = total_done_kav +  UserExerciseLog.objects.filter(user=ub.user, exercise=ux_row.exercise).count() #, time_done__gt=datetime.date(2013, 10, 1), time_done__lt=datetime.date(2013, 11, 12)).count()
-        if ux_row.exercise.ex_type=="pe":
-          total_correct_pe = total_correct_pe + int(ux_row.total_correct)
-          total_done_pe = total_done_pe + int(ux_row.total_done) 
-        if ux_row.exercise.ex_type=="ss":
-          total_correct_ss = total_correct_ss + int(ux_row.total_correct)
-          total_done_ss = total_done_ss + int(ux_row.total_done)
+      #uxe = UserExercise.objects.filter(user=ub.user) , proficient_date__gt=datetime.date(2013, 10, 1), proficient_date__lt=datetime.date(2013, 11, 12))
 
-      stud_data.append(total_done_ka)
-      stud_data.append(total_correct_ka)
-      stud_data.append(total_done_kav)
-      stud_data.append(total_correct_kav)
-      stud_data.append(total_done_pe)
-      stud_data.append(total_correct_pe)
-      stud_data.append(total_done_ss)
-      stud_data.append(total_correct_ss)
+      #CS3114 F13 M1
+      uxel_m1 = UserExerciseLog.objects.filter(user=ub.user, time_done__lt=datetime.date(2013, 10, 1), time_done__gt=datetime.date(2013, 8, 26), earned_proficiency=True).count()
+      #CS3114 F13 M2
+      uxel_m2 = UserExerciseLog.objects.filter(user=ub.user, time_done__lt=datetime.date(2013, 11, 12), time_done__gt=datetime.date(2013, 10, 2), earned_proficiency=True).count()
+      #CS3114 F13 F
+      uxel_f = UserExerciseLog.objects.filter(user=ub.user, time_done__lt=datetime.date(2013, 12, 12), time_done__gt=datetime.date(2013, 11, 13), earned_proficiency=True).count()
+
+      stud_data.append(uxel_m1)
+      stud_data.append(uxel_m2)
+      stud_data.append(uxel_f)
+
+
+
+#      for ux_row in uxe:
+#        if ux_row.exercise.ex_type=="ka" and ux_row.exercise.id not in ka_exe_av and ux_row.exercise.id not in other_exe:
+#          total_correct_ka = total_correct_ka + int(ux_row.progress)
+#          total_done_ka = total_done_ka +  UserExerciseLog.objects.filter(user=ub.user, exercise=ux_row.exercise).count() #, time_done__gt=datetime.date(2013, 10, 1), time_done__lt=datetime.date(2013, 11, 12)).count()
+#        if ux_row.exercise.id in ka_exe_av:
+#          total_correct_kav = total_correct_kav + int(ux_row.progress)
+#          total_done_kav = total_done_kav +  UserExerciseLog.objects.filter(user=ub.user, exercise=ux_row.exercise).count() #, time_done__gt=datetime.date(2013, 10, 1), time_done__lt=datetime.date(2013, 11, 12)).count()
+#        if ux_row.exercise.ex_type=="pe":
+#          total_correct_pe = total_correct_pe + int(ux_row.total_correct)
+#          total_done_pe = total_done_pe + int(ux_row.total_done) 
+#        if ux_row.exercise.ex_type=="ss":
+#          total_correct_ss = total_correct_ss + int(ux_row.total_correct)
+#          total_done_ss = total_done_ss + int(ux_row.total_done)
+
+#      stud_data.append(total_done_ka)
+#      stud_data.append(total_correct_ka)
+#      stud_data.append(total_done_kav)
+#      stud_data.append(total_correct_kav)
+#      stud_data.append(total_done_pe)
+#      stud_data.append(total_correct_pe)
+#      stud_data.append(total_done_ss)
+#      stud_data.append(total_correct_ss)
 
       #ux = uxe.aggregate(total=Sum('total_done'))
       #uxl = uxel.aggregate(total=Sum('time_done'))
@@ -646,6 +769,6 @@ def students_logs( course=None):
       #else:
       #  stud_data.append( 0 )
 
-      students_logs.append(stud_data)
-    return students_logs
+      students_ilogs.append(stud_data)
+    return students_ilogs
   return None
