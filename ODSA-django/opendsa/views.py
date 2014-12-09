@@ -640,6 +640,8 @@ def class_summary(request, book, course):
                     #u_assign[0] =  str(students_assignment_points)
                 u_data = u_data + u_assign
 
+                if max_book_points == 0:
+                    max_book_points = 1
                 u_points = (u_points * 100) / max_book_points
                 u_data[3] = str("%.2f" % round(u_points,2))
                 udata_list.append(u_data)
