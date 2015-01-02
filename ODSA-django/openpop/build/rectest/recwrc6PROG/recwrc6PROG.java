@@ -16,7 +16,7 @@ public class studentrecwrc6PROG
 
   else
 
-   return power(x-1, y) * y;
+   return modelpower(x-1, y) * y;
 }
  
 

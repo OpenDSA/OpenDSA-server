@@ -22,7 +22,7 @@ public class studentrecwrc12PROG
 	    count = 1;
 	   }
 	 
-	   return count +  countChr(str.substring(1));
+	   return count +  modelcountChr(str.substring(1));
 	
 	  }
 	

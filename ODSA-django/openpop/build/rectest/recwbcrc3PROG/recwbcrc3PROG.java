@@ -13,7 +13,7 @@ public class studentrecwbcrc3PROG
    public static int modellog(int b, int n ) { 
 
    if ( b == n ) return 1;
-   return 1+ log(b,n/b); 
+   return 1+ modellog(b,n/b); 
  }
   
    

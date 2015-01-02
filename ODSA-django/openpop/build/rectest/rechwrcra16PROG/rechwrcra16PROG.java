@@ -13,7 +13,7 @@ public class studentrechwrcra16PROG
    if ( num < 2)
      return Integer.toString(num);
    else
-      return modeldecibinary(num/2) + "  "+ Integer.toString(num%2);
+      return modeldecibinary(num/2) + Integer.toString(num%2);
   }
 	
      

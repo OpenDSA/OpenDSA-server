@@ -14,7 +14,7 @@ public class studentrecwrc11PROG
 	if (number == 0)
 	  return digits;
 	  
-	return GetDigits(number/ 10, ++digits);
+	return modelGetDigits(number/ 10, ++digits);
  }
 
   

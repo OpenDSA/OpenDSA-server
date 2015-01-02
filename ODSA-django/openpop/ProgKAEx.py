@@ -14,11 +14,22 @@ import codecs
 import unicodedata
 import sys
 import string
-import time
+import time, sys
 
 
 #from subprocess import call
 #import pdb; pdb.set_trace()
+
+# Static code analysis Includes
+#sys.path.append(os.path.abspath('plyj/'))
+#import plyj.model as model
+#import plyj.parser as plyj
+#import pprint
+
+
+sys.path.append(os.path.abspath('.'))
+import settings
+
 
 def attempt_problem_pop(user_data, user_exercise, attempt_number,
     completed, count_hints, time_taken, attempt_content, module,   
@@ -28,16 +39,17 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     generatedList =request_post.get('genlist')
 
     checkDefinedvar= request_post.get('checkdefvar')
-    
-    #listoftypes= request_post.get('listoftypes')
-    
+    if checkDefinedvar == "True":
+       listoftypes= request_post.get('listoftypes')
+    else : 
+       listoftypes=""
     # Clean the strings from bad characters
     
-    listoftypes =""# ''.join([x for x in listoftypes if ord(x) < 128])
+    #listoftypes = ''.join([x for x in listoftypes if ord(x) < 128])
 
     data = ''.join([x for x in data if ord(x) < 128])
 
-    # Summary Programming Exercises so we need to get the current selected exercises
+    # Summary Programming Exercises so we need to get the current selected exercise name to run the eqivelant unit test
     if request_post.get('summexname')  != 'null':
        exerciseName = request_post.get('summexname')
 
@@ -142,11 +154,14 @@ def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftype
 #  All Programming exercises are compiled and run through the following function
 def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefinedvar, listoftypes ):
     # live server
-    filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
+    #filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
 
     # testing server
     #filesPath = '/home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
-    
+    print "=============="
+    print settings 
+    filesPath = settings.File_Path  + testfoldername+'/'
+     
     testfilename = testfilenamep+".java"
     studentfilename = "student"+testfilename
 
@@ -163,7 +178,8 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
     # Those are the datatypes that are not allowed to be defined in that exercise
     # The first one is already defined in the given code to the student 
     # so the student should not define more and the others should not be declared at all
-    datatypes= re.split(",", listoftypes )
+    
+   
    
     #cleaning: deleting already created files
     if generatedList != 'null':
@@ -188,7 +204,41 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
     if os.path.isfile(filesPath +'newpolicy.policy'):
        os.remove(filesPath + 'newpolicy.policy')
 
+    #if os.path.isfile(filesPath +'StaticCode.java'):
+    #   os.remove(filesPath + 'StaticCode.java')
+    
+    # Static code analysis
+    
+    #Enlcose the student code in a class
+    #staticCode = open(filesPath+"StaticCode.java", 'w')
+    #staticCode.write("class StaticCode { ")
+    #staticCode.write(data)
+    #staticCode.write("}")
+    #staticCode.close() 
+    #print filesPath +"StaticCode.java"
+    
+    #parser = plyj.Parser()
+    
+    #parsed = parser.parse_file(filesPath +"StaticCode.java")
+    #print parsed
+    #for a_class in parsed.type_declarations:
+    #    for declaration in a_class.body:
+    #        if isinstance(declaration, plyj.MethodDeclaration):
+    #            name = declaration.name
+    #            declaration.accept(RecursionChecker(name))
+
+    #rexfileread = open(filesPath +"rexfile" , 'r')
+    #line= rexfileread.read()
+    #rexfileread.close()
+
+    #if "True" in line:
+    #   print "True"
+    #else:
+    #   print "False"
    
+    # End of Static code analysis
+
+
     # Saving the submitted/received code in the studentrectest.java file by copying the preorder + studentcode +}
     TestFile = open(filesPath+testfilename , 'r')
     test = TestFile.read()
@@ -231,10 +281,11 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
                 return feedback
     #print datatypes[0]
     #print datatypes[1:len(datatypes)]
-    #if checkDefinedvar == "True":
-    #   if data.count(datatypes[0]) > 1 or (any( x in data for x in datatypes[1:len(datatypes)])):
-    #      feedback[1]= ["Try Again! You should not declare any variables!"]
-    #      return feedback
+    if checkDefinedvar == "True":
+       datatypes= re.split(",", listoftypes )
+       if data.count(datatypes[0]) > 1 or (any( x in data for x in datatypes[1:len(datatypes)])):
+          feedback[1]= ["Try Again! You should not declare any variables!"]
+          return feedback
 
     if os.path.isfile(filesPath+'runerrors.out'):
        #Check what is returned from the test : what is inside the success file
@@ -265,10 +316,29 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
               feedback[0] = True
               return feedback
                
-           else :
+           else:
               feedback[0] = False
               return feedback
 
     feedback[1]=['Try Again! Your code is taking too long to run! Revise your code!']
     return feedback
+
+# Static code analysis code
+
+#class RecursionChecker(model.Visitor):
+#    def __init__(self, needle):
+#        super(RecursionChecker, self).__init__()
+#        self.needle = needle
+#        self.rexfile = open("rexfile" , 'w')
+
+
+
+#    def visit_MethodInvocation(self, t):
+#       if t.name == self.needle:
+#           self.rexfile.write('True')
+#           self.rexfile.close()
+           
+
+
+
                 
