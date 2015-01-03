@@ -1,5 +1,6 @@
 # Python
 from icalendar import Calendar, Event
+import json
 
 #Django
 from django.contrib.auth.models import User
@@ -10,6 +11,7 @@ from course.models import CourseInstance
 
 # OpenDSA
 from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserExerciseLog, UserButton, UserData, UserBook
+from opendsa.statistics import is_authorized
 
 # Django
 from django.template.context import RequestContext
@@ -1314,7 +1316,7 @@ class exercise_step:
 @staff_member_required    
 def exercise_detail(request, student, exercise):
     #The activities of a user and an exercise
-    userButtons = UserButton.objects.filter(user=student).filter(exercise=exercise)
+    userButtons = UserButton.objects.filter(user=student).filter(exercise=exercise).order_by('action_time')
     #filter(module=module).
     max_time = 0
     max_click = 0
@@ -1330,7 +1332,9 @@ def exercise_detail(request, student, exercise):
         flag = 0
 
         if userButton.name == 'jsav-forward' and not userButton.description == 'description':
-            step = int(userButton.description[:userButton.description.find('/')])
+            json_data = json.loads(str(userButton.description))
+            step = int(json_data['ev_num'])
+            #step = int(userButton.description[:userButton.description.find('/')])
 
             if current_time == 0 or userButton.action_time < current_time or not step - current_step == 1:
                 current_time = userButton.action_time
@@ -1368,7 +1372,9 @@ def exercise_detail(request, student, exercise):
                 line.append(current_step)
                 
         if userButton.name == 'jsav-backward' and not userButton.description == 'description':
-            step = int(userButton.description[:userButton.description.find('/')])
+            json_data = json.loads(str(userButton.description))
+            step = int(json_data['ev_num'])
+            #step = int(userButton.description[:userButton.description.find('/')])
 
             if current_time == 0 or userButton.action_time < current_time or not step - current_step == -1:
                 current_time = userButton.action_time

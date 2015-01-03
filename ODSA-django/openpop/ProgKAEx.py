@@ -39,6 +39,7 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     generatedList =request_post.get('genlist')
 
     checkDefinedvar= request_post.get('checkdefvar')
+
     if checkDefinedvar == "True":
        listoftypes= request_post.get('listoftypes')
     else : 
@@ -153,15 +154,10 @@ def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftype
 
 #  All Programming exercises are compiled and run through the following function
 def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefinedvar, listoftypes ):
-    # live server
-    #filesPath = '/home/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
-
-    # testing server
-    #filesPath = '/home/OpenDSA-server-beta/OpenDSA-server/ODSA-django/openpop/build/'+testfoldername+'/'
     print "=============="
     print settings 
     filesPath = settings.File_Path  + testfoldername+'/'
-     
+ 
     testfilename = testfilenamep+".java"
     studentfilename = "student"+testfilename
 
@@ -279,10 +275,11 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
              print feedback[1]
              if  feedback[1][0].find("Note:") == -1: # Ignore the warnings
                 return feedback
-    #print datatypes[0]
-    #print datatypes[1:len(datatypes)]
+
     if checkDefinedvar == "True":
        datatypes= re.split(",", listoftypes )
+
+    if checkDefinedvar == "True":
        if data.count(datatypes[0]) > 1 or (any( x in data for x in datatypes[1:len(datatypes)])):
           feedback[1]= ["Try Again! You should not declare any variables!"]
           return feedback
