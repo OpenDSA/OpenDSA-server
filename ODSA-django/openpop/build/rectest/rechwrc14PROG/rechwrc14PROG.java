@@ -23,8 +23,8 @@ public class studentrechwrc14PROG
    
     Random randNumGenerator = new Random();
     int number=  randNumGenerator.nextInt(30);
-	
-    if (Fibonacci(number) == modelFibonacci(number)) SUCCESS = true;
+	int number2 = randNumGenerator.nextInt(30);
+    if ((Fibonacci(number) == modelFibonacci(number)) &&  (Fibonacci(number2) == modelFibonacci(number2)) ) SUCCESS = true;
 
     try{
 
