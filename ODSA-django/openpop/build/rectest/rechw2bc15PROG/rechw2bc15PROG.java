@@ -25,9 +25,12 @@ public class studentrechw2bc15PROG
     
    
     Random randNumGenerator = new Random();
+    
     int number=  randNumGenerator.nextInt(1000000);
 	
-    if (Prime(number, number) == modelPrime(number , number-1)) SUCCESS = true;
+    int number2=  randNumGenerator.nextInt(1000000);
+    
+    if ((Prime(number, number-1) == modelPrime(number , number-1)) && (Prime(number2, (number2)-1) == modelPrime(number2 , (number2)-1))) SUCCESS = true;
 
     try{
 

@@ -26,8 +26,11 @@ public class studentrecw20PROG
     int row = randNumGenerator.nextInt(10)+1;
     int column = randNumGenerator.nextInt(10)+1;
     
+    int row2 = randNumGenerator.nextInt(10)+1;
+    int column2 = randNumGenerator.nextInt(10)+1;
     
-    if (pascal(row, column) == modelpascal(row, column)) SUCCESS = true;
+    
+    if ((pascal(row, column) == modelpascal(row, column)) && (pascal(row2, column2) == modelpascal(row2, column2))) SUCCESS = true;
 
     try{
 
