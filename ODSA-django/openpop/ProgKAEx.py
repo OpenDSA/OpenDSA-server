@@ -36,8 +36,11 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     ex_question, ip_address, request_post):
     
     data = request_post.get('code') 
+    
     generatedList =request_post.get('genlist')
-
+    
+    progexType =request_post.get('progexType')
+   
     checkDefinedvar= request_post.get('checkdefvar')
 
     if checkDefinedvar == "True":
@@ -57,7 +60,7 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     else:
         exerciseName = request_post.get('sha1')
     
-    feedback= setparameters(exerciseName, data, generatedList, checkDefinedvar , listoftypes)
+    feedback= setparameters(exerciseName, data, generatedList, checkDefinedvar , listoftypes , progexType)
      
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         dt_now = datetime.datetime.now()
@@ -130,7 +133,7 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  Set the testing folder and passed parameters to the programming exercise
-def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftypes ):
+def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftypes, progexType ):
     # Check from which programming exercise we got this request
     if exerciseName == "BinaryTreePROG" : #count number of nodes
        feedback= assessprogkaex (data, "binarytreetest", "binarytreetest","",checkDefinedvar , listoftypes)
@@ -146,7 +149,7 @@ def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftype
        feedback= assessprogkaex(data,"bttest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes)
 
     # Recursion programming exercises have the same folder with different subfolders. Where the subfolder is the exercise name
-    elif "rec" in exerciseName:   
+    elif "recursion" in progexType:   
        feedback= assessprogkaex(data,"rectest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes)
     return feedback   
 
