@@ -300,7 +300,18 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
                  return feedback
               elif 'Exception in thread "main" java.lang.StackOverflowError' in line:
                  feedback[1]= ["Try Again! Your solution leads to infinite recursion!"]
-                 return feedback     
+                 return feedback
+              elif 'Exception in thread "main"' in line:
+				  feedback[1]= ["Try Again! Your solution leads to "+ line.replace("Exception in thread \"main\" java.lang.", "")]
+				  return feedback
+              #elif 'Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException' in line:
+			#	  feedback[1]= ["Try Again! Your solution leads to an array index out of bounds exception!"]
+			#	  return feedback
+              #elif 'Exception in thread "main" java.lang.ArithmeticException: / by zero' in line:
+				#  feedback[1]= ["Try Again! Your solution leads to divide by zero exception!"]
+				#  return feedback
+
+				       
           runErrorFile.close()
           if os.stat(filesPath+'runerrors.out')[6]!=0:
              return feedback;
