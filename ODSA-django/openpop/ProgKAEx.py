@@ -141,10 +141,10 @@ def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftype
     elif exerciseName == "BTLeafPROG" :  #count number of leaf nodes
        feedback= assessprogkaex (data , "btleaftest", "btleaftest","", checkDefinedvar , listoftypes)      
 
-    elif exerciseName == "ListADTPROG":  #generate a list
+    elif "list" in progexType:  #generate a list
        feedback= assessprogkaex(data , "listadttest", "listadttest" ,generatedList, checkDefinedvar, listoftypes)
 
-    # Binary Trees programming exercises
+    # Binary Trees programming exercises 
     elif "bt" in exerciseName:   
        feedback= assessprogkaex(data,"bttest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes)
 
