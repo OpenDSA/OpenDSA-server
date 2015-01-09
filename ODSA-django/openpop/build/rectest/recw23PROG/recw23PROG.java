@@ -41,7 +41,7 @@ public static String generateRandomString(){
    
     String str = generateRandomString();
  
-    if (ReverseStringRecursive(str).equals(modelReverseStringRecursive(str))) SUCCESS = true;
+    if (reverseStringRecursive(str).equals(modelReverseStringRecursive(str))) SUCCESS = true;
 
     try{
 

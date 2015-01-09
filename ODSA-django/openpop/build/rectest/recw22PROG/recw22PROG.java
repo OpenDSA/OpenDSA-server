@@ -28,11 +28,11 @@ public class studentrecw22PROG
     
     String str = "kcaack";
     
-    if (CheckPalindrome(str) == modelCheckPalindrome(str)) SUCCESS1 = true;
+    if (checkPalindrome(str) == modelCheckPalindrome(str)) SUCCESS1 = true;
 
     str = "others";
 
-    if (CheckPalindrome(str) == modelCheckPalindrome(str)) SUCCESS2 = true;
+    if (checkPalindrome(str) == modelCheckPalindrome(str)) SUCCESS2 = true;
 
     try{
 

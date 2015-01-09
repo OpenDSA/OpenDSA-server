@@ -32,8 +32,9 @@ public class studentrecw26PROG
     
     int n= randNumGenerator.nextInt(20);
     
+    int anothern= randNumGenerator.nextInt(20);
    
-    if (noOfPath(n)== modelnoOfPath(n)) SUCCESS = true;
+    if ((numOfPaths(n)== modelnoOfPath(n)) && (numOfPaths(anothern)== modelnoOfPath(anothern)))SUCCESS = true;
 
     try{
 

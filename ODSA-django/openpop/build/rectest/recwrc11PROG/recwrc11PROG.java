@@ -11,7 +11,7 @@ public class studentrecwrc11PROG
  
  public static int modelGetDigits(int number, int digits)
  {
-	if (number == 0)
+	if (number < 10)
 	  return digits;
 	  
 	return modelGetDigits(number/ 10, ++digits);
@@ -27,7 +27,7 @@ public class studentrecwrc11PROG
     Random randNumGenerator = new Random();
     int number=  randNumGenerator.nextInt(100)+1;
 
-    if ( GetDigits(number,0) == modelGetDigits(number,0)) SUCCESS = true;
+    if ( getDigits(number,1) == modelGetDigits(number,1)) SUCCESS = true;
 
     try{
 
