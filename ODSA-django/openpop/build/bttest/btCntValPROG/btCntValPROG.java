@@ -75,16 +75,15 @@ public class studentbtCntValPROG
 {
 
  public static int modelbtCntVal(BinNode rt , Comparable value) {
-    if (rt == null) return 0; 
-    else{
-     if(((Integer)rt.element()).compareTo((Integer)value)==0)
-       return 1;
-     else{ 
-      return modelbtCntVal(rt.left(), value)+ modelbtCntVal(rt.right() , value);
-
-     }
+    if (rt == null) return 0;    
+    int count = 0;
     
-    }
+    if(value.compareTo(rt.element()) == 0)
+          count++;
+     count += modelbtCntVal(rt.left(), value);
+     count += modelbtCntVal(rt.right(), value);
+     return count;
+    
  }
 
 

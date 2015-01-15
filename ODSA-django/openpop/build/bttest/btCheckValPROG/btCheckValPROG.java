@@ -79,12 +79,9 @@ public class studentbtCheckValPROG
     else{
      if(((Integer)rt.element()).compareTo((Integer)value)==0)
        return true;
-     else{ 
-      modelbtCheckVal(rt.left(), value);
-      modelbtCheckVal(rt.right() , value);
-      return false;
-
-     }
+     else
+       return modelbtCheckVal(rt.left(), value) || modelbtCheckVal(rt.right() , value);
+     
     
     }
  }
