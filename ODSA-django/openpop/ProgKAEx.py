@@ -274,10 +274,12 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
           feedback[1]= syntaxErrorFile.readlines()
           syntaxErrorFile.close()
           if os.stat(filesPath+'compilationerrors.out')[6]!=0:
-             feedback[1]= feedback[1]#.rsplit(':',1)[1]
+             feedback[1]= feedback[1]
              print feedback[1]
              if  feedback[1][0].find("Note:") == -1: # Ignore the warnings
-                return feedback
+                 NewList =  [x for x in feedback[1] if not x.startswith('Note:') ]
+                 feedback[1] = NewList
+                 return feedback
 
     if checkDefinedvar == "True":
        datatypes= re.split(",", listoftypes )
