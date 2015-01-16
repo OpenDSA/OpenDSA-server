@@ -145,7 +145,7 @@ def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftype
        feedback= assessprogkaex(data , "listadttest", "listadttest" ,generatedList, checkDefinedvar, listoftypes)
 
     # Binary Trees programming exercises 
-    elif "bt" in exerciseName:   
+    elif "binarytree" in progexType:   
        feedback= assessprogkaex(data,"bttest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes)
 
     # Recursion programming exercises have the same folder with different subfolders. Where the subfolder is the exercise name
