@@ -71,20 +71,11 @@ class BSTNode implements BinNode {
 
 
 
-public class studentbtIncPROG
+public class studentmbtSamePROG
 {
 
- public static void modelbtInc(BinNode rt) {
-    if (rt != null)
-    {
-     rt.setElement(((Integer)rt.element()) +1);
-     modelbtInc(rt.left());
-     modelbtInc(rt.right());
-    }
- }
-
  
-public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
+ public static boolean modelmbtSame(BSTNode a, BSTNode b) {
     // check for reference equality and nulls
     if (a==b) return true; // note this picks up case of two nulls
     if (a==null) return false;
@@ -97,8 +88,8 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
     }
 
     // recursively check branches
-    if (!checkEqualTrees(a.left(),b.left())) return false;
-    if (!checkEqualTrees(a.right(),b.right())) return false;
+    if (!modelmbtSame(a.left(),b.left())) return false;
+    if (!modelmbtSame(a.right(),b.right())) return false;
 
     // we've eliminated all possibilities for non-equality, so trees must be equal
     return true;
@@ -131,9 +122,7 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
  public static boolean runTestCase(BSTNode rt, BSTNode rt2)
  { 
    boolean SUCCESS = false;  
-   btInc(rt);
-   modelbtInc(rt2);
-   if (checkEqualTrees(rt , rt2) == true) 
+   if (btIdenticalTrees(rt , rt2) == modelmbtSame(rt, rt2))
    { 
      SUCCESS = true;   
    }
@@ -160,7 +149,7 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
    if (runTestCase(root, root2) == false) return;
    ////// End of the first test case
 
-   // Second test case
+   // Second test case -- the same tree
    root = new BSTNode(10);
    root2 = new BSTNode(10);
 
@@ -180,10 +169,10 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
    ////// End of the second test case
 
 
-  //Third test case
+  //Third test case ---Different trees 
   root= null;
   root2= null;
-  root = new BSTNode(10);
+  root = new BSTNode(30);
   root2 = new BSTNode(10);
 
   BSTNode currentNode= root;
@@ -200,7 +189,7 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
    leftChildren.add( new BSTNode(15));
    rightChildren.add( new BSTNode(15));
    
-   leftChildren2.add( new BSTNode(15));
+   leftChildren2.add( new BSTNode(25));
    rightChildren2.add( new BSTNode(15));
   
   }
@@ -234,3 +223,28 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
   writeResult(root , root2 , true);
 
   } 
+public static boolean btIdenticalTrees(BSTNode a, BSTNode b) {
+  // Your code goes between these lines
+
+ 
+    // check for data inequality
+    if ((Integer)a.element().compareTo((Integer)b.element()) !=0) {
+        if (((Integer)a.element()==null)||((Integer)b.element()==null)) return false;
+        if ((((Integer)a.element()).compareTo((Integer)b.element())) !=0) return false;
+    }
+
+    // recursively check branches
+    if (!btIdenticalTrees(a.left(),b.left())) return false;
+    if (!btIdenticalTrees(a.right(),b.right())) return false;
+
+    // we've eliminated all possibilities for non-equality, so trees must be equal
+    return true;
+
+
+
+
+
+  // Your code goes between these lines
+
+}
+}

@@ -71,40 +71,24 @@ class BSTNode implements BinNode {
 
 
 
-public class studentbtIncPROG
+public class studentbstMinPROG
 {
 
- public static void modelbtInc(BinNode rt) {
-    if (rt != null)
-    {
-     rt.setElement(((Integer)rt.element()) +1);
-     modelbtInc(rt.left());
-     modelbtInc(rt.right());
+ public static int  modelbstMin(BinNode rt) {
+	   
+   //if (rt == null) {
+  	 // return Integer.MIN_VALUE;
+    //}
+    if (rt.left() == null) {
+        return (Integer)rt.element();
     }
- }
-
- 
-public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
-    // check for reference equality and nulls
-    if (a==b) return true; // note this picks up case of two nulls
-    if (a==null) return false;
-    if (b==null) return false;
-
-    // check for data inequality
-    if ((Integer)a.element().compareTo((Integer)b.element()) !=0) {
-        if (((Integer)a.element()==null)||((Integer)b.element()==null)) return false;
-        if ((((Integer)a.element()).compareTo((Integer)b.element())) !=0) return false;
+    
+      return modelbstMin(rt.left());
     }
 
-    // recursively check branches
-    if (!checkEqualTrees(a.left(),b.left())) return false;
-    if (!checkEqualTrees(a.right(),b.right())) return false;
 
-    // we've eliminated all possibilities for non-equality, so trees must be equal
-    return true;
-}
 
- public static void writeResult(BSTNode rt, BSTNode rt2, boolean SUCCESS){
+ public static void writeResult(BinNode rt,boolean SUCCESS){
  try{
 
      PrintWriter output = new PrintWriter("output");
@@ -128,12 +112,10 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
 
  }
  
- public static boolean runTestCase(BSTNode rt, BSTNode rt2)
+ public static boolean runTestCase(BinNode rt)
  { 
    boolean SUCCESS = false;  
-   btInc(rt);
-   modelbtInc(rt2);
-   if (checkEqualTrees(rt , rt2) == true) 
+   if (bstMin(rt)  == modelbstMin(rt)) 
    { 
      SUCCESS = true;   
    }
@@ -141,96 +123,44 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
    else  // This test case fail then will write the result and abort the function
    {
     SUCCESS = false;
-    writeResult(rt , rt2, SUCCESS);
+    writeResult(rt , SUCCESS);
     
    }
   return SUCCESS;
  }
  
-
-
   public static void main(String [ ] args) {
  
-  // We will have more than one test case
-   
-  //First test case ..empty tree
-   BSTNode root = null;
-   BSTNode root2 = null;
-  
-   if (runTestCase(root, root2) == false) return;
-   ////// End of the first test case
-
-   // Second test case
-   root = new BSTNode(10);
-   root2 = new BSTNode(10);
-
+   // First test case
+    BSTNode root = new BSTNode(20);
    BSTNode leftChild = new BSTNode(15);
-   BSTNode rightChild = new BSTNode(20);
-
-   BSTNode leftChild2 = new BSTNode(15);
-   BSTNode rightChild2 = new BSTNode(20);
+   BSTNode rightChild = new BSTNode(30);
 
    root.setLeft(leftChild); 
    root.setRight(rightChild);
-  
-   root2.setLeft(leftChild2); 
-   root2.setRight(rightChild2);
-
-   if (runTestCase(root, root2)== false) return;
-   ////// End of the second test case
+   if (runTestCase(root )== false) return;
+   ////// End of the first test case
 
 
-  //Third test case
-  root= null;
-  root2= null;
-  root = new BSTNode(10);
-  root2 = new BSTNode(10);
-
-  BSTNode currentNode= root;
-  ArrayList <BSTNode> leftChildren = new ArrayList<BSTNode>() ; 
-  ArrayList <BSTNode> rightChildren = new ArrayList<BSTNode>() ;
-
-  
-  BSTNode currentNode2= root2;
-  ArrayList <BSTNode> leftChildren2 = new ArrayList<BSTNode>() ; 
-  ArrayList <BSTNode> rightChildren2 = new ArrayList<BSTNode>() ;
-
-  for (int i=0 ; i<10; i++)
-  {   
-   leftChildren.add( new BSTNode(15));
-   rightChildren.add( new BSTNode(15));
+  //Second test case
+   root = new BSTNode(40);
+   leftChild = new BSTNode(30);
+   rightChild = new BSTNode(50);
    
-   leftChildren2.add( new BSTNode(15));
-   rightChildren2.add( new BSTNode(15));
-  
-  }
-
-   for (int i=0 ; i<10; i++)
-  {      
-   currentNode.setLeft(leftChildren.get( i));
-   currentNode = leftChildren.get( i);
-
-   currentNode2.setLeft(leftChildren2.get( i));
-   currentNode2 = leftChildren2.get( i);
-
-  }
-  currentNode= root;
-  currentNode2= root2;
-   for (int i=0 ; i<10; i++)
-  {   
-   currentNode.setRight(rightChildren.get( i));
-   currentNode = rightChildren.get(i);
-
-   currentNode2.setRight(rightChildren2.get( i));
-   currentNode2 = rightChildren2.get(i);
-
-  }
- currentNode=root;
-  currentNode2=root2;
-  if (runTestCase(root, root2 ) == false) return;
- ///End of the third test case
+   BSTNode leftChild2 = new BSTNode(45);
+   BSTNode rightChild2 = new BSTNode(60);
+   
+   root.setLeft(leftChild); 
+   root.setRight(rightChild);
+   
+   rightChild.setLeft(leftChild2); 
+   rightChild.setRight(rightChild2);
+   
+   
+   if (runTestCase(root )== false) return;
+  //End of the second test case
 
   // If none the test cases failed then all of them are ok then sucess=true
-  writeResult(root , root2 , true);
+  writeResult(root , true);
 
   } 

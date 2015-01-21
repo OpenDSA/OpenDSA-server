@@ -1,0 +1,4 @@
+Exception in thread "main" java.lang.NullPointerException
+	at studentmbtSamePROG.btIdenticalTrees(studentmbtSamePROG.java:231)
+	at studentmbtSamePROG.runTestCase(studentmbtSamePROG.java:125)
+	at studentmbtSamePROG.main(studentmbtSamePROG.java:149)
