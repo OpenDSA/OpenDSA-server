@@ -71,7 +71,7 @@ class BSTNode<Key, E> implements BinNode<E> {
 public class studentbtLeafPROG
 {
 
- public static int countLeaf(BinNode root) {
+ public static int modelcountLeaf(BinNode root) {
   if(root == null)  return 0;
   if(root.isLeaf())      
     return 1;            
@@ -109,7 +109,7 @@ public class studentbtLeafPROG
  public static boolean runTestCase(BinNode rt)
  { 
    boolean SUCCESS = false;  
-   if (exercise3(rt)  == countLeaf(rt)) 
+   if (countLeaf(rt)  == modelcountLeaf(rt)) 
    { 
      SUCCESS = true;   
    }
