@@ -4,7 +4,8 @@
 </head>
 
 <body>
-Module Loading Statistics
+<button onclick="goBack()">Go Back</button>
+<h2>Module Loading Statistics</h2>
 <table style="border: solid 1px black;">
   <tr>
     <td style="border: solid 1px black;">Module Name</td>
@@ -41,5 +42,14 @@ Proficiency Dates for Exercises
   </tr>    
 </table>
 <a href="/developer_view/timeline_sum/{{student}}/">timeline</a>
+
+
+<script>
+function goBack() {
+    window.history.back()
+}
+</script>
+
+
 </body>
 </html>

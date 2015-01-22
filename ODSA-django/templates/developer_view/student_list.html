@@ -5,7 +5,9 @@
 </head>
 
 <body>
-Student List<br>
+<button onclick="goBack()">Go Back</button>
+
+<h1>Student List<h1>
 <table style="border: solid 1px black;"> 
     <tr>
       <td style="border: solid 1px black;"> id </td>
@@ -20,5 +22,12 @@ Student List<br>
     </tr>
     {% endfor %} 
 </table>
+
+<script>
+function goBack() {
+    window.history.back()
+}
+</script>
+
 </body>
 </html>
