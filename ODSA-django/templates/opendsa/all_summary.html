@@ -15,6 +15,9 @@
     <link href="{{ STATIC_URL }}datatables/examples/examples_support/jquery.tooltip.css" rel="stylesheet" media="screen" />
     <link href="{{ STATIC_URL }}opendsa/css/activity.css" rel="stylesheet" media="screen" />
     <script type="text/javascript" charset="utf-8">
+        function goBack() {
+           window.history.back()
+        }
         var giRedraw = false;
         var columns = "";
         var u_data = "";
@@ -141,6 +144,7 @@
   </script>
   {% endblock %}
 {% block content %}
+    <button onclick="goBack()">Go Back</button>
     <h1>All Exercises Activity Summary</h1>
     <h4>Course: {{course}}</h4>
     <h4>Book: {{book}}</h4>
