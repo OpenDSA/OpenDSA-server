@@ -74,13 +74,13 @@ class BSTNode implements BinNode {
 public class studentbthasPathSumPROG
 {
 
- public static boolean modelhasPathSum(BinNode rt , int sum) {
+ public static boolean modelbthasPathSum(BinNode rt , int sum) {
     if (rt == null)
       return (sum==0);
     else
     {
       int subsum= sum - (Integer)rt.element();
-      return (modelhasPathSum(rt.left(), subsum)|| modelhasPathSum(rt.right(), subsum));
+      return (modelbthasPathSum(rt.left(), subsum)|| modelbthasPathSum(rt.right(), subsum));
     }
   }
 
@@ -103,8 +103,8 @@ public class studentbthasPathSumPROG
     int sum1= 25;
     int sum2= 5;
 
-    if (hasPathSum(root, sum1)== modelhasPathSum(root, sum1)) SUCCESS1 = true;
-    if (hasPathSum(root, sum2)== modelhasPathSum(root, sum2)) SUCCESS2 = true;
+    if (bthasPathSum(root, sum1)== modelbthasPathSum(root, sum1)) SUCCESS1 = true;
+    if (bthasPathSum(root, sum2)== modelbthasPathSum(root, sum2)) SUCCESS2 = true;
     try{
 
      PrintWriter output = new PrintWriter("output");
