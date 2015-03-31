@@ -667,6 +667,7 @@ def exercise_summary(request, book, course):
         obj_book = Books.objects.get(book_name = book)
         udata_list = []
         udata_list1 = []
+        wrong_exe = []
         columns_list = []
         columns_list1 = []
         columns_list_exe = []  #for exercises
@@ -746,6 +747,11 @@ def exercise_summary(request, book, course):
                     u_assign.append(0)
 
                     for exercise in assign_exe[assignment.course_module.name]:
+                        if exercise.name not in  exe_bme:
+                            if exercise.name not in wrong_exe:
+                                wrong_exe.append(str(exercise.name))
+                            continue
+
                         bexe = exe_bme[exercise.name]
                         u_ex = None
                         user_exe = UserExercise.objects.filter( \
@@ -812,7 +818,9 @@ def exercise_summary(request, book, course):
                     u_assign[0] =  str(students_assignment_points)
                     u_data = u_data + u_assign
                     u_data1.append(str(students_assignment_points))
-                
+               
+                if max_assignments_points == 0:
+                    max_assignments_points = 1 
                 u_points = (u_points * 100) / max_assignments_points 
                 u_data[3] = str("%.2f" % round(u_points,2))
                 udata_list.append(u_data)
@@ -824,6 +832,7 @@ def exercise_summary(request, book, course):
                                            'max_points':max_assignments_points, \
                                            'course':course, \
                                            'udata_list': udata_list, \
+                                           'wrong_exe': str(wrong_exe).strip('[]'), \
                                            'columns_list':columns_list, \
                                            'udata_list1': udata_list1, \
                                            'columns_list1':columns_list1}) 
