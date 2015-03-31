@@ -21,17 +21,26 @@ public class studentrechw2bc15PROG
      
 	
   public static void main(String [ ] args) {
+    boolean SUCCESS1 = false;
+    boolean SUCCESS2 = false;
+    
     boolean SUCCESS = false;
     
-   
     Random randNumGenerator = new Random();
     
-    int number=  randNumGenerator.nextInt(1000000);
+    int number=  randNumGenerator.nextInt(100)+1;
 	
-    int number2=  randNumGenerator.nextInt(1000000);
+    int number2=  randNumGenerator.nextInt(100)+1;
     
-    if ((Prime(number, number-1) == modelPrime(number , number-1)) && (Prime(number2, (number2)-1) == modelPrime(number2 , (number2)-1))) SUCCESS = true;
-
+    if(Prime(number, number-1) == modelPrime(number , number-1))
+        SUCCESS1 = true;
+    
+    if(Prime(number2, number2-1) == modelPrime(number2 , number2-1))
+        SUCCESS2 = true;
+        
+    if (SUCCESS1 && SUCCESS2)
+       SUCCESS = true;
+           
     try{
 
      PrintWriter output = new PrintWriter("output");
@@ -43,7 +52,7 @@ public class studentrechw2bc15PROG
      }
     else 
     {
-     output.println("Try Again! Incorrect recursive call!");
+     output.println("Try Again! Incorrect Base Case(s)");
      output.close();
     }
   
