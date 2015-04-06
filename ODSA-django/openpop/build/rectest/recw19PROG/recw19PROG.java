@@ -1,6 +1,5 @@
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Exercise 19:  given stack without using any other data structures(or without extra memory). You cannot use any memory at all. All what you have to do is use recursion only to attain this. You don’t need to implement a function to push, pop or check if the stack is empty or not.
 
 import java.io.*;
 import java.util.Random;
