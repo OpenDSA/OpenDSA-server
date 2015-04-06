@@ -30,8 +30,8 @@
            class="btn btn-success btn-mini">
            <i></i> {% trans "Assignments activity" %}
         </a>
-        </a>  | <a href="{% url opendsa.developerview.student_list_home instance.instance_name %}" 
-           class="btn btn-success btn-mini">
+        </a>  | {% url opendsa.developerview.student_list_home instance.instance_name as the_url %} 
+               <a href="{{ the_url }}"   class="btn btn-success btn-mini">
            <i></i> {% trans "Students activity" %}
         </a>
 
