@@ -66,13 +66,42 @@ class BSTNode implements BinNode {
   // return TRUE if a leaf node, FALSE otherwise
   public boolean isLeaf() { return (left == null) && (right == null); }
 
-
 }
-
-
 
 public class studentbtSumAllPROG
 {
+
+    public static  long fTimeout=1;
+    public static boolean fFinished= false;
+    public static Throwable fThrown= null;
+    public static  BinNode rtmember; 
+    public static int studentAnswer;
+    public static void evaluate() throws Throwable {
+	    Thread thread= new Thread() {
+		@Override
+		public void run() {
+		 try {
+		  studentAnswer = btSumAll(rtmember);
+		  fFinished= true;
+		 } 
+          catch (Throwable e) {
+		  fThrown= e;
+		 }
+	       }
+	 };
+	
+        thread.start();
+		thread.join(fTimeout);
+		if (fFinished)
+			return;
+		if (fThrown != null)
+			throw fThrown;
+		Exception exception= new Exception(String.format(
+				"test timed out after %d milliseconds", fTimeout));
+		exception.setStackTrace(thread.getStackTrace());
+		throw exception;
+	
+	}
 
  public static int modelbtSumAll(BinNode rt) {
     if (rt == null) return 0; 
@@ -81,7 +110,8 @@ public class studentbtSumAllPROG
 
 
 
- public static void writeResult(BinNode rt,boolean SUCCESS){
+ 
+ public static void writeResult(BinNode rt,boolean SUCCESS , String treeAsString , int modelAnswer, int studentAnswer ){
  try{
 
      PrintWriter output = new PrintWriter("output");
@@ -93,8 +123,7 @@ public class studentbtSumAllPROG
      }
     else 
     {
-     //output.println("Try Again!  Expected Answer is "+ Integer.toString(count(rt)) +" Your Answer is: " + Integer.toString(exercise2(rt)));
-     output.println("Try Again! Your answer is not correct for all test cases."); // Later we should display the binary tree where the test case failed
+     output.println("Try Again! Your answer is not correct for all test cases. For example if the given tree is:\n " + treeAsString + ", your code returns:  " + studentAnswer+ " while the expected answer is: " + modelAnswer+"."); 
      output.close();
     }
   
@@ -105,10 +134,24 @@ public class studentbtSumAllPROG
 
  }
  
- public static boolean runTestCase(BinNode rt)
- { 
-   boolean SUCCESS = false;  
-   if (btSumAll(rt)  == modelbtSumAll(rt)) 
+ public static boolean runTestCase(BinNode rt , String treeAsString)
+ {  
+
+   try {
+     // Fail on time out
+     rtmember = rt;
+     evaluate();
+   
+    } catch(Throwable t) {
+    	
+        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+    }
+   boolean SUCCESS = false;
+   
+   int modelAnswer  = modelbtSumAll(rt);
+  // int studentAnswer= btSumAll(rt);
+   
+   if (modelAnswer  ==  studentAnswer)
    { 
      SUCCESS = true;   
    }
@@ -116,7 +159,7 @@ public class studentbtSumAllPROG
    else  // This test case fail then will write the result and abort the function
    {
     SUCCESS = false;
-    writeResult(rt , SUCCESS);
+    writeResult(rt , SUCCESS ,  treeAsString , modelAnswer, studentAnswer);
     
    }
   return SUCCESS;
@@ -126,13 +169,14 @@ public class studentbtSumAllPROG
 
   public static void main(String [ ] args) {
  
-  // We will more than one test case
-   
+ 
+  // We will have more than one test case
+   String treeAsString = " empty ";
   //First test case ..empty tree
    BSTNode root = null;
-   
+   Comparable value = new Integer(15);
   
-   if (runTestCase(root) == false) return;
+   if (runTestCase(root , treeAsString ) == false) return;
    ////// End of the first test case
 
    // Second test case
@@ -142,42 +186,33 @@ public class studentbtSumAllPROG
 
    root.setLeft(leftChild); 
    root.setRight(rightChild);
-   if (runTestCase(root)== false) return;
+   
+   treeAsString = "  10\n"
+                  +" / \\ \n"
+                  +"15 20 \n ";
+ 
+   if (runTestCase(root , treeAsString )== false) return;
    ////// End of the second test case
 
 
   //Third test case
   root= null;
-  root = new BSTNode(10);
-  BSTNode currentNode= root;
-  ArrayList <BSTNode> leftChildren = new ArrayList<BSTNode>() ; 
-  ArrayList <BSTNode> rightChildren = new ArrayList<BSTNode>() ;
+  root = new BSTNode(5);
+  leftChild = new BSTNode(15);
+  rightChild = new BSTNode(15);
 
-  for (int i=0 ; i<10; i++)
-  {   
-   leftChildren.add( new BSTNode(15));
-   rightChildren.add( new BSTNode(15));
-  
-  }
-
-   for (int i=0 ; i<10; i++)
-  {      
-   currentNode.setLeft(leftChildren.get( i));
-   currentNode = leftChildren.get( i);
-  }
-  currentNode= root;
-
-   for (int i=0 ; i<10; i++)
-  {   
-   currentNode.setRight(rightChildren.get( i));
-   currentNode = rightChildren.get(i);
-  }
- currentNode=root;
+   root.setLeft(leftChild); 
+   root.setRight(rightChild);
  
-  if (runTestCase(root ) == false) return;
+ treeAsString = "  5\n"
+                  +" / \\ \n"
+                  +"15 15 \n ";
+ 
+  if (runTestCase(root , treeAsString ) == false) return;
  ///End of the third test case
 
   // If none the test cases failed then all of them are ok then sucess=true
-  writeResult(root , true);
+  writeResult(root , true , treeAsString  , 0 , 0);
+
 
   } 
