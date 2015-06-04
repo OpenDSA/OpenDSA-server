@@ -4,6 +4,7 @@ import json
 
 #Django
 from django.contrib.auth.models import User
+from django.conf import settings
 
 # A+
 from userprofile.models import UserProfile
@@ -11,12 +12,12 @@ from course.models import CourseInstance
 
 # OpenDSA
 from opendsa.models import Exercise, UserExercise, Module, UserModule, Books, BookModuleExercise, UserExerciseLog, UserButton, UserData, UserBook
-from opendsa.statistics import is_authorized
+from opendsa.statistics import is_authorized, display_grade
 
 # Django
 from django.template.context import RequestContext
 from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
+#from django.contrib.admin.views.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponse, HttpResponseForbidden
 from course.context import CourseContext
@@ -26,6 +27,7 @@ from settings import STATIC_URL
 import time
 import datetime
 import os
+import csv
 
 # For convenience we store the name of the course mapped to book number
 course_name = {4: 'CS223', 5:'CS3114A', 6:'CS3114B'}
@@ -73,7 +75,16 @@ def median(mylist):
     return (sorts[length / 2] + sorts[length / 2 - 1]) / 2.0
   return sorts[length / 2]
 
-@staff_member_required
+
+def average(mylist):
+  if len(mylist) == 0:
+    return ''
+
+  return sum(mylist)/float(len(mylist))
+
+
+
+@login_required
 def work_distribution(request, book, bin_size):
   # Select all users of a given book, except staff accounts, the phantom (guest) account and abandoned accounts
   users = UserBook.objects.filter(book=book, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
@@ -86,7 +97,7 @@ def work_distribution(request, book, bin_size):
   
   bins = {}
   
-  user_exercises = UserExercise.objects.filter(user__in=users, proficient_date__gt=datetime.date(2012, 1, 1)).order_by('proficient_date')
+  user_exercises = UserExercise.objects.filter(user__in=users, proficient_date__gt=datetime.date(2013, 1, 1)).order_by('proficient_date')
   
   # Base time is the first time proficiency was obtained on an exercise
   base_time = time.mktime(user_exercises[0].proficient_date.timetuple())
@@ -102,11 +113,11 @@ def work_distribution(request, book, bin_size):
       bins[bin_num] += 1
   
   # Create the CSV directory if necessary
-  if not os.path.exists('CSV'):
-    os.mkdir('CSV')
+  if not os.path.exists(settings.MEDIA_ROOT + 'CSV'):
+    os.mkdir(settings.MEDIA_ROOT + 'CSV')
   
   # Create a CSV file with the bin information
-  with open('CSV/' + book + '_work_distribution' + str(bin_size) + 'hr_res.csv', 'w') as file:
+  with open(settings.MEDIA_ROOT + 'CSV/' + book + '_work_distribution' + str(bin_size) + 'hr_res.csv', 'w') as file:
     #file.writelines('Calculating a Threshold from Bins of Module Times,Bin size = %s seconds\n' % bin_size)
     file.writelines('Time (Hours),Number of Proficient Exercises Completed In Time Range\n')
 
@@ -123,57 +134,131 @@ def work_distribution(request, book, bin_size):
   return render_to_response("developer_view/default_csv_view.html")
 
 # TODO: This is SLOOOOWWWWW!!
-@staff_member_required
+@login_required
 def time_required(request, book):
   # Compute average for each exercise across all students who complete it
   # Compute average for each student across all exercises they computer
 
   # Select all users of a given book, except staff accounts, the phantom (guest) account and abandoned accounts
   users = UserBook.objects.filter(book=book, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
-  users = [user for user in users]
+  obj_book = Books.objects.get(id = book)
+  users1 = []
+  for user in users:
+    if display_grade(user,obj_book):
+      users1.append(user)
+
+  users = [user for user in users1]
+  #users = [user for user in users]
   users.sort()
-  
-  exer_order = OrderedDict()
-  
+  exer_order = {} #OrderedDict()
+  exer_order['ss'] = []
+  exer_order['av'] = []
+  exer_order['pe'] = []
+  exer_order['cc'] = []
+  exer_order['ps'] = []
+  exer_order['mp'] = []
+  exer_order['ka'] = []
+  exer_order['ot'] = []
+
   # Specify mini-slideshow order
-  exer_order['ss'] = ["InssortCON1", "InssortCON2", "InssortCON3", "BubsortCON1", "BubsortCON2", "SelsortCON1", "SelsortCON2", "shellsortCON1", "shellsortCON2", "shellsortCON4", "shellsortCON5", "shellsortCON7", "shellsortCON9", "mergesortCON1", "mergeImplCON1", "mergeImplCON2", "QuicksortCON1", "heapsortCON", "BinsortCON1", "BinsortCON2", "hashIntroCON1", "hashFuncExCON1", "hashFuncExCON2", "buckethashCON1", "buckethashCON2", "linProbeCON1", "linProbeCON2", "collisionCON1", "collisionCON2", "collisionCON3", "collisionCON4", "collisionCON5", "collisionCON6", "collisionCON7", "collisionCON8", "hashdelCON1"]
+  #exer_order['ss'] = ["InssortCON1", "InssortCON2", "InssortCON3", "BubsortCON1", "BubsortCON2", "SelsortCON1", "SelsortCON2", "shellsortCON1", "shellsortCON2", "shellsortCON4", "shellsortCON5", "shellsortCON7", "shellsortCON9", "mergesortCON1", "mergeImplCON1", "mergeImplCON2", "QuicksortCON1", "heapsortCON", "BinsortCON1", "BinsortCON2", "hashIntroCON1", "hashFuncExCON1", "hashFuncExCON2", "buckethashCON1", "buckethashCON2", "linProbeCON1", "linProbeCON2", "collisionCON1", "collisionCON2", "collisionCON3", "collisionCON4", "collisionCON5", "collisionCON6", "collisionCON7", "collisionCON8", "hashdelCON1"]
 
   # Specify AV order
-  exer_order['av'] = ["insertionsortAV", "bubblesortAV", "selectionsortAV", "shellsortAV", "mergesortAV", "quicksortAV", "QuicksortCON1", "heapsortCON", "BinsortCON1", "BinsortCON2", "radixLinkAV", "radixArrayAV"]
+  #exer_order['av'] = ["insertionsortAV", "bubblesortAV", "selectionsortAV", "shellsortAV", "mergesortAV", "quicksortAV", "QuicksortCON1", "heapsortCON", "BinsortCON1", "BinsortCON2", "radixLinkAV", "radixArrayAV"]
 
   # Specify proficiency exercise order
-  exer_order['pe'] = ["ShellsortProficiency", "mergesortProficiency", "quicksortProficiency", "heapsortProficiency", "HashingDeleteProficiency"]
+  #exer_order['pe'] = ["ShellsortProficiency", "mergesortProficiency", "quicksortProficiency", "heapsortProficiency", "HashingDeleteProficiency"]
 
   # Specify calculator order
-  exer_order['cc'] = ["Birthday", "MidSquare", "StringSimple", "StringSfold"]
+  #exer_order['cc'] = ["Birthday", "MidSquare", "StringSimple", "StringSfold"]
 
   # Specify proficiency exercise order
-  exer_order['ps'] = ["ShellsortPerformance"]
+  #exer_order['ps'] = ["ShellsortPerformance"]
 
   # Specify mini-proficiency exercise order
-  exer_order['mp'] = ["InssortPRO", "BubsortPRO", "SelsortPRO", "FindInversionsPRO", "ShellsortSublist", "ShellsortSeries", "MergesortPRO", "QuicksortPivotPRO", "QuicksortPartitPRO", "HeapsortPRO", "RadixsortPRO", "OpenHashPRO", "HashingBucketPRO", "HashingBucket2PRO", "HashingLinearProbePRO", "HashingLinearStepProbePRO", "HashingPseudoRandomProbePRO", "HashingQuadraticProbePRO", "HashingDoubleProbePRO"]
+  #exer_order['mp'] = ["InssortPRO", "BubsortPRO", "SelsortPRO", "FindInversionsPRO", "ShellsortSublist", "ShellsortSeries", "MergesortPRO", "QuicksortPivotPRO", "QuicksortPartitPRO", "HeapsortPRO", "RadixsortPRO", "OpenHashPRO", "HashingBucketPRO", "HashingBucket2PRO", "HashingLinearProbePRO", "HashingLinearStepProbePRO", "HashingPseudoRandomProbePRO", "HashingQuadraticProbePRO", "HashingDoubleProbePRO"]
 
   # Specify KA (summary) exercise order
-  exer_order['ka'] = ["SortIntroSumm", "InssortSumm", "BubsortSumm", "SelsortSumm", "SortCompareSumm", "ExchangeSumm", "ShellsortSumm", "MergesortSumm", "QuicksortSumm", "HeapsortSumm", "RadixSortSumm", "SortAlgCompSumm", "SortBoundSumm", "ChapterSumm", "HashFuncPROSumm", "HashFuncSumm", "HashAnalSumm", "HashDelSumm", "HashChapterSumm"]
+  #exer_order['ka'] = ["SortIntroSumm", "InssortSumm", "BubsortSumm", "SelsortSumm", "SortCompareSumm", "ExchangeSumm", "ShellsortSumm", "MergesortSumm", "QuicksortSumm", "HeapsortSumm", "RadixSortSumm", "SortAlgCompSumm", "SortBoundSumm", "ChapterSumm", "HashFuncPROSumm", "HashFuncSumm", "HashAnalSumm", "HashDelSumm", "HashChapterSumm"]
 
-  user_exercise_logs = UserExerciseLog.objects.filter(user__in=users).order_by('time_done').only('user', 'exercise', 'time_taken', 'earned_proficiency', 'count_attempts')
+  user_exercise_logs = UserExerciseLog.objects.filter(user__in=users).order_by('time_done').only('user', 'exercise', 'time_taken', 'earned_proficiency', 'count_attempts', 'time_done', 'correct')
 
   exer_data = {}
-  
+  #exer_data[1] = {}
+  #exer_data[2] = {}
+  #exer_data[3] = {}  
+
+
   user_data = OrderedDict()
+  user_data_ss = OrderedDict()
+  user_proftime = OrderedDict()
+  prev_profdate = 0
 
   for uel in user_exercise_logs:
     user = uel.user.id
     exer_name = uel.exercise.name
     time_taken = uel.time_taken
 
+    if exer_name not in exer_order[uel.exercise.ex_type]:
+      exer_order[uel.exercise.ex_type].append(exer_name)
+
     # Initialize dictionary of exercises and exercise type lists for each user
     if user not in user_data:
-      user_data[user] = {'ss': [], 'av': [], 'pe': [], 'cc': [], 'ps': [], 'mp': [], 'ka': []}
+      user_data[user] = {'ss': [], 'av': [], 'pe': [], 'cc': [], 'ps': [], 'mp': [], 'ka': [], 'ot':[]}
+      user_proftime[user]  = {'ss': [], 'av': [], 'pe': [], 'cc': [], 'ps': [], 'mp': [], 'ka': [], 'ot':[], 'all':[]}
+      user_data_ss[user] = []
 
     # Initialize dictionary of stats for each exercise
     if exer_name not in user_data[user]:
       user_data[user][exer_name] = {'time_required': 0, 'proficient': False}
+      user_proftime[user][exer_name] = {'prof_date': [], 'delta': [], 'time_taken': []}
+
+
+    # Record proficiency date difference
+    if uel.earned_proficiency == 1:
+      if prev_profdate == 0:
+         prev_profdate = uel.time_done
+      if len(user_proftime[user]['all']) == 0:
+        user_proftime[user]['all'].append(0) #'2000-01-01 00:00:00')
+      else:
+        b = uel.time_done
+        user_proftime[user]['all'].append((b - prev_profdate).total_seconds())
+
+      if len(user_proftime[user][uel.exercise.ex_type]) == 0:
+        user_proftime[user][uel.exercise.ex_type].append(0)
+      else:
+        user_proftime[user][uel.exercise.ex_type].append((b - prev_profdate).total_seconds())
+  
+      if len(user_proftime[user][exer_name]) == 0:
+        user_proftime[user][exer_name]['prof_date'].append(uel.time_done)
+        user_proftime[user][exer_name]['delta'].append(0)
+      else:
+        user_proftime[user][exer_name]['prof_date'].append(uel.time_done)
+        b = uel.time_done
+        user_proftime[user][exer_name]['delta'].append((b - prev_profdate).total_seconds())
+      prev_profdate = uel.time_done
+
+
+
+    # Get time taken for all ss proficient attempt
+    if uel.exercise.ex_type == 'ss':
+      #if uel.correct == 1:
+      user_proftime[user][exer_name]['time_taken'].append(time_taken)
+        #user_data_ss[user].append(time_taken)
+        #if exer_name not in exer_data[1] and exer_name not in exer_data[2] and exer_name not in exer_data[3]:
+        #  exer_data[1][exer_name] = []
+        #  exer_data[2][exer_name] = []
+        #  exer_data[3][exer_name] = []
+        #if len(exer_data[1][exer_name]) == 0:
+        #  exer_data[1][exer_name].append(time_taken)
+        #elif len(exer_data[1][exer_name]) != 0 and len(exer_data[2][exer_name]) == 0:
+        #  exer_data[2][exer_name].append(time_taken)          
+        #elif len(exer_data[1][exer_name]) != 0 and len(exer_data[2][exer_name]) != 0 and len(exer_data[3][exer_name]) != 0:
+        #  exer_data[3][exer_name].append(time_taken)
+        
+
+
+
 
     # If the user is not yet proficient with the exercise we add the time taken by the exercise
     if not user_data[user][exer_name]['proficient']:
@@ -191,44 +276,114 @@ def time_required(request, book):
         user_data[user][exer_name]['proficient'] = True
         
         time = user_data[user][exer_name]['time_required']
+
         
         # Record the total time required (associated with an exercise)
         if exer_name not in exer_data:
           exer_data[exer_name] = []
+
         
         exer_data[exer_name].append(time)
         
         # Record the total time required (associated with the user's appropriate exercise type list)
-        for exer_type in exer_order:
-          if exer_name in exer_order[exer_type]:
-            user_data[user][exer_type].append(time)
-            break
+        #for exer_type in exer_order:
+        #  if exer_name in exer_order[exer_type]:
+        #    user_data[user][exer_type].append(time)
+        #    break
+         
+        if uel.exercise.ex_type in user_data[user]:
+          user_data[user][uel.exercise.ex_type].append(time)
+        else:
+          user_data[user]['ot'].append(time)
 
   # Create the CSV directory if necessary
-  if not os.path.exists('CSV'):
-    os.mkdir('CSV')
+  if not os.path.exists( settings.MEDIA_ROOT + 'CSV'):
+    os.mkdir(settings.MEDIA_ROOT + 'CSV')
 
-  with open('CSV/' + book + '_time_required_by_student.csv', 'w') as file:
+  with open(settings.MEDIA_ROOT + 'CSV/' + book + '_median_time_required_by_student.csv', 'w') as file:
     file.write('Time (in seconds) Required by Student (' + course_name[int(book)] + ')\n')
     file.write('User,' + ','.join(exer_type.upper() + ' Median' for exer_type in exer_order.keys()) + '\n')
-
-    for user in users:
+    #file.write('User,' + ','.join(exer_type.upper() + ' Median' for exer_type in ['ss','av','pe','cc','ps','mp','ka','ot']) + '\n')
+    for user in user_data.keys(): #users:
       # Append the user ID and medians of each exercise type list to the file
-      file.write(('%s,' % user) + ','.join(str(median(user_data[user][t])) if t in user_data[user] else '' for t in exer_order.keys()) + '\n')
+      if user_data[user]:
+        file.write(('%s,' % user) + ','.join(str(median(user_data[user][t])) if t in user_data[user] else '' for t in exer_order.keys()) + '\n')
 
-  with open('CSV/' + book + '_time_required_by_exercise.csv', 'w') as file:
+
+
+  #with open(settings.MEDIA_ROOT + 'CSV/' + book + '_avg_time_required_by_student.csv', 'w') as file:
+  #  file.write('Average Time (in seconds) Required by Student (' + course_name[int(book)] + ')\n')
+  #  file.write('User,' + ','.join(exer_type.upper() + ' Average' for exer_type in exer_order.keys()) + '\n')
+    #file.write('User,' + ','.join(exer_type.upper() + ' Median' for exer_type in ['ss','av','pe','cc','ps','mp','ka','ot']) + '\n')
+  #  for user in user_data.keys(): #users:
+      # Append the user ID and medians of each exercise type list to the file
+  #    if user_data[user]:
+  #      file.write(('%s,' % user) + ',' + str(average(user_data[user][t])) if t in user_data[user] else '' for t in exer_order.keys() + '\n')
+
+  with open(settings.MEDIA_ROOT + 'CSV/' + book + '_prof_time_taken_by_student_vs_ss.csv', 'w') as file:
+    file.write('Average Time (in seconds) Required by Student (' + course_name[int(book)] + ')\n')
+    file.write('User,' + ','.join(exer_type.upper() + ' Average' for exer_type in exer_order.keys()) + '\n')
+    #file.write('User,' + ','.join(exer_type.upper() + ' Median' for exer_type in ['ss','av','pe','cc','ps','mp','ka','ot']) + '\n')
+    for user in user_data.keys(): #users:
+      # Append the user ID and medians of each exercise type list to the file
+      if user_data_ss[user]:
+        file.write(('%s,' % user) + ','.join(map(str,user_data_ss[user]))  + '\n')
+
+
+
+  # Print all proficiency delta
+  with open(settings.MEDIA_ROOT + 'CSV/' + book + '_proficiency_time_by_student.csv', 'wb') as file:
+    file.write('Proficiency delta (in seconds) between proficiency (' + course_name[int(book)] + ')\n')
+    #file.write('Proficiency delta (in seconds) between proficiency (' + course_name[int(book)] + ')\n\n')
+    for user in user_proftime.keys():
+      if user_proftime[user]:
+        #file.writewriterows(('%s,' % user) + ','.join(map(str,user_proftime[user]['all'])))
+        file.write(('%s,' % user) + ','.join(map(str,user_proftime[user]['all'])) + '\n')
+  # Print all proficiency time deltas for each exercise type
+  for exer_type in exer_order:
+    with open(settings.MEDIA_ROOT + 'CSV/' + book + '_proficiency_delta_student_vs_' + exer_type.upper() + '.csv', 'w') as sve:
+      #writer = csv.writer(sve)
+      sve.write('Delta (in seconds) between exercise profiency -- Exercise vs Student (' + course_name[int(book)] + ')\n\n')
+      for user in user_proftime.keys():
+        if user_proftime[user]:
+          sve.write(('%s,' % user) + ','.join(map(str, user_proftime[user][exer_type])) + '\n')
+
+  # Print all time taken for all ss attempts by students by exercises
+  with open(settings.MEDIA_ROOT + 'CSV/' + book + '_time_taken_attempts_by_exercise.csv', 'w') as file:
+    file.write('Time (in seconds) taken By Exercise (' + course_name[int(book)] + ')\n\n')
+    for user in user_proftime.keys():
+      for exer_name in user_proftime[user].keys():
+        if exer_name not in ['ss', 'av', 'pe', 'cc', 'ps', 'mp', 'ka', 'ot', 'all']:
+          file.write(('%s,' % user) + exer_name + ',' + ','.join(map(str,user_proftime[user][exer_name]['time_taken'])) + '\n')
+
+    #for exer_name in exer_order['ss']:
+    #  if exer_name in exer_data[1].keys(): 
+    #    file.write(exer_name + ',' + ','.join(map(str,exer_data[1][exer_name])) + '\n')
+    #  if exer_name in exer_data[2].keys():
+    #    file.write(exer_name + ',' +','.join(map(str,exer_data[2][exer_name])) + '\n')
+    #  if exer_name in exer_data[3].keys():
+    #    file.write(exer_name + ',' +','.join(map(str,exer_data[3][exer_name])) + '\n')
+
+
+
+
+  with open(settings.MEDIA_ROOT + 'CSV/' + book + '_time_required_by_exercise.csv', 'w') as file:
     file.write('Time (in seconds) Required By Exercise (' + course_name[int(book)] + ')\n\n')
     
     for exer_type in exer_order:
       file.write(','.join(exer_order[exer_type]) + '\n')
-      file.write(','.join(str(median(exer_data[exer])) if exer in exer_data else '' for exer in exer_order[exer_type]) + '\n\n')
+      file.write(','.join(str(median(exer_data[exer])) if exer in exer_data else '' for exer in exer_order[exer_type]) + '\n')
+      file.write(','.join(str(average(exer_data[exer])) if exer in exer_data else '' for exer in exer_order[exer_type]) + '\n\n')
+      
+      #file.write(','.join(str(median(exer_data[exer])) if exer in exer_data else '' ) + '\n\n')
 
       # Print all of a students medians for all exercises (so additional processing can be done such as quartiles for a specific exercise or T-test on a specific exercise between classes)
-      with open('CSV/' + book + '_time_required_student_vs_' + exer_type.upper() + '.csv', 'w') as sve:
+      with open(settings.MEDIA_ROOT + 'CSV/' + book + '_time_required_student_vs_' + exer_type.upper() + '.csv', 'w') as sve:
         sve.write('Time (in seconds) Required -- Exercise vs Student (' + course_name[int(book)] + ')\n\n')
         sve.write('User,' + ','.join(exer for exer in exer_order[exer_type]) + '\n')
-        
-        for user in users:
+        #sve.write('User,' + ','.join(['ss','av','pe','cc','ps','mp','ka','ot']) + '\n')        
+
+        for user in user_data.keys(): #users:
           # Append the user ID and medians of each exercise type list to the file
           sve.write(('%s,' % user) + ','.join(str(user_data[user][exer]['time_required']) if exer in user_data[user] else '' for exer in exer_order[exer_type]) + '\n')
 
@@ -358,7 +513,7 @@ def skipping_text(request, book):
 
   return render_to_response("developer_view/default_csv_view.html")
 
-@staff_member_required
+@login_required
 def slideshow_stats(request, book):
   # Needs to count the total number of slideshows a student attempts, the number they complete, the number they cheat on and the average time
 
@@ -573,7 +728,7 @@ def slideshow_stats(request, book):
 
   return render_to_response("developer_view/default_csv_view.html")
 
-@staff_member_required
+@login_required
 def cheating_exercises(request, book):
   # Calculate total number of times each proficiency exercise is completed (with respect to the current book)
   # Calculate total number of times students used an AV for assistance on each proficiency exercise
@@ -735,7 +890,7 @@ def cheating_exercises(request, book):
 
 
 
-@staff_member_required
+@login_required
 def work_order(request, book):
   # Select all users of a given book, except staff accounts, the phantom (guest) account and abandoned accounts
   users = UserBook.objects.filter(book=book, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
@@ -839,7 +994,7 @@ def work_order(request, book):
   return render_to_response("developer_view/default_csv_view.html")
 
 
-@staff_member_required
+@login_required
 def non_required_exercise_use(request):
   book = 5
 
@@ -941,7 +1096,7 @@ def get_unique(list):
   list = [ x for x in list if x not in seen and not seen_add(x)]
   return list
 
-@staff_member_required
+@login_required
 def exercise_list(request, student):
   interesting_events = ['jsav-end', 'jsav-forward', 'jsav-array-click', 'odsa-award-credit']
   
@@ -969,7 +1124,7 @@ def exercise_list(request, student):
 
   return render_to_response("developer_view/exercise_list.html", {'exercises': exercises, 'student': student})
 
-@staff_member_required
+@login_required
 def slideshow_cheating(request, student):
   # Maps an exercise name to a dictionary which which stores the number of times a student completed the slideshow (key: 'completed' and the number of times they cheated on the slideshow ('cheated')
   exer_data = OrderedDict()
@@ -1025,7 +1180,7 @@ def slideshow_cheating(request, student):
   
   return render_to_response("developer_view/slideshow_cheating.html", {'exer_data': exer_data, 'cheated_for_prof': cheated_for_prof_names})
 
-@staff_member_required
+@login_required
 def total_module_time(request):
   events = ['document-ready', 'window-unload', 'window-blur', 'window-focus']
   
@@ -1101,7 +1256,7 @@ class exeStat:
 
 #function to display the statistics of exercises
 #return the percentage of people that have achieved proficiency for each exercise
-@staff_member_required
+@login_required
 def exercises_stat(request):
     userExercise = UserExercise.objects.order_by('exercise').all();
         
@@ -1123,7 +1278,7 @@ def exercises_stat(request):
 
 #function to display a graph for the statistics of exercises
 #return the total number of proficiency achieved for each exercise
-@staff_member_required
+@login_required
 def exercises_bargraph(request):
     
     userExercise = UserExercise.objects.order_by('exercise').all();
@@ -1147,7 +1302,7 @@ def exercises_bargraph(request):
 #function to display a time distribution graph for the statistics of exercises
 #return the average time taken for an exercise
 #TODO: debug
-@staff_member_required
+@login_required
 def exercises_time(request):
     
     userExerciseLog = UserExerciseLog.objects.order_by('exercise').all();
@@ -1170,7 +1325,7 @@ def exercises_time(request):
                 
     return render_to_response("developer_view/exercises_time.html", {'exercises': exercises })
 
-@staff_member_required
+@login_required
 def student_list_home(request, course_instance = None):
 
 
@@ -1192,7 +1347,7 @@ def student_list_home(request, course_instance = None):
 
 #This function responds student list (not staff or super user)
 #The student information includes id(in the database), user name, and email, etc
-@staff_member_required
+@login_required
 def student_list(request):
 
     courses_intances = CourseInstance.objects.all()
@@ -1242,7 +1397,7 @@ class proficient_exercises:
     def get_number_print(self):
         return self.number*20
 
-@staff_member_required
+@login_required
 def student_exercise(request, course, student):
     userButtons = UserButton.objects.filter(user=student, name='document-ready')
 
@@ -1313,7 +1468,7 @@ class exercise_step:
         return float(self.click_num)/float(self.max_click)*500.0
 
 
-@staff_member_required    
+@login_required    
 def exercise_detail(request, student, exercise):
     #The activities of a user and an exercise
     userButtons = UserButton.objects.filter(user=student).filter(exercise=exercise).order_by('action_time')
@@ -1471,7 +1626,7 @@ class docready_event():
         return 0;
 
 #The first time line model
-@staff_member_required
+@login_required
 def timeline_sum(request, student):
     #This query fetches the document ready activities of a user
     userButtons = UserButton.objects.filter(user=student).filter(name='document-ready')
@@ -1508,7 +1663,7 @@ class general_event():
         
 
 #time line detail model
-@staff_member_required
+@login_required
 def timeline_detail(request, student, module, year, month, day):
     
     #This query fetches the activities of a user, a model, an action date except the document ready actions

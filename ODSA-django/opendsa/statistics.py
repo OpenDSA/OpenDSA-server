@@ -134,62 +134,96 @@ def get_widget_data():
         print "error ({0}) written file : {1}".format(e.errno, e.strerror)
 
 
-def post_proficiency():
+def post_proficiency( book, courseinstance):
     #detailed data on post proficiency
 
     users_pp_logs=[]
+    users_pp_avg = {}
 
     #get books and courses
-    all_books_courses = Books.objects.raw('''SELECT `id`, `books_id`, `courseinstance_id` 
-                                             FROM `opendsa_books_courses` 
-                                         ''' ) 
+    #all_books_courses = Books.objects.raw('''SELECT `id`, `books_id`, `courseinstance_id` 
+    #                                         FROM `opendsa_books_courses` 
+    #                                     ''' ) 
+
+    #get exercises in the book
+    exercise_book = Books.objects.raw('''SELECT id, exercise_id
+                                                   FROM `opendsa_bookmoduleexercise`
+                                                   WHERE `book_id`=%s
+                                                ''',[book])
+    
+    #get exercises in the book
+    exercise_book = Books.objects.raw('''SELECT id, exercise_id
+                                                  FROM `opendsa_bookmoduleexercise`
+                                                  WHERE `book_id`=%s
+                                               ''',[book])
 
 
-    for abc in all_books_courses:
+    #for abc in all_books_courses:
 
         #get course instance
-        book_course =  Books.objects.raw('''SELECT `id`, `instance_name`
-                                             FROM `course_courseinstance` 
-                                             WHERE `id`=%s
-                                         ''', [abc.courseinstance_id] )
+    book_course =  Books.objects.raw('''SELECT `id`, `instance_name`
+                                        FROM `course_courseinstance` 
+                                        WHERE `id`=%s
+                                     ''', [courseinstance] )
 
 
         #get exercises in the book
-        exercise_book = Books.objects.raw('''SELECT id, exercise_id
-                                                      FROM `opendsa_bookmoduleexercise`
-                                                      WHERE `book_id`=%s
-                                                   ''',[abc.books_id])
+        #exercise_book = Books.objects.raw('''SELECT id, exercise_id
+        #                                              FROM `opendsa_bookmoduleexercise`
+        #                                              WHERE `book_id`=%s
+        #                                           ''',[abc.books_id])
 
         #get students id
-        user_book = UserBook.objects.raw('''SELECT `id`, `user_id` FROM `opendsa_userbook`
-                                            WHERE `book_id`=%s
-                                        ''',[abc.books_id]) 
-        for ub in user_book:
-            processed_exe = [] 
-            for eb in exercise_book:
-                if eb.exercise_id not in processed_exe:
-                    processed_exe.append(eb.exercise_id)
-                    exercise_data = Exercise.objects.raw('''SELECT `id`, `name`, `ex_type` 
-                                                            FROM `opendsa_exercise`
-                                                            WHERE `id`=%s
-                                                         ''',[eb.exercise_id])
+    user_book = UserBook.objects.raw('''SELECT `id`, `user_id` FROM `opendsa_userbook`
+                                        WHERE `book_id`=%s and grade='1'
+                                    ''',[book]) 
+    for ub in user_book:
+        processed_exe = []
+        pp_logs={}
+        pp_logs['book'] = ''
+        pp_logs['student'] = 0
+        pp_logs['exercise'] = ''
+        pp_logs['type'] = ''
+        pp_logs['prof_date']= ''
+        pp_logs['number_pp'] = 0
+        pp_list =[]
+        pp_ka_list =[]
+        pp_pe_list =[]
+        pp_ss_list =[]
+        pp_ot_list =[]
 
-                    user_prof_date = UserExercise.objects.raw('''SELECT `id`, `proficient_date` FROM `opendsa_userexercise`
-                                                                 WHERE `user_id`=%s AND `exercise_id`=%s
-                                                              ''',[ub.user_id,eb.exercise_id])
+
+
+
+        for eb in exercise_book:
+            if eb.exercise_id not in processed_exe:
+                processed_exe.append(eb.exercise_id)
+                exercise_data = Exercise.objects.raw('''SELECT `id`, `name`, `ex_type` 
+                                                        FROM `opendsa_exercise`
+                                                        WHERE `id`=%s
+                                                     ''',[eb.exercise_id])
+
+                user_prof_date = UserExercise.objects.raw('''SELECT `id`, `proficient_date` FROM `opendsa_userexercise`
+                                                             WHERE `user_id`=%s AND `exercise_id`=%s
+                                                          ''',[ub.user_id,eb.exercise_id])
                 
 
-                    for upd in user_prof_date:
-                        pp_logs={}
-                        pp_logs['book'] = ''
-                        pp_logs['student'] = 0
-                        pp_logs['exercise'] = ''
-                        pp_logs['type'] = ''
-                        pp_logs['prof_date']= ''
-                        pp_logs['number_pp'] = 0
+                for upd in user_prof_date:
+                    #pp_logs={}
+                    #pp_logs['book'] = ''
+                    #pp_logs['student'] = 0
+                    #pp_logs['exercise'] = ''
+                    #pp_logs['type'] = ''
+                    #pp_logs['prof_date']= ''
+                    #pp_logs['number_pp'] = 0
+                    #pp_list =[]
+                    #pp_ka_list =[]
+                    #pp_pe_list =[]
+                    #pp_ss_list =[]
+                    #pp_ot_list =[]
 
-                        for bc in book_course:
-                            pp_logs['book'] = str(bc.instance_name)
+                    for bc in book_course:
+                        pp_logs['book'] = str(bc.instance_name)
  
                         pp_logs['student'] = int(ub.user_id)
                         for ed in exercise_data:
@@ -197,18 +231,64 @@ def post_proficiency():
                             pp_logs['type'] = str(ed.ex_type)
 
                         pp_logs['prof_date']= str(upd.proficient_date)
-       
-                        exe_prof_data = UserExerciseLog.objects.raw('''SELECT `id`, COUNT( * ) AS numb_pp
+
+                        if str(ed.ex_type) == 'ka':
+                            exe_prof_data = UserExercise.objects.raw('''SELECT `id`, FLOOR(progress) AS numb_pp
+                                                                    FROM  `opendsa_userexercise`
+                                                                    WHERE `user_id`=%s and `exercise_id`=%s
+                                                                    ''',[ub.user_id,eb.exercise_id])
+                        else:       
+                            exe_prof_data = UserExerciseLog.objects.raw('''SELECT `id`, COUNT( * ) AS numb_pp
                                                                     FROM  `opendsa_userexerciselog`
                                                                     WHERE `user_id`=%s and `exercise_id`=%s
-                                                                           and `time_done`>%s 
+                                                                    and `time_done`>%s 
                                                                     ''',[ub.user_id,eb.exercise_id,upd.proficient_date])
                         for epd in exe_prof_data:
                             pp_logs['number_pp'] = int(epd.numb_pp)
-
+                            pp_list.append(int(epd.numb_pp))
+                            if str(ed.ex_type) == 'ka':
+                                pp_ka_list.append(int(epd.numb_pp))  
+                            elif str(ed.ex_type) == 'pe':
+                                pp_pe_list.append(int(epd.numb_pp))
+                            elif str(ed.ex_type) == 'ss':
+                                pp_ss_list.append(int(epd.numb_pp))
+                            else:
+                                pp_ot_list.append(int(epd.numb_pp))
 
                         users_pp_logs.append(pp_logs)
+        if len(pp_ka_list)==0:
+            pp_ka_list.append(0)
+        if len(pp_pe_list)==0:
+            pp_pe_list.append(0)
+        if len(pp_ss_list)==0:
+            pp_ss_list.append(0)
+        if len(pp_ot_list)==0:
+            pp_ot_list.append(0)
+        if len(pp_list)==0:
+            pp_list.append(0)
+                        
+        print "************************"
+        print pp_list
+        print pp_ka_list
+        print pp_pe_list
+        print pp_ss_list
+        print pp_ot_list
+        print "%%%%%%%%%%%%%%%%%%%%%%%%"
+        users_pp_avg[int(ub.user_id)] = [sum(pp_list)/float(len(pp_list)),sum(pp_ka_list)/float(len(pp_ka_list)), sum(pp_pe_list)/float(len(pp_pe_list)), sum(pp_ss_list)/float(len(pp_ss_list)), sum(pp_ot_list)/float(len(pp_ot_list))]
 
+
+    print users_pp_avg
+    #write averages in file
+    try:
+        with open(settings.MEDIA_ROOT + 'proficiency_avg.csv','wb+') as outfile:
+            f = csv.writer(outfile)
+            f.writerow(["id", "avg_pp", "ka_avg_pp", "pe_avg_pp", "ss_avg_pp", "ot_avg_pp"])
+        
+            for x,y in users_pp_avg.iteritems():
+                f.writerow([x,str(y[0]),str(y[1]),str(y[2]),str(y[3]),str(y[4])])
+        
+    except IOError as e:
+        print "error ({0}) written file : {1}".format(e.errno, e.strerror)
         #write data into a file
     try:
         users_pp_logs = str(users_pp_logs).replace("'",'"')
