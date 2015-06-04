@@ -71,8 +71,42 @@ class BSTNode implements BinNode {
 
 
 
+
 public class studentbtIncPROG
 {
+
+    public static  long fTimeout=1;
+    public static boolean fFinished= false;
+    public static Throwable fThrown= null;
+    public static  BSTNode rtmember; 
+
+    public static void evaluate() throws Throwable {
+	    Thread thread= new Thread() {
+		@Override
+		public void run() {
+		 try {
+		  btInc(rtmember);
+		  fFinished= true;
+		 } 
+          catch (Throwable e) {
+		  fThrown= e;
+		 }
+	       }
+	 };
+	
+        thread.start();
+		thread.join(fTimeout);
+		if (fFinished)
+			return;
+		if (fThrown != null)
+			throw fThrown;
+		Exception exception= new Exception(String.format(
+				"test timed out after %d milliseconds", fTimeout));
+		exception.setStackTrace(thread.getStackTrace());
+		throw exception;
+	
+	}
+
 
  public static void modelbtInc(BinNode rt) {
     if (rt != null)
@@ -104,7 +138,7 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
     return true;
 }
 
- public static void writeResult(BSTNode rt, BSTNode rt2, boolean SUCCESS){
+ public static void writeResult(BSTNode rt,boolean SUCCESS, String treeAsString , String modelAnswer, String studentAnswer ){
  try{
 
      PrintWriter output = new PrintWriter("output");
@@ -116,9 +150,10 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
      }
     else 
     {
-     //output.println("Try Again!  Expected Answer is "+ Integer.toString(count(rt)) +" Your Answer is: " + Integer.toString(exercise2(rt)));
-     output.println("Try Again! Your answer is not correct for all test cases."); // Later we should display the binary tree where the test case failed
+     
+     output.println("Try Again! Your answer is not correct for all test cases. For example if the given tree is:\n " + treeAsString + ", your code returns:\n  " + studentAnswer+ " \n while the expected answer is:\n " + modelAnswer); 
      output.close();
+     
     }
   
     }
@@ -128,10 +163,22 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
 
  }
  
- public static boolean runTestCase(BSTNode rt, BSTNode rt2)
+ public static boolean runTestCase(BSTNode rt, BSTNode rt2 , String treeAsString , String modelAnswer)
  { 
-   boolean SUCCESS = false;  
-   btInc(rt);
+   
+   try {
+     // Fail on time out object
+     rtmember = rt;
+     evaluate();
+   
+    } catch(Throwable t) {
+    	
+        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+    }
+   
+   
+   boolean SUCCESS = false;
+   
    modelbtInc(rt2);
    if (checkEqualTrees(rt , rt2) == true) 
    { 
@@ -141,23 +188,34 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
    else  // This test case fail then will write the result and abort the function
    {
     SUCCESS = false;
-    writeResult(rt , rt2, SUCCESS);
+    String studentAnswer ="";
+    if (rt!= null)
+     studentAnswer = getTreeAsaString(rt);
+    writeResult(rt , SUCCESS , treeAsString , modelAnswer , studentAnswer);
     
    }
   return SUCCESS;
  }
  
+ public static String getTreeAsaString(BinNode rt)
+ {
 
+   String tree = " "+ (Integer)rt.element()+"\n";
+   tree = tree +" / \\ \n";
+   tree= tree + " "+ (Integer)rt.left().element()+ " "+ (Integer)rt.right().element() + "\n";
+   
+   return tree;
+ }
 
   public static void main(String [ ] args) {
  
   // We will have more than one test case
-   
+    String treeAsString = " empty ";
   //First test case ..empty tree
    BSTNode root = null;
    BSTNode root2 = null;
   
-   if (runTestCase(root, root2) == false) return;
+   if (runTestCase(root, root2, treeAsString , "") == false) return;
    ////// End of the first test case
 
    // Second test case
@@ -175,62 +233,45 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
   
    root2.setLeft(leftChild2); 
    root2.setRight(rightChild2);
+   
+   treeAsString = "  10\n"
+                  +" / \\ \n"
+                  +"15 20 \n ";
 
-   if (runTestCase(root, root2)== false) return;
+   String modelAnswer = "  11\n"
+                       +" / \\ \n"
+                       +"16 21 \n ";
+
+   if (runTestCase(root, root2 , treeAsString , modelAnswer )== false) return;
    ////// End of the second test case
 
-
-  //Third test case
-  root= null;
-  root2= null;
-  root = new BSTNode(10);
-  root2 = new BSTNode(10);
-
-  BSTNode currentNode= root;
-  ArrayList <BSTNode> leftChildren = new ArrayList<BSTNode>() ; 
-  ArrayList <BSTNode> rightChildren = new ArrayList<BSTNode>() ;
-
-  
-  BSTNode currentNode2= root2;
-  ArrayList <BSTNode> leftChildren2 = new ArrayList<BSTNode>() ; 
-  ArrayList <BSTNode> rightChildren2 = new ArrayList<BSTNode>() ;
-
-  for (int i=0 ; i<10; i++)
-  {   
-   leftChildren.add( new BSTNode(15));
-   rightChildren.add( new BSTNode(15));
+   // Third test case
+   root = new BSTNode(20);
+   root2 = new BSTNode(20);
    
-   leftChildren2.add( new BSTNode(15));
-   rightChildren2.add( new BSTNode(15));
+   leftChild = new BSTNode(5);
+   rightChild = new BSTNode(30);
+
+   leftChild2 = new BSTNode(5);
+   rightChild2 = new BSTNode(30);
+
+   root.setLeft(leftChild); 
+   root.setRight(rightChild);
   
-  }
+   root2.setLeft(leftChild2); 
+   root2.setRight(rightChild2);
+   
+   treeAsString = "  20\n"
+                  +" / \\ \n"
+                  +" 5 30 \n ";
 
-   for (int i=0 ; i<10; i++)
-  {      
-   currentNode.setLeft(leftChildren.get( i));
-   currentNode = leftChildren.get( i);
+   modelAnswer = "  21\n"
+                +" / \\ \n"
+                +" 6  31 \n ";
 
-   currentNode2.setLeft(leftChildren2.get( i));
-   currentNode2 = leftChildren2.get( i);
-
-  }
-  currentNode= root;
-  currentNode2= root2;
-   for (int i=0 ; i<10; i++)
-  {   
-   currentNode.setRight(rightChildren.get( i));
-   currentNode = rightChildren.get(i);
-
-   currentNode2.setRight(rightChildren2.get( i));
-   currentNode2 = rightChildren2.get(i);
-
-  }
- currentNode=root;
-  currentNode2=root2;
-  if (runTestCase(root, root2 ) == false) return;
- ///End of the third test case
-
+  if (runTestCase(root, root2 , treeAsString , modelAnswer )== false) return;
+  
   // If none the test cases failed then all of them are ok then sucess=true
-  writeResult(root , root2 , true);
+ writeResult(root , true , treeAsString , "" , "" );
 
   } 

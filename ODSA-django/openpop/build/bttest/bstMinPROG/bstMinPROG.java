@@ -74,21 +74,53 @@ class BSTNode implements BinNode {
 public class studentbstMinPROG
 {
 
- public static int  modelbstMin(BinNode rt) {
+    public static  long fTimeout=1;
+    public static boolean fFinished= false;
+    public static Throwable fThrown= null;
+    public static  BinNode rtmember; 
+    public static  BinNode studentAnswer;
+    public static void evaluate() throws Throwable {
+	    Thread thread= new Thread() {
+		@Override
+		public void run() {
+		 try {
+		  studentAnswer = bstMin(rtmember);
+		  fFinished= true;
+		 } 
+          catch (Throwable e) {
+		  fThrown= e;
+		 }
+	       }
+	 };
+	
+        thread.start();
+		thread.join(fTimeout);
+		if (fFinished)
+			return;
+		if (fThrown != null)
+			throw fThrown;
+		Exception exception= new Exception(String.format(
+				"test timed out after %d milliseconds", fTimeout));
+		exception.setStackTrace(thread.getStackTrace());
+		throw exception;
+	
+	}
+
+
+ public static BinNode  modelbstMin(BinNode rt) {
 	   
-   //if (rt == null) {
-  	 // return Integer.MIN_VALUE;
-    //}
-    if (rt.left() == null) {
-        return (Integer)rt.element();
-    }
+   if (rt == null) 
+  	  return null;
+   
+   if (rt.left() == null) 
+        return rt;
     
-      return modelbstMin(rt.left());
-    }
+   return modelbstMin(rt.left());
+ }
 
 
 
- public static void writeResult(BinNode rt,boolean SUCCESS){
+ public static void writeResult(BinNode rt,boolean SUCCESS, String treeAsString , String modelAnswer, String studentAnswer ){
  try{
 
      PrintWriter output = new PrintWriter("output");
@@ -100,9 +132,9 @@ public class studentbstMinPROG
      }
     else 
     {
-     //output.println("Try Again!  Expected Answer is "+ Integer.toString(count(rt)) +" Your Answer is: " + Integer.toString(exercise2(rt)));
-     output.println("Try Again! Your answer is not correct for all test cases."); // Later we should display the binary tree where the test case failed
-     output.close();
+    
+    output.println("Try Again! Your answer is not correct for all test cases. For example if the given tree is: \n" + treeAsString + ", your code returns:  " + studentAnswer+ " while the expected answer is: " + modelAnswer+".");  
+    output.close();
     }
   
     }
@@ -112,55 +144,112 @@ public class studentbstMinPROG
 
  }
  
- public static boolean runTestCase(BinNode rt)
+ public static boolean runTestCase(BinNode rt, String treeAsString )
  { 
-   boolean SUCCESS = false;  
-   if (bstMin(rt)  == modelbstMin(rt)) 
+   boolean SUCCESS = false;   
+   try {
+     // Fail on time out object
+     rtmember = rt;
+     evaluate();
+   
+    } catch(Throwable t) {
+    	
+        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+    }
+   
+   if(rt== null) // A special case for this problem
+   {
+	   if(studentAnswer == null)
+	    SUCCESS = true;   
+	   else{
+	     SUCCESS = false; 
+	     writeResult(rt , SUCCESS ,  treeAsString , "null"," "+(Integer)bstMin(rt).element()+" ");
+	 } 
+   }
+   
+   else 
    { 
-     SUCCESS = true;   
+    try {
+     // Fail on time out object
+     rtmember = rt;
+     evaluate();
+   
+    } catch(Throwable t) {
+    	
+        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+    }
+
+    if ((Integer)studentAnswer.element()  == (Integer)modelbstMin(rt).element() ) 
+      SUCCESS = true;   
+    else  // This test case fail then will write the result and abort the function
+    {
+     SUCCESS = false;
+     writeResult(rt , SUCCESS ,  treeAsString , " "+(Integer)modelbstMin(rt).element()+" "," "+(Integer)bstMin(rt).element()+" ");
+    
+    }
    }
   
-   else  // This test case fail then will write the result and abort the function
-   {
-    SUCCESS = false;
-    writeResult(rt , SUCCESS);
-    
-   }
+   
   return SUCCESS;
  }
  
   public static void main(String [ ] args) {
- 
-   // First test case
-    BSTNode root = new BSTNode(20);
+    
+   // First test case 
+   BSTNode root = null;
+   
+   String treeAsString = " empty ";
+   if (runTestCase(root , treeAsString ) == false) return;
+   
+   // Second test case
+   root = new BSTNode(20);
    BSTNode leftChild = new BSTNode(15);
    BSTNode rightChild = new BSTNode(30);
 
    root.setLeft(leftChild); 
    root.setRight(rightChild);
-   if (runTestCase(root )== false) return;
-   ////// End of the first test case
+   
+    
+     
+   treeAsString = "  20\n"
+                  +" / \\ \n"
+                  +"15 30 \n ";
+ 
+   if (runTestCase(root , treeAsString )== false) return;
+   ////// End of the second test case
 
 
-  //Second test case
+  //Third test case
    root = new BSTNode(40);
    leftChild = new BSTNode(30);
    rightChild = new BSTNode(50);
    
-   BSTNode leftChild2 = new BSTNode(45);
-   BSTNode rightChild2 = new BSTNode(60);
+   BSTNode leftChild2 = new BSTNode(25);
+   BSTNode rightChild2 = new BSTNode(35);
+   
+   BSTNode leftChild3 = new BSTNode(45);
+   BSTNode rightChild3 = new BSTNode(60);
    
    root.setLeft(leftChild); 
    root.setRight(rightChild);
    
-   rightChild.setLeft(leftChild2); 
-   rightChild.setRight(rightChild2);
+   leftChild.setLeft(leftChild2); 
+   leftChild.setRight(rightChild2);
+   
+   rightChild.setLeft(leftChild3); 
+   rightChild.setRight(rightChild3);
    
    
-   if (runTestCase(root )== false) return;
-  //End of the second test case
+   treeAsString = "  40\n"
+                  +" /  \\ \n"
+                  +"30     50 \n "
+                  +"/ \\   / \\\n"
+                  +"25 35 45 60\n ";
+   
+   if (runTestCase(root , treeAsString )== false) return;
+  //End of the third test case
 
   // If none the test cases failed then all of them are ok then sucess=true
-  writeResult(root , true);
+  writeResult(root , true , treeAsString , "", "");
 
   } 

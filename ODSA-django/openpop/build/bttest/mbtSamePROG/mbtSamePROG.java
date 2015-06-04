@@ -73,7 +73,38 @@ class BSTNode implements BinNode {
 
 public class studentmbtSamePROG
 {
-
+    public static  long fTimeout=1;
+    public static boolean fFinished= false;
+    public static Throwable fThrown= null;
+    public static  BSTNode rtmember; 
+    public static  BSTNode rtmember2; 
+    public static boolean studentAnswer;
+    public static void evaluate() throws Throwable {
+	    Thread thread= new Thread() {
+		@Override
+		public void run() {
+		 try {
+		  studentAnswer = btIdenticalTrees(rtmember , rtmember2);;
+		  fFinished= true;
+		 } 
+                 catch (Throwable e) {
+		  fThrown= e;
+		 }
+	       }
+	 };
+	
+        thread.start();
+		thread.join(fTimeout);
+		if (fFinished)
+			return;
+		if (fThrown != null)
+			throw fThrown;
+		Exception exception= new Exception(String.format(
+				"test timed out after %d milliseconds", fTimeout));
+		exception.setStackTrace(thread.getStackTrace());
+		throw exception;
+	
+	}
  
  public static boolean modelmbtSame(BSTNode a, BSTNode b) {
     // check for reference equality and nulls
@@ -95,7 +126,7 @@ public class studentmbtSamePROG
     return true;
 }
 
- public static void writeResult(BSTNode rt, BSTNode rt2, boolean SUCCESS){
+ public static void writeResult(BSTNode rt, BSTNode rt2 , boolean SUCCESS, String tree1AsString , String tree2AsString, boolean modelAnswer, boolean studentAnswer ){
  try{
 
      PrintWriter output = new PrintWriter("output");
@@ -107,9 +138,8 @@ public class studentmbtSamePROG
      }
     else 
     {
-     //output.println("Try Again!  Expected Answer is "+ Integer.toString(count(rt)) +" Your Answer is: " + Integer.toString(exercise2(rt)));
-     output.println("Try Again! Your answer is not correct for all test cases."); // Later we should display the binary tree where the test case failed
-     output.close();
+    output.println("Try Again! Your answer is not correct for all test cases. For example if the first tree is:\n " + tree1AsString + "\n and the second tree is:\n "+ tree2AsString + " \n, your code returns:  " + studentAnswer+ " while the expected answer is: " + modelAnswer+".");  
+    output.close();
     }
   
     }
@@ -119,10 +149,22 @@ public class studentmbtSamePROG
 
  }
  
- public static boolean runTestCase(BSTNode rt, BSTNode rt2)
+ public static boolean runTestCase(BSTNode rt, BSTNode rt2, String tree1AsString , String tree2AsString)
  { 
-   boolean SUCCESS = false;  
-   if (btIdenticalTrees(rt , rt2) == modelmbtSame(rt, rt2))
+     try {
+     // Fail on time out object
+     rtmember = rt;
+     rtmember2 = rt2;
+     evaluate();
+    } 
+    catch(Throwable t) {	
+     throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+    }
+   boolean SUCCESS = false;
+   boolean modelAnswer  = modelmbtSame(rt, rt2);
+   //boolean studentAnswer= btIdenticalTrees(rt , rt2); 
+   
+   if (modelAnswer  ==  studentAnswer)  
    { 
      SUCCESS = true;   
    }
@@ -130,7 +172,7 @@ public class studentmbtSamePROG
    else  // This test case fail then will write the result and abort the function
    {
     SUCCESS = false;
-    writeResult(rt , rt2, SUCCESS);
+    writeResult(rt , rt2, SUCCESS ,  tree1AsString ,  tree2AsString, modelAnswer, studentAnswer);
     
    }
   return SUCCESS;
@@ -145,8 +187,12 @@ public class studentmbtSamePROG
   //First test case ..empty tree
    BSTNode root = null;
    BSTNode root2 = null;
-  
-   if (runTestCase(root, root2) == false) return;
+   
+   String tree1AsString = " empty ";
+   
+   String tree2AsString = " empty ";
+   
+   if (runTestCase(root, root2 , tree1AsString , tree2AsString) == false) return;
    ////// End of the first test case
 
    // Second test case -- the same tree
@@ -164,62 +210,55 @@ public class studentmbtSamePROG
   
    root2.setLeft(leftChild2); 
    root2.setRight(rightChild2);
+   
+   tree1AsString = "  10\n"
+                  +" / \\ \n"
+                  +"15 20 \n ";
 
-   if (runTestCase(root, root2)== false) return;
+   tree2AsString = "  10\n"
+                  +" / \\ \n"
+                  +"15 20 \n ";
+
+   if (runTestCase(root, root2 , tree1AsString , tree2AsString)== false) return;
    ////// End of the second test case
 
 
   //Third test case ---Different trees 
-  root= null;
-  root2= null;
-  root = new BSTNode(30);
-  root2 = new BSTNode(10);
+   root = new BSTNode(30);
+   root2 = new BSTNode(10);
 
-  BSTNode currentNode= root;
-  ArrayList <BSTNode> leftChildren = new ArrayList<BSTNode>() ; 
-  ArrayList <BSTNode> rightChildren = new ArrayList<BSTNode>() ;
-
-  
-  BSTNode currentNode2= root2;
-  ArrayList <BSTNode> leftChildren2 = new ArrayList<BSTNode>() ; 
-  ArrayList <BSTNode> rightChildren2 = new ArrayList<BSTNode>() ;
-
-  for (int i=0 ; i<10; i++)
-  {   
-   leftChildren.add( new BSTNode(15));
-   rightChildren.add( new BSTNode(15));
+   leftChild = new BSTNode(5);
+   rightChild = new BSTNode(40);
    
-   leftChildren2.add( new BSTNode(25));
-   rightChildren2.add( new BSTNode(15));
+   BSTNode leftChild3 = new BSTNode(10);
+   BSTNode rightChild3 = new BSTNode(20);
+
+   
+   leftChild2 = new BSTNode(15);
+   rightChild2 = new BSTNode(20);
+
+   root.setLeft(leftChild); 
+   root.setRight(rightChild);
+   
+   leftChild.setLeft(leftChild3); 
+   leftChild.setRight(rightChild3);
   
-  }
+   root2.setLeft(leftChild2); 
+   root2.setRight(rightChild2);
+   
+   tree1AsString = "  30\n"
+                  +" / \\ \n"
+                  +"5 40 \n "
+                  +"/ \\ \n"
+                  +"10 20 \n ";
 
-   for (int i=0 ; i<10; i++)
-  {      
-   currentNode.setLeft(leftChildren.get( i));
-   currentNode = leftChildren.get( i);
+   tree2AsString = "  10\n"
+                  +" / \\ \n"
+                  +"15 20 \n ";
 
-   currentNode2.setLeft(leftChildren2.get( i));
-   currentNode2 = leftChildren2.get( i);
-
-  }
-  currentNode= root;
-  currentNode2= root2;
-   for (int i=0 ; i<10; i++)
-  {   
-   currentNode.setRight(rightChildren.get( i));
-   currentNode = rightChildren.get(i);
-
-   currentNode2.setRight(rightChildren2.get( i));
-   currentNode2 = rightChildren2.get(i);
-
-  }
- currentNode=root;
-  currentNode2=root2;
-  if (runTestCase(root, root2 ) == false) return;
- ///End of the third test case
+   if (runTestCase(root, root2 , tree1AsString , tree2AsString)== false) return;
 
   // If none the test cases failed then all of them are ok then sucess=true
-  writeResult(root , root2 , true);
+ writeResult(root , root2, true , tree1AsString , tree2AsString , true , true);
 
   } 

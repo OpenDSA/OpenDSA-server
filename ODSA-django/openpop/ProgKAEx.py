@@ -15,8 +15,9 @@ import unicodedata
 import sys
 import string
 import time, sys
-
-
+import shutil
+from btsemanticCodeAnalysis import btcheckEfficientCode
+from pntrsemanticCodeAnalysis import pntrcheckEfficientCode
 #from subprocess import call
 #import pdb; pdb.set_trace()
 
@@ -60,7 +61,10 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
     else:
         exerciseName = request_post.get('sha1')
     
-    feedback= setparameters(exerciseName, data, generatedList, checkDefinedvar , listoftypes , progexType)
+    feedback, pathtouserFiles= setparameters(exerciseName, data, generatedList, checkDefinedvar , listoftypes , progexType, user_data)
+
+    if  os.path.exists(pathtouserFiles ):
+        shutil.rmtree(pathtouserFiles)
      
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         dt_now = datetime.datetime.now()
@@ -133,153 +137,146 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  Set the testing folder and passed parameters to the programming exercise
-def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftypes, progexType ):
+def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftypes, progexType , user_data ):
     # Check from which programming exercise we got this request
     if exerciseName == "BinaryTreePROG" : #count number of nodes
-       feedback= assessprogkaex (data, "binarytreetest", "binarytreetest","",checkDefinedvar , listoftypes)
+       feedback , peruserFilesPath= assessprogkaex (data, "binarytreetest", "binarytreetest","",checkDefinedvar , listoftypes , "" , user_data)
 
     elif exerciseName == "BTLeafPROG" :  #count number of leaf nodes
-       feedback= assessprogkaex (data , "btleaftest", "btleaftest","", checkDefinedvar , listoftypes)      
+       feedback, peruserFilesPath= assessprogkaex (data , "btleaftest", "btleaftest","", checkDefinedvar , listoftypes, "", user_data)      
 
     elif "list" in progexType:  #generate a list
-       feedback= assessprogkaex(data , "listadttest", "listadttest" ,generatedList, checkDefinedvar, listoftypes)
+       feedback , peruserFilesPath= assessprogkaex(data , "listadttest", "listadttest" ,generatedList, checkDefinedvar, listoftypes, "", user_data)
 
     # Binary Trees programming exercises 
     elif "binarytree" in progexType:   
-       feedback= assessprogkaex(data,"bttest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes)
+       feedback, peruserFilesPath= assessprogkaex(data,"bttest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes, progexType, user_data)
 
     # Recursion programming exercises have the same folder with different subfolders. Where the subfolder is the exercise name
     elif "recursion" in progexType:   
-       feedback= assessprogkaex(data,"rectest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes)
-    return feedback   
+       feedback, peruserFilesPath= assessprogkaex(data,"rectest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes , progexType, user_data)
+
+    elif "pointers" in progexType:   
+       feedback, peruserFilesPath= assessprogkaex(data,"pntrtest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes , progexType, user_data)
+    return feedback, peruserFilesPath   
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  All Programming exercises are compiled and run through the following function
-def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefinedvar, listoftypes ):
+def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefinedvar, listoftypes, progexType,user_data):
     print "=============="
     print settings 
     filesPath = settings.File_Path  + testfoldername+'/'
  
     testfilename = testfilenamep+".java"
     studentfilename = "student"+testfilename
-
- 
-    print testfilenamep
+    
+    peruserFilesPath = filesPath + str(user_data.user.username)+'/'
+    #print testfilenamep
+    print peruserFilesPath 
     # count the number of lines in the original test file so that we can have the error shown to the student with respect to the student's code
-    TestFile = open(filesPath+testfilename , 'r')
-    with TestFile:
+    if progexType == "pointers":
+      TestFile = open(filesPath+testfilenamep+"part1.java" , 'r')
+      with TestFile:
         for i, l in enumerate(TestFile):
             pass
-    print i+1 
+    else:
+      TestFile = open(filesPath+testfilename , 'r')
+      with TestFile:
+        for i, l in enumerate(TestFile):
+            pass
     
-    feedback=[False, 'null', i+1 , studentfilename , 'class '+ studentfilename]
+    
+    feedback=[False, 'null', i+1 , studentfilename , 'class '+ studentfilename ]
     # Those are the datatypes that are not allowed to be defined in that exercise
     # The first one is already defined in the given code to the student 
     # so the student should not define more and the others should not be declared at all
     
-   
+    if not os.path.exists(peruserFilesPath ):
+       os.makedirs(peruserFilesPath)
    
     #cleaning: deleting already created files
     if generatedList != 'null':
-       if os.path.isfile(filesPath +'generatedlist'):
-          os.remove(filesPath+'generatedlist')
-       genlistfile = open(filesPath+'generatedlist', 'w')
+       if os.path.isfile(peruserFilesPath +'generatedlist'):
+          os.remove(peruserFilesPath+'generatedlist')
+       genlistfile = open(peruserFilesPath+'generatedlist', 'w')
        genlistfile.write(generatedList)
        genlistfile.close()
 
-    if os.path.isfile(filesPath +''):
-       os.remove(filesPath+studentfilename)
+    if os.path.isfile(peruserFilesPath +''):
+       os.remove(peruserFilesPath+studentfilename)
  
-    if os.path.isfile(filesPath +'output'):
-       os.remove(filesPath+'output')
+    if os.path.isfile(peruserFilesPath +'output'):
+       os.remove(peruserFilesPath+'output')
 
-    if os.path.isfile(filesPath +'compilationerrors.out'):
-       os.remove(filesPath + 'compilationerrors.out')
+    if os.path.isfile(peruserFilesPath +'compilationerrors.out'):
+       os.remove(peruserFilesPath + 'compilationerrors.out')
    
-    if os.path.isfile(filesPath +'runerrors.out'):
-       os.remove(filesPath + 'runerrors.out')
+    if os.path.isfile(peruserFilesPath +'runerrors.out'):
+       os.remove(peruserFilesPath + 'runerrors.out')
     
-    if os.path.isfile(filesPath +'newpolicy.policy'):
-       os.remove(filesPath + 'newpolicy.policy')
-
-    #if os.path.isfile(filesPath +'StaticCode.java'):
-    #   os.remove(filesPath + 'StaticCode.java')
-    
-    # Static code analysis
-    
-    #Enlcose the student code in a class
-    #staticCode = open(filesPath+"StaticCode.java", 'w')
-    #staticCode.write("class StaticCode { ")
-    #staticCode.write(data)
-    #staticCode.write("}")
-    #staticCode.close() 
-    #print filesPath +"StaticCode.java"
-    
-    #parser = plyj.Parser()
-    
-    #parsed = parser.parse_file(filesPath +"StaticCode.java")
-    #print parsed
-    #for a_class in parsed.type_declarations:
-    #    for declaration in a_class.body:
-    #        if isinstance(declaration, plyj.MethodDeclaration):
-    #            name = declaration.name
-    #            declaration.accept(RecursionChecker(name))
-
-    #rexfileread = open(filesPath +"rexfile" , 'r')
-    #line= rexfileread.read()
-    #rexfileread.close()
-
-    #if "True" in line:
-    #   print "True"
-    #else:
-    #   print "False"
-   
-    # End of Static code analysis
+    if os.path.isfile(peruserFilesPath +'newpolicy.policy'):
+       os.remove(peruserFilesPath + 'newpolicy.policy')
 
 
     # Saving the submitted/received code in the studentrectest.java file by copying the preorder + studentcode +}
-    TestFile = open(filesPath+testfilename , 'r')
-    test = TestFile.read()
-    answer = open(filesPath+studentfilename, 'w')
-    answer.write(test)
-    answer.write("public static ")
-    answer.write(data)
-    answer.write("}")
+    
+    
+
+    
+
+    if progexType == "pointers":
+       TestFile = open(filesPath+testfilenamep+"part1.java" , 'r')
+       test = TestFile.read()
+       answer = open(peruserFilesPath+studentfilename, 'w')
+       answer.write(test)
+       TestFilepart2 = open(filesPath+testfilenamep+"part2.java" , 'r')
+       testpart2 = TestFilepart2.read()
+       answer.write(data) 
+       answer.write(testpart2)
+    else:
+       TestFile = open(filesPath+testfilename , 'r')
+       test = TestFile.read()
+       answer = open(peruserFilesPath+studentfilename, 'w')
+       answer.write(test)
+       answer.write("public static ")
+       answer.write(data)
+       answer.write("}")
     answer.close()
     
 
     # create the policy file on the fly instead of having a static copy per exercise
-    policyfile = open(filesPath+"newpolicy.policy" , 'w')
-    policyfile.write('grant codeBase "file:'+ filesPath +'*" {')
+    policyfile = open(peruserFilesPath+"newpolicy.policy" , 'w')
+    policyfile.write('grant codeBase "file:'+ peruserFilesPath +'*" {')
     #policyfile.write('permission java.security.AllPermission;')
-    policyfile.write('permission java.io.FilePermission "'+ filesPath +'output","read , write";')
-    policyfile.write('permission java.io.FilePermission "'+ filesPath +'compilationerrors","read , write";')
-    policyfile.write('permission java.io.FilePermission "'+ filesPath +'runerrors","read , write";')
-    policyfile.write('permission java.io.FilePermission "'+ filesPath + studentfilename +'","read , write , execute";')
+    policyfile.write('permission java.io.FilePermission "'+ peruserFilesPath +'output","read , write";')
+    policyfile.write('permission java.io.FilePermission "'+ peruserFilesPath +'compilationerrors","read , write";')
+    policyfile.write('permission java.io.FilePermission "'+ peruserFilesPath +'runerrors","read , write";')
+    policyfile.write('permission java.io.FilePermission "'+ peruserFilesPath + studentfilename +'","read , write , execute";')
     policyfile.write('};')
     policyfile.close()
 
-    # Setting the DISPLAY then run the processing command to test the submitted code
-    proc1 = subprocess.Popen(" cd "+ filesPath +"; javac "+studentfilename+" 2> "+filesPath + "compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy student"+testfilenamep+" 2> " + filesPath +"runerrors.out", stdout=subprocess.PIPE, shell=True)
+    # Run the Javac and java command to compile and test the submitted code
+    proc1 = subprocess.Popen(" cd "+ peruserFilesPath +"; javac "+studentfilename+" 2> "+peruserFilesPath + "compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy student"+testfilenamep+" 2> " + peruserFilesPath +"runerrors.out", stdout=subprocess.PIPE, shell=True)
    
-    time.sleep(3)
-    os.system("kill -9 "+ str(proc1.pid) )
+    
+    time.sleep(2) #Should change in the next push that to be in the java files instead of sleeping here
+    #os.system("kill -9 "+ str(proc1.pid) )
 
     print data
     # Read the success file if has Success inside then "Well Done!" Otherwise "Try Again!"
-    if  os.path.isfile(filesPath+'compilationerrors.out'):
-          syntaxErrorFile = open(filesPath+'compilationerrors.out' , 'r')
+    if  os.path.isfile(peruserFilesPath+'compilationerrors.out'):
+          syntaxErrorFile = open(peruserFilesPath+'compilationerrors.out' , 'r')
           feedback[0] = False
           feedback[1]= syntaxErrorFile.readlines()
           syntaxErrorFile.close()
-          if os.stat(filesPath+'compilationerrors.out')[6]!=0:
+          if os.stat(peruserFilesPath+'compilationerrors.out')[6]!=0:
              feedback[1]= feedback[1]
              print feedback[1]
              if  feedback[1][0].find("Note:") == -1: # Ignore the warnings
                  NewList =  [x for x in feedback[1] if not x.startswith('Note:') ]
                  feedback[1] = NewList
-                 return feedback
+                 return feedback , peruserFilesPath
 
     if checkDefinedvar == "True":
        datatypes= re.split(",", listoftypes )
@@ -287,11 +284,11 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
     if checkDefinedvar == "True":
        if data.count(datatypes[0]) > 1 or (any( x in data for x in datatypes[1:len(datatypes)])):
           feedback[1]= ["Try Again! You should not declare any variables!"]
-          return feedback
+          return feedback , peruserFilesPath
 
-    if os.path.isfile(filesPath+'runerrors.out'):
+    if os.path.isfile(peruserFilesPath+'runerrors.out'):
        #Check what is returned from the test : what is inside the success file
-          runErrorFile = open(filesPath+'runerrors.out' , 'r')
+          runErrorFile = open(peruserFilesPath+'runerrors.out' , 'r')
           feedback[0] = False
           feedback[1]= runErrorFile.readlines()
           print feedback[1]
@@ -299,59 +296,64 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
               print "line" + line
               if "at java.security.AccessControlContext.checkPermission" in line:
                  feedback[1]= ["Try Again! Your solution shouldn't write files to the disk!"]
-                 return feedback
+                 return feedback , peruserFilesPath
               elif 'Exception in thread "main" java.lang.StackOverflowError' in line:
                  feedback[1]= ["Try Again! Your solution leads to infinite recursion!"]
-                 return feedback
+                 return feedback , peruserFilesPath
+              elif 'NullPointerException' in line and progexType == "binarytree":
+		 feedback[1]= ["Try Again! You are trying to access a null node. You have forgotten to check if the node is null before accessing it. Have you checked if the root is null or not? if yes then ask your self the next question: are you trying to access the root's left or right children before the recursive call? You may need to revise your code and check if the solution really need to do that. If you have to get the value of one or both of the children before the recursive call then make sure to check if they are null or not."]
+		 #return feedback
+	      
+              elif 'infinite recursion' in line:
+                 feedback[1]= ["Try Again! You are probably having an infinite recursion! Please revise your code!"]
+                 os.system("pkill -TERM -P"+ str(proc1.pid) ) # terminate all the processes because we need to terminate the thread as well
+                 return feedback , peruserFilesPath
               elif 'Exception in thread "main"' in line:
-				  feedback[1]= ["Try Again! Your solution leads to "+ line.replace("Exception in thread \"main\" java.lang.", "")]
-				  return feedback
-              #elif 'Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException' in line:
-			#	  feedback[1]= ["Try Again! Your solution leads to an array index out of bounds exception!"]
-			#	  return feedback
-              #elif 'Exception in thread "main" java.lang.ArithmeticException: / by zero' in line:
-				#  feedback[1]= ["Try Again! Your solution leads to divide by zero exception!"]
-				#  return feedback
+		 feedback[1]= ["Try Again! Your solution leads to "+ line.replace("Exception in thread \"main\" java.lang.", "")]
+                 return feedback , peruserFilesPath
 
-				       
           runErrorFile.close()
-          if os.stat(filesPath+'runerrors.out')[6]!=0:
-             return feedback;
+          if os.stat(peruserFilesPath+'runerrors.out')[6]!=0:
+             return feedback, peruserFilesPath
     
     
-    if os.path.isfile(filesPath+'output'):
+    if os.path.isfile(peruserFilesPath+'output'):
        #Check what is returned from the test : what is inside the success file
-       successFile = open(filesPath+'output' , 'r')
+       successFile = open(peruserFilesPath+'output' , 'r')
        feedback[1] = successFile.readlines()
-       print feedback[1]
+       print feedback[1] 
        for line in feedback[1]:
-           if "Well Done" in line:
-              feedback[0] = True
-              return feedback
+		   # it is correct but..for recursion check they are doing it recursively
+		   # it is correct but..for binary trees check they are doing it in the effecient way
+           if "Well Done" in line: # static code analysis
+	      if progexType == "binarytree": 
+		   efficient,btineffFB = btcheckEfficientCode(data , testfilenamep)
+		   if efficient == True:
+	 	     feedback[0] = True
+	 	     return feedback , peruserFilesPath
+                   else:
+		     feedback[0] = False
+		     feedback[1]= btineffFB
+		     return feedback , peruserFilesPath
+					
+              elif progexType =="pointers": 
+		    efficient,pntrineffFB = pntrcheckEfficientCode(data , testfilenamep)
+		    if efficient == True:
+	               feedback[0] = True
+		       return feedback , peruserFilesPath
+	            else:
+		       feedback[0] = False
+		       feedback[1]= pntrineffFB
+		       return feedback , peruserFilesPath
+					 
+	      feedback[0] = True
+	      return feedback , peruserFilesPath
                
            else:
               feedback[0] = False
-              return feedback
+              return feedback , peruserFilesPath
 
-    feedback[1]=['Try Again! Your code is taking too long to run! Revise your code!']
-    return feedback
-
-# Static code analysis code
-
-#class RecursionChecker(model.Visitor):
-#    def __init__(self, needle):
-#        super(RecursionChecker, self).__init__()
-#        self.needle = needle
-#        self.rexfile = open("rexfile" , 'w')
-
-
-
-#    def visit_MethodInvocation(self, t):
-#       if t.name == self.needle:
-#           self.rexfile.write('True')
-#           self.rexfile.close()
-           
-
-
+    feedback[1]=['Try Again Later!']
+    return feedback , peruserFilesPath
 
                 
