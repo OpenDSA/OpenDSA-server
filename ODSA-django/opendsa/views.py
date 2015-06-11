@@ -14,6 +14,7 @@ from  exercise.exercise_models import CourseModule
 from opendsa.models import Exercise, UserExercise, Books, \
                            BookModuleExercise, UserData, \
                            Assignments, UserBook   
+
 from opendsa.statistics import is_authorized, convert, \
                                is_file_old_enough, get_widget_data, \
                                exercises_logs, display_grade,create_book_file, \
@@ -287,7 +288,7 @@ def daily_summary(request, course_instance=None):
     return render_to_response("opendsa/daily-ex-stats.html", context)
 
 
-def prof_statistics(request):
+def prof_statistics(request,book, course_instance):
     """
     we only run the whole stats computaion if the statistic
     file is older than an hour
@@ -297,9 +298,9 @@ def prof_statistics(request):
     last_modif = datetime.datetime.fromtimestamp(statbuf.st_mtime)
     diff = datetime.datetime.now() - last_modif
     data = []
-    post_proficiency()
+    post_proficiency( book, course_instance)
     if  diff > datetime.timedelta(0, 86400, 0):
-        context = RequestContext(request, {'daily_stats': post_proficiency() })
+        context = RequestContext(request, {'daily_stats': post_proficiency(book, course_instance) })
     else:
         try:
             f_handle = open(stat_file)
@@ -815,9 +816,12 @@ def exercise_summary(request, book, course):
                                       str(u_ex.proficient_date))  
                     
                         u_assign.append(exe_str)
-                    u_assign[0] =  str(students_assignment_points)
+                    if assignment_points == 0:
+                       assignment_points = 1
+                    assign_score_percent = (students_assignment_points*100)/assignment_points
+                    u_assign[0] =  str("%.2f" % round(assign_score_percent,2))
                     u_data = u_data + u_assign
-                    u_data1.append(str(students_assignment_points))
+                    u_data1.append(str("%.2f" % round(assign_score_percent,2)))                     #str(students_assignment_points))
                
                 if max_assignments_points == 0:
                     max_assignments_points = 1 
