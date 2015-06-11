@@ -80,7 +80,7 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
                 hint_used=int(count_hints) > 0,
                 correct=feedback[0],
                 count_attempts=attempt_number,
-                ex_question=ex_question,
+                ex_question=exerciseName,
                 ip_address=ip_address,
         )
 
