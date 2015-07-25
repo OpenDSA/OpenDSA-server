@@ -1,0 +1,711 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"init",
+				"initServerData"
+			],
+			[
+				"syn",
+				"syncProfError"
+			],
+			[
+				"mod",
+				"modName"
+			],
+			[
+				"mo",
+				"module"
+			],
+			[
+				"sync",
+				"syncProfError"
+			],
+			[
+				"con",
+				"console"
+			],
+			[
+				"syncProf",
+				"syncProfError"
+			],
+			[
+				"server",
+				"serverProfData"
+			],
+			[
+				"pro",
+				"proficient"
+			],
+			[
+				"err",
+				"error"
+			],
+			[
+				"erro",
+				"errorMsg"
+			],
+			[
+				"prof",
+				"proficient"
+			],
+			[
+				"por",
+				"proficiency"
+			],
+			[
+				"ex",
+				"exerciseName"
+			],
+			[
+				"point",
+				"points_progress"
+			],
+			[
+				"Prof",
+				"ProfStatus"
+			],
+			[
+				"to",
+				"toParams"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"json",
+				"Set Syntax: JSON"
+			],
+			[
+				"java	",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"html",
+				"Set Syntax: HTML"
+			],
+			[
+				"xml",
+				"Indent XML"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"pack",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 467.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7a3098092775ccb37ca9d6b2e4b7d'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/hshahin/workspaces/OpenDSA-server"
+	],
+	"file_history":
+	[
+		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises/khan-exercise.js",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/Sorting/Quicksort-11_old.rst",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/Sorting/Quicksort-10.rst",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/Sorting/Quicksort-09.rst",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/Sorting/Quicksort-08.rst",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/Sorting/Quicksort-07.rst",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/Sorting/Quicksort-06.rst",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/Sorting/Quicksort-05.rst",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/Sorting/Quicksort-04.rst",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/Sorting/Quicksort-03.rst",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/Sorting/Quicksort-02.rst",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/Sorting/Quicksort-01.rst",
+		"/home/hshahin/workspaces/OpenDSA/config/CS3114.json",
+		"/home/hshahin/workspaces/OpenDSA/Books/CS3114_old_01/source/Quicksort-01.rst",
+		"/home/hshahin/workspaces/OpenDSA/config/CS3114_orig.json",
+		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises/exercises-stub.js",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/absolute_value.html",
+		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises/local-only/main.js",
+		"/home/hshahin/workspaces/OpenDSA/Doc/source/conf.py",
+		"/home/hshahin/workspaces/OpenDSA/exercises/AlgAnal/AnalPairMCQ2.html",
+		"/home/hshahin/workspaces/OpenDSA/exercises/AlgAnal/AnalPairMCQ1.html",
+		"/home/hshahin/workspaces/OpenDSA/Books/CS3114/html/_static/config.js",
+		"/home/hshahin/workspaces/OpenDSA/AV/Sorting/quicksortPRO.js",
+		"/home/hshahin/workspaces/OpenDSA/Books/CS3114_01/source/Quicksort.rst",
+		"/home/hshahin/workspaces/OpenDSA/config/CS2114.json",
+		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises_old/khan-exercise.js",
+		"/home/hshahin/workspaces/OpenDSA/AV/Hashing/Birthday.js",
+		"/home/hshahin/workspaces/OpenDSA/Makefile",
+		"/home/hshahin/workspaces/OpenDSA/lib/gradebook.js",
+		"/home/hshahin/workspaces/OpenDSA/lib/gradebook-min.js",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaAV.js",
+		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises_old/interface.js",
+		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises_old/interface_old.js",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaUtils_old.js",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaAV-min.js",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaUtils.js",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaUtils-min.js",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaMOD.js",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaMOD-min.js",
+		"/home/hshahin/workspaces/OpenDSA/Books/CS3114_01/html/Gradebook.html",
+		"/home/hshahin/workspaces/OpenDSA/config/CS3114_03.json",
+		"/home/hshahin/workspaces/OpenDSA/config/CS3114_02.json",
+		"/home/hshahin/workspaces/OpenDSA/WebServer",
+		"/home/hshahin/workspaces/OpenDSA/Books/CS3114_old/html/RegisterBook.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/QuicksortMCQwhen.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/QuicksortMCQcosta.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/QuicksortMCQcomplex.html",
+		"/home/hshahin/workspaces/OpenDSA/Books/CS3114_old/html/Quicksort.html",
+		"/home/hshahin/workspaces/OpenDSA/AV/Development/Quicksort.html",
+		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises/exercises/khan-site.html",
+		"/home/hshahin/workspaces/OpenDSA/Books/CS3114_old/source/_static/config.js",
+		"/home/hshahin/workspaces/OpenDSA/Books/CS3114_old/html/_static/config.js",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaMOD-min.css",
+		"/home/hshahin/workspaces/OpenDSA/lib/jquery.min.js",
+		"/home/hshahin/workspaces/OpenDSA/Books/CS3114_old/html/index.html",
+		"/home/hshahin/workspaces/OpenDSA/Books/CS3114_old/index.html",
+		"/home/hshahin/workspaces/OpenDSA/lib/faq.html",
+		"/home/hshahin/.config/sublime-text-3/Packages/User/JsFormat.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/JsFormat/JsFormat.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/hshahin/workspaces/lti_tool_provider_example-1/.gitignore"
+	],
+	"find":
+	{
+		"height": 28.0
+	},
+	"find_in_files":
+	{
+		"height": 105.0,
+		"where_history":
+		[
+			"/home/hshahin/workspaces/OpenDSA",
+			"/home/hshahin/workspaces/OpenDSA/lib",
+			"/home/hshahin/workspaces/OpenDSA",
+			"/home/hshahin/workspaces/OpenDSA/lib",
+			"/home/hshahin/workspaces/OpenDSA",
+			"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises",
+			"/home/hshahin/workspaces/OpenDSA/lib",
+			"/home/hshahin/workspaces/OpenDSA/",
+			"/home/hshahin/workspaces/OpenDSA/Exercises/",
+			"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"shellsortCODE.js",
+			"CODE",
+			"quicksortCON",
+			"-->",
+			"index",
+			"\"exercises\": {},",
+			"\"exercises\": {",
+			"https://opendsa.cs.vt.edu/",
+			":8081",
+			"\"exercises\": {}",
+			"CS3114.json",
+			"Quicksort-01",
+			"ODSAkhan-exercises",
+			"canvas",
+			"ODSAkhan-exercises",
+			"../",
+			"urlBase",
+			"..",
+			"khan-exercise-min.js",
+			"exercises-stub",
+			"quicksortCON",
+			"QuickSortPartitionAnalysisCON",
+			"Summ",
+			"getProficiencyStatus",
+			"local",
+			"Status.",
+			"SUCCESS",
+			"SUBMITTED",
+			"odsaMod.STATUS",
+			"Status",
+			"initOembedAV",
+			"getGradeSuccess",
+			"storeStatusAndUpdateDisplays",
+			".required",
+			"storeProficiencyStatus",
+			"Status",
+			"proficiency",
+			"syncProficiency",
+			"getGradeSuccess",
+			"syncProficiency",
+			"getGradeSuccess",
+			"syncProficiency",
+			"index",
+			"updateProfDisplay",
+			"show",
+			"$(modCompMsgID).show();",
+			"listStyleImage",
+			"updateProfDisplay",
+			"checkProficiency",
+			"moduleName",
+			"exercises[name] && exercises[name].required",
+			"    if (exercises[name] && exercises[name].required && status === Status.STORED) {\n      checkProficiency(moduleName);\n    }",
+			"    if (exercises[name] && exercises[name].required && status === Status.STORED) {\n      checkProficiency(moduleName);\n    }\n",
+			"updateProfDisplay",
+			"storeStatusAndUpdateDisplays",
+			"updateProfDisplay",
+			"storeStatusAndUpdateDisplays",
+			"checkProficiency",
+			"listStyleImage",
+			"syncProficiency",
+			"checkProficiency",
+			"updateProfDisplay",
+			"syncProficiency",
+			"index",
+			"index.html",
+			"a.reference.internal",
+			"index",
+			"SUCCESS",
+			"updateProfDisplay",
+			"ProfStatus",
+			"updateProfDisplay",
+			"storeProficiencyStatus",
+			"storeStatusAndUpdateDisplays",
+			"checkProficiency",
+			"storeStatusAndUpdateDisplays",
+			"checkProficiency",
+			"storeStatusAndUpdateDisplays",
+			"false",
+			"data.proficient",
+			"updateProfDisplay",
+			"data.proficient",
+			"storeStatusAndUpdateDisplays",
+			"checkProficiency",
+			"storeStatusAndUpdateDisplays",
+			"false",
+			"updateProfDisplay",
+			"storeStatusAndUpdateDisplays",
+			"updateProfDisplay",
+			"storeStatusAndUpdateDisplays",
+			"storeProficiencyStatus",
+			"storeStatusAndUpdateDisplays",
+			"storeProficiencyStatus",
+			"ProfStatus",
+			"#f00",
+			"generateSection",
+			"generateGradeTable",
+			"gradebook-gen-table",
+			"serverGradeData",
+			"serverProfData",
+			"generateGradeTable",
+			"generateSection",
+			"generateModule",
+			"generateGradeTable",
+			"ProfStatus",
+			"syncProficiency",
+			"getGradeError",
+			"syncProfError",
+			"syncProfSuccess",
+			"syncProfError",
+			"syncProficiency",
+			"i",
+			"syncProfError",
+			"syncProfSuccess",
+			"syncProfError",
+			"syncProfSuccess",
+			"syncProficiency",
+			"generateGradeTable",
+			"assignments",
+			"proficient",
+			"$.grep(serverProfData",
+			"generateModule",
+			"generateSection",
+			"generateGradeTable",
+			"loadGradebook",
+			"ODSA.MOD.",
+			"handleExpiredSession",
+			"generateGradeTable",
+			"gradebook-gen-table"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/home/hshahin/workspaces/OpenDSA",
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 28.0
+	},
+	"input":
+	{
+		"height": 39.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "OpenDSA-server.sublime-project",
+	"replace":
+	{
+		"height": 52.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"quicksort.html",
+				"Books/CS3114_01/html/Quicksort.html"
+			],
+			[
+				"quicksort.rst",
+				"RST/en/Sorting/Quicksort.rst"
+			],
+			[
+				"que",
+				"RST/en/List/Queue.rst"
+			],
+			[
+				"quick",
+				"RST/en/Sorting/Quicksort.rst"
+			],
+			[
+				"quicksort-01",
+				"Books/CS3114/html/Quicksort-01.html"
+			],
+			[
+				"queue.rst",
+				"RST/en/List/Queue.rst"
+			],
+			[
+				"insertionsort.r",
+				"RST/en/Slides/InsertionSort.rst"
+			],
+			[
+				"cs3114",
+				"config/CS3114.json"
+			],
+			[
+				"cs3114_orig",
+				"config/CS3114_orig.json"
+			],
+			[
+				"cs3114.",
+				"config/CS3114.json"
+			],
+			[
+				"conf.py",
+				"Doc/source/conf.py"
+			],
+			[
+				"interface",
+				"ODSAkhan-exercises/interface.js"
+			],
+			[
+				"quicksortpro",
+				"AV/Sorting/quicksortPRO.js"
+			],
+			[
+				"gradebook.js",
+				"lib/gradebook.js"
+			],
+			[
+				"odsamod.js",
+				"lib/odsaMOD.js"
+			],
+			[
+				"inter",
+				"ODSAkhan-exercises/interface.js"
+			],
+			[
+				"make",
+				"Makefile"
+			],
+			[
+				"makefile",
+				"Makefile"
+			],
+			[
+				"grade",
+				"lib/gradebook-min.js"
+			],
+			[
+				"cs3114_01",
+				"config/CS3114_01.json"
+			],
+			[
+				"odaav",
+				"lib/odsaAV.js"
+			],
+			[
+				"odsau",
+				"lib/odsaUtils.js"
+			],
+			[
+				"gradebook.html",
+				"Books/CS3114_01/html/Gradebook.html"
+			],
+			[
+				"odsautil-min",
+				"lib/odsaUtils-min.js"
+			],
+			[
+				"odsautil",
+				"lib/odsaUtils.js"
+			],
+			[
+				"web",
+				"WebServer"
+			],
+			[
+				"odsamod-",
+				"lib/odsaMOD-min.js"
+			],
+			[
+				"odamod-min",
+				"lib/odsaMOD-min.js"
+			],
+			[
+				"odsamod-min",
+				"lib/odsaMOD-min.js"
+			],
+			[
+				"jquery.js",
+				"lib/jquery.min.js"
+			],
+			[
+				"odsamod",
+				"lib/odsaMOD-min.js"
+			],
+			[
+				"interfa",
+				"ODSAkhan-exercises/interface.js"
+			],
+			[
+				"odsaa",
+				"lib/odsaAV.js"
+			],
+			[
+				"odsam",
+				"lib/odsaMOD.js"
+			],
+			[
+				"khan",
+				"ODSAkhan-exercises/khan-exercise.js"
+			],
+			[
+				"config.js",
+				"Books/CS3114/source/_static/config.js"
+			],
+			[
+				"cs311",
+				"config/CS3114.json"
+			],
+			[
+				"index.html",
+				"Books/CS3114/html/index.html"
+			],
+			[
+				"index",
+				"Books/CS3114/index.html"
+			],
+			[
+				"quicksort.",
+				"AV/Development/Quicksort.html"
+			],
+			[
+				"quicksort",
+				"Exercises/Sorting/QuicksortMCQwhen.html"
+			],
+			[
+				"tool",
+				"tool_provider.rb"
+			],
+			[
+				"too",
+				"tool_provider.rb"
+			],
+			[
+				"odsa",
+				"public/lib/odsaAV-min.js"
+			],
+			[
+				"gemfile",
+				"Gemfile"
+			],
+			[
+				"assess",
+				"views/assessment_finished.erb"
+			],
+			[
+				"odsaav",
+				"public/lib/odsaAV-min.js"
+			],
+			[
+				"odau",
+				"public/lib/odsaUtils.js"
+			],
+			[
+				"graded",
+				"views/graded_content.erb"
+			],
+			[
+				"static",
+				"views/static_content.erb"
+			],
+			[
+				"odsaav-",
+				"public/lib/odsaAV-min.js"
+			],
+			[
+				"staic",
+				"views/static_content.erb"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 306.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
