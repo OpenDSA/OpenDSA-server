@@ -27,7 +27,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.utils import simplejson
 from django.contrib.sessions.models import Session
-#from django.http import HttpResponse
+# from django.http import HttpResponse
 from django.db import transaction, IntegrityError
 import jsonpickle
 import json
@@ -50,6 +50,7 @@ import time
 from canvas_sdk.methods import accounts, courses, external_tools, modules, assignments
 from canvas_sdk import RequestContext
 import collections
+from urlparse import urlparse
 
 
 try:
@@ -74,8 +75,8 @@ def create_key(username):
 
 def get_user_by_key(key):
     """
-    Retrieves the user object from 
-    the database by his API hash key 
+    Retrieves the user object from
+    the database by his API hash key
     """
     user_by_key = ApiKey.objects.filter(key=key)
     if not user_by_key:
@@ -86,7 +87,7 @@ def get_user_by_key(key):
 
 def get_username(key):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     if key == 'phantom-key':
@@ -100,7 +101,7 @@ def get_username(key):
 
 def get_book(name):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     _books = Books.objects.filter(book_name=name)
@@ -114,7 +115,7 @@ def get_book(name):
 
 def get_module(name):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     _modules = Module.objects.filter(name=name)
@@ -128,7 +129,7 @@ def get_module(name):
 
 def get_chapter(book, chapter_name):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     _chapters = BookChapter.objects.filter(book=book, name=chapter_name)
@@ -142,7 +143,7 @@ def get_chapter(book, chapter_name):
 
 def get_exercise(exercise):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     _exercises = Exercise.objects.filter(name=exercise)
@@ -156,7 +157,7 @@ def get_exercise(exercise):
 
 def get_user_book(user, book):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     _user_book = UserBook.objects.filter(user=user, book=book)
@@ -173,7 +174,7 @@ def get_user_book(user, book):
 
 def get_user_module(user, book, module):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     _user_module = UserModule.objects.filter(user=user, book=book,
@@ -188,7 +189,7 @@ def get_user_module(user, book, module):
 
 def get_user_exercise(user, exercise):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     _user_exercise = UserExercise.objects.filter(user=user, exercise=exercise)
@@ -203,7 +204,7 @@ def get_user_exercise(user, exercise):
 class OpendsaAuthentication(ApiKeyAuthentication):
 
     """
-    Authentication class. Uses the API key to check if 
+    Authentication class. Uses the API key to check if
     we have a legit user
     """
 
@@ -224,7 +225,7 @@ class OpendsaAuthentication(ApiKeyAuthentication):
 class CreateUserResource(ModelResource):
 
     """
-    User creation/registration resourse class. Creates new users 
+    User creation/registration resourse class. Creates new users
     """
 
     def determine_format(self, request):
@@ -396,7 +397,7 @@ class ExerciseResource(ModelResource):
 class UserexerciseResource(ModelResource):
 
     """
-    User exercises resources class. This class is responsible of 
+    User exercises resources class. This class is responsible of
     receiving and storing into the database all students attempts
     and interactions with the exercises (KA, PE, SS, Programming, etc.).
     """
@@ -466,7 +467,7 @@ class UserexerciseResource(ModelResource):
                 ex_question = request.POST['sha1']
                 if 'non_summative' in request.POST:
                     ex_question = request.POST['non_summative']
-                #self.method_check(request, allowed=['post'])
+                # self.method_check(request, allowed=['post'])
                 if request.POST.get('code'):
                     uexercise, messages = attempt_problem_pop(user_data,
                                                               user_exercise,
@@ -509,7 +510,7 @@ class UserexerciseResource(ModelResource):
         return self.create_response(request, {'progress': 0})
 
     def logavbutton(self, request, **kwargs):
-        print request.POST
+        print(request.POST)
         for key, value in request.POST.iteritems():
             actions = json.loads(key)
             number_logs = 0
@@ -816,7 +817,7 @@ class UserDataResource(ModelResource):
 class ModuleResource(ModelResource):
 
     """
-    Modules class resource. This class is in charge of loading modules and 
+    Modules class resource. This class is in charge of loading modules and
     books information into the database
     """
 
@@ -998,6 +999,8 @@ class ModuleResource(ModelResource):
                 # get canvas course information
                 access_token = request.POST['access_token']
                 canvas_url = request.POST['canvas_url']
+                canvas_parsed_url = urlparse(canvas_url)
+
                 course_code = request.POST['course_code']
                 book_json = json.loads(request.POST['book_json'],
                                        object_pairs_hook=collections.OrderedDict)
@@ -1012,7 +1015,6 @@ class ModuleResource(ModelResource):
                 for i, course in enumerate(results.json()):
                     if course.get("course_code") == course_code:
                         course_id = course.get("id")
-                        print(course_id)
 
                 LTI_obj = book_json.get("LTI")
                 tool_name = LTI_obj["tool_name"]
@@ -1020,13 +1022,14 @@ class ModuleResource(ModelResource):
                 consumer_key = request.POST["consumer_key"]
                 consumer_secret = request.POST["consumer_secret"]
                 config_type = "by_url"
-                config_url = LTI_obj["config_url"]
+                url = LTI_obj["url"]
+                xml_file_name = LTI_obj["xml_file_name"]
 
                 # configure the course external_tool
                 results = external_tools.create_external_tool_courses(
                     request_ctx, course_id, tool_name,
                     privacy_level, consumer_key, consumer_secret,
-                    config_type=config_type, config_url=config_url)
+                    config_type=config_type, config_url=url + '/' + xml_file_name)
 
                 # update the course name
                 course_name = book_json.get("title")
@@ -1067,7 +1070,7 @@ class ModuleResource(ModelResource):
                                         long_name,
                                         assignment_submission_types="external_tool",
                                         assignment_external_tool_tag_attributes={
-                                            "url": "https://ltitest.cs.vt.edu:9292/lti_tool?problem_type=module&problem_url=CS3114/html/&short_name=" + module_name + "-" + str(exercise_counter).zfill(2)},
+                                            "url": url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" + module_name + "-" + str(exercise_counter).zfill(2)},
                                         assignment_points_possible=points,
                                         assignment_description=long_name)
                                     assignment_id = results.json().get("id")
@@ -1082,7 +1085,7 @@ class ModuleResource(ModelResource):
                             results = modules.create_module_item(
                                 request_ctx, course_id, module_id,
                                 'ExternalTool',
-                                module_item_external_url="https://ltitest.cs.vt.edu:9292/lti_tool?problem_type=module&problem_url=CS3114/html/&short_name=" +
+                                module_item_external_url=url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
                                 module_name,
                                 module_item_content_id=None,
                                 module_item_title=module_name + " Module",
@@ -1096,13 +1099,14 @@ class ModuleResource(ModelResource):
                 # TODO: should use sha1 of course_id instead
                 # TODO: this following part of the code temporarily and should be replace
                 # by a reusable code from loadbook view
-                kbook = get_book(course_id)
+                kbook = get_book(sha1(canvas_parsed_url.netloc + '-' + str(course_id)).hexdigest())
+                print(canvas_parsed_url.netloc)
 
                 if kbook is None:
                     with transaction.commit_on_success():
                         kbook, added = Books.objects.get_or_create(
-                            book_name=str(course_id),
-                            book_url=request.POST['url'],
+                            book_name=sha1(canvas_parsed_url.netloc + '-' + str(course_id)).hexdigest(),
+                            book_url=canvas_parsed_url.netloc + '/courses/' + str(course_id) + '-' + course_code,
                             creation_date=datetime.datetime.now())
                         ubook, created = UserBook.objects.get_or_create(
                             user=kusername,
@@ -1450,7 +1454,7 @@ class BugsResource(ModelResource):
     """
     Endpoint handling bugs request
     """
-    #img = fields.FileField(attribute="screenshot", null=True, blank=True)
+    # img = fields.FileField(attribute="screenshot", null=True, blank=True)
     class Meta:
         queryset = Bugs.objects.all()
         resource_name = 'bugs'
