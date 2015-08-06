@@ -50,6 +50,7 @@ import time
 from canvas_sdk.methods import accounts, courses, external_tools, modules, assignments
 from canvas_sdk import RequestContext
 import collections
+import threading
 from urlparse import urlparse
 
 
@@ -988,6 +989,74 @@ class ModuleResource(ModelResource):
         return self.create_response(request,
                                     {'error': 'unauthorized action'}, HttpUnauthorized)
 
+    def create_chapter(self, request_ctx, course_id, course_code, module_id, chapter_obj, LTI_obj, **kwargs):
+        """
+        Create canvas module that corresponds to OpenDSA chapter
+        """
+
+        url = LTI_obj["url"]
+
+        for module in chapter_obj:
+            module_obj = chapter_obj[str(module)]
+            module_name = module_obj.get("long_name")
+            module_name_url = module.split('/')[1] if '/' in module else module
+            # OpenDSA module header will map to canvas text header
+            results = modules.create_module_item(
+                request_ctx, course_id, module_id, 'SubHeader',
+                module_item_content_id=None,
+                module_item_title=module_name,
+                module_item_indent=0)
+            exercises = module_obj.get("exercises")
+            if bool(exercises):
+                exercise_counter = 1
+                for exercise in exercises:
+                    exercise_obj = exercises[str(exercise)]
+                    long_name = exercise_obj.get("long_name")
+                    required = exercise_obj.get("required")
+                    points = exercise_obj.get("points")
+                    threshold = exercise_obj.get("threshold")
+                    if long_name is not None and required is not None and points is not None and threshold is not None:
+                        print(str(exercise_counter).zfill(2)) + \
+                            " " + long_name
+                        # OpenDSA exercises will map to canvas assignments
+                        results = assignments.create_assignment(
+                            request_ctx, course_id,
+                            long_name,
+                            assignment_submission_types="external_tool",
+                            assignment_external_tool_tag_attributes={
+                                "url": url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" + module_name_url + "-" + str(exercise_counter).zfill(2)},
+                            assignment_points_possible=points,
+                            assignment_description=long_name)
+                        assignment_id = results.json().get("id")
+                        # add assignment to module
+                        results = modules.create_module_item(
+                            request_ctx, course_id, module_id,
+                            'Assignment',
+                            module_item_content_id=assignment_id,
+                            module_item_indent=1)
+                        exercise_counter += 1
+                if exercise_counter == 1:
+                    results = modules.create_module_item(
+                        request_ctx, course_id, module_id,
+                        'ExternalTool',
+                        module_item_external_url=url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
+                        module_name_url,
+                        module_item_content_id=None,
+                        module_item_title=module_name,
+                        module_item_indent=1)
+            else:
+                results = modules.create_module_item(
+                    request_ctx, course_id, module_id,
+                    'ExternalTool',
+                    module_item_external_url=url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
+                    module_name_url,
+                    module_item_content_id=None,
+                    module_item_title=module_name,
+                    module_item_indent=1)
+        # publish the module
+        results = modules.update_module(request_ctx, course_id, module_id,
+                                        module_published=True)
+
     def createcourse(self, request, **kwargs):
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
@@ -1038,69 +1107,20 @@ class ModuleResource(ModelResource):
 
                 chapters = book_json.get("chapters")
 
+                module_position = 1
                 # create course modules and assignments
                 for chapter in chapters:
                     chapter_obj = chapters[str(chapter)]
                     # OpenDSA chapters will map to canvas modules
                     results = modules.create_module(
-                        request_ctx, course_id, str(chapter) + " Chapter")
+                        request_ctx, course_id, str(chapter), module_position=module_position)
+                    module_position += 1
                     module_id = results.json().get("id")
-                    for module in chapter_obj:
-                        module_obj = chapter_obj[str(module)]
-                        module_name = module_obj.get("long_name")
-                        # OpenDSA module header will map to canvas text header
-                        results = modules.create_module_item(
-                            request_ctx, course_id, module_id, 'SubHeader',
-                            module_item_content_id=None,
-                            module_item_title=module_name + " Module",
-                            module_item_indent=0)
-                        exercises = module_obj.get("exercises")
-                        if bool(exercises):
-                            exercise_counter = 1
-                            for exercise in exercises:
-                                exercise_obj = exercises[str(exercise)]
-                                long_name = exercise_obj.get("long_name")
-                                points = exercise_obj.get("points", 0)
-                                if long_name:
-                                    print(str(exercise_counter).zfill(2)) + \
-                                        " " + long_name
-                                    # OpenDSA exercises will map to canvas assignments
-                                    results = assignments.create_assignment(
-                                        request_ctx, course_id,
-                                        long_name,
-                                        assignment_submission_types="external_tool",
-                                        assignment_external_tool_tag_attributes={
-                                            "url": url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" + module_name + "-" + str(exercise_counter).zfill(2)},
-                                        assignment_points_possible=points,
-                                        assignment_description=long_name)
-                                    assignment_id = results.json().get("id")
-                                    # add assignment to module
-                                    results = modules.create_module_item(
-                                        request_ctx, course_id, module_id,
-                                        'Assignment',
-                                        module_item_content_id=assignment_id,
-                                        module_item_indent=1)
-                                    exercise_counter += 1
-                        else:
-                            results = modules.create_module_item(
-                                request_ctx, course_id, module_id,
-                                'ExternalTool',
-                                module_item_external_url=url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
-                                module_name,
-                                module_item_content_id=None,
-                                module_item_title=module_name + " Module",
-                                module_item_indent=1)
-                    # publish the module
-                    results = modules.update_module(
-                        request_ctx, course_id, module_id,
-                        module_published=True)
+                    t = threading.Thread(target=self.create_chapter, args=(request_ctx, course_id, course_code, module_id, chapter_obj, LTI_obj,))
+                    t.start()
 
                 # Register the book to OpenDSA server
-                # TODO: should use sha1 of course_id instead
-                # TODO: this following part of the code temporarily and should be replace
-                # by a reusable code from loadbook view
                 kbook = get_book(sha1(canvas_parsed_url.netloc + '-' + str(course_id)).hexdigest())
-                print(canvas_parsed_url.netloc)
 
                 if kbook is None:
                     with transaction.commit_on_success():
