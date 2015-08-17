@@ -1016,6 +1016,9 @@ class ModuleResource(ModelResource):
                 kchapter.save()
                 #get or create exercises
                 mod_exes = simplejson.loads(request.POST['exercises'])
+                if len(mod_exes) == 0:
+                    response[kmodule.name] = True
+                
                 exers_ = []
                 for mod_exe in mod_exes:
                     if Exercise.objects.filter(\
