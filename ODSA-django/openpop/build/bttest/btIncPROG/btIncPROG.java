@@ -19,8 +19,8 @@ import java.lang.Integer;
 /* *** ODSATag: BinNode *** */
 interface BinNode { // Binary tree node ADT
   // Get and set the element value
-  Object element();
-  void setElement(Object v);
+  int element();
+  void setElement(int v);
 
   // return the children
   BinNode left();
@@ -36,24 +36,20 @@ interface BinNode { // Binary tree node ADT
 
 // Binary tree node implementation: supports comparable objects
 class BSTNode implements BinNode {
-  private Comparable element; // Element for this node
+  private int element; // Element for this node
   private BSTNode left;       // Pointer to left child
   private BSTNode right;      // Pointer to right child
 
   // Constructors
   BSTNode() {left = right = null; }
-  BSTNode(Comparable val) { left = right = null; element = val; }
-  BSTNode(Comparable val, BSTNode l, BSTNode r)
+  BSTNode(int val) { left = right = null; element = val; }
+  BSTNode(int val, BSTNode l, BSTNode r)
     { left = l; right = r; element = val; }
 
   // Get and set the element value
-  public Comparable element() { return element; }
-  public void setElement(Comparable v) { element = v; }
-  public void setElement(Object v) { // We need this one to satisfy BinNode interface
-    if (!(v instanceof Comparable))
-      throw new ClassCastException("A Comparable object is required.");
-    element = (Comparable)v;
-  }
+  public int element() { return element; }
+  public void setElement(int v) { element = v; }
+  
 
   // Get and set the left child
   public BSTNode left() { return left; }
@@ -111,7 +107,7 @@ public class studentbtIncPROG
  public static void modelbtInc(BinNode rt) {
     if (rt != null)
     {
-     rt.setElement(((Integer)rt.element()) +1);
+     rt.setElement(rt.element() +1);
      modelbtInc(rt.left());
      modelbtInc(rt.right());
     }
@@ -125,9 +121,9 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
     if (b==null) return false;
 
     // check for data inequality
-    if ((Integer)a.element().compareTo((Integer)b.element()) !=0) {
-        if (((Integer)a.element()==null)||((Integer)b.element()==null)) return false;
-        if ((((Integer)a.element()).compareTo((Integer)b.element())) !=0) return false;
+    if (a.element()!=b.element()) {
+        if ((a == null)||(b == null)) return false;
+        if (a.element()!= b.element()) return false;
     }
 
     // recursively check branches
@@ -200,9 +196,9 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
  public static String getTreeAsaString(BinNode rt)
  {
 
-   String tree = " "+ (Integer)rt.element()+"\n";
+   String tree = " "+ rt.element()+"\n";
    tree = tree +" / \\ \n";
-   tree= tree + " "+ (Integer)rt.left().element()+ " "+ (Integer)rt.right().element() + "\n";
+   tree= tree + " "+ rt.left().element()+ " "+ rt.right().element() + "\n";
    
    return tree;
  }
