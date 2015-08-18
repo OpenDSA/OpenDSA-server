@@ -19,8 +19,8 @@ import java.lang.Integer;
 /* *** ODSATag: BinNode *** */
 interface BinNode { // Binary tree node ADT
   // Get and set the element value
-  Object element();
-  void setElement(Object v);
+  int element();
+  void setElement(int v);
 
   // return the children
   BinNode left();
@@ -36,24 +36,20 @@ interface BinNode { // Binary tree node ADT
 
 // Binary tree node implementation: supports comparable objects
 class BSTNode implements BinNode {
-  private Comparable element; // Element for this node
+  private int element; // Element for this node
   private BSTNode left;       // Pointer to left child
   private BSTNode right;      // Pointer to right child
 
   // Constructors
   BSTNode() {left = right = null; }
-  BSTNode(Comparable val) { left = right = null; element = val; }
-  BSTNode(Comparable val, BSTNode l, BSTNode r)
+  BSTNode(int val) { left = right = null; element = val; }
+  BSTNode(int val, BSTNode l, BSTNode r)
     { left = l; right = r; element = val; }
 
   // Get and set the element value
-  public Comparable element() { return element; }
-  public void setElement(Comparable v) { element = v; }
-  public void setElement(Object v) { // We need this one to satisfy BinNode interface
-    if (!(v instanceof Comparable))
-      throw new ClassCastException("A Comparable object is required.");
-    element = (Comparable)v;
-  }
+  public int element() { return element; }
+  public void setElement(int v) { element = v; }
+  
 
   // Get and set the left child
   public BSTNode left() { return left; }
@@ -71,13 +67,14 @@ class BSTNode implements BinNode {
 
 
 
+
 public class studentbtCntValPROG
 {
-    public static  long fTimeout=1;
+    public static long fTimeout=1;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
-    public static  BinNode rtmember; 
-    public static  Comparable valuemember;
+    public static BinNode rtmember; 
+    public static int valuemember;
     public static int studentAnswer;
     public static void evaluate() throws Throwable {
 	    Thread thread= new Thread() {
@@ -106,21 +103,21 @@ public class studentbtCntValPROG
 	}
 
 
- public static int modelbtCntVal(BinNode rt , Comparable value) {
+ public static int modelbtCntVal(BinNode rt , int value) {
     if (rt == null) return 0;    
     int count = 0;
     
-    if(value.compareTo(rt.element()) == 0)
+    if(value == rt.element())
           count++;
-     count += modelbtCntVal(rt.left(), (Integer)value);
-     count += modelbtCntVal(rt.right(), (Integer)value);
+     count += modelbtCntVal(rt.left(), value);
+     count += modelbtCntVal(rt.right(), value);
      return count;
     
  }
 
 
 
- public static void writeResult(BinNode rt,boolean SUCCESS , String treeAsString , Comparable value , int modelAnswer, int studentAnswer ){
+ public static void writeResult(BinNode rt,boolean SUCCESS , String treeAsString , int value , int modelAnswer, int studentAnswer ){
  try{
 
      PrintWriter output = new PrintWriter("output");
@@ -143,7 +140,7 @@ public class studentbtCntValPROG
 
  }
  
- public static boolean runTestCase(BinNode rt , Comparable value , String treeAsString)
+ public static boolean runTestCase(BinNode rt , int value , String treeAsString)
  { 
 
    try {
@@ -181,7 +178,7 @@ public class studentbtCntValPROG
    String treeAsString = " empty ";
   //First test case ..empty tree
    BSTNode root = null;
-   Comparable value = new Integer(15);
+   int value = new Integer(15);
   
    if (runTestCase(root , value , treeAsString ) == false) return;
    ////// End of the first test case
