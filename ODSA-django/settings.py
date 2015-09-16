@@ -13,19 +13,19 @@ def get_path(filename):
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 #gist middleware variables
-XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta6.cc.vt.edu','http://algoviz.org','http://algoviz-beta7.cc.vt.edu']
+XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta.cs.vt.edu','http://algoviz.org','https://trak.cs.hut.fi']
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
-XS_SHARING_ALLOWED_HEADERS = ["Content-Type"] 
+XS_SHARING_ALLOWED_HEADERS = ["Content-Type"]
 File_Path = "/home/OpenDSA-server/ODSA-django/openpop/build/"
 
 APPEND_SLASH=True
 
-ACCOUNT_ACTIVATION_DAYS = 365 
+ACCOUNT_ACTIVATION_DAYS = 365
 
 #celery broker
 #BROKER_URL = 'amqp://guest:guest@localhost:5672/'
-BROKER_URL = "django://" 
- 
+BROKER_URL = "django://"
+
 # This URL is used when building absolute URLs to this service
 BASE_URL = ""
 
@@ -106,7 +106,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = conf.secret_key 
+SECRET_KEY = conf.secret_key
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -170,10 +170,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.admin',
-    'django.contrib.humanize', 
+    'django.contrib.humanize',
     'exercise',
     'course',
-    #'south', # South disabled due to refactoring of the database 
+    #'south', # South disabled due to refactoring of the database
     'inheritance',
     'tastypie',
     'userprofile',
@@ -223,6 +223,5 @@ EMAIL_PORT = 587
 # Optional SMTP authentication information for EMAIL_HOST.
 DEFAULT_FROM_EMAIL = 'opendsa.cc.vt.edu <noreply@opendsa.cc.vt.edu>'
 EMAIL_HOST_USER = 'root'
-EMAIL_HOST_PASSWORD = '' 
+EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = True
-
