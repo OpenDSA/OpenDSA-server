@@ -67,8 +67,8 @@ def create_key(username):
 
 def get_user_by_key(key):
     """
-    Retrieves the user object from 
-    the database by his API hash key 
+    Retrieves the user object from
+    the database by his API hash key
     """
     user_by_key = ApiKey.objects.filter(key=key)
     if  not user_by_key:
@@ -78,7 +78,7 @@ def get_user_by_key(key):
 
 def get_username(key):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     if key == 'phantom-key':
@@ -91,7 +91,7 @@ def get_username(key):
 
 def get_book(name):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     _books =  Books.objects.filter(book_name=name)
@@ -104,10 +104,10 @@ def get_book(name):
 
 def get_module(name):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
-    _modules = Module.objects.filter(name=name) 
+    _modules = Module.objects.filter(name=name)
     if _modules:
         module = _modules[0]
     else:
@@ -117,7 +117,7 @@ def get_module(name):
 
 def get_chapter(book, chapter_name):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     _chapters = BookChapter.objects.filter(book=book, name=chapter_name)
@@ -130,7 +130,7 @@ def get_chapter(book, chapter_name):
 
 def get_exercise(exercise):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     _exercises = Exercise.objects.filter(name=exercise)
@@ -143,7 +143,7 @@ def get_exercise(exercise):
 
 def get_user_book(user, book):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     _user_book = UserBook.objects.filter(user=user, book=book)
@@ -159,7 +159,7 @@ def get_user_book(user, book):
 
 def get_user_module(user, book, module):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     _user_module = UserModule.objects.filter(user=user, book=book, \
@@ -173,7 +173,7 @@ def get_user_module(user, book, module):
 
 def get_user_exercise(user, exercise):
     """
-    Safe accessor methods - these functions are designed to prevent 
+    Safe accessor methods - these functions are designed to prevent
     the problem of duplicate entries being created
     """
     _user_exercise = UserExercise.objects.filter(user=user, exercise=exercise)
@@ -189,7 +189,7 @@ def get_user_exercise(user, exercise):
 
 class OpendsaAuthentication(ApiKeyAuthentication):
     """
-    Authentication class. Uses the API key to check if 
+    Authentication class. Uses the API key to check if
     we have a legit user
     """
     def is_authenticated(self, request, **kwargs):
@@ -206,7 +206,7 @@ class OpendsaAuthentication(ApiKeyAuthentication):
 #create new user
 class CreateUserResource(ModelResource):
     """
-    User creation/registration resourse class. Creates new users 
+    User creation/registration resourse class. Creates new users
     """
     def determine_format(self, request):
         return "application/json"
@@ -374,7 +374,7 @@ class ExerciseResource(ModelResource):
 class UserexerciseResource(ModelResource):
 
     """
-    User exercises resources class. This class is responsible of 
+    User exercises resources class. This class is responsible of
     receiving and storing into the database all students attempts
     and interactions with the exercises (KA, PE, SS, Programming, etc.).
     """
@@ -403,7 +403,7 @@ class UserexerciseResource(ModelResource):
                       self.wrap_view('logexercisehint'), name="api_logexeh"),
             url(r"^(?P<resource_name>%s)/attemptpe%s$" \
                     %(self._meta.resource_name, trailing_slash()),\
-                      self.wrap_view('logpeexercise'), name="api_logpeexe"), 
+                      self.wrap_view('logpeexercise'), name="api_logpeexe"),
             url(r"^(?P<resource_name>%s)/attemptpop%s$" \
                     %(self._meta.resource_name, trailing_slash()),\
                       self.wrap_view('logprogexercise'), name="api_assesskaex"),
@@ -441,35 +441,35 @@ class UserexerciseResource(ModelResource):
             module = get_module(request.POST['module_name'])
 
             if user_exercise and ubook:
-                ex_question = request.POST['sha1']
+                ex_question = request.POST['problem_type']
                 if 'non_summative' in request.POST:
                     ex_question = request.POST['non_summative']
                 #self.method_check(request, allowed=['post'])
                 if request.POST.get('code'):
-                    uexercise, messages = attempt_problem_pop(user_data, 
-					     user_exercise, 
+                    uexercise, messages = attempt_problem_pop(user_data,
+					     user_exercise,
 					     request.POST['attempt_number'],
 					     request.POST['complete'],
 					     request.POST['count_hints'],
 					     int(request.POST['time_taken']),
 					     request.POST['attempt_content'],
 					     request.POST['module_name'],
-					     ex_question, 
+					     ex_question,
 					     request.META['REMOTE_ADDR'],
                                              request.POST)
 
-                                       
+
                     returnedVar = uexercise.__dict__
                     returnedVar['correct'] = messages[0]
                     returnedVar['message'] = messages[1]
                     returnedVar['lineNum'] = messages[2]
                     returnedVar['fileName'] = messages[3]
                     returnedVar['className'] = messages[4]
-                    
+
                     return self.create_response(request, \
                                                 jsonpickle.encode(returnedVar))
                 else :
-                    
+
                     return self.create_response(request, {'details': "Empty"})
          return  self.create_response(request, {}, HttpUnauthorized)
 
@@ -491,16 +491,16 @@ class UserexerciseResource(ModelResource):
     def logavbutton(self, request, **kwargs):
         print request.POST
         for key, value in request.POST.iteritems():
-            actions = json.loads(key) 
+            actions = json.loads(key)
             number_logs = 0
             for act in actions:
               kusername = User.objects.get(username=act['user'])
-              if kusername:  
+              if kusername:
                  if 'score[total]' in request.POST:
                      streak = request.POST['score[total]']
                  else:
                      streak = 0
-                 
+
                  with transaction.commit_on_success():
                     #kusername, created = User.objects.get_or_create(\
                     #                                  username=act['user'])
@@ -514,7 +514,7 @@ class UserexerciseResource(ModelResource):
                          kexercise.save()
 
                  with transaction.commit_on_success():
-                     kbook = Books.objects.get(book_name= act['book']) 
+                     kbook = Books.objects.get(book_name= act['book'])
                      user_data, created = UserData.objects.get_or_create(\
                                                    user=kusername,book=kbook)
                  module = get_module(act['module'])
@@ -626,7 +626,7 @@ class UserexerciseResource(ModelResource):
             module = get_module(request.POST['module_name'])
 
             if user_exercise and ubook:
-                ex_question = request.POST['sha1']
+                ex_question = request.POST['problem_type']
                 if 'non_summative' in request.POST:
                     ex_question = request.POST['non_summative']
                 user_exercise, correct = attempt_problem(
@@ -682,7 +682,7 @@ class UserexerciseResource(ModelResource):
             if user_exercise and ubook:
                 bme = BookModuleExercise.components.filter(book=ubook.book, \
                                         module=module, exercise=kexercise)[0]
-                ex_question = request.POST['sha1']
+                ex_question = request.POST['problem_type']
                 if 'non_summative' in request.POST:
                     ex_question = request.POST['non_summative']
                 user_exercise, correct = attempt_problem(
@@ -694,7 +694,7 @@ class UserexerciseResource(ModelResource):
                     int(request.POST['time_taken']),
                     request.POST['attempt_content'],
                     request.POST['module_name'],
-                    ex_question, 
+                    ex_question,
                     request.META['REMOTE_ADDR'],
                     )
 
@@ -795,7 +795,7 @@ class UserDataResource(ModelResource):
 
 class ModuleResource(ModelResource):
     """
-    Modules class resource. This class is in charge of loading modules and 
+    Modules class resource. This class is in charge of loading modules and
     books information into the database
     """
     def determine_format(self, request):
@@ -838,8 +838,8 @@ class ModuleResource(ModelResource):
                 #get and save book elements
                 book_json = simplejson.loads(request.POST['b_json'])
 
-                # We first delete all entries of the book 
-                # in BookModuleExercise table 
+                # We first delete all entries of the book
+                # in BookModuleExercise table
                 #for exer in \
                 BookModuleExercise.components.filter(book = kbook).delete()
                     #if exer not in exers_:
@@ -849,7 +849,7 @@ class ModuleResource(ModelResource):
 
 
                 exers_ = []
-              
+
                 #delete book chapters
                 BookChapter.objects.filter(book = kbook).delete()
                 for chapter in book_json['chapters']:
@@ -863,17 +863,17 @@ class ModuleResource(ModelResource):
                         kchapter, added = \
                                   BookChapter.objects.get_or_create(\
                                              book=kbook,name=chapter)
-                    
+
                     for lesson in book_json['chapters'][chapter]:
                         #if we encounter "hidden" we do nothing
                         if not isinstance(book_json['chapters'][chapter][lesson], Iterable):
                             continue
-                   
+
                         # Get list of exercises
                         exercises_l = \
                             book_json['chapters'][chapter][lesson]['exercises']
                         #get or create module
-                        # We first extract module name 
+                        # We first extract module name
                         if '/' in lesson:
                             lesson = lesson.split('/')[1]
                         kmodule = get_module(lesson)
@@ -883,7 +883,7 @@ class ModuleResource(ModelResource):
                                 kmodule, added = Module.objects.get_or_create(\
                                              name=lesson)
                         #link module/lesson to chapter
-                        if kmodule not in kchapter.get_modules(): 
+                        if kmodule not in kchapter.get_modules():
                             kchapter.add_module(kmodule.id)
                             kchapter.save()
 
@@ -903,9 +903,9 @@ class ModuleResource(ModelResource):
                                 with transaction.commit_on_success():
                                     kexercise, added = \
                                                Exercise.objects.get_or_create(\
-                                               name = exercise, 
-                                               covers = "dsa", 
-                                               description = description, 
+                                               name = exercise,
+                                               covers = "dsa",
+                                               description = description,
                                                streak = streak)
                             else:
                                 # Update existing exercise
@@ -915,8 +915,8 @@ class ModuleResource(ModelResource):
                                     kexercise.description = description
                                     kexercise.streak = Decimal(streak)
                                     kexercise.save()
-                      
-                            #Link exercise to module and books only 
+
+                            #Link exercise to module and books only
                             #if the exercise is required
                             bme =  None
                             if BookModuleExercise.components.filter(\
@@ -926,8 +926,8 @@ class ModuleResource(ModelResource):
                                                and required:
                                 with transaction.commit_on_success():
                                     bme = BookModuleExercise.components.filter(\
-                                                book = kbook, 
-                                                module = kmodule, 
+                                                book = kbook,
+                                                module = kmodule,
                                                 exercise = kexercise)[0]
                                     bme.points = exercises_l[exercise]['points']
                                     bme.save()
@@ -943,8 +943,8 @@ class ModuleResource(ModelResource):
                                 with transaction.commit_on_success():
                                     bme = BookModuleExercise(\
                                           book = kbook, \
-                                          module = kmodule, 
-                                          exercise = kexercise, 
+                                          module = kmodule,
+                                          exercise = kexercise,
                                           points = exercises_l[exercise]['points'])
                                     bme.save()
                                     if kexercise not in exers_:
@@ -979,11 +979,11 @@ class ModuleResource(ModelResource):
                 if kbook is None:
                     with transaction.commit_on_success():
                         kbook, added = Books.objects.get_or_create(\
-                                       book_name= request.POST['book'], 
+                                       book_name= request.POST['book'],
                                        book_url = request.POST['url'],
                                        creation_date = datetime.datetime.now())
                         ubook, created = UserBook.objects.get_or_create(\
-                                         user=kusername, 
+                                         user=kusername,
                                          book=kbook)
                 else:
                     #link a book to user
@@ -992,19 +992,19 @@ class ModuleResource(ModelResource):
                     if ubook is None:
                         with transaction.commit_on_success():
                             ubook, created = UserBook.objects.get_or_create(\
-                                              user=kusername, 
+                                              user=kusername,
                                               book=kbook)
 
                 #get or create module
                 kmodule = get_module(request.POST['module'])
-                
+
                 if kmodule is None:
                     with transaction.commit_on_success():
                         kmodule, added = Module.objects.get_or_create(\
                                          name=request.POST['module'])
-                
+
                 response[kmodule.name] = False
-               
+
                 #get or create chapter
                 kchapter = get_chapter(kbook, request.POST['chapter'])
                 if kchapter is None:
@@ -1018,7 +1018,7 @@ class ModuleResource(ModelResource):
                 mod_exes = simplejson.loads(request.POST['exercises'])
                 if len(mod_exes) == 0:
                     response[kmodule.name] = True
-                
+
                 exers_ = []
                 for mod_exe in mod_exes:
                     if Exercise.objects.filter(\
@@ -1026,10 +1026,10 @@ class ModuleResource(ModelResource):
                         # Add new exercise
                         with transaction.commit_on_success():
                             kexercise, added = Exercise.objects.get_or_create(\
-                                               name=mod_exe['exercise'], 
-                                               covers="dsa", 
-                                               description=mod_exe['name'], 
-                                               ex_type=mod_exe['type'], 
+                                               name=mod_exe['exercise'],
+                                               covers="dsa",
+                                               description=mod_exe['name'],
+                                               ex_type=mod_exe['type'],
                                                streak=mod_exe['threshold'])
                     else:
                         # Update existing exercise
@@ -1045,7 +1045,7 @@ class ModuleResource(ModelResource):
                     u_prof = False
                     with transaction.commit_on_success():
                         user_data, created = UserData.objects.get_or_create(\
-                                             user = kusername, 
+                                             user = kusername,
                                              book = kbook)
                         u_prof = user_data.is_proficient_at(kexercise)
 
@@ -1058,7 +1058,7 @@ class ModuleResource(ModelResource):
                     else:
                         u_prog = 0
 
-                    #Link exercise to module and books only 
+                    #Link exercise to module and books only
                     #if the exercise is required
                     bme =  None
                     if BookModuleExercise.components.filter(book = kbook, \
@@ -1067,38 +1067,38 @@ class ModuleResource(ModelResource):
                                           and mod_exe['required']:
                         with transaction.commit_on_success():
                             bme = BookModuleExercise.components.filter(\
-                                            book = kbook, 
-                                            module = kmodule, 
+                                            book = kbook,
+                                            module = kmodule,
                                             exercise = kexercise)[0]
                             bme.points = mod_exe['points']
                             bme.save()
                     if BookModuleExercise.components.filter(book = kbook, \
-                                          module = kmodule, 
+                                          module = kmodule,
                                           exercise = kexercise).count() == 0 \
                                           and mod_exe['required']:
                         with transaction.commit_on_success():
                             bme = BookModuleExercise(book=kbook, \
-                                         module = kmodule, 
-                                         exercise = kexercise, 
+                                         module = kmodule,
+                                         exercise = kexercise,
                                          points = mod_exe['points'])
                             bme.save()
-                    
+
                     response[kexercise.name] = {'proficient': u_prof, \
                                                 'progress': u_prog}
 
-                # Remove exercises that are no longer 
+                # Remove exercises that are no longer
                 #part of this book / module
                 for exer in \
                          BookModuleExercise.components.get_mod_exercise_list(\
-                                                               kbook,kmodule): 
+                                                               kbook,kmodule):
                     if exer not in exers_:
-                        BookModuleExercise.components.filter(book = kbook, 
-                                                       module = kmodule, 
+                        BookModuleExercise.components.filter(book = kbook,
+                                                       module = kmodule,
                                                        exercise = exer).delete()
 
                 #check module proficiency
-                user_module = get_user_module(user = kusername, 
-                                              book = kbook, 
+                user_module = get_user_module(user = kusername,
+                                              book = kbook,
                                               module = kmodule)
 
                 if user_module is not None:
@@ -1107,12 +1107,12 @@ class ModuleResource(ModelResource):
                                                       user = kusername,
                                                       book = kbook)
 
-                    update_module_proficiency(user_data, 
+                    update_module_proficiency(user_data,
                                               request.POST['module'], None)
 
                     #Module proficiency response
                     response[kmodule.name] = user_module.is_proficient_at()
-   
+
                 return self.create_response(request, response)
         return self.create_response(request, {'error': 'unauthorized action'}, \
                                                HttpUnauthorized)
@@ -1155,11 +1155,11 @@ class UserModuleResource(ModelResource):
             if user_module is not None:
                 with transaction.commit_on_success():
                     user_data, created = UserData.objects.get_or_create(\
-                                                  user=kusername, 
+                                                  user=kusername,
                                                   book=kbook)
 
-                update_module_proficiency(user_data, 
-                                          request.POST['module'], 
+                update_module_proficiency(user_data,
+                                          request.POST['module'],
                                           None)
                 return self.create_response(request, \
                               {'proficient': user_module.is_proficient_at()})
@@ -1209,7 +1209,7 @@ class BugsResource(ModelResource):
                          print "big file"
                          return self.create_response(request, {'error': 'Image file too big'}, \
                                                HttpBadRequest)
-                    
+
                 new_bug = Bugs(user = kusername,
                            os_family = request.POST['os'],
                            browser_family = request.POST['browser'],
@@ -1219,7 +1219,7 @@ class BugsResource(ModelResource):
                 new_bug.save()
                 server_host = request.get_host()
                 res_url = str(request.get_full_path()).split('submitbug')[0]
-                full_url = str(server_host) + str(res_url) + "bugs/" 
+                full_url = str(server_host) + str(res_url) + "bugs/"
                 if img is not None:
                     img_str = 'Screenshot:\t' + str(server_host) + str (settings.MEDIA_URL) + str(new_bug.screenshot)
 
@@ -1233,11 +1233,11 @@ class BugsResource(ModelResource):
                                                                      bug_url, img_str)
                 send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', ['opendsa@cs.vt.edu'], fail_silently=False)
 
-                return self.create_response(request, {'response':'Bug stored'})     
+                return self.create_response(request, {'response':'Bug stored'})
             return self.create_response(request, {'error': 'unauthorized action'}, \
                                               HttpUnauthorized)
         return self.create_response(request, {'error': 'Bad requested'}, \
-                                               HttpBadRequest)      
+                                               HttpBadRequest)
 
 
 class UserExerciseSummaryResource(ModelResource):
