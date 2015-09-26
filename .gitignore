@@ -1,6 +1,6 @@
 #ignore compiled Python files
 *.pyc
-*.class 
+*.class
 settings.py
 *.bk
 ODSA-django/stunnel.log
@@ -20,3 +20,6 @@ ODSA-django/stunnel.log
 
 # sftp configuration file
 sftp-config.json
+
+# python virtual environment
+env

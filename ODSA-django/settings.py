@@ -17,8 +17,9 @@ XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta6.cc.vt.edu',
                               'http://algoviz.org',
                               'http://algoviz-beta7.cc.vt.edu',
                               'http://opendsa.local',
-                              'http://ltitest.cs.vt.edu:3001',
                               'http://localhost:8000',
+                              'http://ltitest.cs.vt.edu:3001',
+                              'http://lti.cs.vt.edu:8000',
                               'https://ltitest.herokuapp.com']
 XS_SHARING_ALLOWED_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
 XS_SHARING_ALLOWED_HEADERS = ["Content-Type"]
