@@ -99,3 +99,6 @@ cd ODSAserver/ODSA-django
 ### Note
   - Due to cross-domain communication issues, the files communicating with the Django server must be hosted by a webserver and that server must be listed in the 'XS_SHARING_ALLOWED_ORIGINS' variable in settings.py.  For OpenDSA development, we are hosting our files on 'http://algoviz-beta.cc.vt.edu'
   - To enable OpenDSA to communicate with the Django server, you must set the "backend_address" field in your book's config file to the base URL of your server
+  - To test https connections with Django setup stunnel `apt-get install stunnel` and run `$. ~/OpenDSA-server/ODSA-django/runserver` 
+
+  
