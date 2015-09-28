@@ -21,7 +21,7 @@ XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta6.cc.vt.edu',
                               'http://opendsa.local',
                               'https://ltitest.cs.vt.edu:9292',
                               'http://ltitest.cs.vt.edu:9000',
-                              'http://lti.cs.vt.edu:8000',
+                              'http://lti.cs.vt.edu:9292',
                               'http://localhost:8000',
                               'http://localhost:8003',
                               'https://ltitest.herokuapp.com']
