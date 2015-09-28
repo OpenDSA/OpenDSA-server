@@ -7,6 +7,8 @@ import djcelery
 djcelery.setup_loader()
 
 # Returns the path to given filename
+
+
 def get_path(filename):
     return os.path.join(os.path.dirname(__file__), filename)
 
@@ -17,20 +19,22 @@ XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta6.cc.vt.edu',
                               'http://algoviz.org',
                               'http://algoviz-beta7.cc.vt.edu',
                               'http://opendsa.local',
+                              'https://ltitest.cs.vt.edu:9292',
+                              'http://ltitest.cs.vt.edu:9000',
+                              'http://lti.cs.vt.edu:8 000',
                               'http://localhost:8000',
-                              'http://ltitest.cs.vt.edu:3001',
-                              'http://lti.cs.vt.edu:8000',
+                              'http://localhost:8003',
                               'https://ltitest.herokuapp.com']
 XS_SHARING_ALLOWED_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
 XS_SHARING_ALLOWED_HEADERS = ["Content-Type"]
-File_Path = "/home/OpenDSA-server/ODSA-django/openpop/build/"
+File_Path = "/home/hshahin/workspaces/OpenDSA-server/ODSA-django/openpop/build/"
 
 APPEND_SLASH = True
 
 ACCOUNT_ACTIVATION_DAYS = 365
 
 # celery broker
-#BROKER_URL = 'amqp://guest:guest@localhost:5672/'
+# BROKER_URL = 'amqp://guest:guest@localhost:5672/'
 BROKER_URL = "django://"
 
 # This URL is used when building absolute URLs to this service

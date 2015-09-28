@@ -85,3 +85,4 @@ wadllib==1.3.2
 whisper==0.9.12
 wsgiref==0.1.2
 zope.interface==4.0.5
+pip install git+ssh://git@github.com/penzance/canvas_python_sdk#egg=canvas_sdk

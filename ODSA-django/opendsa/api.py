@@ -989,13 +989,14 @@ class ModuleResource(ModelResource):
         return self.create_response(request,
                                     {'error': 'unauthorized action'}, HttpUnauthorized)
 
-    def create_chapter(self, request_ctx, course_id, course_code, module_id, chapter_obj, LTI_obj, **kwargs):
+    def create_chapter(self, request_ctx, course_id, course_code, module_id, module_position, chapter_obj, LTI_obj, **kwargs):
         """
         Create canvas module that corresponds to OpenDSA chapter
         """
 
         url = LTI_obj["url"]
 
+        module_item_position = 1
         for module in chapter_obj:
             module_obj = chapter_obj[str(module)]
             module_name = module_obj.get("long_name")
@@ -1004,8 +1005,9 @@ class ModuleResource(ModelResource):
             results = modules.create_module_item(
                 request_ctx, course_id, module_id, 'SubHeader',
                 module_item_content_id=None,
-                module_item_title=module_name,
+                module_item_title=str(module_position) + "." + str(module_item_position) + ". " + module_name,
                 module_item_indent=0)
+            module_item_position += 1
             exercises = module_obj.get("exercises")
             if bool(exercises):
                 exercise_counter = 1
@@ -1113,11 +1115,11 @@ class ModuleResource(ModelResource):
                     chapter_obj = chapters[str(chapter)]
                     # OpenDSA chapters will map to canvas modules
                     results = modules.create_module(
-                        request_ctx, course_id, str(chapter), module_position=module_position)
-                    module_position += 1
+                        request_ctx, course_id, "Chapter " + str(module_position - 1) + " " + str(chapter), module_position=module_position)
                     module_id = results.json().get("id")
-                    t = threading.Thread(target=self.create_chapter, args=(request_ctx, course_id, course_code, module_id, chapter_obj, LTI_obj,))
+                    t = threading.Thread(target=self.create_chapter, args=(request_ctx, course_id, course_code, module_id, module_position - 1, chapter_obj, LTI_obj,))
                     t.start()
+                    module_position += 1
 
                 # Register the book to OpenDSA server
                 kbook = get_book(sha1(canvas_parsed_url.netloc + '-' + str(course_id)).hexdigest())
