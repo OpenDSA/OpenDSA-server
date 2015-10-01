@@ -6,6 +6,8 @@ conf.py
 *.bk
 ODSA-django/stunnel.log
 ODSA-django/media
+src
+canvas-sdk
 
 
 # cache files for sublime text

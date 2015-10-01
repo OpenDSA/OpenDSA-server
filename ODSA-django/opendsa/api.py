@@ -895,8 +895,8 @@ class ModuleResource(ModelResource):
                             continue
 
                         # Get list of exercises
-                        exercises_l = \
-                            book_json['chapters'][chapter][lesson]['exercises']
+                        # exercises_l = \
+                        #     book_json['chapters'][chapter][lesson]['exercises']
                         # get or create module
                         # We first extract module name
                         if '/' in lesson:
@@ -912,68 +912,74 @@ class ModuleResource(ModelResource):
                             kchapter.add_module(kmodule.id)
                             kchapter.save()
 
-                        for exercise in exercises_l:
+                        sections = book_json['chapters'][chapter][lesson]['sections']
+                        for i, section in enumerate(sections):
+                            # for exercise in exercises_l:
                             # get or create exercises
                             description = ''
                             streak = 0
                             required = False
-                            # module has exercises
-                            if len(exercises_l[exercise]) > 0:
-                                description = exercises_l[exercise]['long_name']
-                                streak = exercises_l[exercise]['threshold']
-                                required = exercises_l[exercise]['required']
+                            for attr in section:
+                                # module has exercises
+                                if len(section[attr]) > 0:
+                                    # if len(exercises_l[exercise]) > 0:
+                                    exerciseObj = section[attr]
+                                    exerciseName = attr
+                                    description = exerciseObj['long_name']
+                                    streak = exerciseObj['threshold']
+                                    required = exerciseObj['required']
 
-                            if Exercise.objects.filter(name=exercise).count() == 0:
-                              # Add new exercise
-                                with transaction.commit_on_success():
-                                    kexercise, added = \
-                                        Exercise.objects.get_or_create(
-                                            name=exercise,
-                                            covers="dsa",
-                                            description=description,
-                                            streak=streak)
-                            else:
-                                # Update existing exercise
-                                with transaction.commit_on_success():
-                                    kexercise = get_exercise(exercise)
-                                    kexercise.covers = "dsa"
-                                    kexercise.description = description
-                                    kexercise.streak = Decimal(streak)
-                                    kexercise.save()
+                                if Exercise.objects.filter(name=exerciseName).count() == 0:
+                                  # Add new exercise
+                                    with transaction.commit_on_success():
+                                        kexercise, added = \
+                                            Exercise.objects.get_or_create(
+                                                name=exerciseName,
+                                                covers="dsa",
+                                                description=description,
+                                                streak=streak)
+                                else:
+                                    # Update existing exercise
+                                    with transaction.commit_on_success():
+                                        kexercise = get_exercise(exerciseName)
+                                        kexercise.covers = "dsa"
+                                        kexercise.description = description
+                                        kexercise.streak = Decimal(streak)
+                                        kexercise.save()
 
-                            # Link exercise to module and books only
-                            # if the exercise is required
-                            bme = None
-                            if BookModuleExercise.components.filter(
-                                    book=kbook,
-                                    module=kmodule,
-                                    exercise=kexercise).count() > 0 \
-                                    and required:
-                                with transaction.commit_on_success():
-                                    bme = BookModuleExercise.components.filter(
+                                # Link exercise to module and books only
+                                # if the exercise is required
+                                bme = None
+                                if BookModuleExercise.components.filter(
                                         book=kbook,
                                         module=kmodule,
-                                        exercise=kexercise)[0]
-                                    bme.points = exercises_l[exercise]['points']
-                                    bme.save()
+                                        exercise=kexercise).count() > 0 \
+                                        and required:
+                                    with transaction.commit_on_success():
+                                        bme = BookModuleExercise.components.filter(
+                                            book=kbook,
+                                            module=kmodule,
+                                            exercise=kexercise)[0]
+                                        bme.points = exerciseObj['points']
+                                        bme.save()
+                                        if kexercise not in exers_:
+                                            exers_.append(kexercise)
                                     if kexercise not in exers_:
                                         exers_.append(kexercise)
-                                if kexercise not in exers_:
-                                    exers_.append(kexercise)
-                            if BookModuleExercise.components.filter(
-                                    book=kbook,
-                                    module=kmodule,
-                                    exercise=kexercise).count() == 0\
-                                    and required:
-                                with transaction.commit_on_success():
-                                    bme = BookModuleExercise(
+                                if BookModuleExercise.components.filter(
                                         book=kbook,
                                         module=kmodule,
-                                        exercise=kexercise,
-                                        points=exercises_l[exercise]['points'])
-                                    bme.save()
-                                    if kexercise not in exers_:
-                                        exers_.append(kexercise)
+                                        exercise=kexercise).count() == 0\
+                                        and required:
+                                    with transaction.commit_on_success():
+                                        bme = BookModuleExercise(
+                                            book=kbook,
+                                            module=kmodule,
+                                            exercise=kexercise,
+                                            points=exerciseObj['points'])
+                                        bme.save()
+                                        if kexercise not in exers_:
+                                            exers_.append(kexercise)
 
                 response['saved'] = True
                 # create book json file
@@ -989,55 +995,64 @@ class ModuleResource(ModelResource):
         return self.create_response(request,
                                     {'error': 'unauthorized action'}, HttpUnauthorized)
 
-    def create_chapter(self, request_ctx, course_id, course_code, module_id, module_position, chapter_obj, LTI_obj, **kwargs):
-        """
-        Create canvas module that corresponds to OpenDSA chapter
-        """
+        def create_chapter(self, request_ctx, course_id, course_code, module_id, module_position, chapter_obj, LTI_obj, **kwargs):
+            """
+            Create canvas module that corresponds to OpenDSA chapter
+            """
 
-        url = LTI_obj["url"]
+            url = LTI_obj["url"]
 
-        module_item_position = 1
-        for module in chapter_obj:
-            module_obj = chapter_obj[str(module)]
-            module_name = module_obj.get("long_name")
-            module_name_url = module.split('/')[1] if '/' in module else module
-            # OpenDSA module header will map to canvas text header
-            results = modules.create_module_item(
-                request_ctx, course_id, module_id, 'SubHeader',
-                module_item_content_id=None,
-                module_item_title=str(module_position) + "." + str(module_item_position) + ". " + module_name,
-                module_item_indent=0)
-            module_item_position += 1
-            exercises = module_obj.get("exercises")
-            if bool(exercises):
-                exercise_counter = 1
-                for exercise in exercises:
-                    exercise_obj = exercises[str(exercise)]
-                    long_name = exercise_obj.get("long_name")
-                    required = exercise_obj.get("required")
-                    points = exercise_obj.get("points")
-                    threshold = exercise_obj.get("threshold")
-                    if long_name is not None and required is not None and points is not None and threshold is not None:
-                        print(str(exercise_counter).zfill(2)) + \
-                            " " + long_name
-                        # OpenDSA exercises will map to canvas assignments
-                        results = assignments.create_assignment(
-                            request_ctx, course_id,
-                            long_name,
-                            assignment_submission_types="external_tool",
-                            assignment_external_tool_tag_attributes={
-                                "url": url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" + module_name_url + "-" + str(exercise_counter).zfill(2)},
-                            assignment_points_possible=points,
-                            assignment_description=long_name)
-                        assignment_id = results.json().get("id")
-                        # add assignment to module
+            module_item_position = 1
+            for module in chapter_obj:
+                module_obj = chapter_obj[str(module)]
+                module_name = module_obj.get("long_name")
+                module_name_url = module.split('/')[1] if '/' in module else module
+                # OpenDSA module header will map to canvas text header
+                results = modules.create_module_item(
+                    request_ctx, course_id, module_id, 'SubHeader',
+                    module_item_content_id=None,
+                    module_item_title=str(module_position) + "." + str(module_item_position) + ". " + module_name,
+                    module_item_indent=0)
+                module_item_position += 1
+                exercises = module_obj.get("exercises")
+                if bool(exercises):
+                    exercise_counter = 1
+                    for exercise in exercises:
+                        exercise_obj = exercises[str(exercise)]
+                        long_name = exercise_obj.get("long_name")
+                        required = exercise_obj.get("required")
+                        points = exercise_obj.get("points")
+                        threshold = exercise_obj.get("threshold")
+                        if long_name is not None and required is not None and points is not None and threshold is not None:
+                            print(str(exercise_counter).zfill(2)) + \
+                                " " + long_name
+                            # OpenDSA exercises will map to canvas assignments
+                            results = assignments.create_assignment(
+                                request_ctx, course_id,
+                                long_name,
+                                assignment_submission_types="external_tool",
+                                assignment_external_tool_tag_attributes={
+                                    "url": url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" + module_name_url + "-" + str(exercise_counter).zfill(2)},
+                                assignment_points_possible=points,
+                                assignment_description=long_name)
+                            assignment_id = results.json().get("id")
+                            # add assignment to module
+                            results = modules.create_module_item(
+                                request_ctx, course_id, module_id,
+                                'Assignment',
+                                module_item_content_id=assignment_id,
+                                module_item_indent=1)
+                            exercise_counter += 1
+                    if exercise_counter == 1:
                         results = modules.create_module_item(
                             request_ctx, course_id, module_id,
-                            'Assignment',
-                            module_item_content_id=assignment_id,
+                            'ExternalTool',
+                            module_item_external_url=url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
+                            module_name_url,
+                            module_item_content_id=None,
+                            module_item_title=module_name,
                             module_item_indent=1)
-                        exercise_counter += 1
-                if exercise_counter == 1:
+                else:
                     results = modules.create_module_item(
                         request_ctx, course_id, module_id,
                         'ExternalTool',
@@ -1046,374 +1061,365 @@ class ModuleResource(ModelResource):
                         module_item_content_id=None,
                         module_item_title=module_name,
                         module_item_indent=1)
-            else:
-                results = modules.create_module_item(
-                    request_ctx, course_id, module_id,
-                    'ExternalTool',
-                    module_item_external_url=url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
-                    module_name_url,
-                    module_item_content_id=None,
-                    module_item_title=module_name,
-                    module_item_indent=1)
-        # publish the module
-        results = modules.update_module(request_ctx, course_id, module_id,
-                                        module_published=True)
+            # publish the module
+            results = modules.update_module(request_ctx, course_id, module_id,
+                                            module_published=True)
 
-    def createcourse(self, request, **kwargs):
-        if request.POST['key']:
-            kusername = get_username(request.POST['key'])
+        def createcourse(self, request, **kwargs):
+            if request.POST['key']:
+                kusername = get_username(request.POST['key'])
 
-            if kusername and kusername.is_staff:
-                response = {}
-                response['saved'] = False
+                if kusername and kusername.is_staff:
+                    response = {}
+                    response['saved'] = False
 
-                # get canvas course information
-                access_token = request.POST['access_token']
-                canvas_url = request.POST['canvas_url']
-                canvas_parsed_url = urlparse(canvas_url)
+                    # get canvas course information
+                    access_token = request.POST['access_token']
+                    canvas_url = request.POST['canvas_url']
+                    canvas_parsed_url = urlparse(canvas_url)
 
-                course_code = request.POST['course_code']
-                book_json = json.loads(request.POST['book_json'],
-                                       object_pairs_hook=collections.OrderedDict)
+                    course_code = request.POST['course_code']
+                    book_json = json.loads(request.POST['book_json'],
+                                           object_pairs_hook=collections.OrderedDict)
 
-                # init the request context
-                request_ctx = RequestContext(access_token, canvas_url)
+                    # init the request context
+                    request_ctx = RequestContext(access_token, canvas_url)
 
-                # get course_id
-                results = courses.list_your_courses(request_ctx,
-                                                    'total_scores')
-                # TODO: Proper error message when the course is not created yet.
-                for i, course in enumerate(results.json()):
-                    if course.get("course_code") == course_code:
-                        course_id = course.get("id")
+                    # get course_id
+                    results = courses.list_your_courses(request_ctx,
+                                                        'total_scores')
+                    # TODO: Proper error message when the course is not created yet.
+                    for i, course in enumerate(results.json()):
+                        if course.get("course_code") == course_code:
+                            course_id = course.get("id")
 
-                LTI_obj = book_json.get("LTI")
-                tool_name = LTI_obj["tool_name"]
-                privacy_level = "public"  # should be public
-                consumer_key = request.POST["consumer_key"]
-                consumer_secret = request.POST["consumer_secret"]
-                config_type = "by_url"
-                url = LTI_obj["url"]
-                xml_file_name = LTI_obj["xml_file_name"]
+                    LTI_obj = book_json.get("LTI")
+                    tool_name = LTI_obj["tool_name"]
+                    privacy_level = "public"  # should be public
+                    consumer_key = request.POST["consumer_key"]
+                    consumer_secret = request.POST["consumer_secret"]
+                    config_type = "by_url"
+                    url = LTI_obj["url"]
+                    xml_file_name = LTI_obj["xml_file_name"]
 
-                # configure the course external_tool
-                results = external_tools.create_external_tool_courses(
-                    request_ctx, course_id, tool_name,
-                    privacy_level, consumer_key, consumer_secret,
-                    config_type=config_type, config_url=url + '/' + xml_file_name)
+                    # configure the course external_tool
+                    results = external_tools.create_external_tool_courses(
+                        request_ctx, course_id, tool_name,
+                        privacy_level, consumer_key, consumer_secret,
+                        config_type=config_type, config_url=url + '/' + xml_file_name)
 
-                # update the course name
-                course_name = book_json.get("title")
-                results = courses.update_course(
-                    request_ctx, course_id, course_name=course_name)
+                    # update the course name
+                    course_name = book_json.get("title")
+                    results = courses.update_course(
+                        request_ctx, course_id, course_name=course_name)
 
-                chapters = book_json.get("chapters")
+                    chapters = book_json.get("chapters")
 
-                module_position = 1
-                # create course modules and assignments
-                for chapter in chapters:
-                    chapter_obj = chapters[str(chapter)]
-                    # OpenDSA chapters will map to canvas modules
-                    results = modules.create_module(
-                        request_ctx, course_id, "Chapter " + str(module_position - 1) + " " + str(chapter), module_position=module_position)
-                    module_id = results.json().get("id")
-                    t = threading.Thread(target=self.create_chapter, args=(request_ctx, course_id, course_code, module_id, module_position - 1, chapter_obj, LTI_obj,))
-                    t.start()
-                    module_position += 1
+                    module_position = 1
+                    # create course modules and assignments
+                    for chapter in chapters:
+                        chapter_obj = chapters[str(chapter)]
+                        # OpenDSA chapters will map to canvas modules
+                        results = modules.create_module(
+                            request_ctx, course_id, "Chapter " + str(module_position - 1) + " " + str(chapter), module_position=module_position)
+                        module_id = results.json().get("id")
+                        t = threading.Thread(target=self.create_chapter, args=(request_ctx, course_id, course_code, module_id, module_position - 1, chapter_obj, LTI_obj,))
+                        t.start()
+                        module_position += 1
 
-                # Register the book to OpenDSA server
-                kbook = get_book(sha1(canvas_parsed_url.netloc + '-' + str(course_id)).hexdigest())
+                    # Register the book to OpenDSA server
+                    kbook = get_book(sha1(canvas_parsed_url.netloc + '-' + str(course_id)).hexdigest())
 
-                if kbook is None:
-                    with transaction.commit_on_success():
-                        kbook, added = Books.objects.get_or_create(
-                            book_name=sha1(canvas_parsed_url.netloc + '-' + str(course_id)).hexdigest(),
-                            book_url=canvas_parsed_url.netloc + '/courses/' + str(course_id) + '-' + course_code,
-                            creation_date=datetime.datetime.now())
-                        ubook, created = UserBook.objects.get_or_create(
-                            user=kusername,
-                            book=kbook)
-                else:
-                    # link a book to user
-                    ubook = get_user_book(kusername, kbook)
-                    if ubook is None:
+                    if kbook is None:
                         with transaction.commit_on_success():
+                            kbook, added = Books.objects.get_or_create(
+                                book_name=sha1(canvas_parsed_url.netloc + '-' + str(course_id)).hexdigest(),
+                                book_url=canvas_parsed_url.netloc + '/courses/' + str(course_id) + '-' + course_code,
+                                creation_date=datetime.datetime.now())
                             ubook, created = UserBook.objects.get_or_create(
                                 user=kusername,
                                 book=kbook)
-
-                # We first delete all entries of the book
-                # in BookModuleExercise table
-                # for exer in \
-                BookModuleExercise.components.filter(book=kbook).delete()
-
-                exers_ = []
-
-                # delete book chapters
-                BookChapter.objects.filter(book=kbook).delete()
-                for chapter in book_json['chapters']:
-                  # get or create chapter
-                    kchapter = get_chapter(kbook, chapter)
-                    # First we delete chaper entry already in DB
-                    if kchapter is not None:
-                        with transaction.commit_on_success():
-                            kchapter.delete()
-                    with transaction.commit_on_success():
-                        kchapter, added = \
-                            BookChapter.objects.get_or_create(
-                                book=kbook, name=chapter)
-
-                    for lesson in book_json['chapters'][chapter]:
-                        # if we encounter "hidden" we do nothing
-                        if not isinstance(book_json['chapters'][chapter][lesson], Iterable):
-                            continue
-
-                        # Get list of exercises
-                        exercises_l = \
-                            book_json['chapters'][chapter][lesson]['exercises']
-                        # get or create module
-                        # We first extract module name
-                        if '/' in lesson:
-                            lesson = lesson.split('/')[1]
-                        kmodule = get_module(lesson)
-
-                        if kmodule is None:
+                    else:
+                        # link a book to user
+                        ubook = get_user_book(kusername, kbook)
+                        if ubook is None:
                             with transaction.commit_on_success():
-                                kmodule, added = Module.objects.get_or_create(
-                                    name=lesson)
-                        # link module/lesson to chapter
-                        if kmodule not in kchapter.get_modules():
-                            kchapter.add_module(kmodule.id)
-                            kchapter.save()
+                                ubook, created = UserBook.objects.get_or_create(
+                                    user=kusername,
+                                    book=kbook)
 
-                        for exercise in exercises_l:
-                            # get or create exercises
-                            description = ''
-                            streak = 0
-                            required = False
-                            # module has exercises
-                            if len(exercises_l[exercise]) > 0:
-                                description = exercises_l[exercise]['long_name']
-                                streak = exercises_l[exercise]['threshold']
-                                required = exercises_l[exercise]['required']
+                    # We first delete all entries of the book
+                    # in BookModuleExercise table
+                    # for exer in \
+                    BookModuleExercise.components.filter(book=kbook).delete()
 
-                            if Exercise.objects.filter(name=exercise).count() == 0:
-                              # Add new exercise
-                                with transaction.commit_on_success():
-                                    kexercise, added = \
-                                        Exercise.objects.get_or_create(
-                                            name=exercise,
-                                            covers="dsa",
-                                            description=description,
-                                            streak=streak)
-                            else:
-                                # Update existing exercise
-                                with transaction.commit_on_success():
-                                    kexercise = get_exercise(exercise)
-                                    kexercise.covers = "dsa"
-                                    kexercise.description = description
-                                    kexercise.streak = Decimal(streak)
-                                    kexercise.save()
+                    exers_ = []
 
-                            # Link exercise to module and books only
-                            # if the exercise is required
-                            bme = None
-                            if BookModuleExercise.components.filter(
-                                    book=kbook,
-                                    module=kmodule,
-                                    exercise=kexercise).count() > 0 \
-                                    and required:
-                                with transaction.commit_on_success():
-                                    bme = BookModuleExercise.components.filter(
-                                        book=kbook,
-                                        module=kmodule,
-                                        exercise=kexercise)[0]
-                                    bme.points = exercises_l[exercise]['points']
-                                    bme.save()
-                                    if kexercise not in exers_:
-                                        exers_.append(kexercise)
-                                if kexercise not in exers_:
-                                    exers_.append(kexercise)
-                            if BookModuleExercise.components.filter(
-                                    book=kbook,
-                                    module=kmodule,
-                                    exercise=kexercise).count() == 0\
-                                    and required:
-                                with transaction.commit_on_success():
-                                    bme = BookModuleExercise(
-                                        book=kbook,
-                                        module=kmodule,
-                                        exercise=kexercise,
-                                        points=exercises_l[exercise]['points'])
-                                    bme.save()
-                                    if kexercise not in exers_:
-                                        exers_.append(kexercise)
-
-                response['saved'] = True
-                # create book json file
-                if request.POST['build_date']:
-                    build_date = datetime.datetime.strptime(
-                        request.POST['build_date'], '%Y-%m-%d %H:%M:%S')
-                    print(build_date)
-                    if kbook.creation_date != build_date:
-                        create_book_file(kbook)
-                        kbook.creation_date = build_date
-                        kbook.save()
-
-                return self.create_response(request, response)
-        return self.create_response(request,
-                                    {'error': 'unauthorized action'},
-                                    HttpUnauthorized)
-
-    def loadmodule(self, request, **kwargs):
-        if request.POST['key']:
-            kusername = get_username(request.POST['key'])
-
-            if kusername:
-                response = {}
-                # get or create Book & link a book to user
-                kbook = get_book(request.POST['book'])
-
-                if kbook is None:
-                    with transaction.commit_on_success():
-                        kbook, added = Books.objects.get_or_create(
-                            book_name=request.POST['book'],
-                            book_url=request.POST['url'],
-                            creation_date=datetime.datetime.now())
-                        ubook, created = UserBook.objects.get_or_create(
-                            user=kusername,
-                            book=kbook)
-                else:
-                    # link a book to user
-                    ubook = get_user_book(kusername, kbook)
-
-                    if ubook is None:
+                    # delete book chapters
+                    BookChapter.objects.filter(book=kbook).delete()
+                    for chapter in book_json['chapters']:
+                      # get or create chapter
+                        kchapter = get_chapter(kbook, chapter)
+                        # First we delete chaper entry already in DB
+                        if kchapter is not None:
+                            with transaction.commit_on_success():
+                                kchapter.delete()
                         with transaction.commit_on_success():
+                            kchapter, added = \
+                                BookChapter.objects.get_or_create(
+                                    book=kbook, name=chapter)
+
+                        for lesson in book_json['chapters'][chapter]:
+                            # if we encounter "hidden" we do nothing
+                            if not isinstance(book_json['chapters'][chapter][lesson], Iterable):
+                                continue
+
+                            # Get list of exercises
+                            exercises_l = \
+                                book_json['chapters'][chapter][lesson]['exercises']
+                            # get or create module
+                            # We first extract module name
+                            if '/' in lesson:
+                                lesson = lesson.split('/')[1]
+                            kmodule = get_module(lesson)
+
+                            if kmodule is None:
+                                with transaction.commit_on_success():
+                                    kmodule, added = Module.objects.get_or_create(
+                                        name=lesson)
+                            # link module/lesson to chapter
+                            if kmodule not in kchapter.get_modules():
+                                kchapter.add_module(kmodule.id)
+                                kchapter.save()
+
+                            for exercise in exercises_l:
+                                # get or create exercises
+                                description = ''
+                                streak = 0
+                                required = False
+                                # module has exercises
+                                if len(exercises_l[exercise]) > 0:
+                                    description = exercises_l[exercise]['long_name']
+                                    streak = exercises_l[exercise]['threshold']
+                                    required = exercises_l[exercise]['required']
+
+                                if Exercise.objects.filter(name=exercise).count() == 0:
+                                  # Add new exercise
+                                    with transaction.commit_on_success():
+                                        kexercise, added = \
+                                            Exercise.objects.get_or_create(
+                                                name=exercise,
+                                                covers="dsa",
+                                                description=description,
+                                                streak=streak)
+                                else:
+                                    # Update existing exercise
+                                    with transaction.commit_on_success():
+                                        kexercise = get_exercise(exercise)
+                                        kexercise.covers = "dsa"
+                                        kexercise.description = description
+                                        kexercise.streak = Decimal(streak)
+                                        kexercise.save()
+
+                                # Link exercise to module and books only
+                                # if the exercise is required
+                                bme = None
+                                if BookModuleExercise.components.filter(
+                                        book=kbook,
+                                        module=kmodule,
+                                        exercise=kexercise).count() > 0 \
+                                        and required:
+                                    with transaction.commit_on_success():
+                                        bme = BookModuleExercise.components.filter(
+                                            book=kbook,
+                                            module=kmodule,
+                                            exercise=kexercise)[0]
+                                        bme.points = exercises_l[exercise]['points']
+                                        bme.save()
+                                        if kexercise not in exers_:
+                                            exers_.append(kexercise)
+                                    if kexercise not in exers_:
+                                        exers_.append(kexercise)
+                                if BookModuleExercise.components.filter(
+                                        book=kbook,
+                                        module=kmodule,
+                                        exercise=kexercise).count() == 0\
+                                        and required:
+                                    with transaction.commit_on_success():
+                                        bme = BookModuleExercise(
+                                            book=kbook,
+                                            module=kmodule,
+                                            exercise=kexercise,
+                                            points=exercises_l[exercise]['points'])
+                                        bme.save()
+                                        if kexercise not in exers_:
+                                            exers_.append(kexercise)
+
+                    response['saved'] = True
+                    # create book json file
+                    if request.POST['build_date']:
+                        build_date = datetime.datetime.strptime(
+                            request.POST['build_date'], '%Y-%m-%d %H:%M:%S')
+                        print(build_date)
+                        if kbook.creation_date != build_date:
+                            create_book_file(kbook)
+                            kbook.creation_date = build_date
+                            kbook.save()
+
+                    return self.create_response(request, response)
+            return self.create_response(request,
+                                        {'error': 'unauthorized action'},
+                                        HttpUnauthorized)
+
+        def loadmodule(self, request, **kwargs):
+            if request.POST['key']:
+                kusername = get_username(request.POST['key'])
+
+                if kusername:
+                    response = {}
+                    # get or create Book & link a book to user
+                    kbook = get_book(request.POST['book'])
+
+                    if kbook is None:
+                        with transaction.commit_on_success():
+                            kbook, added = Books.objects.get_or_create(
+                                book_name=request.POST['book'],
+                                book_url=request.POST['url'],
+                                creation_date=datetime.datetime.now())
                             ubook, created = UserBook.objects.get_or_create(
                                 user=kusername,
                                 book=kbook)
-
-                # get or create module
-                kmodule = get_module(request.POST['module'])
-
-                if kmodule is None:
-                    with transaction.commit_on_success():
-                        kmodule, added = Module.objects.get_or_create(
-                            name=request.POST['module'])
-
-                response[kmodule.name] = False
-
-                # get or create chapter
-                kchapter = get_chapter(kbook, request.POST['chapter'])
-                if kchapter is None:
-                    with transaction.commit_on_success():
-                        kchapter, added = BookChapter.objects.get_or_create(
-                            book=kbook,
-                            name=request.POST['chapter'])
-                kchapter.add_module(kmodule.id)
-                kchapter.save()
-                # get or create exercises
-                mod_exes = simplejson.loads(request.POST['exercises'])
-                if len(mod_exes) == 0:
-                    response[kmodule.name] = True
-
-                exers_ = []
-                for mod_exe in mod_exes:
-                    if Exercise.objects.filter(
-                            name=mod_exe['exercise']).count() == 0:
-                        # Add new exercise
-                        with transaction.commit_on_success():
-                            kexercise, added = Exercise.objects.get_or_create(
-                                name=mod_exe['exercise'],
-                                covers="dsa",
-                                description=mod_exe['name'],
-                                ex_type=mod_exe['type'],
-                                streak=mod_exe['threshold'])
                     else:
-                        # Update existing exercise
+                        # link a book to user
+                        ubook = get_user_book(kusername, kbook)
+
+                        if ubook is None:
+                            with transaction.commit_on_success():
+                                ubook, created = UserBook.objects.get_or_create(
+                                    user=kusername,
+                                    book=kbook)
+
+                    # get or create module
+                    kmodule = get_module(request.POST['module'])
+
+                    if kmodule is None:
                         with transaction.commit_on_success():
-                            kexercise = get_exercise(mod_exe['exercise'])
-                            kexercise.covers = "dsa"
-                            kexercise.description = mod_exe['name']
-                            kexercise.ex_type = mod_exe['type']
-                            kexercise.streak = Decimal(mod_exe['threshold'])
-                            kexercise.save()
-                    # add exercise in list of module exercises
-                    exers_.append(kexercise)
-                    u_prof = False
-                    with transaction.commit_on_success():
-                        user_data, created = UserData.objects.get_or_create(
-                            user=kusername,
-                            book=kbook)
-                        u_prof = user_data.is_proficient_at(kexercise)
+                            kmodule, added = Module.objects.get_or_create(
+                                name=request.POST['module'])
 
-                    # check student progress -- KA exercises
-                    user_exercise = get_user_exercise(user=kusername,
-                                                      exercise=kexercise)
+                    response[kmodule.name] = False
 
-                    if u_prof and user_exercise is not None:
-                        u_prog = user_exercise.progress
-                    else:
-                        u_prog = 0
-
-                    # Link exercise to module and books only
-                    # if the exercise is required
-                    bme = None
-                    if BookModuleExercise.components.filter(book=kbook,
-                                                            module=kmodule,
-                                                            exercise=kexercise).count() > 0 \
-                            and mod_exe['required']:
+                    # get or create chapter
+                    kchapter = get_chapter(kbook, request.POST['chapter'])
+                    if kchapter is None:
                         with transaction.commit_on_success():
-                            bme = BookModuleExercise.components.filter(
+                            kchapter, added = BookChapter.objects.get_or_create(
                                 book=kbook,
-                                module=kmodule,
-                                exercise=kexercise)[0]
-                            bme.points = mod_exe['points']
-                            bme.save()
-                    if BookModuleExercise.components.filter(book=kbook,
-                                                            module=kmodule,
-                                                            exercise=kexercise).count() == 0 \
-                            and mod_exe['required']:
+                                name=request.POST['chapter'])
+                    kchapter.add_module(kmodule.id)
+                    kchapter.save()
+                    # get or create exercises
+                    mod_exes = simplejson.loads(request.POST['exercises'])
+                    if len(mod_exes) == 0:
+                        response[kmodule.name] = True
+
+                    exers_ = []
+                    for mod_exe in mod_exes:
+                        if Exercise.objects.filter(
+                                name=mod_exe['exercise']).count() == 0:
+                            # Add new exercise
+                            with transaction.commit_on_success():
+                                kexercise, added = Exercise.objects.get_or_create(
+                                    name=mod_exe['exercise'],
+                                    covers="dsa",
+                                    description=mod_exe['name'],
+                                    ex_type=mod_exe['type'],
+                                    streak=mod_exe['threshold'])
+                        else:
+                            # Update existing exercise
+                            with transaction.commit_on_success():
+                                kexercise = get_exercise(mod_exe['exercise'])
+                                kexercise.covers = "dsa"
+                                kexercise.description = mod_exe['name']
+                                kexercise.ex_type = mod_exe['type']
+                                kexercise.streak = Decimal(mod_exe['threshold'])
+                                kexercise.save()
+                        # add exercise in list of module exercises
+                        exers_.append(kexercise)
+                        u_prof = False
                         with transaction.commit_on_success():
-                            bme = BookModuleExercise(book=kbook,
-                                                     module=kmodule,
-                                                     exercise=kexercise,
-                                                     points=mod_exe['points'])
-                            bme.save()
+                            user_data, created = UserData.objects.get_or_create(
+                                user=kusername,
+                                book=kbook)
+                            u_prof = user_data.is_proficient_at(kexercise)
 
-                    response[kexercise.name] = {'proficient': u_prof,
-                                                'progress': u_prog}
+                        # check student progress -- KA exercises
+                        user_exercise = get_user_exercise(user=kusername,
+                                                          exercise=kexercise)
 
-                # Remove exercises that are no longer
-                # part of this book / module
-                for exer in \
-                    BookModuleExercise.components.get_mod_exercise_list(
-                        kbook, kmodule):
-                    if exer not in exers_:
-                        BookModuleExercise.components.filter(book=kbook,
-                                                             module=kmodule,
-                                                             exercise=exer).delete()
+                        if u_prof and user_exercise is not None:
+                            u_prog = user_exercise.progress
+                        else:
+                            u_prog = 0
 
-                # check module proficiency
-                user_module = get_user_module(user=kusername,
-                                              book=kbook,
-                                              module=kmodule)
+                        # Link exercise to module and books only
+                        # if the exercise is required
+                        bme = None
+                        if BookModuleExercise.components.filter(book=kbook,
+                                                                module=kmodule,
+                                                                exercise=kexercise).count() > 0 \
+                                and mod_exe['required']:
+                            with transaction.commit_on_success():
+                                bme = BookModuleExercise.components.filter(
+                                    book=kbook,
+                                    module=kmodule,
+                                    exercise=kexercise)[0]
+                                bme.points = mod_exe['points']
+                                bme.save()
+                        if BookModuleExercise.components.filter(book=kbook,
+                                                                module=kmodule,
+                                                                exercise=kexercise).count() == 0 \
+                                and mod_exe['required']:
+                            with transaction.commit_on_success():
+                                bme = BookModuleExercise(book=kbook,
+                                                         module=kmodule,
+                                                         exercise=kexercise,
+                                                         points=mod_exe['points'])
+                                bme.save()
 
-                if user_module is not None:
-                    with transaction.commit_on_success():
-                        user_data, created = UserData.objects.get_or_create(
-                            user=kusername,
-                            book=kbook)
+                        response[kexercise.name] = {'proficient': u_prof,
+                                                    'progress': u_prog}
 
-                    update_module_proficiency(user_data,
-                                              request.POST['module'], None)
+                    # Remove exercises that are no longer
+                    # part of this book / module
+                    for exer in \
+                        BookModuleExercise.components.get_mod_exercise_list(
+                            kbook, kmodule):
+                        if exer not in exers_:
+                            BookModuleExercise.components.filter(book=kbook,
+                                                                 module=kmodule,
+                                                                 exercise=exer).delete()
 
-                    # Module proficiency response
-                    response[kmodule.name] = user_module.is_proficient_at()
+                    # check module proficiency
+                    user_module = get_user_module(user=kusername,
+                                                  book=kbook,
+                                                  module=kmodule)
 
-                return self.create_response(request, response)
-        return self.create_response(request, {'error': 'unauthorized action'},
-                                    HttpUnauthorized)
+                    if user_module is not None:
+                        with transaction.commit_on_success():
+                            user_data, created = UserData.objects.get_or_create(
+                                user=kusername,
+                                book=kbook)
+
+                        update_module_proficiency(user_data,
+                                                  request.POST['module'], None)
+
+                        # Module proficiency response
+                        response[kmodule.name] = user_module.is_proficient_at()
+
+                    return self.create_response(request, response)
+            return self.create_response(request, {'error': 'unauthorized action'},
+                                        HttpUnauthorized)
 
 
 class UserModuleResource(ModelResource):
