@@ -1224,14 +1224,16 @@ class ModuleResource(ModelResource):
 
                     sections = book_json['chapters'][chapter][lesson]['sections']
                     for section in sections:
-                        for attr in sections[section]:
+                        section_obj = sections[section]
+                        for attr in section_obj:
                             # get or create exercises
                             description = ''
                             streak = 0
                             required = False
                             # module has exercises
-                            if len(sections[section][attr]) > 0:
-                                exercise_obj = sections[section][attr]
+                            if isinstance(section_obj[attr], dict):
+                            # if len(section_obj[attr]) > 0:
+                                exercise_obj = section_obj[attr]
                                 exercise_name = attr
                                 description = exercise_obj['long_name']
                                 streak = exercise_obj['threshold']
