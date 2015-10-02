@@ -1023,7 +1023,8 @@ class ModuleResource(ModelResource):
                 for section in sections:
                     section_obj = sections[section]
                     for attr in section_obj:
-                        if len(section_obj[attr] > 0):
+                        if isinstance(section_obj[attr], dict):
+                        # if len(section_obj[attr] > 0):
                             exercise_obj = section_obj[attr]
                             exercise_name = attr
                             long_name = exercise_obj.get("long_name")
