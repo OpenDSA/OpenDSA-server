@@ -995,12 +995,10 @@ class ModuleResource(ModelResource):
         return self.create_response(request,
                                     {'error': 'unauthorized action'}, HttpUnauthorized)
 
-    def create_chapter(self, request_ctx, course_id, course_code, module_id, module_position, chapter_obj, LTI_obj, **kwargs):
+    def create_chapter(self, request_ctx, course_id, course_code, module_id, module_position, chapter_obj, tool_url, **kwargs):
         """
         Create canvas module that corresponds to OpenDSA chapter
         """
-
-        url = LTI_obj["url"]
 
         module_item_position = 1
         for module in chapter_obj:
@@ -1040,7 +1038,7 @@ class ModuleResource(ModelResource):
                                     long_name,
                                     assignment_submission_types="external_tool",
                                     assignment_external_tool_tag_attributes={
-                                        "url": url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" + module_name_url + "-" + str(exercise_counter).zfill(2)},
+                                        "url": tool_url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" + module_name_url + "-" + str(exercise_counter).zfill(2)},
                                     assignment_points_possible=points,
                                     assignment_description=long_name)
                                 assignment_id = results.json().get("id")
@@ -1055,7 +1053,7 @@ class ModuleResource(ModelResource):
                             results = modules.create_module_item(
                                 request_ctx, course_id, module_id,
                                 'ExternalTool',
-                                module_item_external_url=url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
+                                module_item_external_url=tool_url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
                                 module_name_url,
                                 module_item_content_id=None,
                                 module_item_title=module_name,
@@ -1064,7 +1062,7 @@ class ModuleResource(ModelResource):
                 results = modules.create_module_item(
                     request_ctx, course_id, module_id,
                     'ExternalTool',
-                    module_item_external_url=url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
+                    module_item_external_url=tool_url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
                     module_name_url,
                     module_item_content_id=None,
                     module_item_title=module_name,
@@ -1100,14 +1098,9 @@ class ModuleResource(ModelResource):
             consumer_secret = json_obj["consumer_secret"]
             config_type = "by_url"
             tool_name = json_obj["tool_name"]
-            url = json_obj["url"]
-            xml_file_name = json_obj["xml_file_name"]
-            LTI_obj = {}
-            LTI_obj['tool_name'] = tool_name
-            LTI_obj['url'] = url
-            LTI_obj['xml_file_name'] = xml_file_name
+            tool_url = json_obj["tool_url"]
+            tool_xml_file = json_obj["tool_xml_file"]
             book_json = json_obj['book_json']
-
 
             # init the request context
             request_ctx = RequestContext(access_token, canvas_url)
@@ -1125,7 +1118,7 @@ class ModuleResource(ModelResource):
             results = external_tools.create_external_tool_courses(
                 request_ctx, course_id, tool_name,
                 privacy_level, consumer_key, consumer_secret,
-                config_type=config_type, config_url=url + '/' + xml_file_name)
+                config_type=config_type, config_url=tool_url + '/' + tool_xml_file)
 
             # update the course name
             course_name = book_json.get("title")
@@ -1142,7 +1135,7 @@ class ModuleResource(ModelResource):
                 results = modules.create_module(
                     request_ctx, course_id, "Chapter " + str(module_position - 1) + " " + str(chapter), module_position=module_position)
                 module_id = results.json().get("id")
-                t = threading.Thread(target=self.create_chapter, args=(request_ctx, course_id, course_code, module_id, module_position - 1, chapter_obj, LTI_obj))
+                t = threading.Thread(target=self.create_chapter, args=(request_ctx, course_id, course_code, module_id, module_position - 1, chapter_obj, tool_url))
                 t.start()
                 module_position += 1
 
