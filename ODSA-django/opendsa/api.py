@@ -1001,6 +1001,7 @@ class ModuleResource(ModelResource):
         """
 
         module_item_position = 1
+
         for module in chapter_obj:
             module_obj = chapter_obj[str(module)]
             module_name = module_obj.get("long_name")
@@ -1011,18 +1012,20 @@ class ModuleResource(ModelResource):
                 module_item_content_id=None,
                 module_item_title=str(module_position) + "." + str(module_item_position) + ". " + module_name,
                 module_item_indent=0)
+
             module_item_position += 1
             # exercises = module_obj.get("exercises")
             sections = module_obj.get("sections")
-            # if bool(exercises):
             if bool(sections):
-                exercise_counter = 1
+                section_couter = 2
                 # for exercise in exercises:
                 for section in sections:
                     section_obj = sections[section]
+                    section_name = section
+                    no_exercise = 1
                     for attr in section_obj:
                         if isinstance(section_obj[attr], dict):
-                        # if len(section_obj[attr] > 0):
+                            # if len(section_obj[attr] > 0):
                             exercise_obj = section_obj[attr]
                             exercise_name = attr
                             long_name = exercise_obj.get("long_name")
@@ -1030,17 +1033,17 @@ class ModuleResource(ModelResource):
                             points = exercise_obj.get("points")
                             threshold = exercise_obj.get("threshold")
                             if long_name is not None and required is not None and points is not None and threshold is not None:
-                                print(str(exercise_counter).zfill(2)) + \
+                                print(str(section_couter).zfill(2)) + \
                                     " " + long_name
                                 # OpenDSA exercises will map to canvas assignments
                                 results = assignments.create_assignment(
                                     request_ctx, course_id,
-                                    long_name,
+                                    section_name,
                                     assignment_submission_types="external_tool",
                                     assignment_external_tool_tag_attributes={
-                                        "url": tool_url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" + module_name_url + "-" + str(exercise_counter).zfill(2)},
+                                        "url": tool_url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" + module_name_url + "-" + str(section_couter).zfill(2)},
                                     assignment_points_possible=points,
-                                    assignment_description=long_name)
+                                    assignment_description=section_name)
                                 assignment_id = results.json().get("id")
                                 # add assignment to module
                                 results = modules.create_module_item(
@@ -1048,16 +1051,18 @@ class ModuleResource(ModelResource):
                                     'Assignment',
                                     module_item_content_id=assignment_id,
                                     module_item_indent=1)
-                                exercise_counter += 1
-                        if exercise_counter == 1:
-                            results = modules.create_module_item(
-                                request_ctx, course_id, module_id,
-                                'ExternalTool',
-                                module_item_external_url=tool_url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
-                                module_name_url,
-                                module_item_content_id=None,
-                                module_item_title=module_name,
-                                module_item_indent=1)
+                                section_couter += 1
+                                no_exercise = 0
+                    if no_exercise == 1:
+                        results = modules.create_module_item(
+                            request_ctx, course_id, module_id,
+                            'ExternalTool',
+                            module_item_external_url=tool_url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
+                            module_name_url + "-" + str(section_couter).zfill(2),
+                            module_item_content_id=None,
+                            module_item_title=section_name,
+                            module_item_indent=1)
+                        section_couter += 1
             else:
                 results = modules.create_module_item(
                     request_ctx, course_id, module_id,
@@ -1073,7 +1078,10 @@ class ModuleResource(ModelResource):
 
     def createcourse(self, request, **kwargs):
         for attr in request.POST:
-            json_obj = json.loads(attr)
+            json_obj = json.loads(attr,
+                       object_pairs_hook=collections.OrderedDict)
+            # print(attr)
+            # print(json_obj)
         username = json_obj["username"]
         password = json_obj["password"]
         # print(username)
@@ -1082,7 +1090,6 @@ class ModuleResource(ModelResource):
 
         # if request.POST.get("key"):
         #     kusername = get_username(request.POST['key'])
-
         if kusername and kusername.is_staff:
             response = {}
             response['saved'] = False
@@ -1100,6 +1107,7 @@ class ModuleResource(ModelResource):
             tool_name = json_obj["tool_name"]
             tool_url = json_obj["tool_url"]
             tool_xml_file = json_obj["tool_xml_file"]
+
             book_json = json_obj['book_json']
 
 
@@ -1113,7 +1121,6 @@ class ModuleResource(ModelResource):
             for i, course in enumerate(results.json()):
                 if course.get("course_code") == course_code:
                     course_id = course.get("id")
-
 
             # configure the course external_tool
             results = external_tools.create_external_tool_courses(
@@ -1217,7 +1224,7 @@ class ModuleResource(ModelResource):
                                 required = False
                                 # module has exercises
                                 if isinstance(section_obj[attr], dict):
-                                    # if len(section_obj[attr]) > 0:
+                                # if len(section_obj[attr]) > 0:
                                     exercise_obj = section_obj[attr]
                                     exercise_name = attr
                                     description = exercise_obj['long_name']
