@@ -1073,7 +1073,8 @@ class ModuleResource(ModelResource):
 
     def createcourse(self, request, **kwargs):
         for attr in request.POST:
-            json_obj = json.loads(attr)
+            json_obj = json.loads(attr,
+                       object_pairs_hook=collections.OrderedDict)
         username = json_obj["username"]
         password = json_obj["password"]
         # print(username)
@@ -1101,6 +1102,7 @@ class ModuleResource(ModelResource):
             tool_url = json_obj["tool_url"]
             tool_xml_file = json_obj["tool_xml_file"]
             book_json = json_obj['book_json']
+
 
             # init the request context
             request_ctx = RequestContext(access_token, canvas_url)
