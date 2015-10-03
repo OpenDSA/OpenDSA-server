@@ -1074,24 +1074,12 @@ class ModuleResource(ModelResource):
                                         module_published=True)
 
     def createcourse(self, request, **kwargs):
-        # self.method_check(request, allowed=['post'])
-        # print(json.dumps(request.POST))
-        # json_obj = json.dumps(request.POST)
-
         for attr in request.POST:
             json_obj = json.loads(attr)
         username = json_obj["username"]
         password = json_obj["password"]
-        # username = json_obj(username)
-        # password = json_obj(password)
-        # username = request.GET.get("username")
-        # password = request.GET.get("password")
-        # username = request["username"]
-        # password = request["password"]
-        # username = request.POST[str("username")]
-        # password = request.POST[str("password")]
-        print(username)
-        print(password)
+        # print(username)
+        # print(password)
         kusername = authenticate(username=username, password=password)
 
         # if request.POST.get("key"):
@@ -1107,10 +1095,14 @@ class ModuleResource(ModelResource):
             canvas_parsed_url = urlparse(canvas_url)
 
             course_code = json_obj['course_code']
-            # book_json = json.loads(json_obj['book_json'],
-            #                        object_pairs_hook=collections.OrderedDict)
+            tool_name = json_obj["tool_name"]
+            privacy_level = "public"  # should be public
+            consumer_key = json_obj["consumer_key"]
+            consumer_secret = json_obj["consumer_secret"]
+            config_type = "by_url"
+            url = json_obj["url"]
+            xml_file_name = json_obj["xml_file_name"]
             book_json = json_obj['book_json']
-            # print(book_json)
 
             # init the request context
             request_ctx = RequestContext(access_token, canvas_url)
@@ -1123,14 +1115,6 @@ class ModuleResource(ModelResource):
                 if course.get("course_code") == course_code:
                     course_id = course.get("id")
 
-            LTI_obj = book_json.get("LTI")
-            tool_name = LTI_obj["tool_name"]
-            privacy_level = "public"  # should be public
-            consumer_key = json_obj["consumer_key"]
-            consumer_secret = json_obj["consumer_secret"]
-            config_type = "by_url"
-            url = LTI_obj["url"]
-            xml_file_name = LTI_obj["xml_file_name"]
 
             # configure the course external_tool
             results = external_tools.create_external_tool_courses(
@@ -1209,9 +1193,10 @@ class ModuleResource(ModelResource):
                     #     book_json['chapters'][chapter][lesson]['exercises']
                     # get or create module
                     # We first extract module name
-                    if '/' in lesson:
-                        lesson = lesson.split('/')[1]
-                    kmodule = get_module(lesson)
+                    lesson_name = lesson
+                    if '/' in lesson_name:
+                        lesson_name = lesson_name.split('/')[1]
+                    kmodule = get_module(lesson_name)
 
                     if kmodule is None:
                         with transaction.commit_on_success():
@@ -1252,7 +1237,7 @@ class ModuleResource(ModelResource):
                                 else:
                                     # Update existing exercise
                                     with transaction.commit_on_success():
-                                        kexercise = get_exercise(exercise)
+                                        kexercise = get_exercise(exercise_name)
                                         kexercise.covers = "dsa"
                                         kexercise.description = description
                                         kexercise.streak = Decimal(streak)
@@ -1296,7 +1281,7 @@ class ModuleResource(ModelResource):
             # create book json file
             if json_obj['build_date']:
                 build_date = datetime.datetime.strptime(
-                    request.POST['build_date'], '%Y-%m-%d %H:%M:%S')
+                    json_obj['build_date'], '%Y-%m-%d %H:%M:%S')
                 print(build_date)
                 if kbook.creation_date != build_date:
                     create_book_file(kbook)
