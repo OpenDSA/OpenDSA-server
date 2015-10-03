@@ -55,7 +55,7 @@ DATABASES = {
         # g3et_path('test.db'),            # Or path to database file if using
         # sqlite3.
         'NAME': 'opendsa',
-        'USER': 'root',                  # Not used with sqlite3. dbadmin
+        'USER': 'opendsa',                  # Not used with sqlite3. dbadmin
         # Not used with sqlite3. vis4_dsa
         'PASSWORD': 'opendsa',
         # Set to empty string for localhost. Not used with sqlite3.
