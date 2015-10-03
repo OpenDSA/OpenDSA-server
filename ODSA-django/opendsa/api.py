@@ -1102,6 +1102,7 @@ class ModuleResource(ModelResource):
             tool_name = json_obj["tool_name"]
             url = json_obj["url"]
             xml_file_name = json_obj["xml_file_name"]
+            LTI_obj = {}
             LTI_obj['tool_name'] = tool_name
             LTI_obj['url'] = url
             LTI_obj['xml_file_name'] = xml_file_name
