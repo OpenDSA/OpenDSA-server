@@ -1095,14 +1095,18 @@ class ModuleResource(ModelResource):
             canvas_parsed_url = urlparse(canvas_url)
 
             course_code = json_obj['course_code']
-            tool_name = json_obj["tool_name"]
             privacy_level = "public"  # should be public
             consumer_key = json_obj["consumer_key"]
             consumer_secret = json_obj["consumer_secret"]
             config_type = "by_url"
+            tool_name = json_obj["tool_name"]
             url = json_obj["url"]
             xml_file_name = json_obj["xml_file_name"]
+            LTI_obj['tool_name'] = tool_name
+            LTI_obj['url'] = url
+            LTI_obj['xml_file_name'] = xml_file_name
             book_json = json_obj['book_json']
+
 
             # init the request context
             request_ctx = RequestContext(access_token, canvas_url)
