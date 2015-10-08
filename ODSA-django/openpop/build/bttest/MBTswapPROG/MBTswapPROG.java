@@ -71,9 +71,9 @@ class BSTNode implements BinNode {
 
 
 
-public class studentmbtSwapPROG
+public class studentMBTswapPROG
 {
-    public static  long fTimeout=1;
+    public static  long fTimeout=4;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
     public static  BSTNode rtmember; 
@@ -84,7 +84,7 @@ public class studentmbtSwapPROG
 		@Override
 		public void run() {
 		 try {
-		  btSwapTrees (rtmember , rtmember2);
+		  MBTswap(rtmember , rtmember2);
 		  fFinished= true;
 		 } 
                  catch (Throwable e) {

@@ -67,7 +67,7 @@ class BSTNode<Key, E> implements BinNode<E> {
   { return (left == null) && (right == null); }
 }
 
-public class studentbtCntPROG
+public class studentBTcntPROG
 {
 
  public static int count(BinNode rt) {
@@ -94,7 +94,7 @@ public class studentbtCntPROG
         root.setRight(new BSTNode<Integer,Integer>(20,20));
     }
    
-    if (exercise2(root)  == count(root)) SUCCESS = true;
+    if (BTcnt(root)  == count(root)) SUCCESS = true;
 
     try{
 

@@ -68,11 +68,9 @@ class BSTNode<Key, E> implements BinNode<E> {
   { return (left == null) && (right == null); }
 }
 
-public class studentbtDepthPROG
+public class studentBTdepthPROG
 {
-
-
-    public static  long fTimeout=1;
+    public static  long fTimeout=4;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
     public static  BinNode rtmember; 
@@ -82,7 +80,7 @@ public class studentbtDepthPROG
 		@Override
 		public void run() {
 		 try {
-		  studentAnswer = btDepth(rtmember);
+		  studentAnswer = BTdepth(rtmember);
 		  fFinished= true;
 		 } 
           catch (Throwable e) {

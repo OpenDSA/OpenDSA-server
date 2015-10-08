@@ -68,10 +68,10 @@ class BSTNode implements BinNode {
 
 
 
-public class studentbtIncPROG
+public class studentBTincPROG
 {
 
-    public static  long fTimeout=1;
+    public static  long fTimeout=4;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
     public static  BSTNode rtmember; 
@@ -81,7 +81,7 @@ public class studentbtIncPROG
 		@Override
 		public void run() {
 		 try {
-		  btInc(rtmember);
+		  BTinc(rtmember);
 		  fFinished= true;
 		 } 
           catch (Throwable e) {

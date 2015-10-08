@@ -71,10 +71,10 @@ class BSTNode implements BinNode {
 
 
 
-public class studentbtcheckSumPROG
+public class studentBTchecksumPROG
 {
 
-    public static  long fTimeout=1;
+    public static  long fTimeout=4;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
     public static  BinNode rtmember; 
@@ -84,7 +84,7 @@ public class studentbtcheckSumPROG
 		@Override
 		public void run() {
 		 try {
-		  studentAnswer = btcheckSum(rtmember);
+		  studentAnswer = BTchecksum(rtmember);
 		  fFinished= true;
 		 } 
           catch (Throwable e) {

@@ -74,7 +74,7 @@ class BSTNode implements BinNode {
 public class studentbtDiameterPROG
 {
 
-    public static  long fTimeout=1;
+    public static  long fTimeout=4;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
     public static  BinNode rtmember; 

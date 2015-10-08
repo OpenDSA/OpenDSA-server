@@ -71,9 +71,10 @@ class BSTNode implements BinNode {
 
 
 
-public class studentmbtSamePROG
+public class studentMBTstructurePROG
 {
-    public static  long fTimeout=1;
+
+    public static  long fTimeout=4;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
     public static  BSTNode rtmember; 
@@ -84,7 +85,7 @@ public class studentmbtSamePROG
 		@Override
 		public void run() {
 		 try {
-		  studentAnswer = btIdenticalTrees(rtmember , rtmember2);;
+		  studentAnswer = MBTstructure(rtmember , rtmember2);;
 		  fFinished= true;
 		 } 
                  catch (Throwable e) {
@@ -105,25 +106,26 @@ public class studentmbtSamePROG
 		throw exception;
 	
 	}
+
+ public static boolean modelmbtStrIdn(BSTNode a, BSTNode b) {
+
+ if (a==null && b== null)
+        return true;
  
- public static boolean modelmbtSame(BSTNode a, BSTNode b) {
-    // check for reference equality and nulls
-    if (a==b) return true; // note this picks up case of two nulls
-    if (a==null) return false;
-    if (b==null) return false;
-
-    // check for data inequality
-    if ((Integer)a.element().compareTo((Integer)b.element()) !=0) {
-        if (((Integer)a.element()==null)||((Integer)b.element()==null)) return false;
-        if ((((Integer)a.element()).compareTo((Integer)b.element())) !=0) return false;
+    /* 2. both non-empty -> compare them */
+    if (a!=null && b!= null)
+    {
+        return
+        (
+            
+            modelmbtStrIdn(a.left(), b.left()) &&
+            modelmbtStrIdn(a.right(), b.right())
+        );
     }
+     
+    /* 3. one empty, one not -> false */
+    return false;
 
-    // recursively check branches
-    if (!modelmbtSame(a.left(),b.left())) return false;
-    if (!modelmbtSame(a.right(),b.right())) return false;
-
-    // we've eliminated all possibilities for non-equality, so trees must be equal
-    return true;
 }
 
  public static void writeResult(BSTNode rt, BSTNode rt2 , boolean SUCCESS, String tree1AsString , String tree2AsString, boolean modelAnswer, boolean studentAnswer ){
@@ -151,7 +153,10 @@ public class studentmbtSamePROG
  
  public static boolean runTestCase(BSTNode rt, BSTNode rt2, String tree1AsString , String tree2AsString)
  { 
-     try {
+   boolean SUCCESS = false;
+   boolean modelAnswer  = modelmbtStrIdn(rt, rt2);
+
+    try {
      // Fail on time out object
      rtmember = rt;
      rtmember2 = rt2;
@@ -160,9 +165,7 @@ public class studentmbtSamePROG
     catch(Throwable t) {	
      throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
     }
-   boolean SUCCESS = false;
-   boolean modelAnswer  = modelmbtSame(rt, rt2);
-   //boolean studentAnswer= btIdenticalTrees(rt , rt2); 
+   //boolean studentAnswer= mbtStrIdn(rt , rt2); 
    
    if (modelAnswer  ==  studentAnswer)  
    { 
@@ -192,32 +195,50 @@ public class studentmbtSamePROG
    
    String tree2AsString = " empty ";
    
-   if (runTestCase(root, root2 , tree1AsString , tree2AsString) == false) return;
+  // if (runTestCase(root, root2 , tree1AsString , tree2AsString) == false) return;
    ////// End of the first test case
 
    // Second test case -- the same tree
    root = new BSTNode(10);
-   root2 = new BSTNode(10);
+   root2 = new BSTNode(20);
 
    BSTNode leftChild = new BSTNode(15);
    BSTNode rightChild = new BSTNode(20);
 
-   BSTNode leftChild2 = new BSTNode(15);
-   BSTNode rightChild2 = new BSTNode(20);
+   BSTNode leftChild2 = new BSTNode(5);
+   BSTNode rightChild2 = new BSTNode(30);
+
+   
+   BSTNode leftChild2c = new BSTNode(35);
+   BSTNode rightChild2c = new BSTNode(45);
+
+   BSTNode leftChild3c = new BSTNode(15);
+   BSTNode rightChild3c = new BSTNode(10);
 
    root.setLeft(leftChild); 
+   leftChild.setLeft(leftChild2c); 
+   
    root.setRight(rightChild);
+   leftChild.setRight(rightChild2c);
+  
   
    root2.setLeft(leftChild2); 
+   leftChild2.setLeft(leftChild3c); 
+   
    root2.setRight(rightChild2);
+   leftChild2.setRight(rightChild3c);
    
    tree1AsString = "  10\n"
                   +" / \\ \n"
-                  +"15 20 \n ";
+                 +"15 20 \n "
+                  +"/ \\ \n"
+                  +"10 20 \n ";
 
-   tree2AsString = "  10\n"
+   tree2AsString = "  20\n"
                   +" / \\ \n"
-                  +"15 20 \n ";
+                  +"5  30 \n "
+                  +"/ \\ \n"
+                  +"15 10 \n ";
 
    if (runTestCase(root, root2 , tree1AsString , tree2AsString)== false) return;
    ////// End of the second test case

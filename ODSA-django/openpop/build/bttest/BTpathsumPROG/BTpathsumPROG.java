@@ -71,7 +71,7 @@ class BSTNode implements BinNode {
 
 
 
-public class studentbthasPathSumPROG
+public class studentBTpathsumPROG
 {
 
  public static  long fTimeout=1;
@@ -86,7 +86,7 @@ public class studentbthasPathSumPROG
 		@Override
 		public void run() {
 		 try {
-		  studentAnswer = bthasPathSum(rtmember, summemeber);
+		  studentAnswer = BTpathsum(rtmember, summemeber);
 		  fFinished= true;
 		 } 
           catch (Throwable e) {

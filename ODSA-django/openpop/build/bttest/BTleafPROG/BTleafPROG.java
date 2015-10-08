@@ -68,11 +68,11 @@ class BSTNode<Key, E> implements BinNode<E> {
   { return (left == null) && (right == null); }
 }
 
-public class studentbtLeafPROG
+public class studentBTleafPROG
 {
 
 
-    public static  long fTimeout=1;
+    public static  long fTimeout=4;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
     public static  BinNode rtmember; 
@@ -82,7 +82,7 @@ public class studentbtLeafPROG
 		@Override
 		public void run() {
 		 try {
-		  studentAnswer = btcountLeaf(rtmember);
+		  studentAnswer = BTleaf(rtmember);
 		  fFinished= true;
 		 } 
           catch (Throwable e) {
