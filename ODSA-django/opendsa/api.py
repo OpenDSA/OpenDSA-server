@@ -1017,7 +1017,7 @@ class ModuleResource(ModelResource):
             # exercises = module_obj.get("exercises")
             sections = module_obj.get("sections")
             if bool(sections):
-                section_couter = 2
+                section_couter = 1
                 # for exercise in exercises:
                 for section in sections:
                     section_obj = sections[section]
