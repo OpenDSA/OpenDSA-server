@@ -4,179 +4,87 @@
 		"selected_items":
 		[
 			[
-				"exercise_",
-				"exercise_name"
-			],
-			[
-				"sectio",
-				"section_obj"
-			],
-			[
 				"section",
-				"section"
+				"section_name"
 			],
 			[
-				"da",
-				"trainData"
-			],
-			[
-				"h",
-				"hiddenUnits"
-			],
-			[
-				"squ",
-				"squashDerivatives"
-			],
-			[
-				"er",
-				"outputError"
-			],
-			[
-				"train",
-				"trainLabels"
-			],
-			[
-				"plot",
-				"plotData"
-			],
-			[
-				"tes",
-				"testLabels"
-			],
-			[
-				"tra",
-				"trainData"
-			],
-			[
-				"model_",
-				"model_linear"
-			],
-			[
-				"mo",
-				"model"
-			],
-			[
-				"gnbPredictL",
-				"gnbPredictLables"
-			],
-			[
-				"test",
-				"testData"
-			],
-			[
-				"gnb",
-				"gnbAccuracy"
-			],
-			[
-				"tain",
-				"train"
-			],
-			[
-				"cou",
-				"counter"
-			],
-			[
-				"new",
-				"newTrainLabels"
-			],
-			[
-				"sam",
-				"sample"
-			],
-			[
-				"trai",
-				"trainData"
-			],
-			[
-				"te",
-				"testLabels"
-			],
-			[
-				"best",
-				"bestLogRegPredict"
-			],
-			[
-				"tr",
-				"train"
-			],
-			[
-				"log",
-				"logRegPredict"
-			],
-			[
-				"liner",
-				"linear"
-			],
-			[
-				"be",
-				"bestScore"
-			],
-			[
-				"logRegP",
-				"logRegPredict"
-			],
-			[
-				"logR",
-				"logRegPredict"
-			],
-			[
-				"logRegPre",
-				"logRegPredictTrainLabels"
-			],
-			[
-				"non",
-				"nonlinear"
-			],
-			[
-				"linear",
-				"linear"
-			],
-			[
-				"accuracyT",
-				"accuracyTrain"
-			],
-			[
-				"logRepre",
-				"logRegPredictTestLabels"
-			],
-			[
-				"predictTrain",
-				"PredictTrainLabels"
-			],
-			[
-				"lamda",
-				"lambdas"
-			],
-			[
-				"logre",
-				"logRegPredictTestLabels"
-			],
-			[
-				"logr",
-				"logRegPredictTrainLabels"
-			],
-			[
-				"sum",
-				"sum_x"
-			],
-			[
-				"pe",
-				"penalty"
-			],
-			[
-				"w_",
-				"w_y"
+				"no",
+				"no_exercise"
 			],
 			[
 				"exerc",
-				"exerciseId"
+				"exercise"
+			],
+			[
+				"json",
+				"json_obj"
+			],
+			[
+				"lo",
+				"loads"
+			],
+			[
+				"boo",
+				"book_json"
+			],
+			[
+				"jsno",
+				"json_obj"
+			],
+			[
+				"Po",
+				"POST"
+			],
+			[
+				"req",
+				"request"
+			],
+			[
+				"can",
+				"canvas_url"
+			],
+			[
+				"user",
+				"username"
+			],
+			[
+				"re",
+				"request"
+			],
+			[
+				"exer",
+				"exerciseName"
+			],
+			[
+				"sec",
+				"section_obj"
+			],
+			[
+				"sect",
+				"section"
+			],
+			[
+				"e",
+				"exerciseObj"
+			],
+			[
+				"type",
+				"typeIndex"
 			],
 			[
 				"newC",
 				"newContents"
 			],
 			[
+				"new",
+				"newContents"
+			],
+			[
 				"summ",
+				"summExercises"
+			],
+			[
+				"sum",
 				"summExercises"
 			],
 			[
@@ -208,10 +116,6 @@
 				"insertBefore"
 			],
 			[
-				"exer",
-				"exerciseId"
-			],
-			[
 				"exe",
 				"exerciseId"
 			],
@@ -230,10 +134,6 @@
 			[
 				"current",
 				"currentExerciseId"
-			],
-			[
-				"json",
-				"json_url"
 			],
 			[
 				"av",
@@ -258,6 +158,10 @@
 			[
 				"mod",
 				"modName"
+			],
+			[
+				"mo",
+				"module"
 			],
 			[
 				"sync",
@@ -312,10 +216,17 @@
 	"buffers":
 	[
 		{
-			"file": "ODSA-django/course/api.py",
 			"settings":
 			{
-				"buffer_size": 1530,
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "OpenDSA-server.sublime-project",
+			"settings":
+			{
+				"buffer_size": 243,
 				"line_ending": "Unix"
 			}
 		},
@@ -323,7 +234,43 @@
 			"file": "ODSA-django/opendsa/api.py",
 			"settings":
 			{
-				"buffer_size": 70315,
+				"buffer_size": 70620,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "SELECT * FROM t1 WHERE column1 = (SELECT column1 FROM t2);",
+			"settings":
+			{
+				"buffer_size": 58,
+				"line_ending": "Unix",
+				"name": "SELECT * FROM t1 WHERE column1 = (SELECT column1 F"
+			}
+		},
+		{
+			"contents": "{\"username\": \"opendsa\", \"password\": \"opendsa\", \"canvas_url\": \"https://canvas.instructure.com/api\", \"course_code\": \"CS3114_rev\", \"access_token\": \"7~98d8KnPbCj7wnA3GLyHIvh4yxHz7t2U6SPp7OLdvscWSN82qCnZbEWebFJVEb0b3\", \"consumer_key\": \"test\", \"consumer_secret\": \"secret\", \"build_date\": \"2015-09-28 13:08:33\", \"tool_name\": \"OpenDSA-LTI\", \"tool_url\": \"https://lti.cs.vt.edu:9292\", \"tool_xml_file\": \"tool_config.xml\", \"book_json\": {\"title\": \"CS3114 Fall 2014\", \"build_dir\": \"Books\", \"code_dir\": \"SourceCode/\", \"code_lang\": {\"Processing\": {\"ext\": [\"pde\"], \"label\": \"Processing\", \"lang\": \"java\"}, \"Java_Generic\": {\"ext\": [\"java\"], \"label\": \"Java (Generic)\", \"lang\": \"java\"}, \"C  \": {\"ext\": [\"cpp\", \"h\"], \"label\": \"C  \", \"lang\": \"C  \"}}, \"lang\": \"en\", \"module_origin\": \"https://lti.cs.vt.edu:9292\", \"exercise_server\": \"https://ltitest.cs.vt.edu:8443\", \"logging_server\": \"https://ltitest.cs.vt.edu:8443\", \"score_server\": \"https://ltitest.cs.vt.edu:8443\", \"build_JSAV\": false, \"allow_anonymous_credit\": true, \"suppress_todo\": true, \"glob_exer_options\": {\"JXOP-debug\": \"true\"}, \"chapters\": {\"Preface\": {\"Intro\": {\"long_name\": \"How to Use this System\", \"dispModComp\": true, \"exercises\": {}, \"sections\": {}}}, \"Binary Trees\": {\"Binary/BSTrev\": {\"long_name\": \"Binary Search Trees\", \"exercises\": {}, \"sections\": {\"Binary Search Tree Definition\": {\"dispModComp\": true}, \"BST Search\": {\"showsection\": true, \"BSTsearchCON\": {\"long_name\": \"BST Search Slideshow\", \"required\": false, \"points\": 0, \"threshold\": 1}}, \"BST Search Exercise\": {\"BSTsearchPRO\": {\"long_name\": \"BST Search Proficiency Exercise\", \"exer_options\": {\"JXOP-code\": \"none\", \"JXOP-feedback\": \"continuous\", \"JXOP-fixmode\": \"undo\"}, \"required\": true, \"points\": 1, \"threshold\": 0.9}}, \"BST Insert\": {\"BSTinsertCON\": {\"long_name\": \"BST Insert Slideshow\", \"required\": false, \"points\": 0, \"threshold\": 1}}, \"BST Insert Exercise\": {\"BSTinsertPRO\": {\"long_name\": \"BST Insert Proficiency Exercise\", \"exer_options\": {\"JXOP-code\": \"none\", \"JXOP-feedback\": \"continuous\", \"JXOP-fixmode\": \"undo\"}, \"required\": true, \"points\": 1, \"threshold\": 0.9}}, \"BST Remove Pt 1\": {\"BSTdeletemaxCON\": {\"long_name\": \"BST deletemax Slideshow\", \"required\": false, \"points\": 0, \"threshold\": 1}}, \"BST Remove Pt 2\": {\"BSTremoveCON\": {\"long_name\": \"BST remove Slideshow\", \"required\": false, \"points\": 0, \"threshold\": 1}}, \"BST Remove Exercise\": {\"BSTremovePRO\": {\"long_name\": \"BST Remove Proficiency Exercise\", \"exer_options\": {\"JXOP-code\": \"none\", \"JXOP-feedback\": \"continuous\", \"JXOP-fixmode\": \"undo\"}, \"required\": true, \"points\": 2, \"threshold\": 0.9}}, \"BST Analysis\": {}}}}}}}\nOrderedDict([(u'username', u'opendsa'), (u'password', u'opendsa'), (u'canvas_url', u'https://canvas.instructure.com/api'), (u'course_code', u'CS3114_rev'), (u'access_token', u'7~98d8KnPbCj7wnA3GLyHIvh4yxHz7t2U6SPp7OLdvscWSN82qCnZbEWebFJVEb0b3'), (u'consumer_key', u'test'), (u'consumer_secret', u'secret'), (u'build_date', u'2015-09-28 13:08:33'), (u'tool_name', u'OpenDSA-LTI'), (u'tool_url', u'https://lti.cs.vt.edu:9292'), (u'tool_xml_file', u'tool_config.xml'), (u'book_json', OrderedDict([(u'title', u'CS3114 Fall 2014'), (u'build_dir', u'Books'), (u'code_dir', u'SourceCode/'), (u'code_lang', OrderedDict([(u'Processing', OrderedDict([(u'ext', [u'pde']), (u'label', u'Processing'), (u'lang', u'java')])), (u'Java_Generic', OrderedDict([(u'ext', [u'java']), (u'label', u'Java (Generic)'), (u'lang', u'java')])), (u'C  ', OrderedDict([(u'ext', [u'cpp', u'h']), (u'label', u'C  '), (u'lang', u'C  ')]))])), (u'lang', u'en'), (u'module_origin', u'https://lti.cs.vt.edu:9292'), (u'exercise_server', u'https://ltitest.cs.vt.edu:8443'), (u'logging_server', u'https://ltitest.cs.vt.edu:8443'), (u'score_server', u'https://ltitest.cs.vt.edu:8443'), (u'build_JSAV', False), (u'allow_anonymous_credit', True), (u'suppress_todo', True), (u'glob_exer_options', OrderedDict([(u'JXOP-debug', u'true')])), (u'chapters', OrderedDict([(u'Preface', OrderedDict([(u'Intro', OrderedDict([(u'long_name', u'How to Use this System'), (u'dispModComp', True), (u'exercises', OrderedDict()), (u'sections', OrderedDict())]))])), (u'Binary Trees', OrderedDict([(u'Binary/BSTrev', OrderedDict([(u'long_name', u'Binary Search Trees'), (u'exercises', OrderedDict()), (u'sections', OrderedDict([(u'Binary Search Tree Definition', OrderedDict([(u'dispModComp', True)])), (u'BST Search', OrderedDict([(u'showsection', True), (u'BSTsearchCON', OrderedDict([(u'long_name', u'BST Search Slideshow'), (u'required', False), (u'points', 0), (u'threshold', 1)]))])), (u'BST Search Exercise', OrderedDict([(u'BSTsearchPRO', OrderedDict([(u'long_name', u'BST Search Proficiency Exercise'), (u'exer_options', OrderedDict([(u'JXOP-code', u'none'), (u'JXOP-feedback', u'continuous'), (u'JXOP-fixmode', u'undo')])), (u'required', True), (u'points', 1), (u'threshold', 0.9)]))])), (u'BST Insert', OrderedDict([(u'BSTinsertCON', OrderedDict([(u'long_name', u'BST Insert Slideshow'), (u'required', False), (u'points', 0), (u'threshold', 1)]))])), (u'BST Insert Exercise', OrderedDict([(u'BSTinsertPRO', OrderedDict([(u'long_name', u'BST Insert Proficiency Exercise'), (u'exer_options', OrderedDict([(u'JXOP-code', u'none'), (u'JXOP-feedback', u'continuous'), (u'JXOP-fixmode', u'undo')])), (u'required', True), (u'points', 1), (u'threshold', 0.9)]))])), (u'BST Remove Pt 1', OrderedDict([(u'BSTdeletemaxCON', OrderedDict([(u'long_name', u'BST deletemax Slideshow'), (u'required', False), (u'points', 0), (u'threshold', 1)]))])), (u'BST Remove Pt 2', OrderedDict([(u'BSTremoveCON', OrderedDict([(u'long_name', u'BST remove Slideshow'), (u'required', False), (u'points', 0), (u'threshold', 1)]))])), (u'BST Remove Exercise', OrderedDict([(u'BSTremovePRO', OrderedDict([(u'long_name', u'BST Remove Proficiency Exercise'), (u'exer_options', OrderedDict([(u'JXOP-code', u'none'), (u'JXOP-feedback', u'continuous'), (u'JXOP-fixmode', u'undo')])), (u'required', True), (u'points', 2), (u'threshold', 0.9)]))])), (u'BST Analysis', OrderedDict())]))]))]))]))]))])\n",
+			"settings":
+			{
+				"buffer_size": 6001,
+				"line_ending": "Unix",
+				"name": "{\"username\": \"opendsa\", \"password\": \"opendsa\", \"ca"
+			}
+		},
+		{
+			"contents": "Searching 2138 files for \"method_check\"\n\nUnable to open ~/workspaces/OpenDSA-server/ODSA-django/stunnel.log\n/home/hshahin/workspaces/OpenDSA-server/ODSA-django/opendsa/api.py:\n  287  \n  288      def login(self, request, **kwargs):\n  289:         self.method_check(request, allowed=['post'])\n  290          username = request.POST['username']\n  291          password = request.POST.get('password')\n  ...\n  312  \n  313      def logout(self, request, **kwargs):\n  314:         self.method_check(request, allowed=['get'])\n  315          if request.user and request.user.is_authenticated():\n  316              logout(request)\n  ...\n  469                  if 'non_summative' in request.POST:\n  470                      ex_question = request.POST['non_summative']\n  471:                 # self.method_check(request, allowed=['post'])\n  472                  if request.POST.get('code'):\n  473                      uexercise, messages = attempt_problem_pop(user_data,\n\n/home/hshahin/workspaces/OpenDSA-server/ODSA-django/tastypie/resources.py:\n  422          \"\"\"\n  423          allowed_methods = getattr(self._meta, \"%s_allowed_methods\" % request_type, None)\n  424:         request_method = self.method_check(request, allowed=allowed_methods)\n  425          method = getattr(self, \"%s_%s\" % (request_method, request_type), None)\n  426  \n  ...\n  467          return kwargs_subset\n  468  \n  469:     def method_check(self, request, allowed=None):\n  470          \"\"\"\n  471          Ensures that the HTTP method used on the request is allowed to be\n  ...\n  476  \n  477              # The most generic lookup.\n  478:             self.method_check(request, self._meta.allowed_methods)\n  479  \n  480              # A lookup against what's allowed for list-type methods.\n  481:             self.method_check(request, self._meta.list_allowed_methods)\n  482  \n  483              # A useful check when creating a new endpoint that only handles\n  484              # GET.\n  485:             self.method_check(request, ['get'])\n  486          \"\"\"\n  487          if allowed is None:\n  ...\n 1386          Should return a HttpResponse (200 OK).\n 1387          \"\"\"\n 1388:         self.method_check(request, allowed=['get'])\n 1389          self.is_authenticated(request)\n 1390          self.throttle_check(request)\n ....\n 1402          Should return a HttpResponse (200 OK).\n 1403          \"\"\"\n 1404:         self.method_check(request, allowed=['get'])\n 1405          self.is_authenticated(request)\n 1406          self.throttle_check(request)\n\n10 matches across 2 files\n",
+			"settings":
+			{
+				"buffer_size": 2542,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "ODSA-django/src/pip-delete-this-directory.txt",
+			"settings":
+			{
+				"buffer_size": 185,
 				"line_ending": "Unix"
 			}
 		},
@@ -336,62 +283,10 @@
 			}
 		},
 		{
-			"contents": "Traceback (most recent call last):\n  File \"create_course.py\", line 23, in <module>\n    response = requests.post(url, data=json.dumps(conf_json), headers=headers, verify=False)\n  File \"/usr/lib/python2.7/dist-packages/requests/api.py\", line 88, in post\n    return request('post', url, data=data, **kwargs)\n  File \"/usr/lib/python2.7/dist-packages/requests/api.py\", line 44, in request\n    return session.request(method=method, url=url, **kwargs)\n  File \"/usr/lib/python2.7/dist-packages/requests/sessions.py\", line 455, in request\n    resp = self.send(prep, **send_kwargs)\n  File \"/usr/lib/python2.7/dist-packages/requests/sessions.py\", line 558, in send\n    r = adapter.send(request, **kwargs)\n  File \"/usr/lib/python2.7/dist-packages/requests/adapters.py\", line 378, in send\n    raise ConnectionError(e)\nrequests.exceptions.ConnectionError: HTTPSConnectionPool(host='ltitest.cs.vt.edu', port=8443): Max retries exceeded with url: /api/v1/module/createcourse/ (Caused by <class 'socket.error'>: [Errno 104] Connection reset by peer)",
+			"contents": "def loadbook(self, request, **kwargs):\n    if request.POST['key']:\n        kusername = get_username(request.POST['key'])\n\n        if kusername and kusername.is_staff:\n            response = {}\n            response['saved'] = False\n            # get or create Book & link a book to user\n            kbook = get_book(request.POST['book'])\n\n            if kbook is None:\n                with transaction.commit_on_success():\n                    kbook, added = Books.objects.get_or_create(\n                        book_name=request.POST['book'],\n                        book_url=request.POST['url'])\n            # get and save book elements\n            book_json = simplejson.loads(request.POST['b_json'])\n\n            # We first delete all entries of the book\n            # in BookModuleExercise table\n            # for exer in \\\n            BookModuleExercise.components.filter(book=kbook).delete()\n            # if exer not in exers_:\n            #    BookModuleExercise.components.filter(book = kbook,\n            #                                   exercise = exer).delete()\n\n            exers_ = []\n\n            # delete book chapters\n            BookChapter.objects.filter(book=kbook).delete()\n            for chapter in book_json['chapters']:\n              # get or create chapter\n                kchapter = get_chapter(kbook, chapter)\n                # First we delete chaper entry already in DB\n                if kchapter is not None:\n                    with transaction.commit_on_success():\n                        kchapter.delete()\n                with transaction.commit_on_success():\n                    kchapter, added = \\\n                        BookChapter.objects.get_or_create(\n                            book=kbook, name=chapter)\n\n                for lesson in book_json['chapters'][chapter]:\n                    # if we encounter \"hidden\" we do nothing\n                    if not isinstance(book_json['chapters'][chapter][lesson], Iterable):\n                        continue\n\n                    # Get list of exercises\n                    # exercises_l = \\\n                    #     book_json['chapters'][chapter][lesson]['exercises']\n                    # get or create module\n                    # We first extract module name\n                    if '/' in lesson:\n                        lesson = lesson.split('/')[1]\n                    kmodule = get_module(lesson)\n\n                    if kmodule is None:\n                        with transaction.commit_on_success():\n                            kmodule, added = Module.objects.get_or_create(\n                                name=lesson)\n                    # link module/lesson to chapter\n                    if kmodule not in kchapter.get_modules():\n                        kchapter.add_module(kmodule.id)\n                        kchapter.save()\n\n                    sections = book_json['chapters'][chapter][lesson]['sections']\n                    for i, section in enumerate(sections):\n                        # for exercise in exercises_l:\n                        # get or create exercises\n                        description = ''\n                        streak = 0\n                        required = False\n                        for attr in section:\n                            # module has exercises\n                            if len(section[attr]) > 0:\n                                # if len(exercises_l[exercise]) > 0:\n                                exercise = section[attr]\n                                description = exercise['long_name']\n                                streak = exercise['threshold']\n                                required = exercise['required']\n\n                            if Exercise.objects.filter(name=exercise).count() == 0:\n                              # Add new exercise\n                                with transaction.commit_on_success():\n                                    kexercise, added = \\\n                                        Exercise.objects.get_or_create(\n                                            name=exercise,\n                                            covers=\"dsa\",\n                                            description=description,\n                                            streak=streak)\n                            else:\n                                # Update existing exercise\n                                with transaction.commit_on_success():\n                                    kexercise = get_exercise(exercise)\n                                    kexercise.covers = \"dsa\"\n                                    kexercise.description = description\n                                    kexercise.streak = Decimal(streak)\n                                    kexercise.save()\n\n                            # Link exercise to module and books only\n                            # if the exercise is required\n                            bme = None\n                            if BookModuleExercise.components.filter(\n                                    book=kbook,\n                                    module=kmodule,\n                                    exercise=kexercise).count() > 0 \\\n                                    and required:\n                                with transaction.commit_on_success():\n                                    bme = BookModuleExercise.components.filter(\n                                        book=kbook,\n                                        module=kmodule,\n                                        exercise=kexercise)[0]\n                                    bme.points = exercise['points']\n                                    bme.save()\n                                    if kexercise not in exers_:\n                                        exers_.append(kexercise)\n                                if kexercise not in exers_:\n                                    exers_.append(kexercise)\n                            if BookModuleExercise.components.filter(\n                                    book=kbook,\n                                    module=kmodule,\n                                    exercise=kexercise).count() == 0\\\n                                    and required:\n                                with transaction.commit_on_success():\n                                    bme = BookModuleExercise(\n                                        book=kbook,\n                                        module=kmodule,\n                                        exercise=kexercise,\n                                        points=exercise['points'])\n                                    bme.save()\n                                    if kexercise not in exers_:\n                                        exers_.append(kexercise)\n\n            response['saved'] = True\n            # create book json file\n            if request.POST['build_date']:\n                build_date = datetime.datetime.strptime(\n                    request.POST['build_date'], '%Y-%m-%d %H:%M:%S')\n                if kbook.creation_date != build_date:\n                    create_book_file(kbook)\n                    kbook.creation_date = build_date\n                    kbook.save()\n\n            return self.create_response(request, response)\n    return self.create_response(request,\n                                {'error': 'unauthorized action'}, HttpUnauthorized)\n",
 			"settings":
 			{
-				"buffer_size": 1032,
-				"line_ending": "Unix",
-				"name": "Traceback (most recent call last):"
-			}
-		},
-		{
-			"contents": "{\"error_message\": \"'Key \\\\'build_date\\\\' not found in <QueryDict: {u\\\\'{\\\"username\\\": \\\"opendsa\\\", \\\"build_date\\\": \\\"2015-09-28 13:08:33\\\", \\\"canvas_url\\\": \\\"https://canvas.instructure.com/api\\\", \\\"book_json\\\": {\\\"lang\\\": \\\"en\\\", \\\"exercise_server\\\": \\\"https://localhost:8443\\\", \\\"build_JSAV\\\": false, \\\"title\\\": \\\"CS3114 Fall 2014\\\", \\\"module_origin\\\": \\\"https://ltitest.cs.vt.edu:9292\\\", \\\"build_dir\\\": \\\"Books\\\", \\\"chapters\\\": {\\\"Binary Trees\\\": {\\\"Binary/BSTrev\\\": {\\\"exercises\\\": {}, \\\"long_name\\\": \\\"Binary Search Trees\\\", \\\"sections\\\": {\\\"BST Remove Exercise\\\": {\\\"BSTremovePRO\\\": {\\\"threshold\\\": 0.9, \\\"long_name\\\": \\\"BST Remove Proficiency Exercise\\\", \\\"required\\\": true, \\\"points\\\": 2, \\\"exer_options\\\": {\\\"JXOP-feedback\\\": \\\"continuous\\\", \\\"JXOP-fixmode\\\": \\\"undo\\\", \\\"JXOP-code\\\": \\\"none\\\"}}}, \\\"BST Remove Pt 2\\\": {\\\"BSTremoveCON\\\": {\\\"threshold\\\": 1, \\\"long_name\\\": \\\"BST remove Slideshow\\\", \\\"required\\\": false, \\\"points\\\": 0}}, \\\"Binary Search Tree Definition\\\": {\\\"dispModComp\\\": true}, \\\"BST Remove Pt 1\\\": {\\\"BSTdeletemaxCON\\\": {\\\"threshold\\\": 1, \\\"long_name\\\": \\\"BST deletemax Slideshow\\\", \\\"required\\\": false, \\\"points\\\": 0}}, \\\"BST Search Exercise\\\": {\\\"BSTsearchPRO\\\": {\\\"threshold\\\": 0.9, \\\"long_name\\\": \\\"BST Search Proficiency Exercise\\\", \\\"required\\\": true, \\\"points\\\": 1, \\\"exer_options\\\": {\\\"JXOP-feedback\\\": \\\"continuous\\\", \\\"JXOP-fixmode\\\": \\\"undo\\\", \\\"JXOP-code\\\": \\\"none\\\"}}}, \\\"BST Analysis\\\": {}, \\\"BST Insert\\\": {\\\"BSTinsertCON\\\": {\\\"threshold\\\": 1, \\\"long_name\\\": \\\"BST Insert Slideshow\\\", \\\"required\\\": false, \\\"points\\\": 0}}, \\\"BST Search\\\": {\\\"showsection\\\": true, \\\"BSTsearchCON\\\": {\\\"threshold\\\": 1, \\\"long_name\\\": \\\"BST Search Slideshow\\\", \\\"required\\\": false, \\\"points\\\": 0}}, \\\"BST Insert Exercise\\\": {\\\"BSTinsertPRO\\\": {\\\"threshold\\\": 0.9, \\\"long_name\\\": \\\"BST Insert Proficiency Exercise\\\", \\\"required\\\": true, \\\"points\\\": 1, \\\"exer_options\\\": {\\\"JXOP-feedback\\\": \\\"continuous\\\", \\\"JXOP-fixmode\\\": \\\"undo\\\", \\\"JXOP-code\\\": \\\"none\\\"}}}}}}, \\\"Preface\\\": {\\\"Intro\\\": {\\\"exercises\\\": {}, \\\"long_name\\\": \\\"How to Use this System\\\", \\\"sections\\\": {}, \\\"dispModComp\\\": true}}}, \\\"code_lang\\\": {\\\"Java_Generic\\\": {\\\"lang\\\": \\\"java\\\", \\\"ext\\\": [\\\"java\\\"], \\\"label\\\": \\\"Java (Generic)\\\"}, \\\"Processing\\\": {\\\"lang\\\": \\\"java\\\", \\\"ext\\\": [\\\"pde\\\"], \\\"label\\\": \\\"Processing\\\"}, \\\"C  \\\": {\\\"lang\\\": \\\"C  \\\", \\\"ext\\\": [\\\"cpp\\\", \\\"h\\\"], \\\"label\\\": \\\"C  \\\"}}, \\\"allow_anonymous_credit\\\": true, \\\"suppress_todo\\\": true, \\\"score_server\\\": \\\"https://localhost:8443\\\", \\\"logging_server\\\": \\\"https://localhost:8443\\\", \\\"LTI\\\": {\\\"url\\\": \\\"https://ltitest.cs.vt.edu:9292\\\", \\\"xml_file_name\\\": \\\"tool_config.xml\\\", \\\"tool_name\\\": \\\"OpenDSA-LTI\\\"}, \\\"code_dir\\\": \\\"SourceCode/\\\", \\\"glob_exer_options\\\": {\\\"JXOP-debug\\\": \\\"true\\\"}}, \\\"access_token\\\": \\\"7~98d8KnPbCj7wnA3GLyHIvh4yxHz7t2U6SPp7OLdvscWSN82qCnZbEWebFJVEb0b3\\\", \\\"consumer_secret\\\": \\\"secret\\\", \\\"url\\\": \\\"http://localhost:8000/Books/CS3114LTI/html/\\\", \\\"book_id\\\": \\\"secret\\\", \\\"course_code\\\": \\\"CS3114LTI\\\", \\\"password\\\": \\\"opendsa\\\", \\\"consumer_key\\\": \\\"test\\\"}\\\\': [u\\\\'\\\\']}>'\", \"traceback\": \"Traceback (most recent call last):\\n\\n  File \\\"/home/hosamshahin/workspaces/OpenDSA-server/ODSA-django/tastypie/resources.py\\\", line 195, in wrapper\\n    response = callback(request, *args, **kwargs)\\n\\n  File \\\"/home/hosamshahin/workspaces/OpenDSA-server/ODSA-django/opendsa/api.py\\\", line 1300, in createcourse\\n    request.POST['build_date'], '%Y-%m-%d %H:%M:%S')\\n\\n  File \\\"/usr/local/lib/python2.7/dist-packages/django/utils/datastructures.py\\\", line 258, in __getitem__\\n    raise MultiValueDictKeyError(\\\"Key %r not found in %r\\\" % (key, self))\\n\\nMultiValueDictKeyError: 'Key \\\\'build_date\\\\' not found in <QueryDict: {u\\\\'{\\\"username\\\": \\\"opendsa\\\", \\\"build_date\\\": \\\"2015-09-28 13:08:33\\\", \\\"canvas_url\\\": \\\"https://canvas.instructure.com/api\\\", \\\"book_json\\\": {\\\"lang\\\": \\\"en\\\", \\\"exercise_server\\\": \\\"https://localhost:8443\\\", \\\"build_JSAV\\\": false, \\\"title\\\": \\\"CS3114 Fall 2014\\\", \\\"module_origin\\\": \\\"https://ltitest.cs.vt.edu:9292\\\", \\\"build_dir\\\": \\\"Books\\\", \\\"chapters\\\": {\\\"Binary Trees\\\": {\\\"Binary/BSTrev\\\": {\\\"exercises\\\": {}, \\\"long_name\\\": \\\"Binary Search Trees\\\", \\\"sections\\\": {\\\"BST Remove Exercise\\\": {\\\"BSTremovePRO\\\": {\\\"threshold\\\": 0.9, \\\"long_name\\\": \\\"BST Remove Proficiency Exercise\\\", \\\"required\\\": true, \\\"points\\\": 2, \\\"exer_options\\\": {\\\"JXOP-feedback\\\": \\\"continuous\\\", \\\"JXOP-fixmode\\\": \\\"undo\\\", \\\"JXOP-code\\\": \\\"none\\\"}}}, \\\"BST Remove Pt 2\\\": {\\\"BSTremoveCON\\\": {\\\"threshold\\\": 1, \\\"long_name\\\": \\\"BST remove Slideshow\\\", \\\"required\\\": false, \\\"points\\\": 0}}, \\\"Binary Search Tree Definition\\\": {\\\"dispModComp\\\": true}, \\\"BST Remove Pt 1\\\": {\\\"BSTdeletemaxCON\\\": {\\\"threshold\\\": 1, \\\"long_name\\\": \\\"BST deletemax Slideshow\\\", \\\"required\\\": false, \\\"points\\\": 0}}, \\\"BST Search Exercise\\\": {\\\"BSTsearchPRO\\\": {\\\"threshold\\\": 0.9, \\\"long_name\\\": \\\"BST Search Proficiency Exercise\\\", \\\"required\\\": true, \\\"points\\\": 1, \\\"exer_options\\\": {\\\"JXOP-feedback\\\": \\\"continuous\\\", \\\"JXOP-fixmode\\\": \\\"undo\\\", \\\"JXOP-code\\\": \\\"none\\\"}}}, \\\"BST Analysis\\\": {}, \\\"BST Insert\\\": {\\\"BSTinsertCON\\\": {\\\"threshold\\\": 1, \\\"long_name\\\": \\\"BST Insert Slideshow\\\", \\\"required\\\": false, \\\"points\\\": 0}}, \\\"BST Search\\\": {\\\"showsection\\\": true, \\\"BSTsearchCON\\\": {\\\"threshold\\\": 1, \\\"long_name\\\": \\\"BST Search Slideshow\\\", \\\"required\\\": false, \\\"points\\\": 0}}, \\\"BST Insert Exercise\\\": {\\\"BSTinsertPRO\\\": {\\\"threshold\\\": 0.9, \\\"long_name\\\": \\\"BST Insert Proficiency Exercise\\\", \\\"required\\\": true, \\\"points\\\": 1, \\\"exer_options\\\": {\\\"JXOP-feedback\\\": \\\"continuous\\\", \\\"JXOP-fixmode\\\": \\\"undo\\\", \\\"JXOP-code\\\": \\\"none\\\"}}}}}}, \\\"Preface\\\": {\\\"Intro\\\": {\\\"exercises\\\": {}, \\\"long_name\\\": \\\"How to Use this System\\\", \\\"sections\\\": {}, \\\"dispModComp\\\": true}}}, \\\"code_lang\\\": {\\\"Java_Generic\\\": {\\\"lang\\\": \\\"java\\\", \\\"ext\\\": [\\\"java\\\"], \\\"label\\\": \\\"Java (Generic)\\\"}, \\\"Processing\\\": {\\\"lang\\\": \\\"java\\\", \\\"ext\\\": [\\\"pde\\\"], \\\"label\\\": \\\"Processing\\\"}, \\\"C  \\\": {\\\"lang\\\": \\\"C  \\\", \\\"ext\\\": [\\\"cpp\\\", \\\"h\\\"], \\\"label\\\": \\\"C  \\\"}}, \\\"allow_anonymous_credit\\\": true, \\\"suppress_todo\\\": true, \\\"score_server\\\": \\\"https://localhost:8443\\\", \\\"logging_server\\\": \\\"https://localhost:8443\\\", \\\"LTI\\\": {\\\"url\\\": \\\"https://ltitest.cs.vt.edu:9292\\\", \\\"xml_file_name\\\": \\\"tool_config.xml\\\", \\\"tool_name\\\": \\\"OpenDSA-LTI\\\"}, \\\"code_dir\\\": \\\"SourceCode/\\\", \\\"glob_exer_options\\\": {\\\"JXOP-debug\\\": \\\"true\\\"}}, \\\"access_token\\\": \\\"7~98d8KnPbCj7wnA3GLyHIvh4yxHz7t2U6SPp7OLdvscWSN82qCnZbEWebFJVEb0b3\\\", \\\"consumer_secret\\\": \\\"secret\\\", \\\"url\\\": \\\"http://localhost:8000/Books/CS3114LTI/html/\\\", \\\"book_id\\\": \\\"secret\\\", \\\"course_code\\\": \\\"CS3114LTI\\\", \\\"password\\\": \\\"opendsa\\\", \\\"consumer_key\\\": \\\"test\\\"}\\\\': [u\\\\'\\\\']}>'\\n\"}\n",
-			"settings":
-			{
-				"buffer_size": 6707,
-				"line_ending": "Unix",
-				"name": "{\"error_message\": \"'Key \\\\'build_date\\\\' not found"
-			}
-		},
-		{
-			"file": "ODSA-django/requirements.txt",
-			"settings":
-			{
-				"buffer_size": 1652,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "sudo apt-get install libxml2-dev libxslt1-dev python-dev libmysqlclient-dev\n",
-			"settings":
-			{
-				"buffer_size": 76,
-				"line_ending": "Unix",
-				"name": "sudo apt-get install libxml2-dev libxslt1-dev pyth"
-			}
-		},
-		{
-			"file": "ODSA-django/settings.py",
-			"settings":
-			{
-				"buffer_size": 8012,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "{\"error_message\": \"global name 'LTI_obj' is not defined\", \"traceback\": \"Traceback (most recent call last):\\n\n\n\\n\n\n  File \\\"/home/hshahin/workspaces/OpenDSA-server/ODSA-django/tastypie/resources.py\\\", line 195, in wrapper\\n\n\n    response = callback(request, *args, **kwargs)\\n\n\n    \\n\n\n  File \\\"/home/hshahin/workspaces/OpenDSA-server/ODSA-django/opendsa/api.py\\\", line 1140, in createcourse\\n\n\n    t = threading.Thread(target=self.create_chapter, args=(request_ctx, course_id, course_code, module_id, module_position - 1, chapter_obj, LTI_obj))\\n\n\n    \\n\n\n    NameError: global name 'LTI_obj' is not defined\\n\n\n\"}\n",
-			"settings":
-			{
-				"buffer_size": 614,
-				"line_ending": "Unix",
-				"name": "{\"error_message\": \"global name 'LTI_obj' is not de"
-			}
-		},
-		{
-			"file": "ODSA-django/stunnel/dev_https",
-			"settings":
-			{
-				"buffer_size": 166,
+				"buffer_size": 7315,
 				"line_ending": "Unix"
 			}
 		},
@@ -400,14 +295,6 @@
 			"settings":
 			{
 				"buffer_size": 7358,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "ODSA-django/static/js/jquery.min.js",
-			"settings":
-			{
-				"buffer_size": 93867,
 				"line_ending": "Unix"
 			}
 		}
@@ -419,17 +306,25 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 392.0,
-		"last_filter": "dis",
+		"height": 370.0,
+		"last_filter": "",
 		"selected_items":
 		[
 			[
-				"dis",
+				"pytho",
+				"Set Syntax: Python (Django)"
+			],
+			[
+				"dic",
 				"Package Control: Disable Package"
 			],
 			[
-				"matl	",
-				"Set Syntax: MATLAB"
+				"readme",
+				"ReadmePlease"
+			],
+			[
+				"readmepl",
+				"ReadmePlease"
 			],
 			[
 				"html",
@@ -444,6 +339,10 @@
 				"Set Syntax: JSON"
 			],
 			[
+				"dis",
+				"Package Control: Disable Package"
+			],
+			[
 				"en",
 				"Package Control: Enable Package"
 			],
@@ -454,10 +353,6 @@
 			[
 				"ena",
 				"Package Control: Enable Package"
-			],
-			[
-				"readme",
-				"ReadmePlease"
 			],
 			[
 				"java	",
@@ -480,7 +375,7 @@
 				"Package Control: Install Package"
 			]
 		],
-		"width": 476.0
+		"width": 467.0
 	},
 	"console":
 	{
@@ -501,35 +396,51 @@
 	},
 	"expanded_folders":
 	[
-		"/home/hosamshahin/workspaces/OpenDSA-server",
-		"/home/hosamshahin/workspaces/OpenDSA-server/ODSA-django",
-		"/home/hosamshahin/workspaces/OpenDSA-server/ODSA-django/assets"
+		"/home/hshahin/workspaces/OpenDSA-server/ODSA-django",
+		"/home/hshahin/workspaces/OpenDSA-server/ODSA-django/assets"
 	],
 	"file_history":
 	[
-		"/home/hosamshahin/workspaces/OpenDSA-server/ODSA-django/opendsa/api.py",
-		"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW3/programming/kernelSvmTrain.m",
-		"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/runCardioExperiments.m",
-		"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/linearPredict.m",
-		"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/logRegTrain.m",
-		"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW3/programming/test.m",
-		"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/runSyntheticExperiments.m",
-		"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW3/questions/hw3.tex",
-		"/home/hshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/plotPredictions.m",
-		"/home/hshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/logRegNLL.m",
-		"/home/hshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/gnbTrain.m",
-		"/home/hshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/linearPredict.m",
-		"/home/hshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/perceptron.m",
-		"/home/hshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/perceptronUpdate.m",
-		"/home/hshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/logRegTrain.m",
-		"/home/hshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/runCardioExperiments.m",
-		"/home/hshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/runSyntheticExperiments.m",
-		"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/runSyntheticExperiments_gaussianNaiveBay.m",
-		"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/gnbPredict.m",
-		"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/Figs/03-logRegAccuracy_linear.png",
-		"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/logRegNLL_orig.m",
-		"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/perceptronUpdate_orig.m",
-		"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/logRegNLL_doaa.m",
+		"/home/hshahin/.config/sublime-text-3/Packages/Wrap Plus/README.md",
+		"/home/hshahin/.config/sublime-text-3/Packages/Djaneiro/README.rst",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/List/ListADTPROG.html",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaKA.js",
+		"/home/hshahin/workspaces/OpenDSA/config/NewKA.json",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/RecurTutor2/BinaryTreeGuidedInfFlw.rst",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/BinaryTreeGuidedInfFlw.rst",
+		"/home/hshahin/workspaces/OpenDSA/server.py",
+		"/home/hshahin/workspaces/OpenDSA/khan-exercises/khan-exercise.js",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Background/IntroMCQeff.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Background/IntroSumm.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/RecurTutor2/BTincPROG.html",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/WritingTraversals.rst",
+		"/home/hshahin/workspaces/OpenDSA/config/CS3114LTI.json",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/RecurTutor2/BTcntvalPROG.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/BubsortPRO.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/TestRecur/btIncPROG.html",
+		"/home/hshahin/workspaces/OpenDSA/khan-exercises/exercises/khan-exercise.html",
+		"/home/hshahin/workspaces/OpenDSA/khan-exercises/interface.js",
+		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises/khan-exercise.js",
+		"/home/hshahin/workspaces/OpenDSA/NewKA/OpenDSA/config/NewKA.json",
+		"/home/hshahin/workspaces/OpenDSA/NewKA/OpenDSA/lib/odsaKA.js",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/HeapsortStepPRO.html",
+		"/home/hshahin/workspaces/OpenDSA/DataStructures/binaryheap.js",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/HeapsortStepPRO.rst",
+		"/home/hshahin/workspaces/OpenDSA/config/CS2401.json",
+		"/home/hshahin/workspaces/OpenDSA/Makefile",
+		"/home/hshahin/workspaces/OpenDSA/config/CS3114.json",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/SelsortFIB2.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/BubsortPRO.js",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/HeapsortStepPRO.js",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/HeapsortStepPRO.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/SelsortPRO.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/SelsortPROSummL2.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/SelsortPROSummL1.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/BubsortPROSummL2.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/BubsortPROSummL1.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/SortIntroMCQ2.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/ChapterSumm.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/SortIntroMCQ1.html",
 		"/home/hshahin/workspaces/OpenDSA/lib/odsaKA_tmp.js",
 		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises/interface.js",
 		"/home/hshahin/workspaces/OpenDSA/lib/odsaAV-min.js",
@@ -540,33 +451,25 @@
 		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/RadixMergesortSumm.html",
 		"/home/hshahin/workspaces/OpenDSA/khan-exercises/local-only/main.js",
 		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises/local-only/jquery.blockUI.js",
-		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises/khan-exercise.js",
 		"/home/hshahin/workspaces/OpenDSA/khan-exercises/exercises/khan-site.html",
-		"/home/hshahin/workspaces/OpenDSA/khan-exercises/exercises/khan-exercise.html",
-		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/BubsortPRO.js",
 		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/ListArray.rst",
 		"/home/hshahin/workspaces/OpenDSA/config/hs_NewKA.json",
 		"/home/hshahin/workspaces/OpenDSA/lib/odsaMOD.js",
 		"/home/hshahin/workspaces/OpenDSA/lib/odsaMOD-min.js",
 		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/ListADTPROGQ1.html",
 		"/home/hshahin/workspaces/OpenDSA/khan-exercises/khan-exercise_layer.js",
-		"/home/hshahin/workspaces/OpenDSA/khan-exercises/khan-exercise.js",
 		"/home/hshahin/workspaces/OpenDSA/khan-exercises/interface_layer.js",
-		"/home/hshahin/workspaces/OpenDSA/khan-exercises/interface.js",
 		"/home/hshahin/workspaces/OpenDSA/lib/CodeMirror-5.5.0/lib/codemirror.css",
 		"/home/hshahin/workspaces/OpenDSA/Exercises/List/alistPRO.css",
 		"/home/hshahin/workspaces/OpenDSA/Exercises/List/AlistDeletePRO.js",
 		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/ListADTPROGQ1.rst",
-		"/home/hshahin/workspaces/OpenDSA/config/NewKA.json",
 		"/home/hshahin/workspaces/OpenDSA/Exercises/List/AlistDeletePRO.html",
 		"/home/hshahin/workspaces/OpenDSA/Exercises/List/AlistInsertPRO.html",
-		"/home/hshahin/workspaces/OpenDSA/lib/odsaKA.js",
 		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/ListADTPROG.html",
 		"/home/hshahin/workspaces/OpenDSA/lib/odsaMOD_mod.js",
 		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/RadixsortPRO.js",
 		"/home/hshahin/workspaces/OpenDSA/Exercises/AlgAnal/GrowthRates.html",
 		"/home/hshahin/workspaces/OpenDSA/Exercises/AlgAnal/AnalPrelimSumm.html",
-		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/BubsortPRO.html",
 		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/BinsortSumm.rst",
 		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/BinsortSumm.html",
 		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/RadixsortPROSumm.html",
@@ -625,16 +528,7 @@
 		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortSumm.html",
 		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortMCQworst.html",
 		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortMCQwhen.html",
-		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortMCQswaps.html",
-		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortMCQstable.html",
-		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortMCQcost.html",
-		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortMCQcomps.html",
-		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortMCQ1.html",
-		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortFIB2.html",
-		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/RadixSortTFbin.html",
-		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/RadixSortTF3.html",
-		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/RadixSortTF1.html",
-		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/RadixSortSumm.html"
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortMCQswaps.html"
 	],
 	"find":
 	{
@@ -645,8 +539,8 @@
 		"height": 114.0,
 		"where_history":
 		[
-			"/home/hosamshahin/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW3/programming",
 			"",
+			"/home/hshahin/workspaces/OpenDSA",
 			"/home/hshahin/workspaces/OpenDSA/config",
 			"/home/hshahin/workspaces/OpenDSA/",
 			"/home/hshahin/workspaces/OpenDSA/Exercises",
@@ -683,134 +577,134 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"tool_name",
-			"\\n",
-			"LTI_obj",
-			"external_tools",
-			"urlparse",
-			"line",
-			"opendsa",
-			"lesson",
+			"long_name",
+			"exercise_counter",
 			"create_chapter",
-			"section_obj",
-			"sections[section]",
-			"sections",
+			"LTI_",
 			"create_chapter",
+			"request.POST",
+			"attr",
+			"request.POST.get",
+			"POST",
+			".get(",
+			".get",
+			"str",
 			"createcourse",
+			"createcoutse",
+			"method_check",
+			"login",
+			"loadmodule",
 			"loadbook",
 			"createcourse",
-			"|",
-			"data",
-			"nll",
-			"mlpObjective",
-			"{1",
-			"&",
-			"linear(",
-			"linearPredict",
-			"eercisce",
-			"logRegTrain",
-			"train",
-			"model",
-			"CardioFigs",
-			"model",
-			"Model_linear",
-			"model_linear",
-			"model_nonlinear",
-			"model_linear",
-			"logRegTrain",
-			"lambd",
-			"ylim",
-			"Model_linear",
-			"model_linear",
-			"Model",
-			"model",
-			"Model_linear",
-			"model_linear",
-			"model_nonlinear",
-			"lambdas",
-			"linspace",
-			"logRegAccuracy.train.linear",
-			"02-logRegAccuracy_linear.png",
-			"./CardioFigs/",
-			"percBestScore.train.nonlinear",
-			"./Figs/",
-			"linear",
-			"plotPredictions",
-			"/Figs/Cardio/",
-			"/Figs",
-			"testData",
-			"model",
-			"Model",
-			"model",
-			"model.W",
-			"model_linear",
-			"bestLogRegPredict",
-			"gnbPredict",
-			"gnbAccuracy",
-			"gnbPredict",
-			"testData",
-			"gnbModel_nonnonlinear",
-			"linear",
-			"train",
-			"linear",
-			"gnbModel",
-			"train",
-			"gnbPredict.train.linear",
-			"bestgnbPredict.train.linear",
-			"gnbAccuracy.train.linear",
-			"gnbPredict.train.linear",
-			"train",
-			"gnbPredict.train.linear",
-			"bestScore",
-			"percPredict",
-			"bestPercPredict",
-			"percBestScore",
-			"counter",
-			"percAccuracy",
-			"percPredict",
-			"trainLabels",
-			"train",
-			"percAccuracy",
-			"gnbLabels",
-			"percPredict",
-			"bestLogRegPredict",
-			"model",
-			"percAccuracy.train.linear",
-			"percPredict.train.linear",
-			"percBestScore.train.linear",
-			"percAccuracy.train.linear",
-			"linear(",
-			"percAccuracy.train.linear",
-			"logRegAccuracy",
-			"title",
-			"xlabel",
-			"lambdas",
-			"perc",
-			"prec",
-			"Prec",
-			"prec",
-			"Prec",
-			"prec",
-			"perc",
-			"Perc",
-			"perc",
-			"Perc",
-			"perc",
-			"Perc",
-			"bestpercPredict",
-			"bestScore",
-			"logRegAccuracy",
-			"LogRegPredict",
-			"logRegPredict",
-			"LogRegPredict",
-			"logRegPredict",
-			"bestScore",
-			"logRegAccuracy",
-			"LogRegPredict",
-			"logRegPredict",
-			"LogRegPredict",
-			"logRegPredict",
-			"y"
+			"create_chapter",
+			"exerciseName",
+			"exercises",
+			"create_chapter",
+			"p",
+			"name=exercise",
+			"exercises_l[exercise]",
+			"attr",
+			"exerciseObj",
+			"exercises_l",
+			"createcourse",
+			"exercise[",
+			"exercises_l[exercise]",
+			"exercise",
+			"val",
+			"exercises",
+			"exers_",
+			"ltitest",
+			"Ivh4yxHz7t2U6SPp7OLdvscWSN82qCnZbEWebFJVEb0b3",
+			"opendsa",
+			"binarytree",
+			"bstsmallcountprog",
+			"server",
+			"type",
+			"log",
+			"↵",
+			"ltitest.cs.vt.edu",
+			"CS3114",
+			"cs3114",
+			"summPromises",
+			"parentSummPromise",
+			"loadSummExercise",
+			"summPromises",
+			"loadExercise(",
+			"summPromises",
+			"$body.find(\".exercise\"",
+			"summPromises",
+			"loadSummExercise",
+			"summPromises",
+			"exerciseId",
+			"summPromises",
+			"promise",
+			"SummexerciseFilePromises",
+			"summPromises",
+			"i",
+			"promise",
+			"SummexerciseFilePromises",
+			"console.",
+			"elelment",
+			"summPromises",
+			"newContents",
+			"filter",
+			"console.log",
+			"loadExercise",
+			"buildAttemptData",
+			"Khan.buildAttemptData",
+			"Khan.",
+			"dupWindowSize",
+			"$(Exercises)",
+			"checkAnswer",
+			"handleAtte",
+			"currentProblemType",
+			"makeProblem",
+			"problemNum",
+			"makeProblem(",
+			"makeProb",
+			"jsavExPath",
+			"../../DataStructures",
+			"binaryheap",
+			"AVLextension",
+			"f_reset",
+			"jsav",
+			"RadixsortPRO",
+			"bubsortPRO",
+			"checkAnswer",
+			"initJSAV",
+			"f_reset",
+			"clickHandler",
+			"var",
+			"RadixsortPRO",
+			"Heapsortsteppro",
+			"DataStructures",
+			"solutionarea",
+			"fancy-scrollbar",
+			"solutionarea",
+			"fancy-scrollbar",
+			"ListADTPROGSumm",
+			"alistDeletePRO",
+			"new",
+			"jsav",
+			"checkAnswer",
+			"initJSAV",
+			"getPos",
+			"t",
+			"getSize",
+			"f_reset",
+			"clickHandler",
+			"copyHandler",
+			"bubsortPRO",
+			"exercises",
+			"style",
+			"_server",
+			"check-answer-results",
+			"Incorrect answer, please try again.",
+			"next-question-button",
+			"check-answer-results",
+			"check-answer-button",
+			"next-question-button",
+			"correctAnswerEffect"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -835,46 +729,77 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "ODSA-django/course/api.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1530,
+						"buffer_size": 0,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								331,
-								331
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"default_dir": "/home/hshahin/workspaces/OpenDSA",
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
-						"translation.x": -0.0,
+						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
+					"file": "OpenDSA-server.sublime-project",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 243,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								243,
+								243
+							]
+						],
+						"settings":
+						{
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
 					"file": "ODSA-django/opendsa/api.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 70315,
+						"buffer_size": 70620,
 						"regions":
 						{
 							"bookmarks":
@@ -884,20 +809,16 @@
 								"regions":
 								[
 									[
-										45774,
-										45774
+										42579,
+										42579
 									],
 									[
-										47819,
-										47819
+										45843,
+										45843
 									],
 									[
-										51924,
-										51924
-									],
-									[
-										52582,
-										52586
+										52600,
+										52600
 									]
 								],
 								"scope": "bookmarks"
@@ -906,26 +827,206 @@
 						"selection":
 						[
 							[
-								52115,
-								52115
+								41578,
+								41578
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Python/Python.tmLanguage",
+							"origPos": 17956.0,
+							"syncScroll": false,
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true,
 							"word_wrap": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 22003.0,
+						"translation.y": 17362.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 58,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								58,
+								58
+							]
+						],
+						"settings":
+						{
+							"auto_name": "SELECT * FROM t1 WHERE column1 = (SELECT column1 F",
+							"default_dir": "/home/hshahin/workspaces/OpenDSA-server",
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 4,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6001,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1073,
+								1073
+							]
+						],
+						"settings":
+						{
+							"auto_name": "{\"username\": \"opendsa\", \"password\": \"opendsa\", \"ca",
+							"default_dir": "/home/hshahin/workspaces/OpenDSA-server",
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2542,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										251,
+										263
+									],
+									[
+										479,
+										491
+									],
+									[
+										787,
+										799
+									],
+									[
+										1187,
+										1199
+									],
+									[
+										1393,
+										1405
+									],
+									[
+										1620,
+										1632
+									],
+									[
+										1778,
+										1790
+									],
+									[
+										1974,
+										1986
+									],
+									[
+										2158,
+										2170
+									],
+									[
+										2386,
+										2398
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								162,
+								162
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/home/hshahin/workspaces/OpenDSA-server",
+							"detect_indentation": false,
+							"line_numbers": false,
+							"origPos": 0.0,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syncScroll": false,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "ODSA-django/src/pip-delete-this-directory.txt",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 185,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
 					"file": ".gitignore",
 					"semi_transient": false,
 					"settings":
@@ -937,164 +1038,21 @@
 						"selection":
 						[
 							[
-								268,
-								268
+								273,
+								273
 							]
 						],
 						"settings":
 						{
+							"origPos": 0.0,
+							"syncScroll": false,
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1032,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								793,
-								793
-							]
-						],
-						"settings":
-						{
-							"auto_name": "Traceback (most recent call last):",
-							"default_dir": "/home/hosamshahin/workspaces/OpenDSA-server",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 6707,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3423,
-								3423
-							]
-						],
-						"settings":
-						{
-							"auto_name": "{\"error_message\": \"'Key \\\\'build_date\\\\' not found",
-							"default_dir": "/home/hosamshahin/workspaces/OpenDSA-server",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 432.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "ODSA-django/requirements.txt",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1652,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								74,
-								74
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 76,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								76,
-								76
-							]
-						],
-						"settings":
-						{
-							"auto_name": "sudo apt-get install libxml2-dev libxslt1-dev pyth",
-							"default_dir": "/home/hosamshahin/workspaces/OpenDSA-server",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "ODSA-django/settings.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8012,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1419,
-								1419
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 535.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
@@ -1102,60 +1060,35 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 614,
+						"buffer_size": 7315,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								542,
-								542
+								7315,
+								7315
 							]
 						],
 						"settings":
 						{
-							"auto_name": "{\"error_message\": \"global name 'LTI_obj' is not de",
-							"default_dir": "/home/hosamshahin/workspaces/OpenDSA-server",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"default_dir": "/home/hshahin/workspaces/OpenDSA-server",
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
 					"buffer": 9,
-					"file": "ODSA-django/stunnel/dev_https",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 166,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								132,
-								132
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
 					"semi_transient": false,
 					"settings":
 					{
@@ -1166,50 +1099,24 @@
 						"selection":
 						[
 							[
-								528,
-								528
+								2239,
+								2239
 							]
 						],
 						"settings":
 						{
-							"default_dir": "/home/hosamshahin/workspaces/OpenDSA-server",
-							"syntax": "Packages/Python/Python.tmLanguage",
+							"default_dir": "/home/hshahin/workspaces/OpenDSA-server",
+							"origPos": 648.0,
+							"syncScroll": false,
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.x": 113.0,
+						"translation.y": 648.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "ODSA-django/static/js/jquery.min.js",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 93867,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								93867,
-								93867
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 256930.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
+					"stack_index": 3,
 					"type": "text"
 				}
 			]
@@ -1217,7 +1124,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 25.0
+		"height": 27.0
 	},
 	"input":
 	{
@@ -1254,7 +1161,7 @@
 	"project": "OpenDSA-server.sublime-project",
 	"replace":
 	{
-		"height": 46.0
+		"height": 50.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1264,108 +1171,96 @@
 		"selected_items":
 		[
 			[
-				"gitignore",
-				".gitignore"
+				"api.py",
+				"ODSA-django/opendsa/api.py"
 			],
 			[
 				"api",
 				"ODSA-django/opendsa/api.py"
 			],
 			[
-				"api.py",
-				"ODSA-django/opendsa/api.py"
+				"_rev",
+				"~/workspaces/OpenDSA/config/CS3114_rev.json"
 			],
 			[
-				"req",
-				"ODSA-django/requirements.txt"
+				"cs3114l",
+				"config/CS3114LTI.json"
 			],
 			[
-				"mlppredict",
-				"HW3/programming/mlpPredict.m"
+				"cs3114_rev",
+				"config/CS3114_rev.json"
 			],
 			[
-				"mlptrain",
-				"HW3/programming/mlpTrain.m"
+				"cs3114",
+				"config/CS3114LTI.json"
 			],
 			[
-				"logregtrain",
-				"HW2/programming/logRegTrain.m"
+				"create",
+				"lib/createcourse-min.js"
 			],
 			[
-				"crossvalidate",
-				"HW3/programming/crossValidate.m"
-			],
-			[
-				"nll",
-				"HW3/programming/nll.m"
-			],
-			[
-				"mlpobjective",
-				"HW3/programming/mlpObjective.m"
-			],
-			[
-				"logistic",
-				"HW3/programming/logistic.m"
-			],
-			[
-				"runsynth",
-				"HW3/programming/runSyntheticExperiments.m"
-			],
-			[
-				"test",
-				"HW3/programming/test.m"
-			],
-			[
-				"runc",
-				"HW2/programming/runCardioExperiments.m"
-			],
-			[
-				"linearpre",
-				"HW2/programming/linearPredict.m"
-			],
-			[
-				"logreg",
-				"HW2/programming/logRegTrain.m"
-			],
-			[
-				"log",
-				"HW2/programming/logRegTrain.m"
-			],
-			[
-				"02-logregaccuracy_linear.png",
-				"~/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/CardioFigs/02-logRegAccuracy_linear.png"
-			],
-			[
-				"03-logregaccuracy_linear",
-				"~/Dropbox/Master/Courses/2015-Fall/Machine Learning/VT-2015/homework/HW2/programming/Figs/03-logRegAccuracy_linear.png"
-			],
-			[
-				"plotpredictions",
-				"HW2/programming/plotPredictions.m"
-			],
-			[
-				"gnbpredict",
-				"HW2/programming/gnbPredict.m"
-			],
-			[
-				"linearpredict",
-				"HW2/programming/linearPredict.m"
-			],
-			[
-				"gnbtrain",
-				"HW2/programming/gnbTrain.m"
-			],
-			[
-				"logre",
-				"HW2/programming/logRegTrain.m"
+				"createcourse",
+				"Books/CS3114/html/CreateCourse.html"
 			],
 			[
 				"odsaka",
 				"lib/odsaKA.js"
 			],
 			[
+				"newka",
+				"config/NewKA.json"
+			],
+			[
+				"binarytreeguidedinfflw",
+				"RST/en/NewKA/BinaryTreeGuidedInfFlw.rst"
+			],
+			[
+				"server",
+				"server.py"
+			],
+			[
 				"khan",
-				"ODSAkhan-exercises/khan-exercise.js"
+				"khan-exercises/khan-exercise.js"
+			],
+			[
+				"intromcqeff",
+				"Exercises/Background/IntroMCQeff.html"
+			],
+			[
+				"introsumm",
+				"Exercises/Background/IntroSumm.html"
+			],
+			[
+				"btcntvalprog",
+				"Exercises/RecurTutor2/BTcntvalPROG.html"
+			],
+			[
+				"btincprog",
+				"Exercises/RecurTutor2/BTincPROG.html"
+			],
+			[
+				"writingtraversals",
+				"RST/en/NewKA/WritingTraversals.rst"
+			],
+			[
+				"listadt",
+				"Exercises/List/ListADTPROG.html"
+			],
+			[
+				"bubsort",
+				"Exercises/NewKA/BubsortPRO.html"
+			],
+			[
+				"cs3114lti",
+				"config/CS3114LTI.json"
+			],
+			[
+				"make",
+				"Makefile"
+			],
+			[
+				"3114",
+				"config/CS3114.json"
 			],
 			[
 				"selsortpro",
@@ -1428,14 +1323,6 @@
 				"DataStructures/binaryheap.js"
 			],
 			[
-				"newka",
-				"config/NewKA.json"
-			],
-			[
-				"bubsort",
-				"Exercises/NewKA/BubsortPRO.html"
-			],
-			[
 				"heapsortsteppro",
 				"Exercises/NewKA/HeapsortStepPRO.html"
 			],
@@ -1490,10 +1377,6 @@
 			[
 				"listadtprogq1",
 				"Exercises/NewKA/ListADTPROGQ1.html"
-			],
-			[
-				"listadt",
-				"Exercises/NewKA/ListADTPROG.html"
 			],
 			[
 				"listadtprog",
@@ -1676,10 +1559,6 @@
 				"Books/NewKA/html/BinsortMCQ2.html"
 			],
 			[
-				"make",
-				"Makefile"
-			],
-			[
 				"listadt.html",
 				"Books/CS3114/html/ListADT.html"
 			],
@@ -1694,10 +1573,6 @@
 			[
 				"bubblesort.rst",
 				"RST/en/Sorting/BubbleSort.rst"
-			],
-			[
-				"cs3114",
-				"config/CS3114.json"
 			],
 			[
 				"alganalcs2114summ",
@@ -1740,20 +1615,12 @@
 				"lib/registerbook-min.js"
 			],
 			[
-				"create",
-				"lib/createcourse-min.js"
-			],
-			[
 				"idsauti",
 				"lib/odsaUtils.js"
 			],
 			[
 				"cerate",
 				"lib/createcourse-min.js"
-			],
-			[
-				"createcourse",
-				"RST/en/CreateCourse.rst"
 			],
 			[
 				"odsastyle",
@@ -1774,6 +1641,46 @@
 			[
 				"confi",
 				"tools/configure.py"
+			],
+			[
+				"configure",
+				"tools/configure.py"
+			],
+			[
+				"con",
+				"tools/configure.py"
+			],
+			[
+				"quicksort.html",
+				"Books/CS3114_01/html/Quicksort.html"
+			],
+			[
+				"que",
+				"RST/en/List/Queue.rst"
+			],
+			[
+				"quick",
+				"RST/en/Sorting/Quicksort.rst"
+			],
+			[
+				"quicksort-01",
+				"Books/CS3114/html/Quicksort-01.html"
+			],
+			[
+				"queue.rst",
+				"RST/en/List/Queue.rst"
+			],
+			[
+				"insertionsort.r",
+				"RST/en/Slides/InsertionSort.rst"
+			],
+			[
+				"cs3114_orig",
+				"config/CS3114_orig.json"
+			],
+			[
+				"cs3114.",
+				"config/CS3114.json"
 			]
 		],
 		"width": 0.0
@@ -1781,9 +1688,13 @@
 	"select_project":
 	{
 		"height": 500.0,
-		"last_filter": "opendsap",
+		"last_filter": "opendsa-ser",
 		"selected_items":
 		[
+			[
+				"opendsa-ser",
+				"~/workspaces/OpenDSA-server/OpenDSA-server.sublime-project"
+			],
 			[
 				"opendsap",
 				"~/workspaces/KA/hosam/OpenDSA/OpenDSA.sublime-project"
@@ -1808,7 +1719,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 245.0,
+	"side_bar_width": 226.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
