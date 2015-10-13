@@ -16,6 +16,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 # gist middleware variables
 XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta6.cc.vt.edu',
+                              'http://algoviz-beta.cs.vt.edu',			      
                               'http://algoviz.org',
                               'http://algoviz-beta7.cc.vt.edu',
                               'http://opendsa.local',
