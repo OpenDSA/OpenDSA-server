@@ -107,7 +107,7 @@ public class studentBTsetdepthPROG
  public static void modelbtSetDepth(BinNode rt, int depth) {
     if (rt != null)
     {
-     rt.setElement(rt.element()+ depth);
+     rt.setElement(depth);
      modelbtSetDepth(rt.left() , depth + 1);
      modelbtSetDepth(rt.right() , depth + 1);
     }
@@ -234,9 +234,9 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
                   +" / \\ \n"
                   +"15 20 \n ";
 
-   String modelAnswer = "  11\n"
+   String modelAnswer = "  1\n"
                        +" / \\ \n"
-                       +"17 22 \n ";
+                       +"2  2 \n ";
 
    if (runTestCase(root, root2 , treeAsString , modelAnswer )== false) return;
    ////// End of the second test case
@@ -246,8 +246,8 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
   root = new BSTNode(20);
   leftChild = new BSTNode(5);
   rightChild = new BSTNode(10);
-  BSTNode leftChild2 = new BSTNode(30);
-  BSTNode rightChild2 = new BSTNode(70);
+  leftChild2 = new BSTNode(30);
+  rightChild2 = new BSTNode(70);
   BSTNode leftChild3 = new BSTNode(50);
   BSTNode rightChild3 = new BSTNode(10);
 
@@ -266,11 +266,11 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
                 +" / \\ / \\\n"
                 +"30 70 50 10\n ";
                 
-  modelAnswer = "  21\n"
+  modelAnswer = "   1\n"
                 +" / \\ \n"
-                +"7   13 \n "
+                +"2   2 \n "
                 +" / \\ / \\\n"
-                +"33 73 53 13\n ";
+                +"3   33   3\n ";
  
    
   if (runTestCase(root, root2 , treeAsString , modelAnswer )== false) return;
