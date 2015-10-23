@@ -102,12 +102,9 @@ def checkifLeafMisconception(studentCode):
          return (True,[""])
 
 def checkifRootsSwapped(studentCode):
-      if "root1=root2" in studentCode:
+      notAllowedStatments = ["root1=root2" , "root2=root1"]
+      if any(notAllowedStatment in studentCode.replace(" ", "") for notAllowedStatment in notAllowedStatments):
          return (False, ["\n Try Again! The problem requires you to swap the values of the nodes in the trees, not just swap the roots of the trees."])
-
-      if "root2=root1" in studentCode:
-         return (False, ["\n Try Again! The problem requires you to swap the values of the nodes in the trees, not just swap the roots of the trees."])
-
       else:
          return (True,[""])
 
