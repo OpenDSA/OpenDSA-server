@@ -58,7 +58,7 @@ def btcheckEfficientCode(studentCode , exerciseName):
 # This misconception can be called if for example it is required from the student to get the minimum value in a binary search tree.. the student HAS to traverse the left sub-tree to get the minimum value
 def checkNoLeftSubTreeMisconception(studentCode):
 	if "left()" not in studentCode:
-          return (False, ["\nTry Again! Your solution is executing correctly but not efficient. Remeber that to get the minimum value in a binary search tree you HAVE to check on the values less than the root which are on the left sub-tree."])
+          return (False, ["\nTry Again! Your solution is incorrect. To find the minimum value in a BST, you MUST check at least some values that are less than the root. These are in the left subtree."])
 
 	else:
           return (True,[""])
@@ -66,7 +66,7 @@ def checkNoLeftSubTreeMisconception(studentCode):
 # Used in BST Misconceptions: Checking if the student traverse the right sub-tree (if you want to get the min value in a bst ...you don't need)
 def checkRightSubTreeMisconception(studentCode):
 	if "right()" in studentCode:
-          return (False, ["Try Again! Your solution is executing correctly but not efficient. Remeber that to get the minimum value in a binary search tree you don't need to check on the values greater than the root which are on the right sub-tree."])
+          return (False, ["Try Again! Your solution executes correctly but is not efficient. Remember that in a BST, a smaller value than the current node can only be in the left subtree."])
 
 	else:
           return (True,[""])
@@ -76,7 +76,7 @@ def checkChildisNullMisconception(studentCode):
        notAllowedConditions = ["left()==null" , "right()==null" , "left()!=null" , "right()!=null"]
 
        if  any(notAllowedCondition in studentCode.replace(" ", "") for notAllowedCondition in notAllowedConditions):
-         return (False, ["Try Again! Your solution is executing correctly but not efficient. You shouldn't expliciltly check if the children are null or not. Remember that the root's left or right child is treated as the new root when passed to the recursive call."])
+         return (False, ["Try Again! Your solution executes correctly but is not efficient. There is no reason to check if the children are null or not. Remember that the root's left or right child is treated as the new root when processed by the recursive call."])
 
        else:
          return (True,[""])
@@ -87,7 +87,7 @@ def checkChildisNullMisconception(studentCode):
 def checkChildValueMisconception(studentCode):
        notAllowedStatments = ["left().element()" , "right().element()"]
        if any(notAllowedStatment in studentCode.replace(" ", "") for notAllowedStatment in notAllowedStatments):
-        return (False, ["\n Try Again! Your solution is executing correctly but not efficient. You shouldn't check on the children values. Remember that the root's left or right children are treated as the new root when passed to the recursive call."])
+        return (False, ["\n Try Again! Your solution executes correctly but is not efficient. There is no reason to check the children's values. Remember that the root's left or right child is treated as the new root when processed by the recursive call."])
 
        else:
         return (True,[""])
@@ -96,18 +96,15 @@ def checkChildValueMisconception(studentCode):
 #Used in Binary Tree and/or BST Misconceptions: Check if the student is checking if the root is leaf or not while it is needed
 def checkifLeafMisconception(studentCode):
        if "isLeaf()" in studentCode:
-         return (False, ["\n Try Again! Your solution is executing correctly but not efficient. You don't need to have a seperate if statement to check if the root/node is leaf or not because your base case action should perfom a termination when no more nodes to process."])
+         return (False, ["\n Try Again! Your solution executes correctly but is not efficient. There is no reason to check if the root is a leaf or not."])
 
        else:
          return (True,[""])
 
 def checkifRootsSwapped(studentCode):
-      if "root1=root2" in studentCode:
-         return (False, ["\n Try Again! Your solution is executing correctly but you should actually swap the values of the nodes in the trees not swapping the roots of the trees."])
-
-      if "root2=root1" in studentCode:
-         return (False, ["\n Try Again! Your solution is executing correctly but you should actually swap the values of the nodes in the trees not swapping the roots of the trees."])
-
+      notAllowedStatments = ["root1=root2" , "root2=root1"]
+      if any(notAllowedStatment in studentCode.replace(" ", "") for notAllowedStatment in notAllowedStatments):
+         return (False, ["\n Try Again! The problem requires you to swap the values of the nodes in the trees, not just swap the roots of the trees."])
       else:
          return (True,[""])
 
