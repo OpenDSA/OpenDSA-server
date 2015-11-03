@@ -1032,7 +1032,8 @@ class ModuleResource(ModelResource):
                                     " " + long_name
                                 # OpenDSA exercises will map to canvas assignments
                                 results = assignments.create_assignment(
-                                    request_ctx, course_id,
+                                    request_ctx,
+                                    course_id,
                                     section_name,
                                     assignment_submission_types="external_tool",
                                     assignment_external_tool_tag_attributes={
@@ -1042,30 +1043,52 @@ class ModuleResource(ModelResource):
                                 assignment_id = results.json().get("id")
                                 # add assignment to module
                                 results = modules.create_module_item(
-                                    request_ctx, course_id, module_id,
+                                    request_ctx,
+                                    course_id,
+                                    module_id,
                                     'Assignment',
                                     module_item_content_id=assignment_id,
                                     module_item_indent=1)
                                 section_couter += 1
                                 no_exercise = 0
                     if no_exercise == 1:
+                        results = assignments.create_assignment(
+                            request_ctx,
+                            course_id,
+                            section_name,
+                            assignment_submission_types="external_tool",
+                            assignment_external_tool_tag_attributes={
+                                "url": tool_url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" + module_name_url + "-" + str(section_couter).zfill(2)},
+                            assignment_points_possible=0,
+                            assignment_description=section_name)
+                        assignment_id = results.json().get("id")
+                        # add assignment to module
                         results = modules.create_module_item(
-                            request_ctx, course_id, module_id,
-                            'ExternalTool',
-                            module_item_external_url=tool_url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
-                            module_name_url + "-" + str(section_couter).zfill(2),
-                            module_item_content_id=None,
-                            module_item_title=section_name,
+                            request_ctx,
+                            course_id,
+                            module_id,
+                            'Assignment',
+                            module_item_content_id=assignment_id,
                             module_item_indent=1)
                         section_couter += 1
             else:
+                results = assignments.create_assignment(
+                    request_ctx,
+                    course_id,
+                    module_name,
+                    assignment_submission_types="external_tool",
+                    assignment_external_tool_tag_attributes={
+                        "url": tool_url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" + module_name_url},
+                    assignment_points_possible=0,
+                    assignment_description=module_name)
+                assignment_id = results.json().get("id")
+                # add assignment to module
                 results = modules.create_module_item(
-                    request_ctx, course_id, module_id,
-                    'ExternalTool',
-                    module_item_external_url=tool_url + "/lti_tool?problem_type=module&problem_url=" + course_code + "&short_name=" +
-                    module_name_url,
-                    module_item_content_id=None,
-                    module_item_title=module_name,
+                    request_ctx,
+                    course_id,
+                    module_id,
+                    'Assignment',
+                    module_item_content_id=assignment_id,
                     module_item_indent=1)
         # publish the module
         results = modules.update_module(request_ctx, course_id, module_id,
