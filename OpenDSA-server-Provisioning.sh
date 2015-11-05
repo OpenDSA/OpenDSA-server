@@ -25,6 +25,9 @@ mysql -uroot -proot -e "CREATE DATABASE opendsa"
 mysql -uroot -proot -e "GRANT ALL ON opendsa.* TO 'opendsa'@'localhost' IDENTIFIED BY 'opendsa'"
 
 sudo-pw /etc/init.d/mysql restart
+sudo service mysql stop
+sudo service mysql restart
+
 
 # Install OpenDSA-server
 sudo-pw apt-get -y autoremove
@@ -77,6 +80,7 @@ sudo-pw touch /vagrant/OpenDSA-server/ODSA-django/media/daily_stats.json
 sudo-pw pip install git+http://git@github.com/penzance/canvas_python_sdk#egg=canvas_sdk
 sudo-pw pip install -r requirements.txt
 
+#
 # suncdb
 python manage.py syncdb
 
