@@ -107,9 +107,10 @@ public class studentBTsetdepthPROG
  public static void modelbtSetDepth(BinNode rt, int depth) {
     if (rt != null)
     {
-     rt.setElement(depth);
+     
      modelbtSetDepth(rt.left() , depth + 1);
      modelbtSetDepth(rt.right() , depth + 1);
+     rt.setElement(depth);
     }
  }
 
@@ -241,39 +242,7 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
    if (runTestCase(root, root2 , treeAsString , modelAnswer )== false) return;
    ////// End of the second test case
 
-  //Third test case
-  root= null;
-  root = new BSTNode(20);
-  leftChild = new BSTNode(5);
-  rightChild = new BSTNode(10);
-  leftChild2 = new BSTNode(30);
-  rightChild2 = new BSTNode(70);
-  BSTNode leftChild3 = new BSTNode(50);
-  BSTNode rightChild3 = new BSTNode(10);
-
-  root.setLeft(leftChild); 
-  root.setRight(rightChild);
   
-  leftChild.setLeft(leftChild2); 
-  leftChild.setRight(rightChild2);
-  
-  rightChild.setLeft(leftChild3); 
-  rightChild.setRight(rightChild3);
-  
-  treeAsString = "  20\n"
-                +" / \\ \n"
-                +"5   10 \n "
-                +" / \\ / \\\n"
-                +"30 70 50 10\n ";
-                
-  modelAnswer = "   1\n"
-                +" / \\ \n"
-                +"2   2 \n "
-                +" / \\ / \\\n"
-                +"3   33   3\n ";
- 
-   
-  if (runTestCase(root, root2 , treeAsString , modelAnswer )== false) return;
   
   // If none the test cases failed then all of them are ok then sucess=true
  writeResult(root , true , treeAsString , "" , "" );
