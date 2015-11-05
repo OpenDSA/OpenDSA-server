@@ -30,7 +30,7 @@ XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta6.cc.vt.edu',
                               'https://ltitest.herokuapp.com']
 XS_SHARING_ALLOWED_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
 XS_SHARING_ALLOWED_HEADERS = ["Content-Type"]
-File_Path = "/home/hshahin/workspaces/OpenDSA-server/ODSA-django/openpop/build/"
+File_Path = conf.base_path+"/OpenDSA-server/ODSA-django/openpop/build/"
 
 APPEND_SLASH = True
 
@@ -56,10 +56,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         # g3et_path('test.db'),            # Or path to database file if using
         # sqlite3.
-        'NAME': 'opendsa',
-        'USER': 'opendsa',                  # Not used with sqlite3. dbadmin
+        'NAME': conf.name,
+        'USER': conf.user,                  # Not used with sqlite3. dbadmin
         # Not used with sqlite3. vis4_dsa
-        'PASSWORD': 'opendsa',
+        'PASSWORD': conf.password,
         # Set to empty string for localhost. Not used with sqlite3.
         'HOST': '',
         # Set to empty string for default. Not used with sqlite3.
@@ -88,7 +88,7 @@ USE_I18N = True
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 # get_path("media/")
-MEDIA_ROOT = '/home/hshahin/workspaces/OpenDSA-server/ODSA-django/media/'
+MEDIA_ROOT = conf.base_path+'/OpenDSA-server/ODSA-django/media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -107,7 +107,7 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    "/home/hshahin/workspaces/OpenDSA-server/ODSA-django/assets/",
+    conf.base_path+"/OpenDSA-server/ODSA-django/assets/",
     #"/home/aalto/aaltoplus/assets"
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
