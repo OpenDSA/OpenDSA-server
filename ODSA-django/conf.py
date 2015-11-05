@@ -1,5 +1,5 @@
 secret_key = 'opendsa_secret_key'
-base_path = '/vagrant'
+base_path = '/home/hshahin/workspaces'
 name = 'opendsa'
 user = 'opendsa'
 password = 'opendsa'
