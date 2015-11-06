@@ -1245,61 +1245,62 @@ class ModuleResource(ModelResource):
                                 # if len(section_obj[attr]) > 0:
                                     exercise_obj = section_obj[attr]
                                     exercise_name = attr
-                                    description = exercise_obj['long_name']
-                                    streak = exercise_obj['threshold']
-                                    required = exercise_obj['required']
+                                    description = exercise_obj.get('long_name')
+                                    streak = exercise_obj.get('threshold')
+                                    required = exercise_obj.get('required')
 
-                                    if Exercise.objects.filter(name=exercise_name).count() == 0:
-                                      # Add new exercise
-                                        with transaction.commit_on_success():
-                                            kexercise, added = \
-                                                Exercise.objects.get_or_create(
-                                                    name=exercise_name,
-                                                    covers="dsa",
-                                                    description=description,
-                                                    streak=streak)
-                                    else:
-                                        # Update existing exercise
-                                        with transaction.commit_on_success():
-                                            kexercise = get_exercise(exercise_name)
-                                            kexercise.covers = "dsa"
-                                            kexercise.description = description
-                                            kexercise.streak = Decimal(streak)
-                                            kexercise.save()
+                                    if description is not None and required is not None and streak is not None:
+                                        if Exercise.objects.filter(name=exercise_name).count() == 0:
+                                          # Add new exercise
+                                            with transaction.commit_on_success():
+                                                kexercise, added = \
+                                                    Exercise.objects.get_or_create(
+                                                        name=exercise_name,
+                                                        covers="dsa",
+                                                        description=description,
+                                                        streak=streak)
+                                        else:
+                                            # Update existing exercise
+                                            with transaction.commit_on_success():
+                                                kexercise = get_exercise(exercise_name)
+                                                kexercise.covers = "dsa"
+                                                kexercise.description = description
+                                                kexercise.streak = Decimal(streak)
+                                                kexercise.save()
 
-                                    # Link exercise to module and books only
-                                    # if the exercise is required
-                                    bme = None
-                                    if BookModuleExercise.components.filter(
-                                            book=kbook,
-                                            module=kmodule,
-                                            exercise=kexercise).count() > 0 \
-                                            and required:
-                                        with transaction.commit_on_success():
-                                            bme = BookModuleExercise.components.filter(
+                                        # Link exercise to module and books only
+                                        # if the exercise is required
+                                        bme = None
+                                        if BookModuleExercise.components.filter(
                                                 book=kbook,
                                                 module=kmodule,
-                                                exercise=kexercise)[0]
-                                            bme.points = exercise_obj['points']
-                                            bme.save()
+                                                exercise=kexercise).count() > 0 \
+                                                and required:
+                                            with transaction.commit_on_success():
+                                                bme = BookModuleExercise.components.filter(
+                                                    book=kbook,
+                                                    module=kmodule,
+                                                    exercise=kexercise)[0]
+                                                bme.points = exercise_obj['points']
+                                                bme.save()
+                                                if kexercise not in exers_:
+                                                    exers_.append(kexercise)
                                             if kexercise not in exers_:
                                                 exers_.append(kexercise)
-                                        if kexercise not in exers_:
-                                            exers_.append(kexercise)
-                                    if BookModuleExercise.components.filter(
-                                            book=kbook,
-                                            module=kmodule,
-                                            exercise=kexercise).count() == 0\
-                                            and required:
-                                        with transaction.commit_on_success():
-                                            bme = BookModuleExercise(
+                                        if BookModuleExercise.components.filter(
                                                 book=kbook,
                                                 module=kmodule,
-                                                exercise=kexercise,
-                                                points=exercise_obj['points'])
-                                            bme.save()
-                                            if kexercise not in exers_:
-                                                exers_.append(kexercise)
+                                                exercise=kexercise).count() == 0\
+                                                and required:
+                                            with transaction.commit_on_success():
+                                                bme = BookModuleExercise(
+                                                    book=kbook,
+                                                    module=kmodule,
+                                                    exercise=kexercise,
+                                                    points=exercise_obj['points'])
+                                                bme.save()
+                                                if kexercise not in exers_:
+                                                    exers_.append(kexercise)
 
             response['saved'] = True
             # create book json file
