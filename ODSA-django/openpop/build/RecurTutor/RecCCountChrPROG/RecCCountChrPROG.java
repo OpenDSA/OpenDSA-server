@@ -5,7 +5,7 @@ import java.io.*;
 import java.util.Random;
 
 
-public class studentrecCCountChrPROG
+public class studentRecCCountChrPROG
 {
     public static  long fTimeout=2;
     public static boolean fFinished= false;

@@ -1,26 +1,26 @@
 
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Exercise 5: multiply two  numbers x and y. (Assume both values given are positive.)
+//Exercise 1: finds the largest number in the array named numbers.
+
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecCMultiplyPROG
+public class studentRecCLargestPROG
 {
-	
+ 
     public static  long fTimeout=1;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
     public static int studentAnswer;
-    public static int x;
-    public static int y;
+    public static int[] numbers;
     public static void evaluate() throws Throwable {
 	    Thread thread= new Thread() {
 		@Override
 		public void run() {
 		 try {
-		  studentAnswer = multiply(x , y);
+		  studentAnswer = largest(numbers,0);
 		  fFinished= true;
 		 } 
           catch (Throwable e) {
@@ -43,28 +43,30 @@ public class studentrecCMultiplyPROG
 	}
 
  
- public static int modelmult(int x, int y) {
-
-    if ( x == 1 )
-    
-      return y;
-
-     else
-
-     return modelmult(x-1, y) + y;
-     }
+ 
+ public static int modellargest(int[] numbers, int index) {
+   if(index==numbers.length-1)
+   {
+     return numbers[index];
+   }
+   else if(numbers[index] > numbers[index+1]) {
+     numbers[index+1] = numbers[index];
+   }
+    return modellargest(numbers,index+1);
+ } 
  
 
   public static void main(String [ ] args) {
-    boolean SUCCESS = false;
-    
-    // To test: generate a random number
+	  
+	 // To test: generate a random array of length 10
     Random randNumGenerator = new Random();
-    x=  randNumGenerator.nextInt(100)+1;
-    y=  randNumGenerator.nextInt(100)+1;
-
-
-    try {
+    numbers = new int[10];
+    for (int i=0; i< numbers.length; i++)
+    {
+       numbers[i] = (randNumGenerator.nextInt(100)+1);
+    }
+      
+	 try {
      // Fail on time out object
      evaluate();
    
@@ -72,7 +74,12 @@ public class studentrecCMultiplyPROG
     	
         throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
     }
-    if ( studentAnswer == modelmult(x,y)) SUCCESS = true;
+    
+    boolean SUCCESS = false;
+    
+    
+   
+    if (studentAnswer  == modellargest(numbers,0)) SUCCESS = true;
 
     try{
 
@@ -85,7 +92,7 @@ public class studentrecCMultiplyPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect Base case condition or base case action!");
+     output.println("Try Again! Incorrect Base case!");
      output.close();
     }
   

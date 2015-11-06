@@ -1,26 +1,24 @@
-
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Exercise 9: computes the GCD of x and y
+//Exercise 17:  determines the minimum element in an array of integers
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecCGcdPROG
+public class studentRecHMinPROG
 {
- 
-    public static  long fTimeout=1;
+    public static  long fTimeout=5;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
     public static int studentAnswer;
-    public static int x;
-    public static int y;
+    public static int[] numbers = new int[5];
+    
     public static void evaluate() throws Throwable {
 	    Thread thread= new Thread() {
 		@Override
 		public void run() {
 		 try {
-		  studentAnswer = GCD(x , y);
+		  studentAnswer = recursiveMin(numbers,0);
 		  fFinished= true;
 		 } 
           catch (Throwable e) {
@@ -40,29 +38,29 @@ public class studentrecCGcdPROG
 		exception.setStackTrace(thread.getStackTrace());
 		throw exception;
 	
-	}
+	} 
  
- public static int modelGCD(int x, int y)
- {
- if ((x % y) == 0)
-  {
-   return y;
-  }   
- else
- {
-   return modelGCD (y, x % y);
- }
+ 
+ public static  int modelrecursiveMin(int numbers[] , int startIndex)
+{ 
+  if(startIndex == numbers.length-1)
+    return numbers[startIndex];
+  else
+    return Math.min(numbers[startIndex], modelrecursiveMin(numbers , startIndex+1));	
 }
-	
+	  
   public static void main(String [ ] args) {
     boolean SUCCESS = false;
-    
-    // To test: generate a random number
+   
+    // To test: generate a random array of length 10
     Random randNumGenerator = new Random();
-    x=  randNumGenerator.nextInt(100)+1;
-    y=  randNumGenerator.nextInt(100)+1;
-
-     try {
+  
+    for (int i=0; i< numbers.length; i++)
+    {
+       numbers[i] = (randNumGenerator.nextInt(20)+1);
+    }
+  
+    try {
      // Fail on time out object
      evaluate();
    
@@ -70,7 +68,8 @@ public class studentrecCGcdPROG
     	
         throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
     }
-    if ( studentAnswer == modelGCD(x,y)) SUCCESS = true;
+    
+    if (studentAnswer == modelrecursiveMin(numbers,0)) SUCCESS = true;
 
     try{
 
@@ -83,7 +82,7 @@ public class studentrecCGcdPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect base case or base case action!");
+     output.println("Try Again! Incorrect recursive call!");
      output.close();
     }
   

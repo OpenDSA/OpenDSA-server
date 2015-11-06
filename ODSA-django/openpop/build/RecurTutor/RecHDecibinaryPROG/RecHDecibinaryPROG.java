@@ -1,25 +1,24 @@
-
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Exercise 10: complete the cummulative sum function
+//Exercise 16:  prints the binary equivalent of an integer N
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecCSumtokPROG
+public class studentRecHDecibinaryPROG
 {
-
-    public static  long fTimeout=1;
+    public static  long fTimeout=5;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
-    public static int studentAnswer;
-    public static int k;
+    public static String studentAnswer;
+    public static int number;
+    
     public static void evaluate() throws Throwable {
 	    Thread thread= new Thread() {
 		@Override
 		public void run() {
 		 try {
-		  studentAnswer = sumtok(k);
+		  studentAnswer = decibinary(number);
 		  fFinished= true;
 		 } 
           catch (Throwable e) {
@@ -41,30 +40,25 @@ public class studentrecCSumtokPROG
 	
 	}
  
- public static int modelmystery(int k) 
- {
-
-  if (k <= 0) {
-
-   return 0;
- }
-
- else {
  
-  return k + modelmystery(k - 1);
-
+ public static String modeldecibinary (int num)
+  {
+   if ( num < 2)
+     return Integer.toString(num);
+   else
+      return modeldecibinary(num/2) + Integer.toString(num%2);
   }
-
- }
+	
+     
 	
   public static void main(String [ ] args) {
     boolean SUCCESS = false;
-    
-    // To test: generate a random number
+   
     Random randNumGenerator = new Random();
-    k=  randNumGenerator.nextInt(100)+1;
     
-    try {
+    number=  (randNumGenerator.nextInt(20)+1);
+    
+	try {
      // Fail on time out object
      evaluate();
    
@@ -73,7 +67,7 @@ public class studentrecCSumtokPROG
         throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
     }
     
-    if ( studentAnswer == modelmystery(k)) SUCCESS = true;
+    if (studentAnswer.equals(modeldecibinary(number))) SUCCESS = true;
 
     try{
 
@@ -86,7 +80,7 @@ public class studentrecCSumtokPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect recursive call!");
+     output.println("Try Again! Incorrect recursive call or action!");
      output.close();
     }
   

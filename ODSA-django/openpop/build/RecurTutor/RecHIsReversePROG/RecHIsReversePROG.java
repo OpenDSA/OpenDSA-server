@@ -5,7 +5,7 @@ import java.io.*;
 import java.util.Random;
 
 
-public class studentrecHIsReversePROG
+public class studentRecHIsReversePROG
 {
     public static  long fTimeout= 3;
     public static boolean fFinished= false;

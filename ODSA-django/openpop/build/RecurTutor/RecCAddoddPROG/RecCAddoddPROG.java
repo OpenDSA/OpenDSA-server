@@ -1,24 +1,25 @@
+
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Exercise 17:  determines the minimum element in an array of integers
+//Exercise 4:sum of all positive odd numbers less than or equal to n
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecHMinPROG
+public class studentRecCAddoddPROG
 {
-    public static  long fTimeout=5;
+    public static  long fTimeout=1;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
     public static int studentAnswer;
-    public static int[] numbers = new int[5];
+    public static int n;
     
     public static void evaluate() throws Throwable {
 	    Thread thread= new Thread() {
 		@Override
 		public void run() {
 		 try {
-		  studentAnswer = recursiveMin(numbers,0);
+		  studentAnswer = addodd(n);
 		  fFinished= true;
 		 } 
           catch (Throwable e) {
@@ -38,28 +39,31 @@ public class studentrecHMinPROG
 		exception.setStackTrace(thread.getStackTrace());
 		throw exception;
 	
-	} 
- 
- 
- public static  int modelrecursiveMin(int numbers[] , int startIndex)
-{ 
-  if(startIndex == numbers.length-1)
-    return numbers[startIndex];
+	}
+	
+ public static int modelOddRecursive(int n) {
+  if(n<=0)
+  {
+    return 0;    
+  }
+  if(n%2 != 0)
+  {
+    return (n+ modelOddRecursive(n-1));
+  }
   else
-    return Math.min(numbers[startIndex], modelrecursiveMin(numbers , startIndex+1));	
+  {
+    return modelOddRecursive(n-1);
+  }
+      
 }
-	  
+ 
+
   public static void main(String [ ] args) {
     boolean SUCCESS = false;
-   
-    // To test: generate a random array of length 10
+    
+    // To test: generate a random number
     Random randNumGenerator = new Random();
-  
-    for (int i=0; i< numbers.length; i++)
-    {
-       numbers[i] = (randNumGenerator.nextInt(20)+1);
-    }
-  
+    n=  randNumGenerator.nextInt(100)+1;
     try {
      // Fail on time out object
      evaluate();
@@ -69,7 +73,7 @@ public class studentrecHMinPROG
         throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
     }
     
-    if (studentAnswer == modelrecursiveMin(numbers,0)) SUCCESS = true;
+    if ( studentAnswer == modelOddRecursive(n)) SUCCESS = true;
 
     try{
 

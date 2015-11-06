@@ -1,24 +1,26 @@
+
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Exercise 13: takes a non-negative integer and returns the sum of its digits. For example, sumOfDigits(1234) returns 1+2+3+4 =10
+//Exercise 5: multiply two  numbers x and y. (Assume both values given are positive.)
 import java.io.*;
 import java.util.Random;
 
 
-public class studentrecCSumOfDigitsPROG
+public class studentRecCMultiplyPROG
 {
+	
     public static  long fTimeout=1;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
     public static int studentAnswer;
-    public static int number;
-    
+    public static int x;
+    public static int y;
     public static void evaluate() throws Throwable {
 	    Thread thread= new Thread() {
 		@Override
 		public void run() {
 		 try {
-		  studentAnswer = sumOfDigits(number);
+		  studentAnswer = multiply(x , y);
 		  fFinished= true;
 		 } 
           catch (Throwable e) {
@@ -39,24 +41,30 @@ public class studentrecCSumOfDigitsPROG
 		throw exception;
 	
 	}
-	
- public static int modelsumOfDigits(int number)
- {  
-    if(number/10 == 0)
-      return number;    
-    return number%10 + modelsumOfDigits(number/10);
- }
 
-     
-	
+ 
+ public static int modelmult(int x, int y) {
+
+    if ( x == 1 )
+    
+      return y;
+
+     else
+
+     return modelmult(x-1, y) + y;
+     }
+ 
+
   public static void main(String [ ] args) {
     boolean SUCCESS = false;
     
-   
+    // To test: generate a random number
     Random randNumGenerator = new Random();
-    number=  randNumGenerator.nextInt(1000000);
-	
-	try {
+    x=  randNumGenerator.nextInt(100)+1;
+    y=  randNumGenerator.nextInt(100)+1;
+
+
+    try {
      // Fail on time out object
      evaluate();
    
@@ -64,8 +72,7 @@ public class studentrecCSumOfDigitsPROG
     	
         throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
     }
-    
-    if ( studentAnswer == modelsumOfDigits(number)) SUCCESS = true;
+    if ( studentAnswer == modelmult(x,y)) SUCCESS = true;
 
     try{
 
@@ -78,7 +85,7 @@ public class studentrecCSumOfDigitsPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect recursive call!");
+     output.println("Try Again! Incorrect Base case condition or base case action!");
      output.close();
     }
   
