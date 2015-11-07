@@ -852,8 +852,8 @@ class ModuleResource(ModelResource):
             book_obj = json.loads(attr,
                        object_pairs_hook=collections.OrderedDict)
 
-        username = book_obj["username"]
-        password = book_obj["password"]
+        username = book_obj["odsa_username"]
+        password = book_obj["odsa_password"]
 
         kusername = authenticate(username=username, password=password)
 
@@ -1003,15 +1003,18 @@ class ModuleResource(ModelResource):
                                                     exers_.append(kexercise)
 
             response['saved'] = True
+
             # create book json file
-            if book_obj['build_date']:
-                build_date = datetime.datetime.strptime(
-                    book_obj['build_date'], '%Y-%m-%d %H:%M:%S')
-                print(build_date)
-                if kbook.creation_date != build_date:
-                    create_book_file(kbook)
-                    kbook.creation_date = build_date
-                    kbook.save()
+            kbook.creation_date = datetime.datetime.now()
+            kbook.save()
+            # if book_obj['build_date']:
+            #     build_date = datetime.datetime.strptime(
+            #         book_obj['build_date'], '%Y-%m-%d %H:%M:%S')
+            #     print(build_date)
+            #     if kbook.creation_date != build_date:
+            #         create_book_file(kbook)
+            #         kbook.creation_date = build_date
+            #         kbook.save()
 
             return self.create_response(request, response)
         else:
