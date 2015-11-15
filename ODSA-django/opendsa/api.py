@@ -847,10 +847,8 @@ class ModuleResource(ModelResource):
 
     def loadbook(self, request, **kwargs):
         """ Register Book"""
-
-        for attr in request.POST:
-            book_obj = json.loads(attr,
-                       object_pairs_hook=collections.OrderedDict)
+        book_obj = json.loads(request.body,
+                   object_pairs_hook=collections.OrderedDict)
 
         username = book_obj["odsa_username"]
         password = book_obj["odsa_password"]
@@ -861,21 +859,21 @@ class ModuleResource(ModelResource):
             response = {}
             response['saved'] = False
 
-            # get canvas course information
+            # get LMS course information
             course_id = book_obj['course_id']
-            canvas_url = book_obj['canvas_url']
-            canvas_parsed_url = urlparse(canvas_url)
+            LMS_url = book_obj['LMS_url']
+            LMS_parsed_url = urlparse(LMS_url)
 
             course_code = book_obj['course_code']
 
             # Register the book to OpenDSA server
-            kbook = get_book(sha1(canvas_parsed_url.netloc + '-' + str(course_id)).hexdigest())
+            kbook = get_book(sha1(LMS_parsed_url.netloc + '-' + str(course_id)).hexdigest())
 
             if kbook is None:
                 with transaction.commit_on_success():
                     kbook, added = Books.objects.get_or_create(
-                        book_name=sha1(canvas_parsed_url.netloc + '-' + str(course_id)).hexdigest(),
-                        book_url=canvas_parsed_url.netloc + '/courses/' + str(course_id) + '-' + course_code,
+                        book_name=sha1(LMS_parsed_url.netloc + '-' + str(course_id)).hexdigest(),
+                        book_url=LMS_parsed_url.netloc + '/courses/' + str(course_id) + '-' + course_code,
                         creation_date=datetime.datetime.now())
                     ubook, created = UserBook.objects.get_or_create(
                         user=kusername,
@@ -898,7 +896,7 @@ class ModuleResource(ModelResource):
             # delete book chapters
             BookChapter.objects.filter(book=kbook).delete()
             for chapter in book_obj['chapters']:
-              # get or create chapter
+                # get or create chapter
                 kchapter = get_chapter(kbook, chapter)
                 # First we delete chaper entry already in DB
                 if kchapter is not None:
