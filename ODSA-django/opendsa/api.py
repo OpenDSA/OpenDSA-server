@@ -47,8 +47,6 @@ import hmac
 import datetime
 import time
 
-from canvas_sdk.methods import accounts, courses, external_tools, modules, assignments
-from canvas_sdk import RequestContext
 import collections
 import threading
 from urlparse import urlparse
