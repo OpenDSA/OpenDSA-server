@@ -7,6 +7,6 @@ output = stunnel.log
 options = NO_SSLv2
 
 [https]
-accept=128.173.54.37:8443
+accept=0.0.0.0:8443
 connect=8001
 TIMEOUTclose=1
