@@ -7,7 +7,7 @@ import java.io.*;
 //import java.util.Random;
 
 
-public class studentrecWChckPlndrmPROG
+public class studentRecWCheckPalPROG
 {
     public static  long fTimeout= 10;
     public static boolean fFinished= false;

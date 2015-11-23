@@ -1,25 +1,27 @@
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
+//Exercise 20:  recursive function which takes a row and a column and finds the value at that position in the Pascal's triangle. 
 
 import java.io.*;
 import java.util.Random;
-import java.util.Stack;
-import java.util.*;
-import java.awt.*;
 
-public class studentrecWStckRevrsPROG
+
+public class studentRecWPascalPROG
 {
-	public static  long fTimeout= 10;
+    public static  long fTimeout= 10;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
-    public static Stack <Integer> lifo2 = new Stack <Integer> ();;
-        
+    public static int studentAnswer;
+    public static int row;
+    public static int column;
+    
+            
     public static void evaluate() throws Throwable {
 	    Thread thread= new Thread() {
 		@Override
 		public void run() {
 		 try {
-		  stackReversal(lifo2);  
+		  studentAnswer = pascal(row, column);
 		  fFinished= true;
 		 } 
           catch (Throwable e) {
@@ -39,52 +41,24 @@ public class studentrecWStckRevrsPROG
 		exception.setStackTrace(thread.getStackTrace());
 		throw exception;
 	
-	}      
- 
- public  static <T> boolean compareStacks(Stack<T> a, Stack<T> b) {
-    if (a.isEmpty() != b.isEmpty()) return false; 
-    if (a.isEmpty() && b.isEmpty()) return true; 
-    T element_a = a.pop(); 
-    T element_b = b.pop();
-    try {
-        if (((element_a==null) && (element_b!=null)) || (!element_a.equals(element_b)))
-            return false;
-        return compareStacks(a, b); 
-    } finally { // restore elements
-        a.push(element_a); 
-        b.push(element_b);
-    }
- }
-
-
- public static  void modelstackReversal(Stack<Integer> s)
-   {
-   if(s.size() == 0)  
-    return; 
-   int n = popBottom(s);
-   modelstackReversal(s);   
-   s.push(n);
-  }
-
- 
+	}     
+	 
+ public static  int  modelpascal(int row, int column)
+{
+   if ((row+1)==1 || (column+1)==1 || row==column)
+     return 1;
+   else
+     return modelpascal(row-1, column-1) + modelpascal(row-1, column);	
+}
 	  
  public static void main(String [ ] args) {
   
-   boolean SUCCESS = false;
+    boolean SUCCESS = false;
 
-    Stack <Integer> lifo = new Stack <Integer> ();
-    lifo.push(1);
-    lifo.push(2);
-    lifo.push(3);
-    lifo.push(4);
+    Random randNumGenerator = new Random();
     
-    modelstackReversal(lifo);
-     
-    lifo2.push(1);
-    lifo2.push(2);
-    lifo2.push(3);
-    lifo2.push(4);
-   
+    row = randNumGenerator.nextInt(10)+1;
+    column = randNumGenerator.nextInt(10)+1;
     
     
     try {
@@ -95,10 +69,24 @@ public class studentrecWStckRevrsPROG
     	
         throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
     }
-      
     
-    if (compareStacks(lifo , lifo2)) SUCCESS = true;
+    if (studentAnswer == modelpascal(row, column))  SUCCESS = true;
 
+    row = randNumGenerator.nextInt(10)+1;
+    column = randNumGenerator.nextInt(10)+1;
+    SUCCESS = false;
+    
+    try {
+     // Fail on time out object
+     evaluate();
+   
+    } catch(Throwable t) {
+    	
+        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+    }
+
+    if (studentAnswer == modelpascal(row, column))  SUCCESS = true;
+    
     try{
 
      PrintWriter output = new PrintWriter("output");
