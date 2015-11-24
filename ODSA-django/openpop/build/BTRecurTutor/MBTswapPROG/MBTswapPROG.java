@@ -151,7 +151,7 @@ public class studentMBTswapPROG
      }
     else 
     {
-     output.println("Try Again! Your answer is not correct for all test cases. For example if the first tree is:\n " + tree1AsString + "\n and the second tree is:\n "+ tree2AsString + " \n, your code changes the first tree to:\n  " + studentAnswerrt1 +"and the second tree to:\n"+ studentAnswerrt2+ " while the expected answer is the trees swapped.");  
+     output.println("Try Again! Your answer is not correct for all test cases. For example, if the first tree is:\n " + tree1AsString + "\n and the second tree is:\n "+ tree2AsString + " \n, then your code changes the first tree to:\n  " + studentAnswerrt1 +"and the second tree to:\n"+ studentAnswerrt2+ ". The expected answer is the trees swapped.");  
      output.close();
     }
   

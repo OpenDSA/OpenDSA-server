@@ -147,7 +147,7 @@ public static boolean checkEqualTrees(BSTNode a, BSTNode b) {
     else 
     {
      
-     output.println("Try Again! Your answer is not correct for all test cases. For example if the given tree is:\n " + treeAsString + ", your code returns:\n  " + studentAnswer+ " \n while the expected answer is:\n " + modelAnswer); 
+     output.println("Try Again! Your answer is not correct for all test cases. For example, if the given tree is:\n " + treeAsString + ", then your code returns:\n  " + studentAnswer+ " \n. The expected answer is:\n " + modelAnswer); 
      output.close();
      
     }
