@@ -17,17 +17,11 @@ TEMPLATE_DEBUG = DEBUG
 # gist middleware variables
 XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta6.cc.vt.edu',
                               'http://algoviz-beta.cs.vt.edu',
-                              'http://algoviz.org',
                               'http://algoviz-beta7.cc.vt.edu',
-                              'http://opendsa.local',
-                              'http://ltitest.cs.vt.edu:9000',
-                              'http://lti.cs.vt.edu:8000',
-                              'http://localhost:8000',
-                              'http://localhost:8003',
-                              'https://ltitest.cs.vt.edu:9292',
-                              'https://lti.cs.vt.edu:9292',
+                              'http://algoviz.org',
                               'https://lti.cs.vt.edu',
-                              'https://ltitest.herokuapp.com']
+                              'https://ltitest.cs.vt.edu:9292',
+                              'https://192.168.33.10:9292']
 XS_SHARING_ALLOWED_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
 XS_SHARING_ALLOWED_HEADERS = ["Content-Type"]
 File_Path = conf.base_path+"/OpenDSA-server/ODSA-django/openpop/build/"
