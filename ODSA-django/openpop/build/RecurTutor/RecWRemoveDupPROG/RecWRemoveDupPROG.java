@@ -1,27 +1,25 @@
 /** Test program for recursion programming exercise.
 Author: Sally Hamouda */
-//Exercise 20:  recursive function which takes a row and a column and finds the value at that position in the Pascal's triangle. 
+//Exercise 27: modifies an array of Strings to remove duplicates.
+
 
 import java.io.*;
 import java.util.Random;
+import java.util.ArrayList;
 
-
-public class studentrecWPascalPROG
+public class studentRecWRemoveDupPROG
 {
-    public static  long fTimeout= 10;
+	public static  long fTimeout= 10;
     public static boolean fFinished= false;
     public static Throwable fThrown= null;
-    public static int studentAnswer;
-    public static int row;
-    public static int column;
-    
-            
+    public static ArrayList<String> studentList = new ArrayList<String>();
+        
     public static void evaluate() throws Throwable {
 	    Thread thread= new Thread() {
 		@Override
 		public void run() {
 		 try {
-		  studentAnswer = pascal(row, column);
+		  removeDuplicates(studentList , 0);
 		  fFinished= true;
 		 } 
           catch (Throwable e) {
@@ -41,40 +39,42 @@ public class studentrecWPascalPROG
 		exception.setStackTrace(thread.getStackTrace());
 		throw exception;
 	
-	}     
-	 
- public static  int  modelpascal(int row, int column)
+	}      
+
+ public static void modelremoveDuplicates(ArrayList<String> list, int counter)
+ {
+  if(counter < list.size()){
+   if(list.contains(list.get(counter))){
+    if(list.lastIndexOf(list.get(counter))!=counter)
+     {
+	list.remove(list.lastIndexOf(list.get(counter)));
+	counter--;
+      }
+     }
+     modelremoveDuplicates(list, ++counter);
+    }
+ }
+
+ public static void main(String [ ] args) 
 {
-   if ((row+1)==1 || (column+1)==1 || row==column)
-     return 1;
-   else
-     return modelpascal(row-1, column-1) + modelpascal(row-1, column);	
-}
-	  
- public static void main(String [ ] args) {
   
     boolean SUCCESS = false;
-
-    Random randNumGenerator = new Random();
+    ArrayList<String> modelList = new ArrayList<String>();
+    modelList.add("one");
+    modelList.add("one");
+    modelList.add("two");
+    modelList.add("two");
+    modelList.add("three");
+    modelList.add("three");
     
-    row = randNumGenerator.nextInt(10)+1;
-    column = randNumGenerator.nextInt(10)+1;
-    
-    
-    try {
-     // Fail on time out object
-     evaluate();
-   
-    } catch(Throwable t) {
-    	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
-    }
-    
-    if (studentAnswer == modelpascal(row, column))  SUCCESS = true;
-
-    row = randNumGenerator.nextInt(10)+1;
-    column = randNumGenerator.nextInt(10)+1;
-    SUCCESS = false;
+    modelremoveDuplicates(modelList , 0);
+ 
+    studentList.add("one");
+    studentList.add("one");
+    studentList.add("two");
+    studentList.add("two");
+    studentList.add("three");
+    studentList.add("three");
     
     try {
      // Fail on time out object
@@ -84,9 +84,10 @@ public class studentrecWPascalPROG
     	
         throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
     }
-
-    if (studentAnswer == modelpascal(row, column))  SUCCESS = true;
     
+    
+    if (studentList.equals(modelList)) SUCCESS = true;
+
     try{
 
      PrintWriter output = new PrintWriter("output");

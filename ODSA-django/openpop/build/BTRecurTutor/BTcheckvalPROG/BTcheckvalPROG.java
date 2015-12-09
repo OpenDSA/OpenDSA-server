@@ -134,7 +134,7 @@ public class studentBTcheckvalPROG
      }
     else 
     {
-     output.println("Try Again! Your answer is not correct for all test cases. For example if the given tree is:\n " + treeAsString + " and the searched value is " + (Integer)value + ", your code returns:  " + studentAnswer+ " while the expected answer is: " + modelAnswer); 
+     output.println("Try Again! Your answer is not correct for all test cases. For example, if the given tree is:\n " + treeAsString + " and the searched value is " + (Integer)value + ", then your code returns:  " + studentAnswer+ " . The expected answer is: " + modelAnswer); 
      output.close();
     }
   

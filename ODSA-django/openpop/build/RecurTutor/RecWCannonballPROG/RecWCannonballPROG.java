@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.Random;
 
 
-public class studentrecWCnonballPROG
+public class studentRecWCannonballPROG
 {
     public static  long fTimeout= 10;
     public static boolean fFinished= false;

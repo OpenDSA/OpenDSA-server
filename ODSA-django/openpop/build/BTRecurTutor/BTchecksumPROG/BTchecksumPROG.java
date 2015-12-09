@@ -145,7 +145,7 @@ public class studentBTchecksumPROG
      }
     else 
     {
-      output.println("Try Again! Your answer is not correct for all test cases. For example if the given tree is:\n " + treeAsString + ", your code returns:  " + studentAnswer+ " while the expected answer is: " + modelAnswer);     
+      output.println("Try Again! Your answer is not correct for all test cases. For example, if the given tree is:\n " + treeAsString + ",then your code returns: " + studentAnswer+ ". The expected answer is: " + modelAnswer);     
       output.close();
     }
   

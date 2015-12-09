@@ -207,7 +207,7 @@ public class studentBTpathsumPROG
      }
     else 
     { 
-     output.println("Try Again! Your answer is not correct for all test cases. For example if the given tree is:\n " + treeAsString + " and the sub-sum is " + sum + ", your code returns:  " + studentAnswer+ " while the expected answer is: " + modelAnswer+".");
+     output.println("Try Again! Your answer is not correct for all test cases. For example, if the given tree is:\n " + treeAsString + " and the sub-sum is " + sum + ", then your code returns:  " + studentAnswer+ ". The expected answer is: " + modelAnswer+".");
      output.close();
     }
   

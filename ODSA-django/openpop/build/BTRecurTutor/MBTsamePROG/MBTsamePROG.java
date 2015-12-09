@@ -138,7 +138,7 @@ public class studentMBTsamePROG
      }
     else 
     {
-    output.println("Try Again! Your answer is not correct for all test cases. For example if the first tree is:\n " + tree1AsString + "\n and the second tree is:\n "+ tree2AsString + " \n, your code returns:  " + studentAnswer+ " while the expected answer is: " + modelAnswer+".");  
+    output.println("Try Again! Your answer is not correct for all test cases. For example, if the first tree is:\n " + tree1AsString + "\n and the second tree is:\n "+ tree2AsString + " \n, then your code returns:  " + studentAnswer+ ". The expected answer is: " + modelAnswer+".");  
     output.close();
     }
   

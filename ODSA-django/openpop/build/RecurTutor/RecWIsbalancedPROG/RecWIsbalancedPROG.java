@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.Random;
 
 
-public class studentrecWIsbalancPROG
+public class studentRecWIsbalancedPROG
 {
     public static  long fTimeout= 10;
     public static boolean fFinished= false;
@@ -50,13 +50,7 @@ public static boolean modelisBalanced(String str) {
         return modelisBalanced(str.replaceFirst("\\(\\)", ""));
     }
 
-    if (str.contains("[]")) {
-        return modelisBalanced(str.replaceFirst("\\[\\]", ""));
-    }
-
-    if (str.contains("{}")) {
-        return modelisBalanced(str.replaceFirst("\\{\\}", ""));
-    } else {
+    else {
         return false;
     }
 		
@@ -68,7 +62,7 @@ public static boolean modelisBalanced(String str) {
     boolean SUCCESS1 = false;
     boolean SUCCESS2 = false;
 
-    str="{{}}";
+    str="(())";
          
     try {
      // Fail on time out object
@@ -81,7 +75,7 @@ public static boolean modelisBalanced(String str) {
     
     if (studentAnswer == modelisBalanced(str)) SUCCESS1 = true;
     
-    str="{{{}{{";
+    str="((()((";
 
     
     try {
