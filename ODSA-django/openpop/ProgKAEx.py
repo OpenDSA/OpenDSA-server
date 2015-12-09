@@ -1,23 +1,33 @@
 # Create your views here.
-from opendsa.models import  UserExercise, UserExerciseLog, UserData , UserProgLog
+
+import sys
+sys.path.append('/vagrant/OpenDSA-server/ODSA-django')
+sys.path.append('/vagrant/OpenDSA-server/ODSA-django/openpop')
+sys.path.append('/vagrant/OpenDSA-server/ODSA-django/openpop/javavisualizer/frontAndBackendFiles/backendFiles')
+import os
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+
+import opendsa.models
+#import UserExercise, UserExerciseLog, UserData , UserProgLog
 from opendsa.exercises import update_module_proficiency
-from opendsa import models 
+#from opendsa import models
+ 
 from decimal import Decimal                         
 from django.http import HttpResponse
 import xml.etree.ElementTree as xml # for xml parsing
-import shlex # for strings splitting
+import shlex # forstrings splitting
 import re # for special characters escaping
-import os
 import subprocess
 import datetime
 import codecs
 import unicodedata
-import sys
+import JsonFilter
+from JsonFilter import *
 import string
 import time, sys
 import shutil
-from btsemanticCodeAnalysis import btcheckEfficientCode
-from pntrsemanticCodeAnalysis import pntrcheckEfficientCode
+from pntrsemanticCodeAnalysis  import pntrcheckEfficientCode
+import btsemanticCodeAnalysis
 #from subprocess import call
 #import pdb; pdb.set_trace()
 
@@ -35,7 +45,7 @@ import settings
 def attempt_problem_pop(user_data, user_exercise, attempt_number,
     completed, count_hints, time_taken, attempt_content, module,   
     ex_question, ip_address, request_post):
-    
+       
     data = request_post.get('code') 
     
     generatedList =request_post.get('genlist')
@@ -169,13 +179,15 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
     filesPath = settings.File_Path  + testfoldername+'/'
  
     testfilename = testfilenamep+".java"
+
     studentfilename = "student"+testfilename
     
-    peruserFilesPath = filesPath + str(user_data.user.username)+'/'
+    peruserFilesPath = filesPath + str('Medha')+'/' #user_data.user.username)+'/'
     #print testfilenamep
-    print peruserFilesPath 
+    print peruserFilesPath
+    print 'pointers'
     # count the number of lines in the original test file so that we can have the error shown to the student with respect to the student's code
-    if progexType == "pointers":
+    if progexType == "pointers":      
       TestFile = open(filesPath+testfilenamep+"part1.java" , 'r')
       with TestFile:
         for i, l in enumerate(TestFile):
@@ -233,7 +245,7 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
        TestFilepart2 = open(filesPath+testfilenamep+"part2.java" , 'r')
        testpart2 = TestFilepart2.read()
        answer.write(data) 
-       answer.write(testpart2)
+       answer.write(testpart2)       
     else:
        TestFile = open(filesPath+testfilename , 'r')
        test = TestFile.read()
@@ -322,38 +334,56 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
        successFile = open(peruserFilesPath+'output' , 'r')
        feedback[1] = successFile.readlines()
        print feedback[1] 
-       for line in feedback[1]:
-		   # it is correct but..for recursion check they are doing it recursively
-		   # it is correct but..for binary trees check they are doing it in the effecient way
-           if "Well Done" in line: # static code analysis
-	      if progexType == "binarytree": 
-		   efficient,btineffFB = btcheckEfficientCode(data , testfilenamep)
-		   if efficient == True:
-	 	     feedback[0] = True
-	 	     return feedback , peruserFilesPath
-                   else:
-		     feedback[0] = False
-		     feedback[1]= btineffFB
-		     return feedback , peruserFilesPath
-					
-              elif progexType =="pointers": 
-		    efficient,pntrineffFB = pntrcheckEfficientCode(data , testfilenamep)
-		    if efficient == True:
-	               feedback[0] = True
-		       return feedback , peruserFilesPath
-	            else:
-		       feedback[0] = False
-		       feedback[1]= pntrineffFB
-		       return feedback , peruserFilesPath
-					 
-	      feedback[0] = True
-	      return feedback , peruserFilesPath
+       for line in feedback[1]:# it is correct but..for recursion check they are doing it recursively
+         # it is correct but..for binary trees check they are doing it in the effecient way
+         if "Well Done" in line: # static code analysis
+            if progexType == "binarytree": 
+               efficient,btineffFB = btcheckEfficientCode(data , testfilenamep)
                
-           else:
+               
+               
+               if efficient == True:
+                  feedback[0] = True
+                  return feedback , peruserFilesPath
+               else:
+                  feedback[0] = False
+                  feedback[1]= btineffFB
+                  return feedback , peruserFilesPath					
+            elif progexType =="pointers": 
+               efficient,pntrineffFB = pntrcheckEfficientCode(data , testfilenamep)                             
+               javascriptFileData = seperateAndFilterTrace(studentfilename, "/vagrant/OpenDSA-server/ODSA-django/openpop/build/pntrtest/pntrequalspntrPROG/Medha/", "/vagrant/OpenDSA-server/ODSA-django/openpop/build/pntrtest/pntrequalspntrPROG/", "Medhaa")
+               codeScript = open("/vagrant/OpenDSA/Exercises/Pointers/visualResponses/codeScript.js", 'w')
+               codeScript.write(javascriptFileData)               
+               codeScript.close()
+       
+               if efficient == True:
+                  feedback[0] = True
+                  return feedback , peruserFilesPath
+               else:
+                  feedback[0] = False
+                  feedback[1]= pntrineffFB
+                  return feedback , peruserFilesPath					 
+               feedback[0] = True
+               return feedback , peruserFilesPath               
+            else:
               feedback[0] = False
               return feedback , peruserFilesPath
 
     feedback[1]=['Try Again Later!']
     return feedback , peruserFilesPath
+   
+# assessprogkaex("Link Mthird = new Link(3,null);"
+#                +"Link Msecond = new Link(2,Mthird);"
+#                +"Link Mfirst = new Link(1,Msecond); "
+#                +"Link Mp;"
+#                +"Link Mq;"
+#                +"Link Mr;"+	
+#   "Mp = Mfirst;Mq = Msecond;Mp = Mq; returnLink = Mq ;\n ", "pntrequalspntrPROG", "pntrequalspntrPROG", "Link p = createList(1,2,3);Link q = p.next();p = q;", 'False', "listoftypes", "pointers", "")
+
+#assessprogkaex("Link p = createList(1,2,3);Link q = p.next();//Insert Your Code Here \np=q;", "pntrequalspntrPROG", "pntrequalspntrPROG", "<1 2 3>", 'False', "listoftypes", "pointers", "")
+[feedback, filepath] = setparameters("pntrequalspntrPROG","Link p = createList(1,2,3);Link q = p.next();//Insert Your Code Here \np=q;", "<1 2 3>", 'False', "", "pointers", "")
+print feedback
+print filepath
+
 
                 

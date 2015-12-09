@@ -1,14 +1,6 @@
-	if( checkIfLinksLinked(first,second,third) == true) 
-	{
-		returnLink = p; 
-	}
-	else 
-	{
-		returnLink = r;
-	}
-	
-	return returnLink; 
-
-	}
+	endTraceNow();
+	return q;
+	}    
+    public static void endTraceNow(){}
 
 }

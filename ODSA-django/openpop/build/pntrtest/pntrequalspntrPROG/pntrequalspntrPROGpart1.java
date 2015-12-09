@@ -110,18 +110,18 @@ public static boolean checkIfLinksLinked(Link front, Link middle, Link end){
     
     return linkFlag; 
 }
+public static Link createList(int one, int two, int three) { 
+    
+    Link tail = new Link(three,null); 
+    Link next = new Link(two,tail); 
+    Link head = new Link(one,next); 
+    
+    return head; 
+}
 
- public static Link reAssignPointer() { 
-	 
-	 Link returnLink; 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-
-
+public static void startTraceNow()
+{
+  
+}
+ public static Link reAssignPointer() {	
+	startTraceNow();
