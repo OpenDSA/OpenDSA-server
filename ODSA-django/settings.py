@@ -24,7 +24,7 @@ XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta6.cc.vt.edu',
                               'https://192.168.33.10:9292']
 XS_SHARING_ALLOWED_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
 XS_SHARING_ALLOWED_HEADERS = ["Content-Type"]
-File_Path = conf.base_path+"/OpenDSA-server/ODSA-django/openpop/build/"
+File_Path = conf.base_path+"/OpenDSA-server/ODSA-django/proginfrastructure/build/"
 
 APPEND_SLASH = True
 
