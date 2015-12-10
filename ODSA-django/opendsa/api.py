@@ -37,7 +37,7 @@ from opendsa.exercises import attempt_problem, \
     attempt_problem_pe, update_module_proficiency, \
     student_grade_all, date_from_timestamp
 
-from openpop.ProgKAEx import attempt_problem_pop
+from proginfrastructure.ProgKAEx import attempt_problem_pop
 from django.conf import settings
 from django.core.mail import send_mail
 
