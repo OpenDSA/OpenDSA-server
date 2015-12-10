@@ -7,42 +7,57 @@ import djcelery
 djcelery.setup_loader()
 
 # Returns the path to given filename
+
+
 def get_path(filename):
     return os.path.join(os.path.dirname(__file__), filename)
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-#gist middleware variables
-XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta.cs.vt.edu','http://algoviz.org','https://trak.cs.hut.fi']
-XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
-XS_SHARING_ALLOWED_HEADERS = ["Content-Type"] 
-File_Path = "/home/OpenDSA-server/ODSA-django/openpop/build/"
+# gist middleware variables
+XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta6.cc.vt.edu',
+                              'http://algoviz-beta.cs.vt.edu',
+                              'http://algoviz-beta7.cc.vt.edu',
+                              'http://algoviz.org',
+                              'https://lti.cs.vt.edu',
+                              'https://ltitest.cs.vt.edu:9292',
+                              'https://192.168.33.10:9292']
+XS_SHARING_ALLOWED_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
+XS_SHARING_ALLOWED_HEADERS = ["Content-Type"]
+File_Path = conf.base_path+"/OpenDSA-server/ODSA-django/openpop/build/"
 
-APPEND_SLASH=True
+APPEND_SLASH = True
 
-ACCOUNT_ACTIVATION_DAYS = 365 
+ACCOUNT_ACTIVATION_DAYS = 365
 
-#celery broker
-#BROKER_URL = 'amqp://guest:guest@localhost:5672/'
-BROKER_URL = "django://" 
- 
+# celery broker
+# BROKER_URL = 'amqp://guest:guest@localhost:5672/'
+BROKER_URL = "django://"
+
 # This URL is used when building absolute URLs to this service
 BASE_URL = ""
 
 ADMINS = (
-     ('', ''),
+    ('', ''),
 )
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': conf.name,         #g3et_path('test.db'),            # Or path to database file if using sqlite3.
+        # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or
+        # 'oracle'.
+        'ENGINE': 'django.db.backends.mysql',
+        # g3et_path('test.db'),            # Or path to database file if using
+        # sqlite3.
+        'NAME': conf.name,
         'USER': conf.user,                  # Not used with sqlite3. dbadmin
-        'PASSWORD': conf.password,                  # Not used with sqlite3. vis4_dsa
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        # Not used with sqlite3. vis4_dsa
+        'PASSWORD': conf.password,
+        # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': '',
+        # Set to empty string for default. Not used with sqlite3.
+        'PORT': '',
     }
 }
 
@@ -66,7 +81,8 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/var/www/media/'   #get_path("media/")
+# get_path("media/")
+MEDIA_ROOT = conf.base_path+'/OpenDSA-server/ODSA-django/media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -85,7 +101,7 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    "/home/efouh/OpenDSA-server/ODSA-django/assets/",
+    conf.base_path+"/OpenDSA-server/ODSA-django/assets/",
     #"/home/aalto/aaltoplus/assets"
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
@@ -102,17 +118,19 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = conf.secret_key 
+SECRET_KEY = conf.secret_key
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader', # Replace 'Loader' with 'load_template_source' if Django version is < 1.4.1
-    'django.template.loaders.app_directories.Loader', # Replace 'Loader' with 'load_template_source' if Django version is < 1.4.1
-#     'django.template.loaders.eggs.load_template_source',
+    # Replace 'Loader' with 'load_template_source' if Django version is < 1.4.1
+    'django.template.loaders.filesystem.Loader',
+    # Replace 'Loader' with 'load_template_source' if Django version is < 1.4.1
+    'django.template.loaders.app_directories.Loader',
+    #     'django.template.loaders.eggs.load_template_source',
 )
 
 # Cache backends
@@ -158,7 +176,7 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
-#STATICFILES_DIRS = (
+# STATICFILES_DIRS = (
 #    get_path("assets"),
 #)
 
@@ -170,10 +188,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.admin',
-    'django.contrib.humanize', 
+    'django.contrib.humanize',
     'exercise',
     'course',
-    #'south', # South disabled due to refactoring of the database 
+    # 'south', # South disabled due to refactoring of the database
     'inheritance',
     'tastypie',
     'userprofile',
@@ -193,9 +211,9 @@ LOGIN_REDIRECT_URL = "/"
 AUTH_PROFILE_MODULE = 'userprofile.UserProfile'
 
 FILE_UPLOAD_HANDLERS = (
-                        #"django.core.files.uploadhandler.MemoryFileUploadHandler",
-                        "django.core.files.uploadhandler.TemporaryFileUploadHandler",
-                        )
+    #"django.core.files.uploadhandler.MemoryFileUploadHandler",
+    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
+)
 
 
 # Shibboleth settings
@@ -211,19 +229,17 @@ SHIB_ATTRIBUTE_MAP = {
 SHIB_USERNAME = "eppn"
 SHIB_EMAIL = "email"
 
-#EMAIL
+# EMAIL
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Host for sending e-mail.
-EMAIL_HOST = 'opendsa.cs.vt.edu'
+EMAIL_HOST = 'opendsa.cc.vt.edu'
 
 # Port for sending e-mail.
-EMAIL_PORT = 25 # 587
+EMAIL_PORT = 587
 
 # Optional SMTP authentication information for EMAIL_HOST.
-EMAIL_USE_TLS = False
-DEFAULT_FROM_EMAIL = 'opendsa.cs.vt.edu <noreply@opendsa.cs.vt.edu>'
+DEFAULT_FROM_EMAIL = 'opendsa.cc.vt.edu <noreply@opendsa.cc.vt.edu>'
 EMAIL_HOST_USER = 'root'
-EMAIL_HOST_PASSWORD = '' 
+EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = True
-

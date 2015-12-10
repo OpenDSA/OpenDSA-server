@@ -1,0 +1,5 @@
+secret_key = 'opendsa_secret_key'
+base_path = '/vagrant'
+name = 'opendsa'
+user = 'opendsa'
+password = 'opendsa'

@@ -1,0 +1,1727 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"section",
+				"section_name"
+			],
+			[
+				"no",
+				"no_exercise"
+			],
+			[
+				"exerc",
+				"exercise"
+			],
+			[
+				"json",
+				"json_obj"
+			],
+			[
+				"lo",
+				"loads"
+			],
+			[
+				"boo",
+				"book_json"
+			],
+			[
+				"jsno",
+				"json_obj"
+			],
+			[
+				"Po",
+				"POST"
+			],
+			[
+				"req",
+				"request"
+			],
+			[
+				"can",
+				"canvas_url"
+			],
+			[
+				"user",
+				"username"
+			],
+			[
+				"re",
+				"request"
+			],
+			[
+				"exer",
+				"exerciseName"
+			],
+			[
+				"sec",
+				"section_obj"
+			],
+			[
+				"sect",
+				"section"
+			],
+			[
+				"e",
+				"exerciseObj"
+			],
+			[
+				"type",
+				"typeIndex"
+			],
+			[
+				"newC",
+				"newContents"
+			],
+			[
+				"new",
+				"newContents"
+			],
+			[
+				"summ",
+				"summExercises"
+			],
+			[
+				"sum",
+				"summExercises"
+			],
+			[
+				"jsav",
+				"jsavExPath"
+			],
+			[
+				"Open",
+				"OpenPopKa"
+			],
+			[
+				"att",
+				"attemptData"
+			],
+			[
+				"ans",
+				"answerData"
+			],
+			[
+				"con",
+				"console"
+			],
+			[
+				"first",
+				"firstChild"
+			],
+			[
+				"insert",
+				"insertBefore"
+			],
+			[
+				"exe",
+				"exerciseId"
+			],
+			[
+				"bu",
+				"bubSortPRO"
+			],
+			[
+				"curent",
+				"currentExerciseId"
+			],
+			[
+				"module",
+				"moduleName"
+			],
+			[
+				"current",
+				"currentExerciseId"
+			],
+			[
+				"av",
+				"av_name"
+			],
+			[
+				"createc",
+				"createcourse"
+			],
+			[
+				"create",
+				"createcourse"
+			],
+			[
+				"init",
+				"initServerData"
+			],
+			[
+				"syn",
+				"syncProfError"
+			],
+			[
+				"mod",
+				"modName"
+			],
+			[
+				"mo",
+				"module"
+			],
+			[
+				"sync",
+				"syncProfError"
+			],
+			[
+				"syncProf",
+				"syncProfError"
+			],
+			[
+				"server",
+				"serverProfData"
+			],
+			[
+				"pro",
+				"proficient"
+			],
+			[
+				"err",
+				"error"
+			],
+			[
+				"erro",
+				"errorMsg"
+			],
+			[
+				"prof",
+				"proficient"
+			],
+			[
+				"por",
+				"proficiency"
+			],
+			[
+				"ex",
+				"exerciseName"
+			],
+			[
+				"point",
+				"points_progress"
+			],
+			[
+				"Prof",
+				"ProfStatus"
+			],
+			[
+				"to",
+				"toParams"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "OpenDSA-server.sublime-project",
+			"settings":
+			{
+				"buffer_size": 243,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "ODSA-django/opendsa/api.py",
+			"settings":
+			{
+				"buffer_size": 70620,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "SELECT * FROM t1 WHERE column1 = (SELECT column1 FROM t2);",
+			"settings":
+			{
+				"buffer_size": 58,
+				"line_ending": "Unix",
+				"name": "SELECT * FROM t1 WHERE column1 = (SELECT column1 F"
+			}
+		},
+		{
+			"contents": "{\"username\": \"opendsa\", \"password\": \"opendsa\", \"canvas_url\": \"https://canvas.instructure.com/api\", \"course_code\": \"CS3114_rev\", \"access_token\": \"7~98d8KnPbCj7wnA3GLyHIvh4yxHz7t2U6SPp7OLdvscWSN82qCnZbEWebFJVEb0b3\", \"consumer_key\": \"test\", \"consumer_secret\": \"secret\", \"build_date\": \"2015-09-28 13:08:33\", \"tool_name\": \"OpenDSA-LTI\", \"tool_url\": \"https://lti.cs.vt.edu:9292\", \"tool_xml_file\": \"tool_config.xml\", \"book_json\": {\"title\": \"CS3114 Fall 2014\", \"build_dir\": \"Books\", \"code_dir\": \"SourceCode/\", \"code_lang\": {\"Processing\": {\"ext\": [\"pde\"], \"label\": \"Processing\", \"lang\": \"java\"}, \"Java_Generic\": {\"ext\": [\"java\"], \"label\": \"Java (Generic)\", \"lang\": \"java\"}, \"C  \": {\"ext\": [\"cpp\", \"h\"], \"label\": \"C  \", \"lang\": \"C  \"}}, \"lang\": \"en\", \"module_origin\": \"https://lti.cs.vt.edu:9292\", \"exercise_server\": \"https://ltitest.cs.vt.edu:8443\", \"logging_server\": \"https://ltitest.cs.vt.edu:8443\", \"score_server\": \"https://ltitest.cs.vt.edu:8443\", \"build_JSAV\": false, \"allow_anonymous_credit\": true, \"suppress_todo\": true, \"glob_exer_options\": {\"JXOP-debug\": \"true\"}, \"chapters\": {\"Preface\": {\"Intro\": {\"long_name\": \"How to Use this System\", \"dispModComp\": true, \"exercises\": {}, \"sections\": {}}}, \"Binary Trees\": {\"Binary/BSTrev\": {\"long_name\": \"Binary Search Trees\", \"exercises\": {}, \"sections\": {\"Binary Search Tree Definition\": {\"dispModComp\": true}, \"BST Search\": {\"showsection\": true, \"BSTsearchCON\": {\"long_name\": \"BST Search Slideshow\", \"required\": false, \"points\": 0, \"threshold\": 1}}, \"BST Search Exercise\": {\"BSTsearchPRO\": {\"long_name\": \"BST Search Proficiency Exercise\", \"exer_options\": {\"JXOP-code\": \"none\", \"JXOP-feedback\": \"continuous\", \"JXOP-fixmode\": \"undo\"}, \"required\": true, \"points\": 1, \"threshold\": 0.9}}, \"BST Insert\": {\"BSTinsertCON\": {\"long_name\": \"BST Insert Slideshow\", \"required\": false, \"points\": 0, \"threshold\": 1}}, \"BST Insert Exercise\": {\"BSTinsertPRO\": {\"long_name\": \"BST Insert Proficiency Exercise\", \"exer_options\": {\"JXOP-code\": \"none\", \"JXOP-feedback\": \"continuous\", \"JXOP-fixmode\": \"undo\"}, \"required\": true, \"points\": 1, \"threshold\": 0.9}}, \"BST Remove Pt 1\": {\"BSTdeletemaxCON\": {\"long_name\": \"BST deletemax Slideshow\", \"required\": false, \"points\": 0, \"threshold\": 1}}, \"BST Remove Pt 2\": {\"BSTremoveCON\": {\"long_name\": \"BST remove Slideshow\", \"required\": false, \"points\": 0, \"threshold\": 1}}, \"BST Remove Exercise\": {\"BSTremovePRO\": {\"long_name\": \"BST Remove Proficiency Exercise\", \"exer_options\": {\"JXOP-code\": \"none\", \"JXOP-feedback\": \"continuous\", \"JXOP-fixmode\": \"undo\"}, \"required\": true, \"points\": 2, \"threshold\": 0.9}}, \"BST Analysis\": {}}}}}}}\nOrderedDict([(u'username', u'opendsa'), (u'password', u'opendsa'), (u'canvas_url', u'https://canvas.instructure.com/api'), (u'course_code', u'CS3114_rev'), (u'access_token', u'7~98d8KnPbCj7wnA3GLyHIvh4yxHz7t2U6SPp7OLdvscWSN82qCnZbEWebFJVEb0b3'), (u'consumer_key', u'test'), (u'consumer_secret', u'secret'), (u'build_date', u'2015-09-28 13:08:33'), (u'tool_name', u'OpenDSA-LTI'), (u'tool_url', u'https://lti.cs.vt.edu:9292'), (u'tool_xml_file', u'tool_config.xml'), (u'book_json', OrderedDict([(u'title', u'CS3114 Fall 2014'), (u'build_dir', u'Books'), (u'code_dir', u'SourceCode/'), (u'code_lang', OrderedDict([(u'Processing', OrderedDict([(u'ext', [u'pde']), (u'label', u'Processing'), (u'lang', u'java')])), (u'Java_Generic', OrderedDict([(u'ext', [u'java']), (u'label', u'Java (Generic)'), (u'lang', u'java')])), (u'C  ', OrderedDict([(u'ext', [u'cpp', u'h']), (u'label', u'C  '), (u'lang', u'C  ')]))])), (u'lang', u'en'), (u'module_origin', u'https://lti.cs.vt.edu:9292'), (u'exercise_server', u'https://ltitest.cs.vt.edu:8443'), (u'logging_server', u'https://ltitest.cs.vt.edu:8443'), (u'score_server', u'https://ltitest.cs.vt.edu:8443'), (u'build_JSAV', False), (u'allow_anonymous_credit', True), (u'suppress_todo', True), (u'glob_exer_options', OrderedDict([(u'JXOP-debug', u'true')])), (u'chapters', OrderedDict([(u'Preface', OrderedDict([(u'Intro', OrderedDict([(u'long_name', u'How to Use this System'), (u'dispModComp', True), (u'exercises', OrderedDict()), (u'sections', OrderedDict())]))])), (u'Binary Trees', OrderedDict([(u'Binary/BSTrev', OrderedDict([(u'long_name', u'Binary Search Trees'), (u'exercises', OrderedDict()), (u'sections', OrderedDict([(u'Binary Search Tree Definition', OrderedDict([(u'dispModComp', True)])), (u'BST Search', OrderedDict([(u'showsection', True), (u'BSTsearchCON', OrderedDict([(u'long_name', u'BST Search Slideshow'), (u'required', False), (u'points', 0), (u'threshold', 1)]))])), (u'BST Search Exercise', OrderedDict([(u'BSTsearchPRO', OrderedDict([(u'long_name', u'BST Search Proficiency Exercise'), (u'exer_options', OrderedDict([(u'JXOP-code', u'none'), (u'JXOP-feedback', u'continuous'), (u'JXOP-fixmode', u'undo')])), (u'required', True), (u'points', 1), (u'threshold', 0.9)]))])), (u'BST Insert', OrderedDict([(u'BSTinsertCON', OrderedDict([(u'long_name', u'BST Insert Slideshow'), (u'required', False), (u'points', 0), (u'threshold', 1)]))])), (u'BST Insert Exercise', OrderedDict([(u'BSTinsertPRO', OrderedDict([(u'long_name', u'BST Insert Proficiency Exercise'), (u'exer_options', OrderedDict([(u'JXOP-code', u'none'), (u'JXOP-feedback', u'continuous'), (u'JXOP-fixmode', u'undo')])), (u'required', True), (u'points', 1), (u'threshold', 0.9)]))])), (u'BST Remove Pt 1', OrderedDict([(u'BSTdeletemaxCON', OrderedDict([(u'long_name', u'BST deletemax Slideshow'), (u'required', False), (u'points', 0), (u'threshold', 1)]))])), (u'BST Remove Pt 2', OrderedDict([(u'BSTremoveCON', OrderedDict([(u'long_name', u'BST remove Slideshow'), (u'required', False), (u'points', 0), (u'threshold', 1)]))])), (u'BST Remove Exercise', OrderedDict([(u'BSTremovePRO', OrderedDict([(u'long_name', u'BST Remove Proficiency Exercise'), (u'exer_options', OrderedDict([(u'JXOP-code', u'none'), (u'JXOP-feedback', u'continuous'), (u'JXOP-fixmode', u'undo')])), (u'required', True), (u'points', 2), (u'threshold', 0.9)]))])), (u'BST Analysis', OrderedDict())]))]))]))]))]))])\n",
+			"settings":
+			{
+				"buffer_size": 6001,
+				"line_ending": "Unix",
+				"name": "{\"username\": \"opendsa\", \"password\": \"opendsa\", \"ca"
+			}
+		},
+		{
+			"contents": "Searching 2138 files for \"method_check\"\n\nUnable to open ~/workspaces/OpenDSA-server/ODSA-django/stunnel.log\n/home/hshahin/workspaces/OpenDSA-server/ODSA-django/opendsa/api.py:\n  287  \n  288      def login(self, request, **kwargs):\n  289:         self.method_check(request, allowed=['post'])\n  290          username = request.POST['username']\n  291          password = request.POST.get('password')\n  ...\n  312  \n  313      def logout(self, request, **kwargs):\n  314:         self.method_check(request, allowed=['get'])\n  315          if request.user and request.user.is_authenticated():\n  316              logout(request)\n  ...\n  469                  if 'non_summative' in request.POST:\n  470                      ex_question = request.POST['non_summative']\n  471:                 # self.method_check(request, allowed=['post'])\n  472                  if request.POST.get('code'):\n  473                      uexercise, messages = attempt_problem_pop(user_data,\n\n/home/hshahin/workspaces/OpenDSA-server/ODSA-django/tastypie/resources.py:\n  422          \"\"\"\n  423          allowed_methods = getattr(self._meta, \"%s_allowed_methods\" % request_type, None)\n  424:         request_method = self.method_check(request, allowed=allowed_methods)\n  425          method = getattr(self, \"%s_%s\" % (request_method, request_type), None)\n  426  \n  ...\n  467          return kwargs_subset\n  468  \n  469:     def method_check(self, request, allowed=None):\n  470          \"\"\"\n  471          Ensures that the HTTP method used on the request is allowed to be\n  ...\n  476  \n  477              # The most generic lookup.\n  478:             self.method_check(request, self._meta.allowed_methods)\n  479  \n  480              # A lookup against what's allowed for list-type methods.\n  481:             self.method_check(request, self._meta.list_allowed_methods)\n  482  \n  483              # A useful check when creating a new endpoint that only handles\n  484              # GET.\n  485:             self.method_check(request, ['get'])\n  486          \"\"\"\n  487          if allowed is None:\n  ...\n 1386          Should return a HttpResponse (200 OK).\n 1387          \"\"\"\n 1388:         self.method_check(request, allowed=['get'])\n 1389          self.is_authenticated(request)\n 1390          self.throttle_check(request)\n ....\n 1402          Should return a HttpResponse (200 OK).\n 1403          \"\"\"\n 1404:         self.method_check(request, allowed=['get'])\n 1405          self.is_authenticated(request)\n 1406          self.throttle_check(request)\n\n10 matches across 2 files\n",
+			"settings":
+			{
+				"buffer_size": 2542,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "ODSA-django/src/pip-delete-this-directory.txt",
+			"settings":
+			{
+				"buffer_size": 185,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": ".gitignore",
+			"settings":
+			{
+				"buffer_size": 516,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "def loadbook(self, request, **kwargs):\n    if request.POST['key']:\n        kusername = get_username(request.POST['key'])\n\n        if kusername and kusername.is_staff:\n            response = {}\n            response['saved'] = False\n            # get or create Book & link a book to user\n            kbook = get_book(request.POST['book'])\n\n            if kbook is None:\n                with transaction.commit_on_success():\n                    kbook, added = Books.objects.get_or_create(\n                        book_name=request.POST['book'],\n                        book_url=request.POST['url'])\n            # get and save book elements\n            book_json = simplejson.loads(request.POST['b_json'])\n\n            # We first delete all entries of the book\n            # in BookModuleExercise table\n            # for exer in \\\n            BookModuleExercise.components.filter(book=kbook).delete()\n            # if exer not in exers_:\n            #    BookModuleExercise.components.filter(book = kbook,\n            #                                   exercise = exer).delete()\n\n            exers_ = []\n\n            # delete book chapters\n            BookChapter.objects.filter(book=kbook).delete()\n            for chapter in book_json['chapters']:\n              # get or create chapter\n                kchapter = get_chapter(kbook, chapter)\n                # First we delete chaper entry already in DB\n                if kchapter is not None:\n                    with transaction.commit_on_success():\n                        kchapter.delete()\n                with transaction.commit_on_success():\n                    kchapter, added = \\\n                        BookChapter.objects.get_or_create(\n                            book=kbook, name=chapter)\n\n                for lesson in book_json['chapters'][chapter]:\n                    # if we encounter \"hidden\" we do nothing\n                    if not isinstance(book_json['chapters'][chapter][lesson], Iterable):\n                        continue\n\n                    # Get list of exercises\n                    # exercises_l = \\\n                    #     book_json['chapters'][chapter][lesson]['exercises']\n                    # get or create module\n                    # We first extract module name\n                    if '/' in lesson:\n                        lesson = lesson.split('/')[1]\n                    kmodule = get_module(lesson)\n\n                    if kmodule is None:\n                        with transaction.commit_on_success():\n                            kmodule, added = Module.objects.get_or_create(\n                                name=lesson)\n                    # link module/lesson to chapter\n                    if kmodule not in kchapter.get_modules():\n                        kchapter.add_module(kmodule.id)\n                        kchapter.save()\n\n                    sections = book_json['chapters'][chapter][lesson]['sections']\n                    for i, section in enumerate(sections):\n                        # for exercise in exercises_l:\n                        # get or create exercises\n                        description = ''\n                        streak = 0\n                        required = False\n                        for attr in section:\n                            # module has exercises\n                            if len(section[attr]) > 0:\n                                # if len(exercises_l[exercise]) > 0:\n                                exercise = section[attr]\n                                description = exercise['long_name']\n                                streak = exercise['threshold']\n                                required = exercise['required']\n\n                            if Exercise.objects.filter(name=exercise).count() == 0:\n                              # Add new exercise\n                                with transaction.commit_on_success():\n                                    kexercise, added = \\\n                                        Exercise.objects.get_or_create(\n                                            name=exercise,\n                                            covers=\"dsa\",\n                                            description=description,\n                                            streak=streak)\n                            else:\n                                # Update existing exercise\n                                with transaction.commit_on_success():\n                                    kexercise = get_exercise(exercise)\n                                    kexercise.covers = \"dsa\"\n                                    kexercise.description = description\n                                    kexercise.streak = Decimal(streak)\n                                    kexercise.save()\n\n                            # Link exercise to module and books only\n                            # if the exercise is required\n                            bme = None\n                            if BookModuleExercise.components.filter(\n                                    book=kbook,\n                                    module=kmodule,\n                                    exercise=kexercise).count() > 0 \\\n                                    and required:\n                                with transaction.commit_on_success():\n                                    bme = BookModuleExercise.components.filter(\n                                        book=kbook,\n                                        module=kmodule,\n                                        exercise=kexercise)[0]\n                                    bme.points = exercise['points']\n                                    bme.save()\n                                    if kexercise not in exers_:\n                                        exers_.append(kexercise)\n                                if kexercise not in exers_:\n                                    exers_.append(kexercise)\n                            if BookModuleExercise.components.filter(\n                                    book=kbook,\n                                    module=kmodule,\n                                    exercise=kexercise).count() == 0\\\n                                    and required:\n                                with transaction.commit_on_success():\n                                    bme = BookModuleExercise(\n                                        book=kbook,\n                                        module=kmodule,\n                                        exercise=kexercise,\n                                        points=exercise['points'])\n                                    bme.save()\n                                    if kexercise not in exers_:\n                                        exers_.append(kexercise)\n\n            response['saved'] = True\n            # create book json file\n            if request.POST['build_date']:\n                build_date = datetime.datetime.strptime(\n                    request.POST['build_date'], '%Y-%m-%d %H:%M:%S')\n                if kbook.creation_date != build_date:\n                    create_book_file(kbook)\n                    kbook.creation_date = build_date\n                    kbook.save()\n\n            return self.create_response(request, response)\n    return self.create_response(request,\n                                {'error': 'unauthorized action'}, HttpUnauthorized)\n",
+			"settings":
+			{
+				"buffer_size": 7315,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "    def loadbook(self, request, **kwargs):\n        if request.POST['key']:\n            kusername = get_username(request.POST['key'])\n\n            if kusername and kusername.is_staff:\n                response = {}\n                response['saved'] = False\n                # get or create Book & link a book to user\n                kbook = get_book(request.POST['book'])\n\n                if kbook is None:\n                    with transaction.commit_on_success():\n                        kbook, added = Books.objects.get_or_create(\n                            book_name=request.POST['book'],\n                            book_url=request.POST['url'])\n                # get and save book elements\n                book_json = simplejson.loads(request.POST['b_json'])\n\n                # We first delete all entries of the book\n                # in BookModuleExercise table\n                # for exer in \\\n                BookModuleExercise.components.filter(book=kbook).delete()\n                # if exer not in exers_:\n                #    BookModuleExercise.components.filter(book = kbook,\n                #                                   exercise = exer).delete()\n\n                exers_ = []\n\n                # delete book chapters\n                BookChapter.objects.filter(book=kbook).delete()\n                for chapter in book_json['chapters']:\n                  # get or create chapter\n                    kchapter = get_chapter(kbook, chapter)\n                    # First we delete chaper entry already in DB\n                    if kchapter is not None:\n                        with transaction.commit_on_success():\n                            kchapter.delete()\n                    with transaction.commit_on_success():\n                        kchapter, added = \\\n                            BookChapter.objects.get_or_create(\n                                book=kbook, name=chapter)\n\n                    for lesson in book_json['chapters'][chapter]:\n                        # if we encounter \"hidden\" we do nothing\n                        if not isinstance(book_json['chapters'][chapter][lesson], Iterable):\n                            continue\n\n                        # Get list of exercises\n                        exercises_l = \\\n                            book_json['chapters'][chapter][lesson]['exercises']\n                        # get or create module\n                        # We first extract module name\n                        if '/' in lesson:\n                            lesson = lesson.split('/')[1]\n                        kmodule = get_module(lesson)\n\n                        if kmodule is None:\n                            with transaction.commit_on_success():\n                                kmodule, added = Module.objects.get_or_create(\n                                    name=lesson)\n                        # link module/lesson to chapter\n                        if kmodule not in kchapter.get_modules():\n                            kchapter.add_module(kmodule.id)\n                            kchapter.save()\n\n                        for exercise in exercises_l:\n                            # get or create exercises\n                            description = ''\n                            streak = 0\n                            required = False\n                            # module has exercises\n                            if len(exercises_l[exercise]) > 0:\n                                description = exercises_l[exercise]['long_name']\n                                streak = exercises_l[exercise]['threshold']\n                                required = exercises_l[exercise]['required']\n\n                            if Exercise.objects.filter(name=exercise).count() == 0:\n                              # Add new exercise\n                                with transaction.commit_on_success():\n                                    kexercise, added = \\\n                                        Exercise.objects.get_or_create(\n                                            name=exercise,\n                                            covers=\"dsa\",\n                                            description=description,\n                                            streak=streak)\n                            else:\n                                # Update existing exercise\n                                with transaction.commit_on_success():\n                                    kexercise = get_exercise(exercise)\n                                    kexercise.covers = \"dsa\"\n                                    kexercise.description = description\n                                    kexercise.streak = Decimal(streak)\n                                    kexercise.save()\n\n                            # Link exercise to module and books only\n                            # if the exercise is required\n                            bme = None\n                            if BookModuleExercise.components.filter(\n                                    book=kbook,\n                                    module=kmodule,\n                                    exercise=kexercise).count() > 0 \\\n                                    and required:\n                                with transaction.commit_on_success():\n                                    bme = BookModuleExercise.components.filter(\n                                        book=kbook,\n                                        module=kmodule,\n                                        exercise=kexercise)[0]\n                                    bme.points = exercises_l[exercise]['points']\n                                    bme.save()\n                                    if kexercise not in exers_:\n                                        exers_.append(kexercise)\n                                if kexercise not in exers_:\n                                    exers_.append(kexercise)\n                            if BookModuleExercise.components.filter(\n                                    book=kbook,\n                                    module=kmodule,\n                                    exercise=kexercise).count() == 0\\\n                                    and required:\n                                with transaction.commit_on_success():\n                                    bme = BookModuleExercise(\n                                        book=kbook,\n                                        module=kmodule,\n                                        exercise=kexercise,\n                                        points=exercises_l[exercise]['points'])\n                                    bme.save()\n                                    if kexercise not in exers_:\n                                        exers_.append(kexercise)\n\n                response['saved'] = True\n                # create book json file\n                if request.POST['build_date']:\n                    build_date = datetime.datetime.strptime(\n                        request.POST['build_date'], '%Y-%m-%d %H:%M:%S')\n                    if kbook.creation_date != build_date:\n                        create_book_file(kbook)\n                        kbook.creation_date = build_date\n                        kbook.save()\n\n                return self.create_response(request, response)\n        return self.create_response(request,\n                                    {'error': 'unauthorized action'}, HttpUnauthorized)\n",
+			"settings":
+			{
+				"buffer_size": 7358,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 370.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"pytho",
+				"Set Syntax: Python (Django)"
+			],
+			[
+				"dic",
+				"Package Control: Disable Package"
+			],
+			[
+				"readme",
+				"ReadmePlease"
+			],
+			[
+				"readmepl",
+				"ReadmePlease"
+			],
+			[
+				"html",
+				"Set Syntax: HTML"
+			],
+			[
+				"java",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"json",
+				"Set Syntax: JSON"
+			],
+			[
+				"dis",
+				"Package Control: Disable Package"
+			],
+			[
+				"en",
+				"Package Control: Enable Package"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"ena",
+				"Package Control: Enable Package"
+			],
+			[
+				"java	",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"xml",
+				"Indent XML"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"pack",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 467.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7a3098092775ccb37ca9d6b2e4b7d'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/hshahin/workspaces/OpenDSA-server/ODSA-django",
+		"/home/hshahin/workspaces/OpenDSA-server/ODSA-django/assets"
+	],
+	"file_history":
+	[
+		"/home/hshahin/.config/sublime-text-3/Packages/Wrap Plus/README.md",
+		"/home/hshahin/.config/sublime-text-3/Packages/Djaneiro/README.rst",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/List/ListADTPROG.html",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaKA.js",
+		"/home/hshahin/workspaces/OpenDSA/config/NewKA.json",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/RecurTutor2/BinaryTreeGuidedInfFlw.rst",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/BinaryTreeGuidedInfFlw.rst",
+		"/home/hshahin/workspaces/OpenDSA/server.py",
+		"/home/hshahin/workspaces/OpenDSA/khan-exercises/khan-exercise.js",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Background/IntroMCQeff.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Background/IntroSumm.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/RecurTutor2/BTincPROG.html",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/WritingTraversals.rst",
+		"/home/hshahin/workspaces/OpenDSA/config/CS3114LTI.json",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/RecurTutor2/BTcntvalPROG.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/BubsortPRO.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/TestRecur/btIncPROG.html",
+		"/home/hshahin/workspaces/OpenDSA/khan-exercises/exercises/khan-exercise.html",
+		"/home/hshahin/workspaces/OpenDSA/khan-exercises/interface.js",
+		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises/khan-exercise.js",
+		"/home/hshahin/workspaces/OpenDSA/NewKA/OpenDSA/config/NewKA.json",
+		"/home/hshahin/workspaces/OpenDSA/NewKA/OpenDSA/lib/odsaKA.js",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/HeapsortStepPRO.html",
+		"/home/hshahin/workspaces/OpenDSA/DataStructures/binaryheap.js",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/HeapsortStepPRO.rst",
+		"/home/hshahin/workspaces/OpenDSA/config/CS2401.json",
+		"/home/hshahin/workspaces/OpenDSA/Makefile",
+		"/home/hshahin/workspaces/OpenDSA/config/CS3114.json",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/SelsortFIB2.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/BubsortPRO.js",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/HeapsortStepPRO.js",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/HeapsortStepPRO.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/SelsortPRO.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/SelsortPROSummL2.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/SelsortPROSummL1.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/BubsortPROSummL2.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/BubsortPROSummL1.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/SortIntroMCQ2.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/ChapterSumm.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/SortIntroMCQ1.html",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaKA_tmp.js",
+		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises/interface.js",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaAV-min.js",
+		"/home/hshahin/workspaces/OpenDSA/Books/NewKA/source/Dprobs.rst",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/Dprobs.html",
+		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises/exercises/khan-site.html",
+		"/home/hshahin/workspaces/OpenDSA/khan-exercises/local-only/main_layer.js",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/RadixMergesortSumm.html",
+		"/home/hshahin/workspaces/OpenDSA/khan-exercises/local-only/main.js",
+		"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises/local-only/jquery.blockUI.js",
+		"/home/hshahin/workspaces/OpenDSA/khan-exercises/exercises/khan-site.html",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/ListArray.rst",
+		"/home/hshahin/workspaces/OpenDSA/config/hs_NewKA.json",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaMOD.js",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaMOD-min.js",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/ListADTPROGQ1.html",
+		"/home/hshahin/workspaces/OpenDSA/khan-exercises/khan-exercise_layer.js",
+		"/home/hshahin/workspaces/OpenDSA/khan-exercises/interface_layer.js",
+		"/home/hshahin/workspaces/OpenDSA/lib/CodeMirror-5.5.0/lib/codemirror.css",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/List/alistPRO.css",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/List/AlistDeletePRO.js",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/ListADTPROGQ1.rst",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/List/AlistDeletePRO.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/List/AlistInsertPRO.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/ListADTPROG.html",
+		"/home/hshahin/workspaces/OpenDSA/lib/odsaMOD_mod.js",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/RadixsortPRO.js",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/AlgAnal/GrowthRates.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/AlgAnal/AnalPrelimSumm.html",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/BinsortSumm.rst",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/BinsortSumm.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/RadixsortPROSumm.html",
+		"/home/hshahin/workspaces/OpenDSA/config/CPSC270F15.json",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/RadixsortPRO.html",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/RadixsortPRO.rst",
+		"/home/hshahin/.config/sublime-text-3/Packages/SublimeREPL/SublimeREPL.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/SublimeLinter/SublimeLinter.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/User/JsFormat.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/User/JavascriptBeautify.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/Javascript Beautify/JavascriptBeautify.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/JsFormat/JsFormat.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/JsFormat/README.md",
+		"/home/hshahin/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/hshahin/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/RadixsortPRO.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA/MergesortMergePRO.html",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/Sorting/RadixSortSumm.rst",
+		"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA/RadixsortPROSumm.rst",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/TestRecur/BinaryTreeLocalSumm.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortIntroSumm.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortIntroMCQ4.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortIntroMCQ3b.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortIntroMCQ3a.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortIntroMCQ2.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortIntroMCQ1.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortBoundSumm.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortBoundMCQ7.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortBoundMCQ6.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortBoundMCQ3.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortBoundMCQ2.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortBoundMCQ1.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortAlgCompTF13.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortAlgCompSumm.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortAlgCompMCQ9.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortAlgCompMCQ8.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortAlgCompMCQ7.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortAlgCompMCQ6.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortAlgCompMCQ5.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortAlgCompMCQ4.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortAlgCompMCQ11.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortAlgCompMCQ10a.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortAlgCompMCQ10.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SortAlgCompMCQ1.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/ShellsortTFincr.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/ShellsortSeries.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/ShellsortMCQskip.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/ShellsortMCQ6.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/ShellsortMCQ5.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/ShellsortMCQ4.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/ShellsortMCQ3.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/ShellsortMCQ2.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/ShellsortMCQ1.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortSumm.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortMCQworst.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortMCQwhen.html",
+		"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting/SelsortMCQswaps.html"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 114.0,
+		"where_history":
+		[
+			"",
+			"/home/hshahin/workspaces/OpenDSA",
+			"/home/hshahin/workspaces/OpenDSA/config",
+			"/home/hshahin/workspaces/OpenDSA/",
+			"/home/hshahin/workspaces/OpenDSA/Exercises",
+			"/home/hshahin/workspaces/OpenDSA",
+			"/home/hshahin/workspaces/OpenDSA/config",
+			"/home/hshahin/workspaces/OpenDSA",
+			"/home/hshahin/workspaces/OpenDSA/Exercises",
+			"/home/hshahin/workspaces/OpenDSA/khan-exercises/exercises",
+			"/home/hshahin/workspaces/OpenDSA/khan-exercises/exercies",
+			"/home/hshahin/workspaces/OpenDSA/khan-exercises\\exercies",
+			"/home/hshahin/workspaces/OpenDSA/Exercises",
+			"/home/hshahin/workspaces/OpenDSA/khan-exercises",
+			"/home/hshahin/workspaces/OpenDSA/khan-exercies",
+			"/home/hshahin/workspaces/OpenDSA/Exercises/NewKA",
+			"/home/hshahin/workspaces/OpenDSA/RST/en/NewKA",
+			"/home/hshahin/workspaces/OpenDSA/tools",
+			"",
+			"/home/hshahin/workspaces/lti_tool_provider_example-1/public/OpenDSA/Books/CS3114/html",
+			"/home/hshahin/workspaces/OpenDSA",
+			"/home/hshahin/workspaces/OpenDSA/lib",
+			"/home/hshahin/workspaces/OpenDSA",
+			"/home/hshahin/workspaces/OpenDSA/lib",
+			"/home/hshahin/workspaces/OpenDSA",
+			"/home/hshahin/workspaces/OpenDSA/ODSAkhan-exercises",
+			"/home/hshahin/workspaces/OpenDSA/lib",
+			"/home/hshahin/workspaces/OpenDSA/",
+			"/home/hshahin/workspaces/OpenDSA/Exercises/",
+			"/home/hshahin/workspaces/OpenDSA/Exercises/Sorting",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"long_name",
+			"exercise_counter",
+			"create_chapter",
+			"LTI_",
+			"create_chapter",
+			"request.POST",
+			"attr",
+			"request.POST.get",
+			"POST",
+			".get(",
+			".get",
+			"str",
+			"createcourse",
+			"createcoutse",
+			"method_check",
+			"login",
+			"loadmodule",
+			"loadbook",
+			"createcourse",
+			"create_chapter",
+			"exerciseName",
+			"exercises",
+			"create_chapter",
+			"p",
+			"name=exercise",
+			"exercises_l[exercise]",
+			"attr",
+			"exerciseObj",
+			"exercises_l",
+			"createcourse",
+			"exercise[",
+			"exercises_l[exercise]",
+			"exercise",
+			"val",
+			"exercises",
+			"exers_",
+			"ltitest",
+			"Ivh4yxHz7t2U6SPp7OLdvscWSN82qCnZbEWebFJVEb0b3",
+			"opendsa",
+			"binarytree",
+			"bstsmallcountprog",
+			"server",
+			"type",
+			"log",
+			"↵",
+			"ltitest.cs.vt.edu",
+			"CS3114",
+			"cs3114",
+			"summPromises",
+			"parentSummPromise",
+			"loadSummExercise",
+			"summPromises",
+			"loadExercise(",
+			"summPromises",
+			"$body.find(\".exercise\"",
+			"summPromises",
+			"loadSummExercise",
+			"summPromises",
+			"exerciseId",
+			"summPromises",
+			"promise",
+			"SummexerciseFilePromises",
+			"summPromises",
+			"i",
+			"promise",
+			"SummexerciseFilePromises",
+			"console.",
+			"elelment",
+			"summPromises",
+			"newContents",
+			"filter",
+			"console.log",
+			"loadExercise",
+			"buildAttemptData",
+			"Khan.buildAttemptData",
+			"Khan.",
+			"dupWindowSize",
+			"$(Exercises)",
+			"checkAnswer",
+			"handleAtte",
+			"currentProblemType",
+			"makeProblem",
+			"problemNum",
+			"makeProblem(",
+			"makeProb",
+			"jsavExPath",
+			"../../DataStructures",
+			"binaryheap",
+			"AVLextension",
+			"f_reset",
+			"jsav",
+			"RadixsortPRO",
+			"bubsortPRO",
+			"checkAnswer",
+			"initJSAV",
+			"f_reset",
+			"clickHandler",
+			"var",
+			"RadixsortPRO",
+			"Heapsortsteppro",
+			"DataStructures",
+			"solutionarea",
+			"fancy-scrollbar",
+			"solutionarea",
+			"fancy-scrollbar",
+			"ListADTPROGSumm",
+			"alistDeletePRO",
+			"new",
+			"jsav",
+			"checkAnswer",
+			"initJSAV",
+			"getPos",
+			"t",
+			"getSize",
+			"f_reset",
+			"clickHandler",
+			"copyHandler",
+			"bubsortPRO",
+			"exercises",
+			"style",
+			"_server",
+			"check-answer-results",
+			"Incorrect answer, please try again.",
+			"next-question-button",
+			"check-answer-results",
+			"check-answer-button",
+			"next-question-button",
+			"correctAnswerEffect"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"  <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n  <script src=\"../../khan-exercises/local-only/main.js\" ></script>\n",
+			"",
+			"  <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n",
+			"  <script src=\"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js\"></script>\n  <script src=\"../../khan-exercises/local-only/main.js\" ></script>",
+			"Exercises/NewKA",
+			"\"OpenDSA/",
+			"\"OpenDSA/_static/"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/home/hshahin/workspaces/OpenDSA",
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "OpenDSA-server.sublime-project",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 243,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								243,
+								243
+							]
+						],
+						"settings":
+						{
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "ODSA-django/opendsa/api.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 70620,
+						"regions":
+						{
+							"bookmarks":
+							{
+								"flags": 144,
+								"icon": "bookmark",
+								"regions":
+								[
+									[
+										42579,
+										42579
+									],
+									[
+										45843,
+										45843
+									],
+									[
+										52600,
+										52600
+									]
+								],
+								"scope": "bookmarks"
+							}
+						},
+						"selection":
+						[
+							[
+								41578,
+								41578
+							]
+						],
+						"settings":
+						{
+							"origPos": 17956.0,
+							"syncScroll": false,
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true,
+							"word_wrap": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 17362.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 58,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								58,
+								58
+							]
+						],
+						"settings":
+						{
+							"auto_name": "SELECT * FROM t1 WHERE column1 = (SELECT column1 F",
+							"default_dir": "/home/hshahin/workspaces/OpenDSA-server",
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6001,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1073,
+								1073
+							]
+						],
+						"settings":
+						{
+							"auto_name": "{\"username\": \"opendsa\", \"password\": \"opendsa\", \"ca",
+							"default_dir": "/home/hshahin/workspaces/OpenDSA-server",
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2542,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										251,
+										263
+									],
+									[
+										479,
+										491
+									],
+									[
+										787,
+										799
+									],
+									[
+										1187,
+										1199
+									],
+									[
+										1393,
+										1405
+									],
+									[
+										1620,
+										1632
+									],
+									[
+										1778,
+										1790
+									],
+									[
+										1974,
+										1986
+									],
+									[
+										2158,
+										2170
+									],
+									[
+										2386,
+										2398
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								162,
+								162
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/home/hshahin/workspaces/OpenDSA-server",
+							"detect_indentation": false,
+							"line_numbers": false,
+							"origPos": 0.0,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syncScroll": false,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "ODSA-django/src/pip-delete-this-directory.txt",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 185,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": ".gitignore",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 516,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								273,
+								273
+							]
+						],
+						"settings":
+						{
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7315,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7315,
+								7315
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/home/hshahin/workspaces/OpenDSA-server",
+							"origPos": 0.0,
+							"syncScroll": false,
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7358,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2239,
+								2239
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/home/hshahin/workspaces/OpenDSA-server",
+							"origPos": 648.0,
+							"syncScroll": false,
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 113.0,
+						"translation.y": 648.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 27.0
+	},
+	"input":
+	{
+		"height": 39.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "OpenDSA-server.sublime-project",
+	"replace":
+	{
+		"height": 50.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"api.py",
+				"ODSA-django/opendsa/api.py"
+			],
+			[
+				"api",
+				"ODSA-django/opendsa/api.py"
+			],
+			[
+				"_rev",
+				"~/workspaces/OpenDSA/config/CS3114_rev.json"
+			],
+			[
+				"cs3114l",
+				"config/CS3114LTI.json"
+			],
+			[
+				"cs3114_rev",
+				"config/CS3114_rev.json"
+			],
+			[
+				"cs3114",
+				"config/CS3114LTI.json"
+			],
+			[
+				"create",
+				"lib/createcourse-min.js"
+			],
+			[
+				"createcourse",
+				"Books/CS3114/html/CreateCourse.html"
+			],
+			[
+				"odsaka",
+				"lib/odsaKA.js"
+			],
+			[
+				"newka",
+				"config/NewKA.json"
+			],
+			[
+				"binarytreeguidedinfflw",
+				"RST/en/NewKA/BinaryTreeGuidedInfFlw.rst"
+			],
+			[
+				"server",
+				"server.py"
+			],
+			[
+				"khan",
+				"khan-exercises/khan-exercise.js"
+			],
+			[
+				"intromcqeff",
+				"Exercises/Background/IntroMCQeff.html"
+			],
+			[
+				"introsumm",
+				"Exercises/Background/IntroSumm.html"
+			],
+			[
+				"btcntvalprog",
+				"Exercises/RecurTutor2/BTcntvalPROG.html"
+			],
+			[
+				"btincprog",
+				"Exercises/RecurTutor2/BTincPROG.html"
+			],
+			[
+				"writingtraversals",
+				"RST/en/NewKA/WritingTraversals.rst"
+			],
+			[
+				"listadt",
+				"Exercises/List/ListADTPROG.html"
+			],
+			[
+				"bubsort",
+				"Exercises/NewKA/BubsortPRO.html"
+			],
+			[
+				"cs3114lti",
+				"config/CS3114LTI.json"
+			],
+			[
+				"make",
+				"Makefile"
+			],
+			[
+				"3114",
+				"config/CS3114.json"
+			],
+			[
+				"selsortpro",
+				"Exercises/NewKA/SelsortPRO.html"
+			],
+			[
+				"selsortprosumml2",
+				"Exercises/NewKA/SelsortPROSummL2.html"
+			],
+			[
+				"selsortprosumml1",
+				"Exercises/NewKA/SelsortPROSummL1.html"
+			],
+			[
+				"bubsortpro",
+				"Exercises/NewKA/BubsortPRO.html"
+			],
+			[
+				"bubsortprosumml2",
+				"Exercises/NewKA/BubsortPROSummL2.html"
+			],
+			[
+				"bubsortprosumml1",
+				"Exercises/NewKA/BubsortPROSummL1.html"
+			],
+			[
+				"sortintromcq2",
+				"Exercises/NewKA/SortIntroMCQ2.html"
+			],
+			[
+				"sortintromcq1",
+				"Exercises/NewKA/SortIntroMCQ1.html"
+			],
+			[
+				"selsort",
+				"Exercises/NewKA/SelsortPROSummL2.html"
+			],
+			[
+				"chapter",
+				"Exercises/NewKA/ChapterSumm.html"
+			],
+			[
+				"odaska",
+				"lib/odsaKA.js"
+			],
+			[
+				"inter",
+				"khan-exercises/interface.js"
+			],
+			[
+				"chaptersumm",
+				"Exercises/NewKA/ChapterSumm.html"
+			],
+			[
+				"new",
+				"config/NewKA.json"
+			],
+			[
+				"binaryheap.js",
+				"DataStructures/binaryheap.js"
+			],
+			[
+				"heapsortsteppro",
+				"Exercises/NewKA/HeapsortStepPRO.html"
+			],
+			[
+				"selsortfib2",
+				"Exercises/NewKA/SelsortFIB2.html"
+			],
+			[
+				"odsaka.js",
+				"NewKA/OpenDSA/lib/odsaKA.js"
+			],
+			[
+				"bubsortpro.js",
+				"Exercises/NewKA/BubsortPRO.js"
+			],
+			[
+				"alistdeletepro",
+				"Exercises/List/AlistDeletePRO.js"
+			],
+			[
+				"alistpro",
+				"Exercises/List/alistPRO.css"
+			],
+			[
+				"alistdelete",
+				"Exercises/List/AlistDeletePRO.html"
+			],
+			[
+				"alistinsertpro",
+				"Exercises/List/AlistInsertPRO.html"
+			],
+			[
+				"radixmergesortsumm",
+				"Exercises/NewKA/RadixMergesortSumm.html"
+			],
+			[
+				"main",
+				"khan-exercises/local-only/main.js"
+			],
+			[
+				"listarray.rst",
+				"RST/en/NewKA/ListArray.rst"
+			],
+			[
+				"odsamod",
+				"lib/odsaMOD-min.js"
+			],
+			[
+				"blockui",
+				"ODSAkhan-exercises/local-only/jquery.blockUI.js"
+			],
+			[
+				"listadtprogq1",
+				"Exercises/NewKA/ListADTPROGQ1.html"
+			],
+			[
+				"listadtprog",
+				"Exercises/NewKA/ListADTPROG.html"
+			],
+			[
+				"dprobs",
+				"Exercises/NewKA/Dprobs.html"
+			],
+			[
+				"dprobs.rst",
+				"Books/NewKA/source/Dprobs.rst"
+			],
+			[
+				"khan-site.html",
+				"ODSAkhan-exercises/exercises/khan-site.html"
+			],
+			[
+				"odasmod",
+				"lib/odsaMOD-min.js"
+			],
+			[
+				"khan-exer",
+				"khan-exercises/khan-exercise.js"
+			],
+			[
+				"growthrates",
+				"Exercises/AlgAnal/GrowthRates.html"
+			],
+			[
+				"interfa",
+				"khan-exercises/interface.js"
+			],
+			[
+				"kha",
+				"khan-exercises/khan-exercise.js"
+			],
+			[
+				"binsortsumm",
+				"Exercises/NewKA/BinsortSumm.html"
+			],
+			[
+				"radixsortpro",
+				"Exercises/NewKA/RadixsortPRO.html"
+			],
+			[
+				"radixsortpro.rst",
+				"RST/en/NewKA/RadixsortPRO.rst"
+			],
+			[
+				"",
+				"Exercises/NewKA/RadixsortPRO.html"
+			],
+			[
+				"binsortsumm.rst",
+				"RST/en/NewKA/BinsortSumm.rst"
+			],
+			[
+				"mergesortmergepro",
+				"Exercises/NewKA/MergesortMergePRO.html"
+			],
+			[
+				"exercestub",
+				"khan-exercises/exercises-stub.js"
+			],
+			[
+				"mergesortpro.json",
+				"AV/Sorting/mergesortPRO.json"
+			],
+			[
+				"bub",
+				"Exercises/NewKA/BubsortPRO.html"
+			],
+			[
+				"bubsortpro.html",
+				"Books/NewKA/html/BubsortPRO.html"
+			],
+			[
+				"alganalsumm",
+				"Exercises/AlgAnal/AlgAnalSumm.html"
+			],
+			[
+				"khan-",
+				"khan-exercises/khan-exercise.js"
+			],
+			[
+				"anlsintrofibgrthfn2n2",
+				"Exercises/AlgAnal/AnlsIntroFIBgrthfn2n2.js"
+			],
+			[
+				"anlsintrofibgrthfn2n",
+				"Exercises/AlgAnal/AnlsIntroFIBgrthfn2n.html"
+			],
+			[
+				"anlsintrofibgrthfnnfact",
+				"Exercises/AlgAnal/AnlsIntroFIBgrthfnnfact.html"
+			],
+			[
+				"anlsintrofibgrthfn10n",
+				"Exercises/AlgAnal/AnlsIntroFIBgrthfn10n.html"
+			],
+			[
+				"anlsintrofibgrthfn20n",
+				"Exercises/AlgAnal/AnlsIntroFIBgrthfn20n.html"
+			],
+			[
+				"anlsintrofibgrthfn5nlogn",
+				"Exercises/AlgAnal/AnlsIntroFIBgrthfn5nlogn.html"
+			],
+			[
+				"comparealgsumm",
+				"Exercises/AlgAnal/CompareAlgSumm.html"
+			],
+			[
+				"analintro.rst",
+				"RST/en/NewKA/AnalIntro.rst"
+			],
+			[
+				"growth",
+				"Exercises/AlgAnal/GrowthRates.html"
+			],
+			[
+				"binsorttf1",
+				"Exercises/NewKA/BinsortTF1.html"
+			],
+			[
+				"interface",
+				"khan-exercises/interface.js"
+			],
+			[
+				"binsortmcq2.html",
+				"Books/NewKA/html/BinsortMCQ2.html"
+			],
+			[
+				"web",
+				"WebServer"
+			],
+			[
+				"khan-exercise.js",
+				"khan-exercises/khan-exercise.js"
+			],
+			[
+				"khan-exe",
+				"khan-exercises/khan-exercise.js"
+			],
+			[
+				"kahn-exer",
+				"khan-exercises/khan-exercise_orig.js"
+			],
+			[
+				"bubsortmcqcomps",
+				"Exercises/NewKA/BubsortMCQcomps.html"
+			],
+			[
+				"bubsortmcqcomplex",
+				"Exercises/NewKA/BubsortMCQcomplex.html"
+			],
+			[
+				"bubsortsumm",
+				"Exercises/NewKA/BubsortSumm.html"
+			],
+			[
+				"comparealg",
+				"Exercises/NewKA/CompareAlgSumm.html"
+			],
+			[
+				"chapt",
+				"Exercises/NewKA/ChapterSumm.html"
+			],
+			[
+				"listadtprogsumm",
+				"Exercises/NewKA/ListADTPROGSumm.html"
+			],
+			[
+				"khan-exercise.html",
+				"khan-exercises/exercises/khan-exercise.html"
+			],
+			[
+				"binsortmcq2",
+				"Books/NewKA/html/BinsortMCQ2.html"
+			],
+			[
+				"listadt.html",
+				"Books/CS3114/html/ListADT.html"
+			],
+			[
+				"kh",
+				"ODSAkhan-exercises/khan-exercise.js"
+			],
+			[
+				"makefile",
+				"Makefile"
+			],
+			[
+				"bubblesort.rst",
+				"RST/en/Sorting/BubbleSort.rst"
+			],
+			[
+				"alganalcs2114summ",
+				"Exercises/AlgAnal/AlgAnalCS2114Summ.html"
+			],
+			[
+				"quicksort.rst",
+				"RST/en/Sorting/Quicksort.rst"
+			],
+			[
+				"analasymptotic.rst",
+				"Books/CS2114SS215/source/AnalAsymptotic.rst"
+			],
+			[
+				"cs2114",
+				"config/CS2114SS215.json"
+			],
+			[
+				".git",
+				".gitignore"
+			],
+			[
+				"createcourse.js",
+				"lib/createcourse.js"
+			],
+			[
+				"odsautil",
+				"lib/odsaUtils-min.js"
+			],
+			[
+				"odsamod-min",
+				"lib/odsaMOD-min.js"
+			],
+			[
+				"odsa",
+				"lib/odsaUtils.js"
+			],
+			[
+				"register",
+				"lib/registerbook-min.js"
+			],
+			[
+				"idsauti",
+				"lib/odsaUtils.js"
+			],
+			[
+				"cerate",
+				"lib/createcourse-min.js"
+			],
+			[
+				"odsastyle",
+				"lib/odsaStyle.css"
+			],
+			[
+				"regist",
+				"lib/registerbook.js"
+			],
+			[
+				"regis",
+				"lib/registerbook.js"
+			],
+			[
+				"post",
+				"tools/postprocessor.py"
+			],
+			[
+				"confi",
+				"tools/configure.py"
+			],
+			[
+				"configure",
+				"tools/configure.py"
+			],
+			[
+				"con",
+				"tools/configure.py"
+			],
+			[
+				"quicksort.html",
+				"Books/CS3114_01/html/Quicksort.html"
+			],
+			[
+				"que",
+				"RST/en/List/Queue.rst"
+			],
+			[
+				"quick",
+				"RST/en/Sorting/Quicksort.rst"
+			],
+			[
+				"quicksort-01",
+				"Books/CS3114/html/Quicksort-01.html"
+			],
+			[
+				"queue.rst",
+				"RST/en/List/Queue.rst"
+			],
+			[
+				"insertionsort.r",
+				"RST/en/Slides/InsertionSort.rst"
+			],
+			[
+				"cs3114_orig",
+				"config/CS3114_orig.json"
+			],
+			[
+				"cs3114.",
+				"config/CS3114.json"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "opendsa-ser",
+		"selected_items":
+		[
+			[
+				"opendsa-ser",
+				"~/workspaces/OpenDSA-server/OpenDSA-server.sublime-project"
+			],
+			[
+				"opendsap",
+				"~/workspaces/KA/hosam/OpenDSA/OpenDSA.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 226.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
