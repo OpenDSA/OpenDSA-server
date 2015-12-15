@@ -1,5 +1,5 @@
 """
-OpenDSA database model 
+OpenDSA database model
 """
 
 # Python
@@ -46,7 +46,7 @@ class Books(models.Model):
     Books table
     """
     book_name = models.CharField(max_length=50)
-    book_url =  models.CharField(max_length=80) 
+    book_url =  models.CharField(max_length=80)
                    #(unique=False, max_length=80, blank=False,
                    #validators=[RegexValidator(regex="^[\w\-\.]*$")],
                    #help_text="Input an URL identifier for this book.")
@@ -75,7 +75,7 @@ def create_course_module(sender, instance, action, pk_set, **kwargs):
     '''
     if action == "post_add":
         name_ = "Assignment_%s" % datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        c_i = 0 
+        c_i = 0
         for ci in pk_set:
             c_i = ci
         course_i = CourseInstance.objects.get(id = c_i)
@@ -101,7 +101,7 @@ class Assignments(models.Model):
 
     def add_exercise(self, exid):
         """
-        Adds exercise to the assignment 
+        Adds exercise to the assignment
         """
         if len(self.assignment_exercises)==0:
             self.assignment_exercises += '%s' % exid
@@ -109,7 +109,7 @@ class Assignments(models.Model):
             self.assignment_exercises += ',%s' % exid
     def get_exercises_id(self):
         """
-        returns a list of ids of the exercises in the assignment 
+        returns a list of ids of the exercises in the assignment
         """
         _ex = []
         for ex in self.assignment_exercises.split(','):
@@ -118,18 +118,18 @@ class Assignments(models.Model):
         return _ex
     def get_exercises(self):
         """
-        returns a list of exercises objects in the assignment 
+        returns a list of exercises objects in the assignment
         """
         _ex = []
         for ex in self.assignment_exercises.split(','):
             if ex.isdigit():
-                if Exercise.objects.filter(id=ex).count() > 0: 
+                if Exercise.objects.filter(id=ex).count() > 0:
                     exer = Exercise.objects.get(id=ex)
                     _ex.append(exer)
         return _ex
     def isType(self):
         """
-        returns the type of the model object 
+        returns the type of the model object
         """
         return "assignments"
 
@@ -138,7 +138,7 @@ class Assignments(models.Model):
 
 class Module(models.Model):
     """
-    Module table 
+    Module table
     """
     short_display_name = models.CharField(max_length=50)  #name
     name = models.TextField()  #decription
@@ -154,7 +154,7 @@ class Module(models.Model):
 
     def get_proficiency_model(self, book):
         """
-        function that returns list of id of exercises 
+        function that returns list of id of exercises
         we get it from BookModuleExercise table
         will be compared to student list of proficiency exercises
         """
@@ -208,7 +208,7 @@ class ModuleExerciseManager(models.Manager):
         for bme in super(ModuleExerciseManager, \
                          self).get_query_set().filter(book = book):
             exercise_list.append(bme.exercise)
-        return exercise_list 
+        return exercise_list
 
     def get_mod_exercise_list(self, book, mod):
         """
@@ -233,7 +233,7 @@ class BookModuleExercise (models.Model):
     exercise = models.ForeignKey(Exercise)
     #points the exercise is worth
     points = models.DecimalField(default = 0, max_digits=5, decimal_places=2)
-    #reference to manager 
+    #reference to manager
     components = ModuleExerciseManager()
     class Meta:
         unique_together = (("book", "module", "exercise"),)
@@ -295,7 +295,7 @@ class UserBook (models.Model):
     """
     user = models.ForeignKey(User)
     book = models.ForeignKey(Books)
-    grade = models.BooleanField(default = True) 
+    grade = models.BooleanField(default = True)
     class Meta:
         unique_together = (("user","book"),)
 
@@ -348,7 +348,7 @@ class UserModule(models.Model):
 
     def is_proficient_at(self):
         """
-        Returns if the student earned module proficiency or not 
+        Returns if the student earned module proficiency or not
         """
         return (self.proficient_date != datetime.datetime.strptime( \
                                 '2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))
@@ -358,7 +358,7 @@ class UserModule(models.Model):
 class UserData(models.Model):
     """
     A table storing a summary of user/exercises activity:
-    started exercises and proficient exercises 
+    started exercises and proficient exercises
     """
     # Canonical reference to the user entity.
     user =   models.ForeignKey(User)
@@ -395,13 +395,13 @@ class UserData(models.Model):
     def is_proficient_at(self, exid):
         """
         returns if the student earned proficiency on a specific exercise
-        """ 
+        """
         if self.all_proficient_exercises is None or \
            len(self.all_proficient_exercises) == 0:
             return False
         for ex in self.all_proficient_exercises.split(','):
             if ex.isdigit() and int(ex) == exid.id:
-                return True  
+                return True
         return False
 
     def has_started(self, exid):
@@ -457,11 +457,13 @@ class UserExerciseLog(models.Model):
     points_earned = models.DecimalField(default = 0, \
                                         max_digits = 5, \
                                         decimal_places = 2)
-    earned_proficiency = models.BooleanField(default = False) 
+    earned_proficiency = models.BooleanField(default = False)
               # True if proficiency was earned on this problem
     count_attempts = models.BigIntegerField(default = 0)
     ip_address = models.CharField(max_length=20)
     ex_question = models.CharField(max_length=50)
+    correct_keys = models.TextField()
+    exposed_key = models.IntegerField(default = 0)
 
     def put(self):
         """
@@ -473,17 +475,17 @@ class UserExerciseLog(models.Model):
 
 class UserProgLog(models.Model):
     """
-    Table storing all the additional information 
+    Table storing all the additional information
     about each programing exercise attempt
     """
     problem_log =  models.ForeignKey(UserExerciseLog)
     student_code = models.TextField()
-    feedback = models.TextField() 
+    feedback = models.TextField()
 
 
 class UserProfExerciseLog(models.Model):
     """
-    Table storing all the additional information 
+    Table storing all the additional information
     about each JSAV proficiency exercise attempt
     """
     problem_log =  models.ForeignKey(UserExerciseLog)
@@ -497,7 +499,7 @@ class UserProfExerciseLog(models.Model):
 class UserExercise(models.Model):
     """
     Table recording statistics about student attempts
-    each record contains the data related to one student and one 
+    each record contains the data related to one student and one
     exercise
     """
     user = models.ForeignKey(User)
@@ -530,7 +532,7 @@ class UserExercise(models.Model):
 
     def update_proficiency_pe(self, correct, ubook):
         """
-        update statistics (correct/proficient/etc.) for 
+        update statistics (correct/proficient/etc.) for
         JSAV Proficiency exercises
         """
         exercise = Exercise.objects.get(pk=self.exercise_id)
@@ -549,7 +551,7 @@ class UserExercise(models.Model):
 
     def is_proficient(self):
         """
-        returns if the user already earned proficiency 
+        returns if the user already earned proficiency
         """
         return (self.proficient_date != datetime.datetime.strptime( \
                                    '2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))
@@ -563,5 +565,5 @@ class Bugs(models.Model):
     os_family = models.CharField(max_length=50)
     browser_family = models.CharField(max_length=20)
     title = models.CharField(max_length=50)
-    description = models.TextField() 
+    description = models.TextField()
     screenshot = models.ImageField(upload_to='bugs/%Y_%m_%d/', null=True, blank=True)

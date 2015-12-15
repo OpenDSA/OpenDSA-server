@@ -73,8 +73,8 @@ def get_due_date(book, exercise):
     for assignment in assignments_list:
         if int(exercise.id) in assignment.get_exercises_id():
             return assignment.course_module.closing_time
-    return None 
-    
+    return None
+
 
 def get_assignment(book, exercise):
     """
@@ -112,7 +112,7 @@ def student_grade_all(user, book):
     exe_assign = []
 
     #get book's open courses
-    currentCourses = CourseInstance.objects.filter(books=book, ending_time__gte = datetime.datetime.now())   
+    currentCourses = CourseInstance.objects.filter(books=book, ending_time__gte = datetime.datetime.now())
     currentCourse = currentCourses[0]
     #get open assignments for the book
     #we get open exercises_course_modules
@@ -167,7 +167,7 @@ def student_grade_all(user, book):
 
     user_grade['modules'] = modules
     user_grade['grades'] = grade
-    user_grade['assignments'] = assignments 
+    user_grade['assignments'] = assignments
     return user_grade
 
 
@@ -192,7 +192,7 @@ def update_module_proficiency(user_data, module, exercise):
         is_last_exercise = False
         if user_module.proficient_date == datetime.datetime.strptime(\
                                 '2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'):
-            if user_prof is None:  
+            if user_prof is None:
                 user_prof = []
             if module_ex_list is None:
                 module_ex_list = []
@@ -215,7 +215,7 @@ def update_module_proficiency(user_data, module, exercise):
 
 
 def attempt_problem(user_data, user_exercise, attempt_number,
-    completed, count_hints, time_taken, attempt_content, module,   
+    completed, count_hints, time_taken, correct_keys, exposed_key, attempt_content, module,
     ex_question, ip_address):
     """
     Stores data related to a KA exercise attempt
@@ -230,6 +230,8 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 user=user_data.user,
                 exercise=user_exercise.exercise,
                 time_taken=time_taken,
+                correct_keys=correct_keys,
+                exposed_key=exposed_key,
                 time_done=dt_now,
                 count_hints=count_hints,
                 hint_used=int(count_hints) > 0,
@@ -259,7 +261,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
             user_exercise.total_done += 1
             if problem_log.correct:
 
-                # Streak only increments if problem was 
+                # Streak only increments if problem was
                 #solved correctly (on first attempt)
                 user_exercise.total_correct += 1
                 user_exercise.streak += 1
@@ -308,7 +310,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
 
 
 def attempt_problem_pe(user_data, user_exercise, attempt_number,
-    submit_time, time_taken, threshold, score,      
+    submit_time, time_taken, threshold, score,
     module, ip_address):
     """
     Stores data related to a PE exercise attempt
@@ -337,13 +339,13 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
             user_data.started(exercise.id)
 
         #just_earned_proficiency = False
-        
+
         user_exercise.total_done += 1
         value = False
         proficient = user_data.is_proficient_at(user_exercise.exercise)
         if problem_log.correct:
             user_exercise.total_correct += 1
-            user_exercise.longest_streak = 0 
+            user_exercise.longest_streak = 0
             value = True
             if not proficient:
                 problem_log.earned_proficiency =  \
@@ -392,4 +394,3 @@ def log_button_action( user, exercise, module, book, name, \
                         ip_address = ip_address)
 
     return button_log.save(), True
-

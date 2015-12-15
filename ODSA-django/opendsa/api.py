@@ -463,7 +463,7 @@ class UserexerciseResource(ModelResource):
             module = get_module(request.POST['module_name'])
 
             if user_exercise and ubook:
-                ex_question = request.POST['sha1']
+                ex_question = request.POST['problem_type']
                 if 'non_summative' in request.POST:
                     ex_question = request.POST['non_summative']
                 # self.method_check(request, allowed=['post'])
@@ -474,6 +474,8 @@ class UserexerciseResource(ModelResource):
                                                               request.POST['complete'],
                                                               request.POST['count_hints'],
                                                               int(request.POST['time_taken']),
+                                                              request.POST['correct_keys'],
+                                                              request.POST['exposed_key'],
                                                               request.POST['attempt_content'],
                                                               request.POST['module_name'],
                                                               ex_question,
@@ -645,7 +647,7 @@ class UserexerciseResource(ModelResource):
             module = get_module(request.POST['module_name'])
 
             if user_exercise and ubook:
-                ex_question = request.POST['sha1']
+                ex_question = request.POST['problem_type']
                 if 'non_summative' in request.POST:
                     ex_question = request.POST['non_summative']
                 user_exercise, correct = attempt_problem(
@@ -655,6 +657,8 @@ class UserexerciseResource(ModelResource):
                     request.POST['complete'],
                     request.POST['count_hints'],
                     int(request.POST['time_taken']),
+                    request.POST['correct_keys'],
+                    request.POST['exposed_key'],
                     request.POST['attempt_content'],
                     request.POST['module_name'],
                     ex_question,
@@ -701,7 +705,7 @@ class UserexerciseResource(ModelResource):
             if user_exercise and ubook:
                 bme = BookModuleExercise.components.filter(book=ubook.book,
                                                            module=module, exercise=kexercise)[0]
-                ex_question = request.POST['sha1']
+                ex_question = request.POST['problem_type']
                 if 'non_summative' in request.POST:
                     ex_question = request.POST['non_summative']
                 user_exercise, correct = attempt_problem(
@@ -711,6 +715,8 @@ class UserexerciseResource(ModelResource):
                     request.POST['complete'],
                     request.POST['count_hints'],
                     int(request.POST['time_taken']),
+                    request.POST['correct_keys'],
+                    request.POST['exposed_key'],
                     request.POST['attempt_content'],
                     request.POST['module_name'],
                     ex_question,
