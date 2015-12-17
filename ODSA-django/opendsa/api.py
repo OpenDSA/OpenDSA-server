@@ -474,8 +474,9 @@ class UserexerciseResource(ModelResource):
                                                               request.POST['complete'],
                                                               request.POST['count_hints'],
                                                               int(request.POST['time_taken']),
-                                                              request.POST['correct_keys'],
-                                                              request.POST['exposed_key'],
+                                                              # This part is rolled back temporarily
+                                                              # request.POST['correct_keys'],
+                                                              # request.POST['exposed_key'],
                                                               request.POST['attempt_content'],
                                                               request.POST['module_name'],
                                                               ex_question,
