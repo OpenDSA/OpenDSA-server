@@ -1,0 +1,3 @@
+[submodule "OpenPOP"]
+	path = OpenPOP
+	url = https://github.com/OpenDSA/OpenPOP.git
