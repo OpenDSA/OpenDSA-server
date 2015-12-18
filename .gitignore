@@ -2,7 +2,7 @@
 *.pyc
 *.class
 settings.py
-#conf.py
+conf.py
 *.bk
 ODSA-django/stunnel.log
 ODSA-django/media
