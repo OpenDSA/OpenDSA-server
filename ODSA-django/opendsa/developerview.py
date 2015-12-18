@@ -62,7 +62,7 @@ course_name = {4: 'CS223', 5:'CS3114A', 6:'CS3114B'}
 #   - 538 - has UserBook associations for both 5 and 6 but is in CS3114A (book 5)
 #   - 592 - abandoned?, only completed 2 exercises
 #   - 617 - no exercises (user registered and looked at the gradebook, that's it)
-accounts_to_ignore = {4: [20, 40, 41, 42, 43, 45, 54, 88, 89, 222, 547], 5:[30, 510, 626, 632], 6:[29, 462, 471, 473, 481, 499, 538, 592, 617]}
+accounts_to_ignore = {4: [20, 40, 41, 42, 43, 45, 54, 88, 89, 222, 547], 5:[30, 510], 6:[29, 462, 471, 473, 481, 499, 538, 592, 617]}
 
 # http://stackoverflow.com/questions/10482339/how-to-find-median
 def median(mylist):
@@ -392,6 +392,7 @@ def time_required(request, book):
 def skipping_text(request, book):
   # Select all users of a given book, except staff accounts, the phantom (guest) account and abandoned accounts
   users = UserBook.objects.filter(book=book, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
+  #users = UserBook.objects.filter(book=book, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
   users = [user for user in users]
   users.sort()
 
@@ -518,7 +519,8 @@ def slideshow_stats(request, book):
   # Needs to count the total number of slideshows a student attempts, the number they complete, the number they cheat on and the average time
 
   # Select all users of a given book, except staff accounts, the phantom (guest) account and abandoned accounts
-  users = UserBook.objects.filter(book=book, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
+  #users = UserBook.objects.filter(book=book, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
+  users = UserBook.objects.filter(book=book, grade=1, user__is_staff=0).exclude(user__username='phantom').exclude(user__in=accounts_to_ignore[int(book)]).order_by('id').values_list('user_id', flat=True)
   users = [user for user in users]
   users.sort()
 
@@ -534,17 +536,17 @@ def slideshow_stats(request, book):
   total_num_ss_times = 0
 
   # Create the CSV directory if necessary
-  if not os.path.exists('CSV'):
-    os.mkdir('CSV')
+  if not os.path.exists(settings.MEDIA_ROOT + 'CSV'):
+    os.mkdir(settings.MEDIA_ROOT + 'CSV')
 
-  with open('CSV/' + book + '_slideshow_stats.csv', 'w') as file:
+  with open(settings.MEDIA_ROOT + 'CSV/' + book + '_slideshow_stats.csv', 'w') as file:
     file.write('Slideshows Stats (' + course_name[int(book)] + ')\n')
     file.write('User,Total Attempted,Unique Attempted,Total Completed,Unique Completed,Number Rushed Through,Number of Slideshows Missing Some Event Data,Number of Slideshows Missing All Event Data,Total Number of Slideshows Missing Event Data,Skipped for Credit,Median Seconds Per Slide\n')
 
     for user in users:
       # Filter UserExerciseLog by user and slideshows where the user gained proficiency
       # Possible to also limit by a time threshold (to reduce the number of results that require processing, but then we can't determine the total number of completions (time_taken__lte=2)
-      user_exercise_logs = UserExerciseLog.objects.filter(user=user, exercise__ex_type='ss', earned_proficiency=1).order_by('time_done').only('exercise', 'time_taken', 'count_attempts')
+      user_exercise_logs = UserExerciseLog.objects.filter(user=user, exercise__ex_type='ss', correct=1).order_by('time_done').only('exercise', 'time_taken', 'count_attempts')
 
       # Initialize counters
       total_attempted = 0
@@ -618,7 +620,8 @@ def slideshow_stats(request, book):
             # Determine if the user cheated on this instance
 
             # Parse the total number of slides from the description
-            num_slides = int(event['description'].split(' / ')[1])
+            #num_slides = int(event['description'].split(' / ')[1])
+            num_slides = int(json.loads(event['description'])['currentStep'])
 
             # Get the descriptions of events from a specific exercise instance
             descriptions = ss_events_query.filter(user=user, exercise=exercise, uiid=uiid).values_list('description', flat=True)
@@ -681,7 +684,7 @@ def slideshow_stats(request, book):
 
       file.write(','.join(str(x) for x in [user, total_attempted, unique_attempted, total_completed, unique_completed, rushed_through, num_missing_some_data, num_missing_all_data, (num_missing_some_data + num_missing_all_data), skipped_for_credit, med_time]) + '\n')
 
-  with open('CSV/' + book + '_slideshow_rushing_threshold.csv', 'w') as file:
+  with open(settings.MEDIA_ROOT + 'CSV/' + book + '_slideshow_rushing_threshold.csv', 'w') as file:
     file.writelines('Bins of Normalized Time Per Slide,Bin size = %s seconds\n' % bin_size)
     file.writelines('Time (Seconds),Number of Slideshows Whose Normalized Time Per Slide is in Each Time Range\n')
 
@@ -714,7 +717,7 @@ def slideshow_stats(request, book):
     file.writelines('\nQuartiles (%s second resolution)\n1st,2nd,3rd\n' % bin_size)
     file.writelines(','.join(str(t) + ' sec' for t in quartile_times))
 
-  with open('CSV/' + book + '_slideshow_median_histogram.csv', 'w') as file:
+  with open(settings.MEDIA_ROOT + 'CSV/' + book + '_slideshow_median_histogram.csv', 'w') as file:
     file.writelines('Histogram of Median Normalized Time Per Slide,Bin size = %s seconds\n' % median_bin_size)
     file.writelines('Time (Seconds),Number of Students Whose Median Time Per Slide is in Each Time Range\n')
 

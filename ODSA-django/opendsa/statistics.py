@@ -465,11 +465,11 @@ def exercises_logs( course=None):
       obj_book = Books.objects.filter(courses=obj_course)
       if obj_book:
         book_ = obj_book[0]
-        clause_1 = " WHERE user_id in (SELECT user_id FROM opendsa_userbook WHERE book_id=%s AND grade=1)" %int(book_.id)      
+        clause_1 = " WHERE user_id in (SELECT user_id FROM opendsa_userbook WHERE book_id=%s AND grade=1) AND time_done>='%s' and time_done<='%s'" %(int(book_.id),str(obj_course.starting_time),str(obj_course.ending_time))      
         clause_2 = "WHERE id in (SELECT user_id FROM opendsa_userbook WHERE book_id=%s AND grade=1)" %int(book_.id)
-        clause_3 = "WHERE book_id =%s" %int(book_.id)
-        clause_4 = "AND user_id in (SELECT user_id FROM opendsa_userbook WHERE book_id=%s AND grade=1)" %int(book_.id)
-        clause_5 = " AND `opendsa_userexerciselog`.`user_id` in (SELECT user_id FROM opendsa_userbook WHERE book_id=%s AND grade=1)" %int(book_.id)
+        clause_3 = "WHERE book_id =%s AND action_time>='%s' and action_time<='%s'" %(int(book_.id),str(obj_course.starting_time),str(obj_course.ending_time))
+        clause_4 = "AND user_id in (SELECT user_id FROM opendsa_userbook WHERE book_id=%s AND grade=1) AND time_done>='%s' and time_done<='%s'" %(int(book_.id),str(obj_course.starting_time),str(obj_course.ending_time))
+        clause_5 = " AND `opendsa_userexerciselog`.`user_id` in (SELECT user_id FROM opendsa_userbook WHERE book_id=%s AND grade=1) AND time_done>='%s' and time_done<='%s'" %(int(book_.id),str(obj_course.starting_time),str(obj_course.ending_time))
     #days rage, now all dayys the book was used
     day_list = UserExerciseLog.objects.raw('''SELECT id, DATE(action_time) As date
                                                   FROM opendsa_userbutton {0}

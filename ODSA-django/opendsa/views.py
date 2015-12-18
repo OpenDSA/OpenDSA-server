@@ -282,9 +282,12 @@ def daily_summary(request, course_instance=None):
 
     exercises_logs(course_instance)
    
+    filename = 'daily_stats.json'
+    if course_instance is not None:
+        filename = 'daily_stats_%s.json' %course_instance.lower()
  
     context = RequestContext(request, {'courses': ci_List, 'instance': course_instance,'daily_stats': str(settings.MEDIA_URL \
-                                                      + 'daily_stats.json')})
+                                                      + filename)})
     return render_to_response("opendsa/daily-ex-stats.html", context)
 
 
@@ -528,6 +531,252 @@ def merged_book(request, book, book1):
     return render_to_response("opendsa/class_summary.html", context)
 
 
+@login_required
+def class_summary_correct(request, book, course):
+    """
+    View creating the data displayed in the class activity spreadsheet
+    """
+    if is_authorized(request.user, book, course):
+        exe_bme = []
+        obj_book = Books.objects.get(book_name = book)
+        max_book_points = 0
+        udata_list = []
+        udata_list1 = []
+        columns_list = []
+        columns_list1 = []
+        columns_list_exe = []  #for exercises
+        columns_list.append({"sTitle":"Id"})
+        columns_list.append({"sTitle":"Username"})
+        columns_list.append({"sTitle":"Email"})
+        columns_list.append({"sTitle":"Score"})
+        #get book instances required exercises
+        for bexe in BookModuleExercise.components.filter( \
+                                         book = obj_book):
+            if Decimal(bexe.points) > Decimal(0):
+                exe_bme.append(bexe)
+
+                max_book_points += Decimal(bexe.points)
+
+                columns_list.append({"sTitle":str(bexe.exercise.name)+ \
+                                         '('+str(bexe.points)+')'+ \
+                                         '<span class="details" \
+                                         style="display:inline;" \
+                                         data-type="' + \
+                                         str(bexe.exercise.description) + \
+                                         '"></span>',"sClass": "center" })
+        userData = UserData.objects.select_related().filter( \
+                                                     book = obj_book, \
+                                                     user__is_staff = 0 \
+                                                     ).order_by('user')
+
+
+        users = []
+        for userdata in userData:
+            if not userdata.user.is_staff and display_grade( \
+                                              userdata.user, obj_book):
+                u_points = 0
+                u_data = []
+                u_data.append(0)
+                u_data.append(str(userdata.user.username))
+                u_data.append(str(userdata.user.email))
+                u_data.append(0)
+                u_assign = []
+                for bexe in exe_bme:
+                        u_ex = None
+                        user_exe = UserExercise.objects.filter( \
+                                                user = userdata.user, \
+                                                exercise = bexe.exercise)
+                        if not user_exe and (not bexe.exercise.id in userdata.get_prof_list()):
+                            exe_str = '' 
+                        else:
+                            user_exe = user_exe[0]
+                            u_ex = user_exe
+                            #assignment_points += Decimal(bexe.points)
+                            exe_str = ''
+                            #if bexe.exercise.id in userdata.get_prof_list():
+                            u_points += Decimal(bexe.points)
+                            correct = 0
+                            if bexe.exercise.ex_type=='ka':
+                                correct =  int(divmod(Decimal(u_ex.progress),1)[0]) 
+                            else:
+                                correct = int(u_ex.total_correct)
+
+                            exe_str = '<span class="details" \
+                                  style="display:inline;" \
+                                  data-type="First done:%s, \
+                                  Last done:%s, Total done:%i, \
+                                  Total correct:%i, \
+                                  Proficiency date:%s">%i</span>' \
+                                  %(str(u_ex.first_done), \
+                                  str(u_ex.last_done), \
+                                  int(u_ex.total_done), \
+                                  int(u_ex.total_correct), \
+                                  str(u_ex.proficient_date),int(correct))
+
+                            #if bexe.exercise.id in userdata.get_started_list() and \
+                            #              bexe.exercise.id not in \
+                            #              userdata.get_prof_list():
+                            #    exe_str = '<span class="details" \
+                            #          style="visibility: hidden; \
+                            #          display:inline;" \
+                            #          data-type="First done:%s, \
+                            #          Last done:%s, Total done:%i, \
+                            #          Total correct:%i, \
+                            #          Proficiency date:%s">Started</span>' \
+                            #          %(str(u_ex.first_done), \
+                            #          str(u_ex.last_done), \
+                            #          int(u_ex.total_done), \
+                            #          int(u_ex.total_correct), \
+                            #          str(u_ex.proficient_date))
+
+                        u_assign.append(exe_str)
+                    #u_assign[0] =  str(students_assignment_points)
+                u_data = u_data + u_assign
+
+                if max_book_points == 0:
+                    max_book_points = 1
+                u_points = (u_points * 100) / max_book_points
+                u_data[3] = str("%.2f" % round(u_points,2))
+                udata_list.append(u_data)
+
+
+        context = RequestContext(request, {'book':book, \
+                                           'max_points':max_book_points, \
+                                           'course':course, \
+                                           'udata_list': udata_list, \
+                                           'columns_list':columns_list})
+        return render_to_response("opendsa/all_summary.html", context)
+    else:
+        return  HttpResponseForbidden('<h1>Page Forbidden</h1>')
+
+
+
+#Table ratio correct/done per exercises per students
+@login_required
+def class_summary_ratio(request, book, course):
+    """
+    View creating the data displayed in the class exercise ratio activity spreadsheet
+    """
+    if is_authorized(request.user, book, course):
+        exe_bme = []
+        obj_book = Books.objects.get(book_name = book)
+        max_book_points = 0
+        udata_list = []
+        udata_list1 = []
+        columns_list = []
+        columns_list1 = []
+        columns_list_exe = []  #for exercises
+        columns_list.append({"sTitle":"Id"})
+        columns_list.append({"sTitle":"Username"})
+        columns_list.append({"sTitle":"Email"})
+        columns_list.append({"sTitle":"Score"})
+        #get book instances required exercises
+        for bexe in BookModuleExercise.components.filter( \
+                                         book = obj_book):
+            if Decimal(bexe.points) > Decimal(0):
+                exe_bme.append(bexe)
+
+                max_book_points += Decimal(bexe.points)
+
+                columns_list.append({"sTitle":str(bexe.exercise.name)+ \
+                                         '('+str(bexe.points)+')'+ \
+                                         '<span class="details" \
+                                         style="display:inline;" \
+                                         data-type="' + \
+                                         str(bexe.exercise.description) + \
+                                         '"></span>',"sClass": "center" })
+        userData = UserData.objects.select_related().filter( \
+                                                     book = obj_book, \
+                                                     user__is_staff = 0 \
+                                                     ).order_by('user')
+
+
+        users = []
+        for userdata in userData:
+            if not userdata.user.is_staff and display_grade( \
+                                              userdata.user, obj_book):
+                u_points = 0
+                u_data = []
+                u_data.append(0)
+                u_data.append(str(userdata.user.username))
+                u_data.append(str(userdata.user.email))
+                u_data.append(0)
+                u_assign = []
+                for bexe in exe_bme:
+                        u_ex = None
+                        user_exe = UserExercise.objects.filter( \
+                                                user = userdata.user, \
+                                                exercise = bexe.exercise)
+                        if not user_exe and (not bexe.exercise.id in userdata.get_prof_list()):
+                            exe_str = ''
+                            #continue 
+                        else:
+                            user_exe = user_exe[0]
+                            u_ex = user_exe
+                            #assignment_points += Decimal(bexe.points)
+                            exe_str = ''
+                            if int(u_ex.total_done)==0:
+                                ratio = 0
+                            else:
+                                ratio = int(u_ex.total_correct)/Decimal(u_ex.total_done)
+                                if ratio < 0.50:
+                                    ratio = 0
+                                else:
+                                    ratio = 1
+                                
+                            if bexe.exercise.id in userdata.get_prof_list():
+                                u_points += Decimal(bexe.points)
+                                exe_str = '<span class="details" \
+                                      style="display:inline;" \
+                                      data-type="First done:%s, \
+                                      Last done:%s, Total done:%i, \
+                                      Total correct:%i, \
+                                      Proficiency date:%s">%.2f</span>' \
+                                      %(str(u_ex.first_done), \
+                                      str(u_ex.last_done), \
+                                      int(u_ex.total_done), \
+                                      int(u_ex.total_correct), \
+                                      str(u_ex.proficient_date),round(ratio,2))
+                            if bexe.exercise.id in userdata.get_started_list() and \
+                                          bexe.exercise.id not in \
+                                          userdata.get_prof_list():
+                                exe_str = '<span class="details" \
+                                      style="visibility: hidden; \
+                                      display:inline;" \
+                                      data-type="First done:%s, \
+                                      Last done:%s, Total done:%i, \
+                                      Total correct:%i, \
+                                      Proficiency date:%s">%.2f</span>' \
+                                      %(str(u_ex.first_done), \
+                                      str(u_ex.last_done), \
+                                      int(u_ex.total_done), \
+                                      int(u_ex.total_correct), \
+                                      str(u_ex.proficient_date),round(ratio,2))
+
+                        u_assign.append(exe_str)
+                    #u_assign[0] =  str(students_assignment_points)
+                u_data = u_data + u_assign
+
+                if max_book_points == 0:
+                    max_book_points = 1
+                u_points = (u_points * 100) / max_book_points
+                u_data[3] = str("%.2f" % round(u_points,2))
+                udata_list.append(u_data)
+
+
+        context = RequestContext(request, {'book':book, \
+                                           'max_points':max_book_points, \
+                                           'course':course, \
+                                           'udata_list': udata_list, \
+                                           'columns_list':columns_list})
+        return render_to_response("opendsa/all_summary.html", context)
+    else:
+        return  HttpResponseForbidden('<h1>Page Forbidden</h1>')
+
+
+
+
+
 
 
 @login_required
@@ -547,7 +796,7 @@ def class_summary(request, book, course):
         columns_list.append({"sTitle":"Id"})
         columns_list.append({"sTitle":"Username"})
         columns_list.append({"sTitle":"Email"})
-        columns_list.append({"sTitle":"Score(%)"})
+        columns_list.append({"sTitle":"Score"})
         #get book instances required exercises
         for bexe in BookModuleExercise.components.filter( \
                                          book = obj_book):
@@ -675,11 +924,11 @@ def exercise_summary(request, book, course):
         columns_list.append({"sTitle":"Id"})
         columns_list.append({"sTitle":"Username"})
         columns_list.append({"sTitle":"Email"})
-        columns_list.append({"sTitle":"Score(%)"})
+        columns_list.append({"sTitle":"Score"})
         columns_list1.append({"sTitle":"Id"})
         columns_list1.append({"sTitle":"Username"})
         columns_list1.append({"sTitle":"Email"})
-        columns_list1.append({"sTitle":"Score(%)"})
+        columns_list1.append({"sTitle":"Score"})
         #get list of book assignments
         assignments_list = Assignments.objects.select_related().filter( \
                            assignment_book=obj_book).order_by( \
@@ -778,12 +1027,12 @@ def exercise_summary(request, book, course):
                                           data-type="First done:%s, \
                                           Last done:%s, Total done:%i, \
                                           Total correct:%i, \
-                                          Proficiency date:%s">Done</span>' \
+                                          Proficiency date:%s">%s</span>' \
                                           %(str(u_ex.first_done), \
                                           str(u_ex.last_done), \
                                           int(u_ex.total_done), \
                                           int(u_ex.total_correct), \
-                                          str(u_ex.proficient_date))
+                                          str(u_ex.proficient_date),str(Decimal(bexe.points)) )
                                 else:
                                     penalty = Decimal(bexe.points) * (Decimal(1)-Decimal(assignment.course_module.late_submission_penalty))
                                     u_points += Decimal(penalty)
@@ -793,12 +1042,12 @@ def exercise_summary(request, book, course):
                                           data-type="First done:%s, \
                                           Last done:%s, Total done:%i, \
                                           Total correct:%i, \
-                                          Proficiency date:%s">Late</span>' \
+                                          Proficiency date:%s">%s</span>' \
                                           %(str(u_ex.first_done), \
                                           str(u_ex.last_done), \
                                           int(u_ex.total_done), \
                                           int(u_ex.total_correct), \
-                                          str(u_ex.proficient_date))
+                                          str(u_ex.proficient_date),str(Decimal(penalty)))
                             if exercise.id in userdata.get_started_list() and \
                                           exercise.id not in \
                                           userdata.get_prof_list():    
@@ -808,7 +1057,7 @@ def exercise_summary(request, book, course):
                                       data-type="First done:%s, \
                                       Last done:%s, Total done:%i, \
                                       Total correct:%i, \
-                                      Proficiency date:%s">Started</span>' \
+                                      Proficiency date:%s">0</span>' \
                                       %(str(u_ex.first_done), \
                                       str(u_ex.last_done), \
                                       int(u_ex.total_done), \
@@ -818,14 +1067,16 @@ def exercise_summary(request, book, course):
                         u_assign.append(exe_str)
                     if assignment_points == 0:
                        assignment_points = 1
-                    assign_score_percent = (students_assignment_points*100)/assignment_points
+                    #assign_score_percent = (students_assignment_points*100)/assignment_points
+                    assign_score_percent = students_assignment_points 
                     u_assign[0] =  str("%.2f" % round(assign_score_percent,2))
                     u_data = u_data + u_assign
                     u_data1.append(str("%.2f" % round(assign_score_percent,2)))                     #str(students_assignment_points))
                
                 if max_assignments_points == 0:
                     max_assignments_points = 1 
-                u_points = (u_points * 100) / max_assignments_points 
+                #u_points = (u_points * 100) / max_assignments_points 
+                #u_points = max_assignments_points
                 u_data[3] = str("%.2f" % round(u_points,2))
                 udata_list.append(u_data)
                 u_data1[3] = str("%.2f" % round(u_points,2))
@@ -867,6 +1118,32 @@ def get_all_activity(request, module_id):
         course_module = CourseModule.objects.get(id=module_id)
         for c_book in  Books.objects.filter(courses=course_module.course_instance):
             return class_summary(request, c_book.book_name, \
+                   course_module.course_instance.instance_name)
+        return HttpResponseForbidden('<h1>No class activity</h1>')
+    return HttpResponseForbidden('<h1>No class activity</h1>')
+
+
+def get_all_activity_ratio(request, module_id):
+    """
+    efouh: Leaving this for now.
+    """
+    if module_id:
+        course_module = CourseModule.objects.get(id=module_id)
+        for c_book in  Books.objects.filter(courses=course_module.course_instance):
+            return class_summary_ratio(request, c_book.book_name, \
+                   course_module.course_instance.instance_name)
+        return HttpResponseForbidden('<h1>No class activity</h1>')
+    return HttpResponseForbidden('<h1>No class activity</h1>')
+
+
+def get_all_activity_correct(request, module_id):
+    """
+    efouh: Leaving this for now.
+    """
+    if module_id:
+        course_module = CourseModule.objects.get(id=module_id)
+        for c_book in  Books.objects.filter(courses=course_module.course_instance):
+            return class_summary_correct(request, c_book.book_name, \
                    course_module.course_instance.instance_name)
         return HttpResponseForbidden('<h1>No class activity</h1>')
     return HttpResponseForbidden('<h1>No class activity</h1>')
@@ -1057,7 +1334,7 @@ def create_accounts(request, module_id):
             #send notification email
             subject = '[OpenDSA] Students accounts created'
             message = 'List of accounts created.\n\n\n\n' + roster
-            send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', [current_user.email], fail_silently=False)
+            send_mail(subject, message, 'noreply@opendsa.cs.vt.edu', [current_user.email], fail_silently=False)
 
     else:
         form = AccountsCreationForm()
@@ -1102,7 +1379,7 @@ def upload_accounts(request, module_id):
                         #send notification email
                         subject = '[OpenDSA] account created'
                         message = 'Your OpenDSA account has been  created for the Book instance at %s.\n\n\n username: %s\n password:%s' %(book.book_url,username, password)
-                        send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', [email], fail_silently=False)
+                        send_mail(subject, message, 'noreply@opendsa.cs.vt.edu', [email], fail_silently=False)
 
 
                 messages.success(request, \
