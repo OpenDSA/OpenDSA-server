@@ -60,7 +60,7 @@ public class studentRecCLogPROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You probably have infinite recursion. Please revise your code.");
     }
     if (studentAnswer == modellog(b , n)) SUCCESS = true;
 
@@ -75,7 +75,7 @@ public class studentRecCLogPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect Base case or recursive call!");
+     output.println("Try Again! Incorrect Base case or recursive call.");
      output.close();
     }
   

@@ -66,7 +66,7 @@ public class studentRecHMinPROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You probably have infinite recursion. Please revise your code.");
     }
     
     if (studentAnswer == modelrecursiveMin(numbers,0)) SUCCESS = true;
@@ -82,7 +82,7 @@ public class studentRecHMinPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect recursive call!");
+     output.println("Try Again! Incorrect recursive call.");
      output.close();
     }
   

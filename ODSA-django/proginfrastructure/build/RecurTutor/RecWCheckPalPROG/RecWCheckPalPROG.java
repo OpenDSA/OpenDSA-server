@@ -65,7 +65,7 @@ public class studentRecWCheckPalPROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You probably have infinite recursion. Please revise your code.");
     }
     
     if (studentAnswer == modelCheckPalindrome(str)) SUCCESS1 = true;
@@ -78,7 +78,7 @@ public class studentRecWCheckPalPROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You probably have infinite recursion. Please revise your code.");
     }
     
     if (studentAnswer == modelCheckPalindrome(str)) SUCCESS2 = true;
@@ -94,7 +94,7 @@ public class studentRecWCheckPalPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect answer!");
+     output.println("Try Again! Incorrect answer.");
      output.close();
     }
   

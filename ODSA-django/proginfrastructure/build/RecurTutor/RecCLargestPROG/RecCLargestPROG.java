@@ -72,7 +72,7 @@ public class studentRecCLargestPROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You probably have infinite recursion. Please revise your code.");
     }
     
     boolean SUCCESS = false;
@@ -92,7 +92,7 @@ public class studentRecCLargestPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect Base case!");
+     output.println("Try Again! Incorrect Base case.");
      output.close();
     }
   

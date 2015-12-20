@@ -67,7 +67,7 @@ public class studentRecWPascalPROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You probably have infinite recursion. Please revise your code.");
     }
     
     if (studentAnswer == modelpascal(row, column))  SUCCESS = true;
@@ -98,7 +98,7 @@ public class studentRecWPascalPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect answer!");
+     output.println("Try Again! Incorrect answer.");
      output.close();
     }
   

@@ -62,7 +62,7 @@ public class studentRecCSumOfDigitsPROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You probably have infinite recursion. Please revise your code.");
     }
     
     if ( studentAnswer == modelsumOfDigits(number)) SUCCESS = true;
@@ -78,7 +78,7 @@ public class studentRecCSumOfDigitsPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect recursive call!");
+     output.println("Try Again! Incorrect recursive call.");
      output.close();
     }
   

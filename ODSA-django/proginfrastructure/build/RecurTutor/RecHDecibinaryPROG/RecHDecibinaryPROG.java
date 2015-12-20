@@ -64,7 +64,7 @@ public class studentRecHDecibinaryPROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You are probably having an infinite recursion. Please revise your code.");
     }
     
     if (studentAnswer.equals(modeldecibinary(number))) SUCCESS = true;
@@ -80,7 +80,7 @@ public class studentRecHDecibinaryPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect recursive call or action!");
+     output.println("Try Again! Incorrect recursive call or action.");
      output.close();
     }
   
