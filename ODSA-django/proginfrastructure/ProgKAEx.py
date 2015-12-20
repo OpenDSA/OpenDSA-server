@@ -283,7 +283,7 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
 
     if checkDefinedvar == "True":
        if data.count(datatypes[0]) > 1 or (any( x in data for x in datatypes[1:len(datatypes)])):
-          feedback[1]= ["Try Again! You should not declare any variables!"]
+          feedback[1]= ["Try Again! You should not declare any variables."]
           return feedback , peruserFilesPath
 
     if os.path.isfile(peruserFilesPath+'runerrors.out'):
@@ -295,7 +295,7 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
           for line in feedback[1]:
               print "line" + line
               if "at java.security.AccessControlContext.checkPermission" in line:
-                 feedback[1]= ["Try Again! Your solution shouldn't write files to the disk!"]
+                 feedback[1]= ["Try Again! Your solution shouldn't write files to the disk."]
                  return feedback , peruserFilesPath
               elif 'Exception in thread "main" java.lang.StackOverflowError' in line:
                  feedback[1]= ["Try Again! Your solution leads to infinite recursion!"]
@@ -305,7 +305,7 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
 		 #return feedback
 	      
               elif 'infinite recursion' in line:
-                 feedback[1]= ["Try Again! You are probably having an infinite recursion! Please revise your code!"]
+                 feedback[1]= ["Try Again! You probably have infinite recursion."]
                  os.system("pkill -TERM -P"+ str(proc1.pid) ) # terminate all the processes because we need to terminate the thread as well
                  return feedback , peruserFilesPath
               elif 'Exception in thread "main"' in line:
