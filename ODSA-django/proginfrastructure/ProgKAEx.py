@@ -326,7 +326,7 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
 		   # it is correct but..for recursion check they are doing it recursively
 		   # it is correct but..for binary trees check they are doing it in the effecient way
            if "Well Done" in line: # static code analysis
-	      if progexType == "binarytree": 
+	      if progexType == "BTRecurTutor": 
 		   efficient,btineffFB = btcheckEfficientCode(data , testfilenamep)
 		   if efficient == True:
 	 	     feedback[0] = True
