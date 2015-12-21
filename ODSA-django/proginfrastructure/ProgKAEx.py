@@ -156,8 +156,8 @@ def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftype
     elif "RecurTutor" in progexType:   
        feedback, peruserFilesPath= assessprogkaex(data,"RecurTutor/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes , progexType, user_data)
 
-    elif "pointers" in progexType:   
-       feedback, peruserFilesPath= assessprogkaex(data,"pntrtest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes , progexType, user_data)
+    elif "Pointers" in progexType:   
+       feedback, peruserFilesPath= assessprogkaex(data,"Pointers/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes , progexType, user_data)
     return feedback, peruserFilesPath   
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
