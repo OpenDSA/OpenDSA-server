@@ -12,7 +12,7 @@ def btcheckEfficientCode(studentCode , exerciseName):
         # 2- Checking on the children values.
         # 3- No check on Left (for any min of a bst the left sub-tree has to be traversed)
         # 4- Check if the root is leaf to terminate
-	if exerciseName == "bstMinPROG" or  exerciseName == "bstsmallCountPROG":
+	if exerciseName == "bstMinPROG" or  exerciseName == "BSTsmallcountPROG":
                 efficient1, feedback1 = checkNoLeftSubTreeMisconception(studentCode)
 		efficient2, feedback2 = checkChildisNullMisconception(studentCode) 
                 efficient3, feedback3 = checkChildValueMisconception(studentCode)
@@ -28,7 +28,7 @@ def btcheckEfficientCode(studentCode , exerciseName):
         # For everynode check if the sum of the left subtree plus the right sub-tree always equals the root value
         # Check on the following misconceptions (The following should not be done):
         # 1- Check if the root is leaf to terminate
-        elif exerciseName== "btcheckSumPROG":
+        elif exerciseName== "BTchecksumPROG":
                 efficient, feedback =  checkifLeafMisconception(studentCode)                       
 	
         # Other exercises:
@@ -42,12 +42,12 @@ def btcheckEfficientCode(studentCode , exerciseName):
                 efficient = (efficient1 and efficient2)
                 feedback = feedback1 + feedback2 
 
-                if exerciseName != "btLeafPROG":
+                if exerciseName != "BTleafPROG":
                   efficient3, feedback3 = checkifLeafMisconception(studentCode)
                   efficient = (efficient and efficient3)
                   feedback = feedback + feedback3
             
-                if exerciseName == "mbtSwapPROG":
+                if exerciseName == "MBTswapPROG":
 		  efficient4, feedback4 = checkifRootsSwapped(studentCode)
                   efficient = (efficient and efficient4)             
                   feedback = feedback + feedback4
