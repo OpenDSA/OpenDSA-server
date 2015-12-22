@@ -175,7 +175,7 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
     #print testfilenamep
     print peruserFilesPath 
     # count the number of lines in the original test file so that we can have the error shown to the student with respect to the student's code
-    if progexType == "pointers":
+    if progexType == "Pointers":
       TestFile = open(filesPath+testfilenamep+"part1.java" , 'r')
       with TestFile:
         for i, l in enumerate(TestFile):
