@@ -336,7 +336,7 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
 		     feedback[1]= btineffFB
 		     return feedback , peruserFilesPath
 					
-              elif progexType =="pointers": 
+              elif progexType =="Pointers": 
 		    efficient,pntrineffFB = pntrcheckEfficientCode(data , testfilenamep)
 		    if efficient == True:
 	               feedback[0] = True
