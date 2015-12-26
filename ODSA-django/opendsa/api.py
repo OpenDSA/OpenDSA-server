@@ -352,6 +352,7 @@ class ExerciseResource(ModelResource):
                 user_exercise = get_user_exercise(kusername, kexercise)
                 if(user_exercise):
                     bundle.data['progress_streak'] = user_exercise.streak
+                    bundle.data['longest_streak'] = user_exercise.longest_streak
         return bundle
 
     def get_object_list(self, request):
