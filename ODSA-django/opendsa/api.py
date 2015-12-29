@@ -219,6 +219,7 @@ def get_user_exerciselog(user, exercise):
 
     return user_exerciselog
 
+
 class OpendsaAuthentication(ApiKeyAuthentication):
 
     """
@@ -456,24 +457,7 @@ class UserexerciseResource(ModelResource):
             url(r"^(?P<resource_name>%s)/getprogress%s$"
                 % (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('getprogress'), name="api_getprogress"),
-            url(r"^(?P<resource_name>%s)/exerciselog%s$"
-                % (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('exerciselog'), name="api_exerciselog"),
         ]
-
-def exerciselog(self, request, **kwargs):
-    if request.POST['key']:
-        kusername = get_username(request.POST['key'])
-        kexercise = get_exercise(request.POST['sha1'])
-        kuid = User.objects.get(username=kusername)
-        uid = kuid.id
-
-        user_exerciselog = get_user_exerciselog(uid, kexercise)
-
-        print jsonpickle.encode(user_exerciselog)
-        return self.create_response(request,
-                                    jsonpickle.encode(user_exerciselog))
-
 
     def logprogexercise(self, request, **kwargs):
         if request.POST['key']:
@@ -510,8 +494,8 @@ def exerciselog(self, request, **kwargs):
                                                               request.POST['complete'],
                                                               request.POST['count_hints'],
                                                               int(request.POST['time_taken']),
-                                                              request.POST['correct_keys'],
-                                                              request.POST['exposed_key'],
+                                                            #   request.POST['correct_keys'],
+                                                            #   request.POST['exposed_key'],
                                                               request.POST['attempt_content'],
                                                               request.POST['module_name'],
                                                               ex_question,
@@ -545,6 +529,21 @@ def exerciselog(self, request, **kwargs):
                 return self.create_response(request,
                                             {'progress': user_exercise.progress})
         return self.create_response(request, {'progress': 0})
+
+    def logexerciselog(self, request, **kwargs):
+        if request.POST['key']:
+            kusername = get_username(request.POST['key'])
+            kexercise = get_exercise(request.POST['sha1'])
+            kuid = User.objects.get(username=kusername)
+            uid = kuid.id
+
+            response_data = jsonpickle.encode(user_exerciselog)
+            response_data['result'] = 'error'
+            response_data['message'] = 'Some error message'
+
+            # user_exerciselog = get_user_exerciselog(uid, kexercise)
+            # print jsonpickle.encode(user_exerciselog)
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     def logavbutton(self, request, **kwargs):
         print(request.POST)
@@ -599,6 +598,9 @@ def exerciselog(self, request, **kwargs):
                         )
                         if correct:
                             number_logs += 1
+                        # u = User.objects.get(username=kusername)
+                        # uid = u.id
+                        # exposed_key = UserExerciseLog.objects.filter(user_id=uid).values('exposed_key').order_by('-id')[0]
 
         if number_logs == len(actions):
             return self.create_response(request, {'success': True,
@@ -660,9 +662,12 @@ def exerciselog(self, request, **kwargs):
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
             kexercise = get_exercise(request.POST['sha1'])
+            kuid = User.objects.get(username=kusername)
+            uid = kuid.id
 
             if kusername and kexercise:
                 user_exercise = get_user_exercise(kusername, kexercise)
+                # user_exerciselog = get_user_exerciselog(uid, kexercise)
 
                 if user_exercise is None:
                     with transaction.commit_on_success():
@@ -701,13 +706,21 @@ def exerciselog(self, request, **kwargs):
                     request.META['REMOTE_ADDR'],
                 )
 
+                u = User.objects.get(username=kusername)
+                uid = u.id
+                exposed_key = UserExerciseLog.objects.filter(user_id=uid).values('correct_keys').order_by('-id')[0]
+                # return self.create_response(request, {'message': exposed_key})
+
+
                 if correct:
                     print jsonpickle.encode(user_exercise)
                     return self.create_response(request,
                                                 jsonpickle.encode(user_exercise))
+                    # return self.create_response(request, {'message': exposed_key})
                 else:
                     return self.create_response(request,
                                                 {'error': 'attempt not logged'}, HttpBadRequest)
+
         return self.create_response(request, {'error': 'unauthorized action'},
                                     HttpUnauthorized)
 
@@ -796,6 +809,21 @@ class ProblemlogResource(ModelResource):
         allowed_methods = ['get']
         authentication = Authentication()
         authorization = ReadOnlyAuthorization()
+
+    def logexerciselog(self, request, **kwargs):
+        if request.POST['key']:
+            kusername = get_username(request.POST['key'])
+            kexercise = get_exercise(request.POST['sha1'])
+            kuid = User.objects.get(username=kusername)
+            uid = kuid.id
+
+            response_data = jsonpickle.encode(user_exerciselog)
+            response_data['result'] = 'error'
+            response_data['message'] = 'Some error message'
+
+            # user_exerciselog = get_user_exerciselog(uid, kexercise)
+            # print jsonpickle.encode(user_exerciselog)
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 
 class UserDataResource(ModelResource):
@@ -1336,32 +1364,29 @@ class BugsResource(ModelResource):
         return self.create_response(request, {'error': 'Bad requested'},
                                     HttpBadRequest)
 
-class UserExerciseLogResource(ModelResource):
-
-    def determine_format(self, request):
-        return "application/json"
-
-    class Meta:
-        queryset = UserExerciseLog.objects.all()
-        resource_name = 'user/exerciselog'
-        excludes = []
-
-        allowed_methods = ['get']
-        authentication = Authentication()
-        authorization = ReadOnlyAuthorization()
-
-    def exerciselog(self, request, **kwargs):
-        if request.POST['key']:
-            kusername = get_username(request.POST['key'])
-            kexercise = get_exercise(request.POST['sha1'])
-            kuid = User.objects.get(username=kusername)
-            uid = kuid.id
-
-            user_exerciselog = get_user_exerciselog(uid, kexercise)
-
-            print jsonpickle.encode(user_exerciselog)
-            return self.create_response(request,
-                                        jsonpickle.encode(user_exerciselog))
+# class UserExerciseLogResource(ModelResource):
+#
+#     def determine_format(self, request):
+#         return "application/json"
+#
+#     class Meta:
+#         queryset = UserExerciseLog.objects.all()
+#         resource_name = 'user/exerciselog'
+#         excludes = []
+#
+#         allowed_methods = ['get']
+#         authentication = Authentication()
+#         authorization = ReadOnlyAuthorization()
+#
+#     def logexercise(self, request, **kwargs):
+#         if request.POST['key']:
+#             kusername = get_username(request.POST['key'])
+#             kexercise = get_exercise(request.POST['sha1'])
+#             kuid = User.objects.get(username=kusername)
+#             uid = kuid.id
+#             print jsonpickle.encode(user_exerciselog)
+#             return self.create_response(request,
+#                                         jsonpickle.encode(user_exerciselog))
 
 
 class UserExerciseSummaryResource(ModelResource):
