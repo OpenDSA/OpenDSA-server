@@ -199,6 +199,25 @@ def get_user_exercise(user, exercise):
 
     return user_exercise
 
+def get_user_exerciselog(user, exercise):
+    """
+    Safe accessor methods - these functions are designed to prevent
+    the problem of duplicate entries being created
+    """
+
+    # u = User.objects.get(username=kusername)
+    # uid = u.id
+    # exposed_key = UserExerciseLog.objects.filter(user_id=uid).values('exposed_key').order_by('-id')[0]
+
+    # return self.create_response(request, {'message': exposed_key})
+
+    _user_exerciselog = UserExerciselog.objects.filter(user_id=uid, exercise=exercise).order_by('-id')
+    if _user_exerciselog:
+        user_exerciselog = _user_exerciselog[0]
+    else:
+        user_exerciselog = None
+
+    return user_exerciselog
 
 class OpendsaAuthentication(ApiKeyAuthentication):
 
@@ -1299,6 +1318,33 @@ class BugsResource(ModelResource):
                                         HttpUnauthorized)
         return self.create_response(request, {'error': 'Bad requested'},
                                     HttpBadRequest)
+
+class UserExerciseLogResource(ModelResource):
+
+    def determine_format(self, request):
+        return "application/json"
+
+    class Meta:
+        queryset = UserExerciseLog.objects.all()
+        resource_name = 'user/exerciselog'
+        excludes = []
+
+        allowed_methods = ['get']
+        authentication = Authentication()
+        authorization = ReadOnlyAuthorization()
+
+    def logexercise(self, request, **kwargs):
+        if request.POST['key']:
+            kusername = get_username(request.POST['key'])
+            kexercise = get_exercise(request.POST['sha1'])
+            kuid = User.objects.get(username=kusername)
+            uid = kuid.id
+
+            user_exerciselog = get_user_exerciselog(uid, kexercise)
+            
+            print jsonpickle.encode(user_exerciselog)
+            return self.create_response(request,
+                                        jsonpickle.encode(user_exerciselog))
 
 
 class UserExerciseSummaryResource(ModelResource):
