@@ -456,7 +456,24 @@ class UserexerciseResource(ModelResource):
             url(r"^(?P<resource_name>%s)/getprogress%s$"
                 % (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('getprogress'), name="api_getprogress"),
+            url(r"^(?P<resource_name>%s)/exerciselog%s$"
+                % (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('exerciselog'), name="api_exerciselog"),
         ]
+
+def exerciselog(self, request, **kwargs):
+    if request.POST['key']:
+        kusername = get_username(request.POST['key'])
+        kexercise = get_exercise(request.POST['sha1'])
+        kuid = User.objects.get(username=kusername)
+        uid = kuid.id
+
+        user_exerciselog = get_user_exerciselog(uid, kexercise)
+
+        print jsonpickle.encode(user_exerciselog)
+        return self.create_response(request,
+                                    jsonpickle.encode(user_exerciselog))
+
 
     def logprogexercise(self, request, **kwargs):
         if request.POST['key']:
@@ -1333,7 +1350,7 @@ class UserExerciseLogResource(ModelResource):
         authentication = Authentication()
         authorization = ReadOnlyAuthorization()
 
-    def logexercise(self, request, **kwargs):
+    def exerciselog(self, request, **kwargs):
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
             kexercise = get_exercise(request.POST['sha1'])
@@ -1341,7 +1358,7 @@ class UserExerciseLogResource(ModelResource):
             uid = kuid.id
 
             user_exerciselog = get_user_exerciselog(uid, kexercise)
-            
+
             print jsonpickle.encode(user_exerciselog)
             return self.create_response(request,
                                         jsonpickle.encode(user_exerciselog))
