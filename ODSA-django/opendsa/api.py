@@ -211,7 +211,7 @@ def get_user_exerciselog(user, exercise):
 
     # return self.create_response(request, {'message': exposed_key})
 
-    _user_exerciselog = UserExerciselog.objects.filter(user_id=uid, exercise=exercise).order_by('-id')
+    _user_exerciselog = UserExerciseLog.objects.filter(user_id=uid, exercise_id=keid).order_by('-id')
     if _user_exerciselog:
         user_exerciselog = _user_exerciselog[0]
     else:
@@ -467,15 +467,17 @@ class UserexerciseResource(ModelResource):
         if request.GET['key']:
             kusername = get_username(request.GET['key'])
             exerciseName = request.GET['exerciseName']
-            print("=======================")
-            print(exerciseName)
-            print("=======================")
+            # print("=======================")
+            # print(exerciseName)
+            # print("=======================")
             kexercise = Exercise.objects.get(name=exerciseName)
             keid = kexercise.id
             kuid = User.objects.get(username=kusername)
             uid = kuid.id
 
+            # user_exerciselog = get_user_exerciselog (uid, keid)
             user_data = UserExerciseLog.objects.filter(user_id=uid, exercise_id=keid).order_by('-id')[0]
+            # if user_data:
             return self.create_response(request, { 'exposed_key': user_data.exposed_key, 'correct_keys': user_data.correct_keys, 'correct': user_data.correct , 'count_attempts': user_data.count_attempts , 'hint_used': user_data.hint_used})
 
     def logprogexercise(self, request, **kwargs):
@@ -819,20 +821,20 @@ class ProblemlogResource(ModelResource):
         authentication = Authentication()
         authorization = ReadOnlyAuthorization()
 
-    def logexerciselog(self, request, **kwargs):
-        if request.POST['key']:
-            kusername = get_username(request.POST['key'])
-            kexercise = get_exercise(request.POST['sha1'])
-            kuid = User.objects.get(username=kusername)
-            uid = kuid.id
-
-            response_data = jsonpickle.encode(user_exerciselog)
-            response_data['result'] = 'error'
-            response_data['message'] = 'Some error message'
-
-            # user_exerciselog = get_user_exerciselog(uid, kexercise)
-            # print jsonpickle.encode(user_exerciselog)
-            return HttpResponse(json.dumps(response_data), content_type="application/json")
+    # def logexerciselog(self, request, **kwargs):
+    #     if request.POST['key']:
+    #         kusername = get_username(request.POST['key'])
+    #         kexercise = get_exercise(request.POST['sha1'])
+    #         kuid = User.objects.get(username=kusername)
+    #         uid = kuid.id
+    #
+    #         response_data = jsonpickle.encode(user_exerciselog)
+    #         response_data['result'] = 'error'
+    #         response_data['message'] = 'Some error message'
+    #
+    #         # user_exerciselog = get_user_exerciselog(uid, kexercise)
+    #         # print jsonpickle.encode(user_exerciselog)
+    #         return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 
 class UserDataResource(ModelResource):
