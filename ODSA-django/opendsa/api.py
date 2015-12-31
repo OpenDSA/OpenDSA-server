@@ -466,12 +466,16 @@ class UserexerciseResource(ModelResource):
     def queryexercise(self, request, **kwargs):
         if request.GET['key']:
             kusername = get_username(request.GET['key'])
-            # kexercise = Exercise.objects.get(name=request.POST['sha1'])
-            # keid = kexercise.id
+            exerciseName = request.GET['exerciseName']
+            print("=======================")
+            print(exerciseName)
+            print("=======================")
+            kexercise = Exercise.objects.get(name=exerciseName)
+            keid = kexercise.id
             kuid = User.objects.get(username=kusername)
             uid = kuid.id
 
-            user_data = UserExerciseLog.objects.filter(user_id=uid).order_by('-id')[0]
+            user_data = UserExerciseLog.objects.filter(user_id=uid, exercise_id=keid).order_by('-id')[0]
             return self.create_response(request, { 'exposed_key': user_data.exposed_key, 'correct_keys': user_data.correct_keys, 'correct': user_data.correct , 'count_attempts': user_data.count_attempts , 'hint_used': user_data.hint_used})
 
     def logprogexercise(self, request, **kwargs):
