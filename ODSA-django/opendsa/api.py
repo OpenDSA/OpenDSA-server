@@ -466,13 +466,13 @@ class UserexerciseResource(ModelResource):
     def queryexercise(self, request, **kwargs):
         if request.GET['key']:
             kusername = get_username(request.GET['key'])
+            # kexercise = Exercise.objects.get(name=request.POST['sha1'])
+            # keid = kexercise.id
             kuid = User.objects.get(username=kusername)
             uid = kuid.id
 
-            u = User.objects.get(username=kusername)
-            uid = u.id
             user_data = UserExerciseLog.objects.filter(user_id=uid).order_by('-id')[0]
-            return self.create_response(request, { 'exposed_key': user_data.exposed_key, 'correct_keys': user_data.correct_keys, 'correct': user_data.correct })
+            return self.create_response(request, { 'exposed_key': user_data.exposed_key, 'correct_keys': user_data.correct_keys, 'correct': user_data.correct , 'count_attempts': user_data.count_attempts , 'hint_used': user_data.hint_used})
 
     def logprogexercise(self, request, **kwargs):
         if request.POST['key']:
@@ -659,12 +659,14 @@ class UserexerciseResource(ModelResource):
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
             kexercise = get_exercise(request.POST['sha1'])
-            kuid = User.objects.get(username=kusername)
-            uid = kuid.id
-
+            # kexercise = Exercise.objects.get(name=request.POST['sha1'])
+            # kuid = User.objects.get(username=kusername)
+            # keid = kexercise.id
+            # uid = kuid.id
+            #
             # u = User.objects.get(username=kusername)
             # uid = u.id
-            # exposed_key = UserExerciseLog.objects.filter(user_id=uid).values('exposed_key').order_by('-id')[0]
+            # exposed_key = UserExerciseLog.objects.filter(user_id=uid, exercise_id=keid).values('exposed_key').order_by('-id')[0]
             # return self.create_response(request, {'message': exposed_key})
 
             if kusername and kexercise:
