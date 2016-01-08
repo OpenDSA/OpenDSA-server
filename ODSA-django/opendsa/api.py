@@ -1501,18 +1501,20 @@ class BugsResource(ModelResource):
                 new_bug.save()
                 server_host = request.get_host()
                 res_url = str(request.get_full_path()).split('submitbug')[0]
-                full_url = str(server_host) + str(res_url) + "bugs/"
+                full_url = str(server_host) + str(res_url)
                 if img is not None:
                     img_str = 'Screenshot:\t' + str(server_host) + str(settings.MEDIA_URL) + str(new_bug.screenshot)
 
                 # send notification email
                 subject = '[OpenDSA] New Bug Reported: %s' % request.POST['title']
-                bug_url = "%s%s/?format=json" % (
-                    full_url, new_bug.id)
-                message = '%s (%s) reported the following bug:\n\n%s\n\nOS:\t%s\nBrowser:\t%s\nURL:\t%s\n%s' % (kusername.username, kusername.email,
+                bug_url = "%s%s/?format=json" % (full_url, new_bug.id)
+                message = '%s (%s) reported the following bug:\n\n%s\n\nOS:\t%s\nBrowser:\t%s\nURL:\t%s\n%s' % (kusername.username,
+                                                                                                                kusername.email,
                                                                                                                 request.POST['description'],
-                                                                                                                new_bug.os_family, new_bug.browser_family,
-                                                                                                                bug_url, img_str)
+                                                                                                                new_bug.os_family,
+                                                                                                                new_bug.browser_family,
+                                                                                                                bug_url,
+                                                                                                                img_str)
                 send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', ['hshahin@cs.vt.edu'], fail_silently=False)
 
                 return self.create_response(request, {'response': 'Bug stored'})
