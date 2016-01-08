@@ -1513,7 +1513,7 @@ class BugsResource(ModelResource):
                                                                                                                 request.POST['description'],
                                                                                                                 new_bug.os_family, new_bug.browser_family,
                                                                                                                 bug_url, img_str)
-                send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', ['opendsa@cs.vt.edu'], fail_silently=False)
+                send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', ['hshahin@cs.vt.edu'], fail_silently=False)
 
                 return self.create_response(request, {'response': 'Bug stored'})
             return self.create_response(request, {'error': 'unauthorized action'},
