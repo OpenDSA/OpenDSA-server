@@ -19,6 +19,7 @@ XS_SHARING_ALLOWED_ORIGINS = ['http://algoviz-beta.cs.vt.edu',
                               'http://algoviz-beta6.cc.vt.edu',
                               'http://algoviz-beta7.cc.vt.edu',
                               'http://algoviz.org',
+			                  'http://localhost:8000',
                               'https://lti.cs.vt.edu',
                               'https://ltitest.cs.vt.edu:9292',
                               'https://192.168.33.10:9292']
@@ -233,13 +234,13 @@ SHIB_EMAIL = "email"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Host for sending e-mail.
-EMAIL_HOST = 'opendsa.cc.vt.edu'
+EMAIL_HOST = 'opendsa.cs.vt.edu'
 
 # Port for sending e-mail.
 EMAIL_PORT = 587
 
 # Optional SMTP authentication information for EMAIL_HOST.
-DEFAULT_FROM_EMAIL = 'opendsa.cc.vt.edu <noreply@opendsa.cc.vt.edu>'
+DEFAULT_FROM_EMAIL = 'opendsa.cs.vt.edu <noreply@opendsa.cs.vt.edu>'
 EMAIL_HOST_USER = 'root'
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = True
