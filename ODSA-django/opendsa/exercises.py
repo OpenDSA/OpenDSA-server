@@ -219,9 +219,7 @@ def update_module_proficiency(user_data, module, exercise):
 
 
 
-def attempt_problem(user_data, user_exercise, attempt_number,
-    completed, count_hints, time_taken, correct_keys, exposed_key, attempt_content, module,
-    ex_question, ip_address):
+def attempt_problem(user_data, user_exercise, attempt_number,completed, count_hints, time_taken, attempt_content, module,ex_question, ip_address):
     """
     Stores data related to a KA exercise attempt
     """
@@ -235,8 +233,6 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                 user=user_data.user,
                 exercise=user_exercise.exercise,
                 time_taken=time_taken,
-                correct_keys=correct_keys,
-                exposed_key=exposed_key,
                 time_done=dt_now,
                 count_hints=count_hints,
                 hint_used=int(count_hints) > 0,
@@ -267,7 +263,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,
             if problem_log.correct:
 
                 # Streak only increments if problem was
-                #solved correctly (on first attempt)
+                # solved correctly (on first attempt)
                 user_exercise.total_correct += 1
                 user_exercise.streak += 1
                 user_exercise.longest_streak = max(\
@@ -287,6 +283,12 @@ def attempt_problem(user_data, user_exercise, attempt_number,
                         else:
                             user_data.all_proficient_exercises += \
                                         ",%s" % user_exercise.exercise.id
+                # save exercise_name so that the client framework won't show it again
+                if len(user_exercise.correct_exercises) == 0:
+                    user_exercise.correct_exercises += '%s' % ex_question
+                else:
+                    user_exercise.correct_exercises += ',%s' % ex_question
+
             else:
                 user_exercise.progress = Decimal(user_exercise.streak)/\
                                          Decimal(user_exercise.exercise.streak)

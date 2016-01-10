@@ -205,12 +205,6 @@ def get_user_exerciselog(user, exercise):
     the problem of duplicate entries being created
     """
 
-    # u = User.objects.get(username=kusername)
-    # uid = u.id
-    # exposed_key = UserExerciseLog.objects.filter(user_id=uid).values('exposed_key').order_by('-id')[0]
-
-    # return self.create_response(request, {'message': exposed_key})
-
     _user_exerciselog = UserExerciseLog.objects.filter(user_id=uid, exercise_id=keid).order_by('-id')
     if _user_exerciselog:
         user_exerciselog = _user_exerciselog[0]
@@ -373,6 +367,8 @@ class ExerciseResource(ModelResource):
                 if(user_exercise):
                     bundle.data['progress_streak'] = user_exercise.streak
                     bundle.data['longest_streak'] = user_exercise.longest_streak
+                    bundle.data['current_exercise'] = user_exercise.current_exercise
+                    bundle.data['correct_exercises'] = user_exercise.correct_exercises
         return bundle
 
     def get_object_list(self, request):
@@ -443,6 +439,9 @@ class UserexerciseResource(ModelResource):
             url(r"^(?P<resource_name>%s)/attempt%s$"
                 % (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('logexercise'), name="api_logexe"),
+            url(r"^(?P<resource_name>%s)/updateExercise%s$"
+                % (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('updateExercise'), name="api_updateexe"),
             url(r"^(?P<resource_name>%s)/queryexercise%s$"
                 % (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('queryexercise'), name="api_queryex"),
@@ -462,23 +461,6 @@ class UserexerciseResource(ModelResource):
                 % (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('getprogress'), name="api_getprogress"),
         ]
-
-    def queryexercise(self, request, **kwargs):
-        if request.GET['key']:
-            kusername = get_username(request.GET['key'])
-            exerciseName = request.GET['exerciseName']
-            # print("=======================")
-            # print(exerciseName)
-            # print("=======================")
-            kexercise = Exercise.objects.get(name=exerciseName)
-            keid = kexercise.id
-            kuid = User.objects.get(username=kusername)
-            uid = kuid.id
-
-            # user_exerciselog = get_user_exerciselog (uid, keid)
-            user_data = UserExerciseLog.objects.filter(user_id=uid, exercise_id=keid).order_by('-id')[0]
-            # if user_data:
-            return self.create_response(request, { 'exposed_key': user_data.exposed_key, 'correct_keys': user_data.correct_keys, 'correct': user_data.correct , 'count_attempts': user_data.count_attempts , 'hint_used': user_data.hint_used})
 
     def logprogexercise(self, request, **kwargs):
         if request.POST['key']:
@@ -601,9 +583,6 @@ class UserexerciseResource(ModelResource):
                         )
                         if correct:
                             number_logs += 1
-                        # u = User.objects.get(username=kusername)
-                        # uid = u.id
-                        # exposed_key = UserExerciseLog.objects.filter(user_id=uid).values('exposed_key').order_by('-id')[0]
 
         if number_logs == len(actions):
             return self.create_response(request, {'success': True,
@@ -615,7 +594,6 @@ class UserexerciseResource(ModelResource):
                                               'error': 'unauthorized action'}, HttpUnauthorized)
 
     def logpeexercise(self, request, **kwargs):
-        print request
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
             dsa_book = get_book(request.POST['book'])
@@ -665,19 +643,63 @@ class UserexerciseResource(ModelResource):
         if request.POST['key']:
             kusername = get_username(request.POST['key'])
             kexercise = get_exercise(request.POST['sha1'])
-            # kexercise = Exercise.objects.get(name=request.POST['sha1'])
-            # kuid = User.objects.get(username=kusername)
-            # keid = kexercise.id
-            # uid = kuid.id
-            #
-            # u = User.objects.get(username=kusername)
-            # uid = u.id
-            # exposed_key = UserExerciseLog.objects.filter(user_id=uid, exercise_id=keid).values('exposed_key').order_by('-id')[0]
-            # return self.create_response(request, {'message': exposed_key})
 
             if kusername and kexercise:
                 user_exercise = get_user_exercise(kusername, kexercise)
-                # user_exerciselog = get_user_exerciselog(uid, kexercise)
+
+                if user_exercise is None:
+                    with transaction.commit_on_success():
+                        user_exercise, exe_created = \
+                          UserExercise.objects.get_or_create(user=kusername, \
+                          exercise=kexercise, streak=0)
+            else:
+                return self.create_response(request, \
+                             {'error': 'attempt not logged'}, HttpUnauthorized)
+
+            dsa_book = get_book(request.POST['book'])
+            ubook = get_user_book(kusername, dsa_book)
+
+            with transaction.commit_on_success():
+                user_data, created = UserData.objects.get_or_create(\
+                                                user=kusername, book=dsa_book)
+
+            module = get_module(request.POST['module_name'])
+
+            if user_exercise and ubook:
+                ex_question = request.POST['problem_type']
+                if 'non_summative' in request.POST:
+                    ex_question = request.POST['non_summative']
+                user_exercise, correct = attempt_problem(
+                    user_data,  #kusername,
+                    user_exercise,
+                    request.POST['attempt_number'],
+                    request.POST['complete'],
+                    request.POST['count_hints'],
+                    int(request.POST['time_taken']),
+                    request.POST['attempt_content'],
+                    request.POST['module_name'],
+                    ex_question,
+                    request.META['REMOTE_ADDR'],
+                    )
+
+                if correct:
+                    print jsonpickle.encode(user_exercise)
+                    return  self.create_response(request, \
+                                            jsonpickle.encode(user_exercise))
+                else:
+                    return  self.create_response(request, \
+                             {'error': 'attempt not logged'}, HttpBadRequest)
+        return self.create_response(request, {'error': 'unauthorized action'}, \
+                                                              HttpUnauthorized)
+
+
+    def updateExercise(self, request, **kwargs):
+        if request.POST['key']:
+            kusername = get_username(request.POST['key'])
+            kexercise = get_exercise(request.POST['sha1'])
+
+            if kusername and kexercise:
+                user_exercise = get_user_exercise(kusername, kexercise)
 
                 if user_exercise is None:
                     with transaction.commit_on_success():
@@ -695,45 +717,16 @@ class UserexerciseResource(ModelResource):
                 user_data, created = UserData.objects.get_or_create(
                     user=kusername, book=dsa_book)
 
-            module = get_module(request.POST['module_name'])
-
             if user_exercise and ubook:
-                ex_question = request.POST['problem_type']
-                if 'non_summative' in request.POST:
-                    ex_question = request.POST['non_summative']
-                user_exercise, correct = attempt_problem(
-                    user_data,  # kusername,
-                    user_exercise,
-                    request.POST['attempt_number'],
-                    request.POST['complete'],
-                    request.POST['count_hints'],
-                    int(request.POST['time_taken']),
-                    request.POST['correct_keys'],
-                    request.POST['exposed_key'],
-                    request.POST['attempt_content'],
-                    request.POST['module_name'],
-                    ex_question,
-                    request.META['REMOTE_ADDR'],
-                )
+                user_exercise.current_exercise = request.POST['current_exercise']
+                user_exercise.save()
 
-                u = User.objects.get(username=kusername)
-                uid = u.id
-                exposed_key = UserExerciseLog.objects.filter(user_id=uid).values('correct_keys').order_by('-id')[0]
-                # return self.create_response(request, {'message': exposed_key})
-                # print jsonpickle.encode(user_exercise)
-                # return self.create_response(request, {'message': exposed_key})
+            return self.create_response(request, {'success': True})
 
-                if correct:
-                    print jsonpickle.encode(user_exercise)
-                    return self.create_response(request,
-                                                jsonpickle.encode(user_exercise))
-                    # return self.create_response(request, {'message': exposed_key})
-                else:
-                    return self.create_response(request,
-                                                {'error': 'attempt not logged'}, HttpBadRequest)
 
         return self.create_response(request, {'error': 'unauthorized action'},
                                     HttpUnauthorized)
+
 
     def logexercisehint(self, request, **kwargs):
         if request.POST['key']:
@@ -775,8 +768,6 @@ class UserexerciseResource(ModelResource):
                     request.POST['complete'],
                     request.POST['count_hints'],
                     int(request.POST['time_taken']),
-                    request.POST['correct_keys'],
-                    request.POST['exposed_key'],
                     request.POST['attempt_content'],
                     request.POST['module_name'],
                     ex_question,
@@ -1501,20 +1492,18 @@ class BugsResource(ModelResource):
                 new_bug.save()
                 server_host = request.get_host()
                 res_url = str(request.get_full_path()).split('submitbug')[0]
-                full_url = str(server_host) + str(res_url)
+                full_url = str(server_host) + str(res_url) + "bugs/"
                 if img is not None:
                     img_str = 'Screenshot:\t' + str(server_host) + str(settings.MEDIA_URL) + str(new_bug.screenshot)
 
                 # send notification email
                 subject = '[OpenDSA] New Bug Reported: %s' % request.POST['title']
-                bug_url = "%s%s/?format=json" % (full_url, new_bug.id)
-                message = '%s (%s) reported the following bug:\n\n%s\n\nOS:\t%s\nBrowser:\t%s\nURL:\t%s\n%s' % (kusername.username,
-                                                                                                                kusername.email,
+                bug_url = "%s%s/?format=json" % (
+                    full_url, new_bug.id)
+                message = '%s (%s) reported the following bug:\n\n%s\n\nOS:\t%s\nBrowser:\t%s\nURL:\t%s\n%s' % (kusername.username, kusername.email,
                                                                                                                 request.POST['description'],
-                                                                                                                new_bug.os_family,
-                                                                                                                new_bug.browser_family,
-                                                                                                                bug_url,
-                                                                                                                img_str)
+                                                                                                                new_bug.os_family, new_bug.browser_family,
+                                                                                                                bug_url, img_str)
                 send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', ['opendsa@cs.vt.edu'], fail_silently=False)
 
                 return self.create_response(request, {'response': 'Bug stored'})
@@ -1522,30 +1511,6 @@ class BugsResource(ModelResource):
                                         HttpUnauthorized)
         return self.create_response(request, {'error': 'Bad requested'},
                                     HttpBadRequest)
-
-# class UserExerciseLogResource(ModelResource):
-#
-#     def determine_format(self, request):
-#         return "application/json"
-#
-#     class Meta:
-#         queryset = UserExerciseLog.objects.all()
-#         resource_name = 'user/exerciselog'
-#         excludes = []
-#
-#         allowed_methods = ['get']
-#         authentication = Authentication()
-#         authorization = ReadOnlyAuthorization()
-#
-#     def logexercise(self, request, **kwargs):
-#         if request.POST['key']:
-#             kusername = get_username(request.POST['key'])
-#             kexercise = get_exercise(request.POST['sha1'])
-#             kuid = User.objects.get(username=kusername)
-#             uid = kuid.id
-#             print jsonpickle.encode(user_exerciselog)
-#             return self.create_response(request,
-#                                         jsonpickle.encode(user_exerciselog))
 
 
 class UserExerciseSummaryResource(ModelResource):
