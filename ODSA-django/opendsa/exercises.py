@@ -13,12 +13,14 @@ from exercise.models import CourseModule
 from django.db import transaction
 from course.models import CourseInstance
 
+
 def diff(list_a, list_b):
     """
     methods to get the difference between two sets
     """
     list_b = set(list_b)
     return [aa for aa in list_a if aa not in list_b]
+
 
 def str2bool(str_var):
     """
@@ -34,12 +36,14 @@ def get_pe_name_from_referer(referer):
     tab = referer.split('/')
     return tab[len(tab)-1].split('.')[0]
 
+
 def date_from_timestamp(tstamp):
     """
     Converts a timestamp to date
     """
     date = datetime.datetime.fromtimestamp(tstamp/1000)
     return date.strftime('%Y-%m-%d %H:%M:%S')
+
 
 def make_wrong_attempt(user_data, user_exercise):
     """
@@ -61,7 +65,6 @@ def getUserExercise(user, user_exe_list):
         if user == ue.user:
             return ue
     return None
-
 
 
 def get_due_date(book, exercise):
@@ -87,6 +90,7 @@ def get_assignment(book, exercise):
         if int(exercise.id) in assignment.get_exercises_id():
             return assignment
     return None
+
 
 def student_grade_all(user, book):
     """
@@ -176,7 +180,6 @@ def student_grade_all(user, book):
     return user_grade
 
 
-
 def update_module_proficiency(user_data, module, exercise):
     """
     Updates student module proficiency status
@@ -216,7 +219,6 @@ def update_module_proficiency(user_data, module, exercise):
         else:
             return True
     return False
-
 
 
 def attempt_problem(user_data, user_exercise, attempt_number,completed, count_hints, time_taken, attempt_content, module,ex_question, ip_address):
@@ -315,7 +317,6 @@ def attempt_problem(user_data, user_exercise, attempt_number,completed, count_hi
         return user_exercise, True      #, user_exercise_graph, goals_updated
 
 
-
 def attempt_problem_pe(user_data, user_exercise, attempt_number,
     submit_time, time_taken, threshold, score,
     module, ip_address):
@@ -367,7 +368,6 @@ def attempt_problem_pe(user_data, user_exercise, attempt_number,
             update_module_proficiency(user_data, module, \
                                                  user_exercise.exercise)
         return user_exercise, value
-
 
 
 def log_button_action( user, exercise, module, book, name, \
