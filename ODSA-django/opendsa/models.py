@@ -21,8 +21,6 @@ from exercise.exercise_models import  CourseModule
 # Create your models here.
 
 
-
-
 class Exercise(models.Model):
     """
     Exercise table
@@ -40,6 +38,7 @@ class Exercise(models.Model):
         Returns a short representation of the book as an unicode string.
         '''
         return '%s:%s' % (self.id, self.name)
+
 
 class Books(models.Model):
     """
@@ -82,8 +81,6 @@ def create_course_module(sender, instance, action, pk_set, **kwargs):
         CourseModule.objects.create(name=name_, course_instance=course_i)
 
 m2m_changed.connect(create_course_module, sender=Books.courses.through)
-
-
 
 
 class Assignments(models.Model):
@@ -134,8 +131,6 @@ class Assignments(models.Model):
         return "assignments"
 
 
-
-
 class Module(models.Model):
     """
     Module table
@@ -168,6 +163,7 @@ class Module(models.Model):
             for bme in  mod_exe_data:
                 ex_id_list.append(int(bme.exercise.id))
             return ex_id_list
+
 
 class ModuleExerciseManager(models.Manager):
     """
@@ -289,6 +285,7 @@ class BookChapter (models.Model):
                 _mod.append(cmod)
         return _mod
 
+
 class UserBook (models.Model):
     """
     A table to record  the  student use of  a book
@@ -298,7 +295,6 @@ class UserBook (models.Model):
     grade = models.BooleanField(default = True)
     class Meta:
         unique_together = (("user","book"),)
-
 
 
 class UserButton(models.Model):
@@ -352,7 +348,6 @@ class UserModule(models.Model):
         """
         return (self.proficient_date != datetime.datetime.strptime( \
                                 '2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))
-
 
 
 class UserData(models.Model):
@@ -440,9 +435,6 @@ class UserData(models.Model):
         return start_ex
 
 
-
-
-
 class UserExerciseLog(models.Model):
     """
     Table storing all the information about each exercise attempt
@@ -462,15 +454,12 @@ class UserExerciseLog(models.Model):
     count_attempts = models.BigIntegerField(default = 0)
     ip_address = models.CharField(max_length=20)
     ex_question = models.CharField(max_length=50)
-    correct_keys = models.TextField()
-    exposed_key = models.IntegerField(default = 0)
 
     def put(self):
         """
         Adds a record to the table
         """
         models.Model.put(self)
-
 
 
 class UserProgLog(models.Model):
@@ -512,6 +501,8 @@ class UserExercise(models.Model):
     total_correct = models.IntegerField(default = 0)
     proficient_date = models.DateTimeField(default="2012-01-01 00:00:00")
     progress = models.DecimalField(default = 0, max_digits=5, decimal_places=2)
+    current_exercise = models.TextField()
+    correct_exercises = models.TextField()
 
     class Meta:
         unique_together = (("user", "exercise"),)
@@ -555,6 +546,7 @@ class UserExercise(models.Model):
         """
         return (self.proficient_date != datetime.datetime.strptime( \
                                    '2012-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))
+
 
 class Bugs(models.Model):
     """
