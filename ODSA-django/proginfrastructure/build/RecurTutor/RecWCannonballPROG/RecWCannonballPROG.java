@@ -67,7 +67,7 @@ public class studentRecWCannonballPROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You probably have infinite recursion. Please revise your code.");
     }
     
     if (studentAnswer == modelCannonball(height)) SUCCESS = true;
@@ -83,7 +83,7 @@ public class studentRecWCannonballPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect answer!");
+     output.println("Try Again! Incorrect answer.");
      output.close();
     }
   

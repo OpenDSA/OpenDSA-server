@@ -67,7 +67,7 @@ public class studentRecHIsReversePROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You probably have infinite recursion. Please revise your code.");
     }
     
     if (studentAnswer == modelisReverse(s1,s2)) SUCCESS1 = true;
@@ -82,7 +82,7 @@ public class studentRecHIsReversePROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You probably have infinite recursion. Please revise your code.");
     }
     
     if (studentAnswer == modelisReverse(s1,s2)) SUCCESS2 = true;
@@ -98,7 +98,7 @@ public class studentRecHIsReversePROG
      }
     else 
     {
-     output.println("Try Again! Incorrect base cases!");
+     output.println("Try Again! Incorrect base cases.");
      output.close();
     }
   

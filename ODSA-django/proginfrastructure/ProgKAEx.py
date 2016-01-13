@@ -1,8 +1,8 @@
 # Create your views here.
 from opendsa.models import  UserExercise, UserExerciseLog, UserData , UserProgLog
 from opendsa.exercises import update_module_proficiency
-from opendsa import models
-from decimal import Decimal
+from opendsa import models 
+from decimal import Decimal                         
 from django.http import HttpResponse
 import xml.etree.ElementTree as xml # for xml parsing
 import shlex # for strings splitting
@@ -33,23 +33,23 @@ import settings
 
 
 def attempt_problem_pop(user_data, user_exercise, attempt_number,
-    completed, count_hints, time_taken, attempt_content, module,
+    completed, count_hints, time_taken, attempt_content, module,   
     ex_question, ip_address, request_post):
-
-    data = request_post.get('code')
-
+    
+    data = request_post.get('code') 
+    
     generatedList =request_post.get('genlist')
-
+    
     progexType =request_post.get('progexType')
-
+   
     checkDefinedvar= request_post.get('checkdefvar')
 
     if checkDefinedvar == "True":
        listoftypes= request_post.get('listoftypes')
-    else :
+    else : 
        listoftypes=""
     # Clean the strings from bad characters
-
+    
     #listoftypes = ''.join([x for x in listoftypes if ord(x) < 128])
 
     data = ''.join([x for x in data if ord(x) < 128])
@@ -60,12 +60,12 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
 
     else:
         exerciseName = request_post.get('sha1')
-
+    
     feedback, pathtouserFiles= setparameters(exerciseName, data, generatedList, checkDefinedvar , listoftypes , progexType, user_data)
 
     if  os.path.exists(pathtouserFiles ):
         shutil.rmtree(pathtouserFiles)
-
+     
     if user_exercise:   # and user_exercise.belongs_to(user_data):
         dt_now = datetime.datetime.now()
         #exercise = user_exercise.exercise
@@ -101,31 +101,24 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
         user_exercise.total_done += 1
         if problem_log.correct:
 
-          # Streak only increments if problem was solved correctly (on first attempt)
-          user_exercise.total_correct += 1
-          user_exercise.streak += 1
-          user_exercise.longest_streak = max(user_exercise.longest_streak, user_exercise.streak)
-          user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)
-          if not proficient:
-            problem_log.earned_proficiency = user_exercise.update_proficiency_ka(correct=True,ubook=user_data.book)
-            if user_exercise.progress >= 1:
-               if len(user_data.all_proficient_exercises)==0:
-                  user_data.all_proficient_exercises += "%s" %user_exercise.exercise.id
-               else:
-                  user_data.all_proficient_exercises += ",%s" %user_exercise.exercise.id
-          else:
-           user_exercise.total_done += 1
+                # Streak only increments if problem was solved correctly (on first attempt)
+           user_exercise.total_correct += 1
+           user_exercise.streak += 1
+           user_exercise.longest_streak = max(user_exercise.longest_streak, user_exercise.streak)
            user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)
-
-          # save exercise_name so that the client framework won't show it again
-          if len(user_exercise.correct_exercises) == 0:
-            user_exercise.correct_exercises += '%s' % ex_question
-          else:
-            user_exercise.correct_exercises += ',%s' % ex_question
-
-
+           if not proficient:
+              problem_log.earned_proficiency = user_exercise.update_proficiency_ka(correct=True,ubook=user_data.book)
+              if user_exercise.progress >= 1:
+                 if len(user_data.all_proficient_exercises)==0:
+                    user_data.all_proficient_exercises += "%s" %user_exercise.exercise.id
+                 else:
+                    user_data.all_proficient_exercises += ",%s" %user_exercise.exercise.id
+           else:
+             user_exercise.total_done += 1
+             user_exercise.progress = Decimal(user_exercise.streak)/Decimal(user_exercise.exercise.streak)
+    
         # Saving student's code and the feedback received
-
+       
         problem_log.save()
         user_exercise.save()
         user_data.save()
@@ -136,7 +129,7 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
                student_code= data,
                feedback=feedback[1],
               )
-
+ 
         userprog_log.save()
         return user_exercise,feedback
 
@@ -150,39 +143,39 @@ def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftype
        feedback , peruserFilesPath= assessprogkaex (data, "binarytreetest", "binarytreetest","",checkDefinedvar , listoftypes , "" , user_data)
 
     elif exerciseName == "BTLeafPROG" :  #count number of leaf nodes
-       feedback, peruserFilesPath= assessprogkaex (data , "btleaftest", "btleaftest","", checkDefinedvar , listoftypes, "", user_data)
+       feedback, peruserFilesPath= assessprogkaex (data , "btleaftest", "btleaftest","", checkDefinedvar , listoftypes, "", user_data)      
 
     elif "list" in progexType:  #generate a list
        feedback , peruserFilesPath= assessprogkaex(data , "listadttest", "listadttest" ,generatedList, checkDefinedvar, listoftypes, "", user_data)
 
-    # Binary Trees programming exercises
-    elif "BTRecurTutor" in progexType:
+    # Binary Trees programming exercises 
+    elif "BTRecurTutor" in progexType:   
        feedback, peruserFilesPath= assessprogkaex(data,"BTRecurTutor/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes, progexType, user_data)
 
     # Recursion programming exercises have the same folder with different subfolders. Where the subfolder is the exercise name
-    elif "RecurTutor" in progexType:
+    elif "RecurTutor" in progexType:   
        feedback, peruserFilesPath= assessprogkaex(data,"RecurTutor/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes , progexType, user_data)
 
-    elif "pointers" in progexType:
-       feedback, peruserFilesPath= assessprogkaex(data,"pntrtest/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes , progexType, user_data)
-    return feedback, peruserFilesPath
+    elif "Pointers" in progexType:   
+       feedback, peruserFilesPath= assessprogkaex(data,"Pointers/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes , progexType, user_data)
+    return feedback, peruserFilesPath   
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  All Programming exercises are compiled and run through the following function
 def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefinedvar, listoftypes, progexType,user_data):
     print "=============="
-    print settings
+    print settings 
     filesPath = settings.File_Path  + testfoldername+'/'
-
+ 
     testfilename = testfilenamep+".java"
     studentfilename = "student"+testfilename
-
+    
     peruserFilesPath = filesPath + str(user_data.user.username)+'/'
     #print testfilenamep
-    print peruserFilesPath
+    print peruserFilesPath 
     # count the number of lines in the original test file so that we can have the error shown to the student with respect to the student's code
-    if progexType == "pointers":
+    if progexType == "Pointers":
       TestFile = open(filesPath+testfilenamep+"part1.java" , 'r')
       with TestFile:
         for i, l in enumerate(TestFile):
@@ -192,16 +185,16 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
       with TestFile:
         for i, l in enumerate(TestFile):
             pass
-
-
+    
+    
     feedback=[False, 'null', i+1 , studentfilename , 'class '+ studentfilename ]
     # Those are the datatypes that are not allowed to be defined in that exercise
-    # The first one is already defined in the given code to the student
+    # The first one is already defined in the given code to the student 
     # so the student should not define more and the others should not be declared at all
-
+    
     if not os.path.exists(peruserFilesPath ):
        os.makedirs(peruserFilesPath)
-
+   
     #cleaning: deleting already created files
     if generatedList != 'null':
        if os.path.isfile(peruserFilesPath +'generatedlist'):
@@ -212,25 +205,25 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
 
     if os.path.isfile(peruserFilesPath +''):
        os.remove(peruserFilesPath+studentfilename)
-
+ 
     if os.path.isfile(peruserFilesPath +'output'):
        os.remove(peruserFilesPath+'output')
 
     if os.path.isfile(peruserFilesPath +'compilationerrors.out'):
        os.remove(peruserFilesPath + 'compilationerrors.out')
-
+   
     if os.path.isfile(peruserFilesPath +'runerrors.out'):
        os.remove(peruserFilesPath + 'runerrors.out')
-
+    
     if os.path.isfile(peruserFilesPath +'newpolicy.policy'):
        os.remove(peruserFilesPath + 'newpolicy.policy')
 
 
     # Saving the submitted/received code in the studentrectest.java file by copying the preorder + studentcode +}
+    
+    
 
-
-
-
+    
 
     if progexType == "pointers":
        TestFile = open(filesPath+testfilenamep+"part1.java" , 'r')
@@ -239,7 +232,7 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
        answer.write(test)
        TestFilepart2 = open(filesPath+testfilenamep+"part2.java" , 'r')
        testpart2 = TestFilepart2.read()
-       answer.write(data)
+       answer.write(data) 
        answer.write(testpart2)
     else:
        TestFile = open(filesPath+testfilename , 'r')
@@ -250,7 +243,7 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
        answer.write(data)
        answer.write("}")
     answer.close()
-
+    
 
     # create the policy file on the fly instead of having a static copy per exercise
     policyfile = open(peruserFilesPath+"newpolicy.policy" , 'w')
@@ -265,8 +258,8 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
 
     # Run the Javac and java command to compile and test the submitted code
     proc1 = subprocess.Popen(" cd "+ peruserFilesPath +"; javac "+studentfilename+" 2> "+peruserFilesPath + "compilationerrors.out ; java -Djava.security.manager -Djava.security.policy==newpolicy.policy student"+testfilenamep+" 2> " + peruserFilesPath +"runerrors.out", stdout=subprocess.PIPE, shell=True)
-
-
+   
+    
     time.sleep(2) #Should change in the next push that to be in the java files instead of sleeping here
     #os.system("kill -9 "+ str(proc1.pid) )
 
@@ -290,7 +283,7 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
 
     if checkDefinedvar == "True":
        if data.count(datatypes[0]) > 1 or (any( x in data for x in datatypes[1:len(datatypes)])):
-          feedback[1]= ["Try Again! You should not declare any variables!"]
+          feedback[1]= ["Try Again! You should not declare any variables."]
           return feedback , peruserFilesPath
 
     if os.path.isfile(peruserFilesPath+'runerrors.out'):
@@ -302,7 +295,7 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
           for line in feedback[1]:
               print "line" + line
               if "at java.security.AccessControlContext.checkPermission" in line:
-                 feedback[1]= ["Try Again! Your solution shouldn't write files to the disk!"]
+                 feedback[1]= ["Try Again! Your solution shouldn't write files to the disk."]
                  return feedback , peruserFilesPath
               elif 'Exception in thread "main" java.lang.StackOverflowError' in line:
                  feedback[1]= ["Try Again! Your solution leads to infinite recursion!"]
@@ -310,9 +303,9 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
               elif 'NullPointerException' in line and progexType == "binarytree":
 		 feedback[1]= ["Try Again! You are trying to access a null node. You have forgotten to check if the node is null before accessing it. Have you checked if the root is null or not? if yes then ask your self the next question: are you trying to access the root's left or right children before the recursive call? You may need to revise your code and check if the solution really need to do that. If you have to get the value of one or both of the children before the recursive call then make sure to check if they are null or not."]
 		 #return feedback
-
+	      
               elif 'infinite recursion' in line:
-                 feedback[1]= ["Try Again! You are probably having an infinite recursion! Please revise your code!"]
+                 feedback[1]= ["Try Again! You probably have infinite recursion."]
                  os.system("pkill -TERM -P"+ str(proc1.pid) ) # terminate all the processes because we need to terminate the thread as well
                  return feedback , peruserFilesPath
               elif 'Exception in thread "main"' in line:
@@ -322,18 +315,18 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
           runErrorFile.close()
           if os.stat(peruserFilesPath+'runerrors.out')[6]!=0:
              return feedback, peruserFilesPath
-
-
+    
+    
     if os.path.isfile(peruserFilesPath+'output'):
        #Check what is returned from the test : what is inside the success file
        successFile = open(peruserFilesPath+'output' , 'r')
        feedback[1] = successFile.readlines()
-       print feedback[1]
+       print feedback[1] 
        for line in feedback[1]:
 		   # it is correct but..for recursion check they are doing it recursively
 		   # it is correct but..for binary trees check they are doing it in the effecient way
            if "Well Done" in line: # static code analysis
-	      if progexType == "binarytree":
+	      if progexType == "BTRecurTutor": 
 		   efficient,btineffFB = btcheckEfficientCode(data , testfilenamep)
 		   if efficient == True:
 	 	     feedback[0] = True
@@ -342,8 +335,8 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
 		     feedback[0] = False
 		     feedback[1]= btineffFB
 		     return feedback , peruserFilesPath
-
-              elif progexType =="pointers":
+					
+              elif progexType =="Pointers": 
 		    efficient,pntrineffFB = pntrcheckEfficientCode(data , testfilenamep)
 		    if efficient == True:
 	               feedback[0] = True
@@ -352,10 +345,10 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
 		       feedback[0] = False
 		       feedback[1]= pntrineffFB
 		       return feedback , peruserFilesPath
-
+					 
 	      feedback[0] = True
 	      return feedback , peruserFilesPath
-
+               
            else:
               feedback[0] = False
               return feedback , peruserFilesPath
@@ -363,4 +356,4 @@ def assessprogkaex(data, testfoldername, testfilenamep, generatedList, checkDefi
     feedback[1]=['Try Again Later!']
     return feedback , peruserFilesPath
 
-
+                

@@ -85,7 +85,7 @@ public class studentRecCCountChrPROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You probably have infinite recursion. Please revise your code.");
     }
     
     if ( studentAnswer ==  modelcountChr(testStrings[index]) ) SUCCESS = true;
@@ -101,7 +101,7 @@ public class studentRecCCountChrPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect recursive call!");
+     output.println("Try Again! Incorrect recursive call.");
      output.close();
     }
   

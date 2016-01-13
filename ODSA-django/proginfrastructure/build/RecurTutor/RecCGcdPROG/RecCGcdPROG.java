@@ -68,7 +68,7 @@ public class studentRecCGcdPROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You probably have infinite recursion. Please revise your code!");
     }
     if ( studentAnswer == modelGCD(x,y)) SUCCESS = true;
 
@@ -83,7 +83,7 @@ public class studentRecCGcdPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect base case or base case action!");
+     output.println("Try Again! Incorrect base case or base case action.");
      output.close();
     }
   

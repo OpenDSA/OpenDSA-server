@@ -70,7 +70,7 @@ public class studentRecCMultiplyPROG
    
     } catch(Throwable t) {
     	
-        throw new AssertionError("You are probably having an infinite recursion! Please revise your code!");
+        throw new AssertionError("You probably have infinite recursion. Please revise your code.");
     }
     if ( studentAnswer == modelmult(x,y)) SUCCESS = true;
 
@@ -85,7 +85,7 @@ public class studentRecCMultiplyPROG
      }
     else 
     {
-     output.println("Try Again! Incorrect Base case condition or base case action!");
+     output.println("Try Again! Incorrect Base case condition or base case action.");
      output.close();
     }
   
