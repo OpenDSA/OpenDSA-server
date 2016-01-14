@@ -39,8 +39,7 @@ from opendsa.exercises import attempt_problem, \
 
 from proginfrastructure.ProgKAEx import attempt_problem_pop
 from django.conf import settings
-# from django.core.mail import send_mail
-from django.core.mail.message import EmailMessage
+from django.core.mail import send_mail
 
 
 # Key generation and verification
@@ -1499,25 +1498,20 @@ class BugsResource(ModelResource):
 
                 # send notification email
                 subject = '[OpenDSA] New Bug Reported: %s' % request.POST['title']
-                bug_url = "%s%s/?format=json" % (full_url, new_bug.id)
-
+                bug_url = "%s%s/?format=json" % (
+                    full_url, new_bug.id)
                 message = '%s (%s) reported the following bug:\n\n%s\n\nOS:\t%s\nBrowser:\t%s\nURL:\t%s\n%s' % (kusername.username, kusername.email,
                                                                                                                 request.POST['description'],
                                                                                                                 new_bug.os_family, new_bug.browser_family,
-                                                                                                                bug_url,
-                                                                                                                img_str)
-                # send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', ['opendsa@cs.vt.edu'], fail_silently=False)
-                email = EmailMessage()
-                email.subject = subject
-                email.body = message
-                email.from_email = "OpenDSA-server <noreply@opendsa.cS.vt.edu>"
-                email.to = ["hshahin@cs.vt.edu"]
-                email.attach(img.name, img.read(), img.content_type)
-                email.send()
+                                                                                                                bug_url, img_str)
+                send_mail(subject, message, 'noreply@opendsa.cc.vt.edu', ['hshahin@cs.vt.edu'], fail_silently=False)
 
                 return self.create_response(request, {'response': 'Bug stored'})
-            return self.create_response(request, {'error': 'unauthorized action'}, HttpUnauthorized)
-        return self.create_response(request, {'error': 'Bad requested'}, HttpBadRequest)
+            return self.create_response(request, {'error': 'unauthorized action'},
+                                        HttpUnauthorized)
+        return self.create_response(request, {'error': 'Bad requested'},
+                                    HttpBadRequest)
+
 
 class UserExerciseSummaryResource(ModelResource):
 
