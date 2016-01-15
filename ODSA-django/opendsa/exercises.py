@@ -221,7 +221,7 @@ def update_module_proficiency(user_data, module, exercise):
     return False
 
 
-def attempt_problem(user_data, user_exercise, attempt_number,completed, count_hints, time_taken, attempt_content, module,ex_question, ip_address):
+def attempt_problem(user_data, user_exercise, attempt_number,completed, count_hints, time_taken, attempt_content, module,ex_question, ip_address, request_type=None):
     """
     Stores data related to a KA exercise attempt
     """
@@ -238,16 +238,15 @@ def attempt_problem(user_data, user_exercise, attempt_number,completed, count_hi
                 time_done=dt_now,
                 count_hints=count_hints,
                 hint_used=int(count_hints) > 0,
-                correct=str2bool(completed) and (int(count_hints)==0) \
-                                            and (int(attempt_number) == 1),
+                correct=str2bool(completed) and (int(count_hints)==0) and (int(attempt_number) == 1) and (user_exercise.hinted_exercise != ex_question),
                 count_attempts=attempt_number,
                 ex_question=ex_question,
                 ip_address=ip_address,
-        )
+                request_type=request_type)
 
 
         first_response = (attempt_number == 1 and count_hints == 0) or \
-                         (count_hints == 1 and attempt_number == 0)
+                         (attempt_number == 0 and count_hints == 1)
 
         #if user_exercise.total_done > 0 and user_exercise.streak == 0 \
         #                                and first_response:
@@ -260,7 +259,6 @@ def attempt_problem(user_data, user_exercise, attempt_number,completed, count_hi
 
         proficient = user_data.is_proficient_at(user_exercise.exercise)
         if str2bool(completed):
-
             user_exercise.total_done += 1
             if problem_log.correct:
 
@@ -268,44 +266,41 @@ def attempt_problem(user_data, user_exercise, attempt_number,completed, count_hi
                 # solved correctly (on first attempt)
                 user_exercise.total_correct += 1
                 user_exercise.streak += 1
-                user_exercise.longest_streak = max(\
-                                               user_exercise.longest_streak, \
-                                               user_exercise.streak)
-                user_exercise.progress = Decimal(user_exercise.streak)/\
-                                         Decimal(user_exercise.exercise.streak)
+                user_exercise.longest_streak = max(user_exercise.longest_streak, user_exercise.streak)
+                user_exercise.progress = Decimal(user_exercise.streak) / Decimal(user_exercise.exercise.streak)
                 if not proficient:
-                    problem_log.earned_proficiency = \
-                         user_exercise.update_proficiency_ka(\
-                                  correct = True, \
-                                  ubook = user_data.book)
+                    problem_log.earned_proficiency = user_exercise.update_proficiency_ka(correct = True,  ubook = user_data.book)
                     if user_exercise.progress >= 1:
                         if len(user_data.all_proficient_exercises) == 0:
-                            user_data.all_proficient_exercises += \
-                                         "%s" % user_exercise.exercise.id
+                            user_data.all_proficient_exercises += "%s" % user_exercise.exercise.id
                         else:
-                            user_data.all_proficient_exercises += \
-                                        ",%s" % user_exercise.exercise.id
+                            user_data.all_proficient_exercises += ",%s" % user_exercise.exercise.id
                 # save exercise_name so that the client framework won't show it again
                 if len(user_exercise.correct_exercises) == 0:
                     user_exercise.correct_exercises += '%s' % ex_question
                 else:
                     user_exercise.correct_exercises += ',%s' % ex_question
 
+                # when student answer an exercise correctly from first time then clear the hint
+                if request_type == 'hint':
+                    user_exercise.hinted_exercise = ''
             else:
-                user_exercise.progress = Decimal(user_exercise.streak)/\
-                                         Decimal(user_exercise.exercise.streak)
+                user_exercise.progress = Decimal(user_exercise.streak) / Decimal(user_exercise.exercise.streak)
         else:
-            if (int(count_hints) ==0) and (attempt_content!='hint') \
+            if (int(count_hints) == 0) and (attempt_content!='hint') \
                                       and (int(attempt_number) == 1):
-            # Only count wrong answer at most once per problem
+                # Only count wrong answer at most once per problem
                 if user_exercise.streak - 1 > 0:
                     user_exercise.streak = user_exercise.streak - 1
                 else:
                     user_exercise.streak = 0
-            user_exercise.progress = Decimal(user_exercise.streak)/\
-                                     Decimal(user_exercise.exercise.streak)
+            user_exercise.progress = Decimal(user_exercise.streak) / Decimal(user_exercise.exercise.streak)
             if first_response:
                 user_exercise.update_proficiency_model(correct=False)
+
+        # save exercise_name to hinted_exercise so that student won't get credit if he saw the hint then refresh the page
+        if request_type == 'hint':
+            user_exercise.hinted_exercise = '%s' % ex_question
 
         problem_log.save()
         user_exercise.save()

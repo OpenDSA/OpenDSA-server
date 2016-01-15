@@ -369,6 +369,7 @@ class ExerciseResource(ModelResource):
                     bundle.data['longest_streak'] = user_exercise.longest_streak
                     bundle.data['current_exercise'] = user_exercise.current_exercise
                     bundle.data['correct_exercises'] = user_exercise.correct_exercises
+                    bundle.data['hinted_exercise'] = user_exercise.hinted_exercise
         return bundle
 
     def get_object_list(self, request):
@@ -680,6 +681,7 @@ class UserexerciseResource(ModelResource):
                     request.POST['module_name'],
                     ex_question,
                     request.META['REMOTE_ADDR'],
+                    "attempt"
                     )
 
                 if correct:
@@ -772,6 +774,7 @@ class UserexerciseResource(ModelResource):
                     request.POST['module_name'],
                     ex_question,
                     request.META['REMOTE_ADDR'],
+                    "hint"
                 )
 
                 if correct:

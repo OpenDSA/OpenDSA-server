@@ -454,6 +454,7 @@ class UserExerciseLog(models.Model):
     count_attempts = models.BigIntegerField(default = 0)
     ip_address = models.CharField(max_length=20)
     ex_question = models.CharField(max_length=50)
+    request_type = models.TextField()
 
     def put(self):
         """
@@ -503,6 +504,7 @@ class UserExercise(models.Model):
     progress = models.DecimalField(default = 0, max_digits=5, decimal_places=2)
     current_exercise = models.TextField()
     correct_exercises = models.TextField()
+    hinted_exercise = models.TextField()
 
     class Meta:
         unique_together = (("user", "exercise"),)
