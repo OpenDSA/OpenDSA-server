@@ -34,7 +34,7 @@ import settings
 
 def attempt_problem_pop(user_data, user_exercise, attempt_number,
     completed, count_hints, time_taken, attempt_content, module,
-    ex_question, ip_address, request_post):
+    ex_question, ip_address, request_post, request_type=None):
 
     data = request_post.get('code')
 
@@ -82,6 +82,7 @@ def attempt_problem_pop(user_data, user_exercise, attempt_number,
                 count_attempts=attempt_number,
                 ex_question=exerciseName,
                 ip_address=ip_address,
+                request_type = request_type
         )
 
 

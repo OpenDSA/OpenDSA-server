@@ -199,6 +199,7 @@ def get_user_exercise(user, exercise):
 
     return user_exercise
 
+
 def get_user_exerciselog(user, exercise):
     """
     Safe accessor methods - these functions are designed to prevent
@@ -233,8 +234,6 @@ class OpendsaAuthentication(ApiKeyAuthentication):
             return self._unauthorized()
 
 # create new user
-
-
 class CreateUserResource(ModelResource):
 
     """
@@ -502,7 +501,8 @@ class UserexerciseResource(ModelResource):
                                                               request.POST['module_name'],
                                                               ex_question,
                                                               request.META['REMOTE_ADDR'],
-                                                              request.POST)
+                                                              request.POST,
+                                                              'attempt')
 
                     returnedVar = uexercise.__dict__
                     returnedVar['correct'] = messages[0]
