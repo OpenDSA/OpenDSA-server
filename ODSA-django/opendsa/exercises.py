@@ -230,6 +230,12 @@ def attempt_problem(user_data, user_exercise, attempt_number,completed, count_hi
         dt_now = datetime.datetime.now()
         #exercise = user_exercise.exercise
         user_exercise.last_done = dt_now
+
+        correct = str2bool(completed) and (int(count_hints)==0) and (int(attempt_number) == 1)
+
+        if "Summ" in user_exercise.exercise.name:
+            correct = correct and (user_exercise.hinted_exercise != ex_question)
+
         # Build up problem log for deferred put
         problem_log = UserExerciseLog(
                 user=user_data.user,
@@ -238,7 +244,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,completed, count_hi
                 time_done=dt_now,
                 count_hints=count_hints,
                 hint_used=int(count_hints) > 0,
-                correct=str2bool(completed) and (int(count_hints)==0) and (int(attempt_number) == 1) and (user_exercise.hinted_exercise != ex_question),
+                correct=correct,
                 count_attempts=attempt_number,
                 ex_question=ex_question,
                 ip_address=ip_address,
@@ -299,7 +305,7 @@ def attempt_problem(user_data, user_exercise, attempt_number,completed, count_hi
                 user_exercise.update_proficiency_model(correct=False)
 
         # save exercise_name to hinted_exercise so that student won't get credit if he saw the hint then refresh the page
-        if request_type == 'hint':
+        if request_type == 'hint' and "Summ" in user_exercise.exercise.name:
             user_exercise.hinted_exercise = '%s' % ex_question
 
         problem_log.save()
