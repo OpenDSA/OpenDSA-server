@@ -287,11 +287,12 @@ def attempt_problem(user_data, user_exercise, attempt_number,completed, count_hi
                 else:
                     user_exercise.correct_exercises += ',%s' % ex_question
 
-                # when student answer an exercise correctly from first time then clear the hint
-                if request_type == 'hint':
-                    user_exercise.hinted_exercise = ''
             else:
                 user_exercise.progress = Decimal(user_exercise.streak) / Decimal(user_exercise.exercise.streak)
+
+            # when student answer an exercise correctly from first time then clear the hint
+            if request_type != 'hint':
+                user_exercise.hinted_exercise = ''
         else:
             if (int(count_hints) == 0) and (attempt_content!='hint') \
                                       and (int(attempt_number) == 1):
