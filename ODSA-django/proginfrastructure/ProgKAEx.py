@@ -158,14 +158,14 @@ def setparameters(exerciseName, data, generatedList, checkDefinedvar, listoftype
 
     # Binary Trees programming exercises
     elif "BTRecurTutor" in progexType:
-       feedback, peruserFilesPath= assessprogkaex(data,"BTRecurTutor/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes, progexType, user_data)
+       feedback, peruserFilesPath= assessprogkaex(data,"BTRecurTutor"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes, progexType, user_data)
 
     # Recursion programming exercises have the same folder with different subfolders. Where the subfolder is the exercise name
     elif "RecurTutor" in progexType:
-       feedback, peruserFilesPath= assessprogkaex(data,"RecurTutor/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes , progexType, user_data)
+       feedback, peruserFilesPath= assessprogkaex(data,"RecurTutor"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes , progexType, user_data)
 
     elif "Pointers" in progexType:
-       feedback, peruserFilesPath= assessprogkaex(data,"Pointers/"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes , progexType, user_data)
+       feedback, peruserFilesPath= assessprogkaex(data,"Pointers"+exerciseName, exerciseName,"",checkDefinedvar , listoftypes , progexType, user_data)
     return feedback, peruserFilesPath
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
