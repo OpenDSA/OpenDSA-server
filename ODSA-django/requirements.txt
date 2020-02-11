@@ -1,4 +1,4 @@
-Django==1.4.3
+Django==1.11.28
 #GnuPGInterface==0.3.2
 #Landscape-Client==14.12
 MySQL-python==1.2.3
