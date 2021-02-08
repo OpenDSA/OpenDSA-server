@@ -35,7 +35,7 @@ django.js==0.6.1
 #djpclient==0.2.0
 feedparser==5.1.2
 html5lib==0.95
-httplib2==0.8
+httplib2==0.19.0
 humanize==0.2
 icalendar==3.1
 jsonpickle==0.4.0
