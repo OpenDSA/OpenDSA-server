@@ -27,7 +27,7 @@ django-eztables==0.2.1
 django-haystack==2.1.0
 django-jsonfield==0.9.10
 django-jsonify==0.2.1
-django-registration==0.8
+django-registration==3.1.2
 django-tagging==0.3.1
 django-tastypie==0.9.11
 django-user-agents==0.2.0
