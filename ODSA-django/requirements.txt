@@ -22,7 +22,7 @@ cssselect==0.9.1
 decorator==3.4.0
 django-activity-stream==0.4.5beta1
 django-celery==3.0.11
-django-debug-toolbar==0.10.2
+django-debug-toolbar==1.11.1
 django-eztables==0.2.1
 django-haystack==2.1.0
 django-jsonfield==0.9.10
