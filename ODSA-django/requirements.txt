@@ -76,7 +76,7 @@ stevedore==0.7.2
 supervisor==3.0
 txAMQP==0.6.2
 ua-parser==0.3.2
-urllib3==1.7.1
+urllib3==1.26.5
 user-agents==0.1.1
 virtualenv==1.8.4
 virtualenv-clone==0.2.4
