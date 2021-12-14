@@ -1,5 +1,8 @@
 # OpenDSA-server
 
+12/13/2021: REPOSITORY ARCHIVED.
+This was the original server for OpenDSA, but as of this date has been inactive for over 5 years.
+
 The OpenDSA project's server-side support to collect and manage data on student performance on web-based exercises.
 
 ## Installation and Setup
